@@ -1,9 +1,23 @@
 import { useState } from 'react';
-import { styled } from '@mui/material/styles';
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse, Box, IconButton } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { 
+  Drawer, 
+  List, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  Collapse, 
+  Box, 
+  IconButton, 
+  useMediaQuery,
+  SwipeableDrawer 
+} from '@mui/material';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PeopleIcon from '@mui/icons-material/People';
 import StarsIcon from '@mui/icons-material/Stars';
 import HelpIcon from '@mui/icons-material/Help';
@@ -11,14 +25,15 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LayersIcon from '@mui/icons-material/Layers';
 import logo from "../../assets/logo.png";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const drawerWidth = 240;
+const DRAWER_WIDTH = 240;
+const DRAWER_COLLAPSED_WIDTH = 60;
 
 const Sidebar = styled(Drawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
-  width: open ? drawerWidth : 60,
+  width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
   flexShrink: 0,
   whiteSpace: 'nowrap',
   transition: theme.transitions.create('width', {
@@ -26,13 +41,44 @@ const Sidebar = styled(Drawer, {
     duration: theme.transitions.duration.enteringScreen,
   }),
   '& .MuiDrawer-paper': {
-    width: open ? drawerWidth : 60,
+    width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
     boxSizing: 'border-box',
     overflowX: 'hidden',
+    position: 'relative',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+  },
+}));
+
+const LogoContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: theme.spacing(2),
+  paddingRight: theme.spacing(6),
+}));
+
+const ToggleButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  right: -30,
+  top: '100%',
+  transform: 'translateY(-50%)',
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[2],
+  zIndex: 1,
+  width: 50, 
+  height: 50, 
+  '& svg': {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)'
+  },
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
   },
 }));
 
@@ -46,48 +92,121 @@ const menuItems = [
 
 const Navbar = ({ open, toggleSidebar }:any) => {
   const [expanded, setExpanded] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  return (
-    <Sidebar variant="permanent" open={open}>
-      <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
-        {/* Always show the logo, even when sidebar is collapsed */}
-        <Box sx={{ width: '100%', display: 'flex', justifyContent: open ? 'flex-start' : 'center' }}>
-          <img src={logo} alt="Logo" style={{ width: '100%' }} />
-        </Box>
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const location = useLocation()?.pathname;
 
-        {/* Move the sidebar toggle icon to the far right */}
-        <IconButton
-          onClick={toggleSidebar}
-          sx={{ position: 'absolute', right: 0, top: '70%', transform: 'translateY(-50%)' }}
+  const handleToggleSidebar = () => {
+    if (isMobile) {
+      setMobileOpen(!mobileOpen);
+    } else {
+      toggleSidebar();
+      setExpanded(false);
+    }
+  };
+
+  const handleMenuItemClick = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
+  const drawerContent = (
+    <>
+      <LogoContainer>
+        {open && <Box 
+          sx={{ 
+            width: '100%', 
+            display: 'flex', 
+            justifyContent: open ? 'flex-start' : 'center',
+            '& img': {
+              maxWidth: open ? '150px' : '100px',
+              height: 'auto',
+              transition: 'all 0.3s ease'
+            }
+          }}
         >
-          {open ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
-      </Box>
+          <img src={logo} alt="Logo" style={{borderRadius: '1px 20px 1px 20px'}} />
+        </Box>}
+        {!isMobile && (
+          <ToggleButton onClick={handleToggleSidebar} size="small">
+            {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </ToggleButton>
+        )}
+      </LogoContainer>
+      
       <List>
         {menuItems.map((item) => (
-          <ListItemButton key={item.name} onClick={() => navigate(item.path)}>
+          <ListItemButton key={item.name} onClick={() => handleMenuItemClick(item.path)} style={{ backgroundColor: item?.path===location ? '#c4dcff':''}}>
             <ListItemIcon>{item.icon}</ListItemIcon>
-            {open && <ListItemText primary={item.name} />}
+            {(open || isMobile) && <ListItemText primary={item.name} />}
           </ListItemButton>
         ))}
+        
         <ListItemButton onClick={() => setExpanded(!expanded)}>
           <ListItemIcon>
             <BarChartIcon />
           </ListItemIcon>
-          {open && <ListItemText primary="Plans" />}
+          {(open || isMobile) && <ListItemText primary="Plans" />}
           {expanded ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
+        
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/plans/coupons')}>
+            <ListItemButton 
+              sx={{ pl: 4 }} 
+              onClick={() => handleMenuItemClick('/plans/coupons')}
+              style={{ backgroundColor: location==="/plans/coupons" ? '#c4dcff':''}}
+            >
               <ListItemIcon>
                 <LocalOfferIcon />
               </ListItemIcon>
-              {open && <ListItemText primary="Coupon Code" />}
+              {(open || isMobile) && <ListItemText primary="Coupon Code" />}
             </ListItemButton>
           </List>
         </Collapse>
       </List>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <IconButton 
+          color="inherit" 
+          aria-label="open drawer" 
+          edge="start" 
+          onClick={handleToggleSidebar}
+          sx={{ mr: 2, position: 'absolute', left: 10, top: 10, zIndex: 1201 }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <SwipeableDrawer
+          variant="temporary"
+          anchor="left"
+          open={mobileOpen}
+          onClose={handleToggleSidebar}
+          onOpen={handleToggleSidebar}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+        >
+          {drawerContent}
+        </SwipeableDrawer>
+      </>
+    );
+  }
+
+  return (
+    <Sidebar 
+      variant="permanent" 
+      open={open} 
+      anchor="left"
+    >
+      {drawerContent}
     </Sidebar>
   );
 };

@@ -4,10 +4,10 @@ import AppRoutes from "./AppRoutes";
 
 const App: React.FC = () => {
   return (
-    <>
+    <div style={{backgroundColor: '#bfd9ff'}}>
       {/* <Notification /> */}
       <AppRoutes />
-    </>
+    </div>
   );
 };
 

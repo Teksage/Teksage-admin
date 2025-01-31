@@ -17,42 +17,61 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
-const RootContainer = styled(Container)(({ theme }) => ({
-    height: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
-  }));
-  
-  const AuthPaper = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(4),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    borderRadius: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
-      width: '100%',
-      margin: theme.spacing(2),
-    },
-  }));
+// Background Image Wrapper
+const BackgroundWrapper = styled(Box)({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  backgroundImage: 'url(https://static.vecteezy.com/system/resources/thumbnails/028/593/614/small_2x/black-and-gold-luxury-background-photo.jpg)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)', // Light opacity overlay
+    zIndex: 1
+  }
+});
+
+const AuthPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  borderRadius: theme.spacing(2),
+  position: 'relative',
+  zIndex: 2,
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    margin: theme.spacing(2),
+  },
+}));
 
 export const Register: React.FC = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-  
-    const handleRegister = (e: React.FormEvent) => {
-      e.preventDefault();
-      // Registration logic here
-      console.log('Registration attempted', { firstName, lastName, email, password });
-    };
-  
-    return (
-      <RootContainer maxWidth="xs">
-        <AuthPaper elevation={6}>
+  const [showPassword, setShowPassword] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Registration attempted', { firstName, lastName, email, password });
+  };
+
+  return (
+    <BackgroundWrapper>
+      <Container maxWidth="xs">
+        <AuthPaper elevation={6} style={{backgroundColor: '#fafcff'}}>
           <Typography component="h1" variant="h5">
             Sign Up
           </Typography>
@@ -123,7 +142,7 @@ export const Register: React.FC = () => {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Register
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
@@ -134,8 +153,9 @@ export const Register: React.FC = () => {
             </Grid>
           </Box>
         </AuthPaper>
-      </RootContainer>
-    );
-  };
-  
-  export default Register;
+      </Container>
+    </BackgroundWrapper>
+  );
+};
+
+export default Register;

@@ -3,7 +3,8 @@ import React from 'react'
 const Astrologers = () => {
   return (
     <div>
-      Astrologers
+      <h1>Astrology Content</h1>
+      <p>Welcome to the Astrology page!</p>
     </div>
   )
 }
