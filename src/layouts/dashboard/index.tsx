@@ -163,7 +163,7 @@ const DashboardLayout = () => {
                   <AccountCircle
                     sx={{ fontSize: 60, color: "grey.500", mb: 1 }}
                   />
-                  <Typography variant="subtitle1">John Doe</Typography>
+                  <Typography variant="subtitle1">Rahul</Typography>
                   <Typography variant="body2" color="text.secondary">
                     Administrator
                   </Typography>
