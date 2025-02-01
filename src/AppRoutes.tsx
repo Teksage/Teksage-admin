@@ -3,7 +3,7 @@ import { useRoutes } from "react-router-dom";
 import DashboardLayout from "./layouts/dashboard";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
-import Users from "./components/Dashboard/Users";
+import Users from "./components/Dashboard/Users/Users";
 import Astrologers from "./components/Dashboard/Astrologers";
 import Services from "./components/Dashboard/Services";
 import Faqs from "./components/Dashboard/Faqs";

@@ -11,7 +11,9 @@ import {
   Paper,
   Divider,
   useMediaQuery,
-  useTheme, Breadcrumbs, Link
+  useTheme,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Logout from "@mui/icons-material/Logout";
@@ -39,7 +41,7 @@ const DashboardLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const pageTitle =
-    menuItems.find((item) => item.path === location.pathname)?.name || "Users";
+    menuItems.find((item) => item.path === location.pathname)?.name || "Coupons";
   const navigate = useNavigate();
 
   const handleMenu = (event: any) => {
@@ -92,12 +94,31 @@ const DashboardLayout = () => {
                 {!isMobile && (
                   <>
                     <Breadcrumbs aria-label="breadcrumb">
-                      <Link underline="hover" color="inherit" href="/users">
+                      <Link
+                        underline="always"
+                        color="inherit"
+                        href="/users"
+                        sx={{
+                          color: "skyblue",
+                          fontWeight: "bold",
+                          "&:hover": { color: "black" },
+                        }}
+                      >
                         Home
                       </Link>
                       <Typography color="text.primary">{pageTitle}</Typography>
                     </Breadcrumbs>
-                    <Typography variant="h6">{pageTitle}</Typography>
+                    <Typography
+                      variant="h6"
+                      // sx={{
+                      //   background: "linear-gradient(90deg, skyblue, green, lime, yellow)",
+                      //   WebkitBackgroundClip: "text",
+                      //   WebkitTextFillColor: "transparent",
+                      //   fontWeight: "bold",
+                      // }}
+                    >
+                      Dashboard
+                    </Typography>
                   </>
                 )}
               </Box>

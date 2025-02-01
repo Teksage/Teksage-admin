@@ -96,7 +96,9 @@ const Navbar = ({ open, toggleSidebar }:any) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const location = useLocation()?.pathname;
+  const location = useLocation();
+  const locationPathname = location?.pathname
+  const firstPathSegment = location.pathname.split("/")[1];
 
   const handleToggleSidebar = () => {
     if (isMobile) {
@@ -140,13 +142,12 @@ const Navbar = ({ open, toggleSidebar }:any) => {
       
       <List>
         {menuItems.map((item) => (
-          <ListItemButton key={item.name} onClick={() => handleMenuItemClick(item.path)} style={{ backgroundColor: item?.path===location ? '#c4dcff':''}}>
+          <ListItemButton key={item.name} onClick={() => {handleMenuItemClick(item.path); setExpanded(false)}} style={{ backgroundColor: item?.path===locationPathname ? '#1976d2':'', color: item?.path===location ? 'white' : ''}}>
             <ListItemIcon>{item.icon}</ListItemIcon>
             {(open || isMobile) && <ListItemText primary={item.name} />}
           </ListItemButton>
         ))}
-        
-        <ListItemButton onClick={() => setExpanded(!expanded)}>
+        <ListItemButton onClick={() => {setExpanded(!expanded); navigate('/plans/coupons')}} style={{backgroundColor: firstPathSegment==="plans" ? '#c4dcff':''}}>
           <ListItemIcon>
             <BarChartIcon />
           </ListItemIcon>
@@ -159,7 +160,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
             <ListItemButton 
               sx={{ pl: 4 }} 
               onClick={() => handleMenuItemClick('/plans/coupons')}
-              style={{ backgroundColor: location==="/plans/coupons" ? '#c4dcff':''}}
+              style={{ backgroundColor: locationPathname==="/plans/coupons" ? '#1976d2':'', color: locationPathname==="/plans/coupons" ? 'white' : ''}}
             >
               <ListItemIcon>
                 <LocalOfferIcon />

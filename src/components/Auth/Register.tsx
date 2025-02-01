@@ -24,7 +24,7 @@ const BackgroundWrapper = styled(Box)({
   left: 0,
   width: '100%',
   height: '100%',
-  backgroundImage: 'url(https://static.vecteezy.com/system/resources/thumbnails/028/593/614/small_2x/black-and-gold-luxury-background-photo.jpg)',
+  backgroundImage: 'url(https://preview.colorkit.co/color/1976d2.png?size=wallpaper&static=true)',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   display: 'flex',
@@ -37,7 +37,7 @@ const BackgroundWrapper = styled(Box)({
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // Light opacity overlay
+    // backgroundColor: 'rgba(255, 255, 255, 0.3)', // Light opacity overlay
     zIndex: 1
   }
 });
@@ -47,7 +47,7 @@ const AuthPaper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  borderRadius: theme.spacing(2),
+  borderRadius: theme.spacing(1),
   position: 'relative',
   zIndex: 2,
   [theme.breakpoints.down('sm')]: {
@@ -65,7 +65,7 @@ export const Register: React.FC = () => {
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Registration attempted', { firstName, lastName, email, password });
+    // console.log('Registration attempted', { firstName, lastName, email, password });
   };
 
   return (
