@@ -1,6 +1,7 @@
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
 import { Chip } from '@mui/material';
+import { useNavigate } from "react-router-dom";
 
 interface UserData {
   id: number;
@@ -12,6 +13,7 @@ interface UserData {
 }
 
 const Users: React.FC = () => {
+  const navigate = useNavigate();
   const columns: TableColumn<UserData>[] = [
     { 
       id: 'name', 
@@ -79,7 +81,7 @@ const userData: UserData[] = [
 ];
 
   const handleAdd = () => {
-    // Handle add
+    navigate('/users/add')
   };
   
   const handleStatus = () => {

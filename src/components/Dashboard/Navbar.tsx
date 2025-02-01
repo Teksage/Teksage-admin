@@ -142,7 +142,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
       
       <List>
         {menuItems.map((item) => (
-          <ListItemButton key={item.name} onClick={() => {handleMenuItemClick(item.path); setExpanded(false)}} style={{ backgroundColor: item?.path===locationPathname ? '#1976d2':'', color: item?.path===location ? 'white' : ''}}>
+          <ListItemButton key={item.name} onClick={() => {handleMenuItemClick(item.path); setExpanded(false)}} style={{ backgroundColor: locationPathname.includes(item?.path) ? '#1976d2':'', color: item?.path===firstPathSegment ? 'white' : ''}}>
             <ListItemIcon>{item.icon}</ListItemIcon>
             {(open || isMobile) && <ListItemText primary={item.name} />}
           </ListItemButton>

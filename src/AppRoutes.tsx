@@ -10,6 +10,7 @@ import Faqs from "./components/Dashboard/Faqs";
 import Analytics from "./components/Dashboard/Analytics";
 import Coupons from "./components/Dashboard/Plans/Coupons";
 import _ from "lodash";
+import NewUser from "./components/Dashboard/Users/NewUser";
 
 const AppRoutes: React.FC = () => {
   // const getCookie = (val:string) => {
@@ -34,13 +35,23 @@ const AppRoutes: React.FC = () => {
       element: <Register />,
     },
     {
+      path: "users",
+      element: <DashboardLayout />,
+      children: [
+        { path: "", element: <Users /> },
+        { path: "add", element: <NewUser mode="new" /> },
+        // { path: "edit/:user_id", element: <UserForm mode="edit" /> },
+        // { path: "view/:user_id", element: <UserForm mode="view" /> },
+      ],
+    },
+    {
       path: "/",
       element: <DashboardLayout />,
       children: [
-        {
-          path: "users",
-          element: <Users />,
-        },
+        // {
+        //   path: "users",
+        //   element: <Users />,
+        // },
         {
           path: "astrologers",
           element: <Astrologers />,
