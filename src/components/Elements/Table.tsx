@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -182,6 +182,25 @@ function GenericTable<T>({
     });
   });
 
+  const filterOptions = useMemo(() => {
+    const options: Record<string, Set<string>> = {};
+
+    columns.forEach((column) => {
+      if (column.filterable) {
+        options[column.id as string] = new Set(
+          data
+            .map((item) => {
+              const value = item[column.id];
+              return value?.toString() || "";
+            })
+            .filter(Boolean)
+        );
+      }
+    });
+
+    return options;
+  }, [data, columns]);
+
   return (
     <StyledPaper elevation={3}>
       {/* Header */}
@@ -227,17 +246,19 @@ function GenericTable<T>({
                 MenuProps={{
                   PaperProps: {
                     style: {
-                      maxHeight: 300, // Limit dropdown height
+                      maxHeight: 300,
                     },
                   },
                 }}
               >
                 <MenuItem value="">All</MenuItem>
-                {column.filterOptions?.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
+                {Array.from(filterOptions[column.id as string] || [])
+                  .sort()
+                  .map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
               </Select>
             </StyledFormControl>
           ))}

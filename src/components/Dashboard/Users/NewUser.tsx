@@ -47,7 +47,7 @@ const nakshatramOptions = [
   'Purva Bhadrapada', 'Uttara Bhadrapada', 'Revati'
 ];
 
-const statusOptions = ['Active', 'Inactive', 'Pending'];
+const statusOptions = ['Active', 'Inactive'];
 const planOptions = ['Free', 'Basic', 'Premium', 'Pro'];
 const userTypeOptions = ['User', 'Astrologer', 'Admin'];
 

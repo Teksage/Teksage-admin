@@ -1,3 +1,4 @@
+import React from 'react';
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
 import { Chip } from '@mui/material';
@@ -7,13 +8,16 @@ interface UserData {
   id: number;
   name: string;
   email: string;
-  role: string;
+  user_type: string;
   status: string;
-  lastLogin: Date;
+  rasi: string;
+  nakshatram: string;
+  plan: string;
 }
 
 const Users: React.FC = () => {
   const navigate = useNavigate();
+  
   const columns: TableColumn<UserData>[] = [
     { 
       id: 'name', 
@@ -27,16 +31,14 @@ const Users: React.FC = () => {
       width: '250px' 
     },
     { 
-      id: 'role', 
-      label: 'Role', 
-      filterable: true,
-      filterOptions: ['Admin', 'User', 'Manager'] 
+      id: 'user_type', 
+      label: 'User Type', 
+      filterable: true
     },
     { 
       id: 'status', 
       label: 'Status',
-      filterable: true,
-      filterOptions: ['Active', 'Inactive'],
+      // filterable: true,
       render: (value) => (
         <Chip 
           label={value} 
@@ -44,56 +46,81 @@ const Users: React.FC = () => {
         />
       )
     },
-    {
-      id: 'lastLogin',
-      label: 'Last Login',
-      render: (value) => new Date(value).toLocaleDateString()
+    { 
+      id: 'rasi', 
+      label: 'Rasi', 
+      filterable: true
+    },
+    { 
+      id: 'nakshatram', 
+      label: 'Nakshatram', 
+      filterable: true
+    },
+    { 
+      id: 'plan', 
+      label: 'Plan', 
+      filterable: true
     }
   ];
 
-  // Sample data
-const userData: UserData[] = [
-  {
-    id: 1,
-    name: "Rahul",
-    email: "rahul@test.in",
-    role: "Admin",
-    status: "Active",
-    lastLogin: new Date("2024-01-01"),
-  },
-  {
-    id: 2,
-    name: "Anand",
-    email: "anand@test.in",
-    role: "User",
-    status: "Active",
-    lastLogin: new Date("2024-01-15"),
-  },
-  {
-    id: 3,
-    name: "Sheik",
-    email: "sheik@test.in",
-    role: "Manager",
-    status: "Inactive",
-    lastLogin: new Date("2024-01-20"),
-  },
-  // Add more sample data as needed
-];
+  const userData: UserData[] = [
+    {
+      id: 1,
+      name: "Rahul",
+      email: "rahul@test.in",
+      user_type: "Admin",
+      status: "Active",
+      rasi: "Thulam",
+      nakshatram: "Rohini",
+      plan: "Premium"
+      // lastLogin: new Date("2024-01-01"),
+    },
+    {
+      id: 2,
+      name: "Sivakami",
+      email: "sivakami@test.in",
+      user_type: "User",
+      status: "Active",
+      rasi: "Mesham",
+      nakshatram: "Hasta",
+      plan: "Basic"
+    },
+    {
+      id: 3,
+      name: "Sheik",
+      email: "sheik@test.in",
+      user_type: "Astrologer",
+      status: "Inactive",
+      rasi: "Rishabam",
+      nakshatram: "Chitra",
+      plan: "Pro"
+    },
+    {
+      id: 4,
+      name: "Vasanth",
+      email: "vasanth@test.in",
+      user_type: "User",
+      status: "Inactive",
+      rasi: "Kanni",
+      nakshatram: "Swati",
+      plan: "Free"
+    },
+  ];
 
   const handleAdd = () => {
-    navigate('/users/add')
+    navigate('/users/add');
   };
   
   const handleStatus = () => {
     // Handle Status
-  }
+  };
 
   const handleView = (row: UserData) => {
-    // Handle view
+    navigate(`/users/view/${row?.id}`);
   };
 
   const handleEdit = (row: UserData) => {
-    // Handle edit
+    navigate(`/users/edit/${row?.id}`);
   };
 
   const handleSelectionChange = (selectedIds: number[]) => {
@@ -113,10 +140,6 @@ const userData: UserData[] = [
       getRowId={(row) => row.id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={10}
-      // sx={{ 
-      //   maxWidth: '1600px', // Override default max-width
-      //   margin: '0 auto'
-      // }}
     />
   );
 };

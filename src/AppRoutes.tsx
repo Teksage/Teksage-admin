@@ -11,6 +11,7 @@ import Analytics from "./components/Dashboard/Analytics";
 import Coupons from "./components/Dashboard/Plans/Coupons";
 import _ from "lodash";
 import NewUser from "./components/Dashboard/Users/NewUser";
+import UserView from "./components/Dashboard/Users/ViewUser";
 
 const AppRoutes: React.FC = () => {
   // const getCookie = (val:string) => {
@@ -40,8 +41,8 @@ const AppRoutes: React.FC = () => {
       children: [
         { path: "", element: <Users /> },
         { path: "add", element: <NewUser mode="new" /> },
-        // { path: "edit/:user_id", element: <UserForm mode="edit" /> },
-        // { path: "view/:user_id", element: <UserForm mode="view" /> },
+        { path: "edit/:user_id", element: <NewUser mode="edit" /> },
+        { path: "view/:user_id", element: <UserView mode="view" /> },
       ],
     },
     {
