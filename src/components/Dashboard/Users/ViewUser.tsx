@@ -25,7 +25,7 @@ interface UserData {
   plan: string;
 }
 
-const UserView: React.FC = () => {
+const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
   const navigate = useNavigate();
 
   const sampleData: UserData = {

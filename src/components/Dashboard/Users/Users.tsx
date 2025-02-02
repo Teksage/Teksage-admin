@@ -108,7 +108,7 @@ const Users: React.FC = () => {
   ];
 
   const handleAdd = () => {
-    navigate('/users/add');
+    navigate('/dashboard/users/new');
   };
   
   const handleStatus = () => {
@@ -116,11 +116,11 @@ const Users: React.FC = () => {
   };
 
   const handleView = (row: UserData) => {
-    navigate(`/users/view/${row?.id}`);
+    navigate(`/dashboard/users/view/${row?.id}`);
   };
 
   const handleEdit = (row: UserData) => {
-    navigate(`/users/edit/${row?.id}`);
+    navigate(`/dashboard/users/edit/${row?.id}`);
   };
 
   const handleSelectionChange = (selectedIds: number[]) => {

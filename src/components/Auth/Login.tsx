@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 // Background Image Wrapper
 const BackgroundWrapper = styled(Box)({
@@ -58,6 +59,7 @@ const AuthPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export const Login: React.FC = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -65,6 +67,13 @@ export const Login: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    // Simulate login success
+    dispatch({ type: 'setAuth', payload: true });
+    dispatch({ 
+      type: 'login', 
+      payload: { name: 'Rahul', role: 'Administrator', email: 'test@example.com' } 
+    });
+    navigate('/dashboard/users');
   };
 
   return (
@@ -112,7 +121,7 @@ export const Login: React.FC = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              onClick={()=>navigate('/users')}
+              // onClick={()=>navigate('/dashboard/users')}
             >
               Login
             </Button>

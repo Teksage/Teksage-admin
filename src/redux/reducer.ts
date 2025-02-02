@@ -7,6 +7,7 @@ interface NotificationState {
 }
 
 interface AppState {
+  isAuthenticated: boolean;
   userInfo: Record<string, any>;
   users: any[];
   notification: NotificationState;
@@ -14,6 +15,7 @@ interface AppState {
 }
 
 const initialState: AppState = {
+  isAuthenticated: false,
   userInfo: {},
   users: [],
   notification: {
@@ -25,6 +27,7 @@ const initialState: AppState = {
 };
 
 type Action =
+  { type: "setAuth"; payload: boolean }
   | { type: "login"; payload: Record<string, any> }
   | { type: "setusers"; payload: any[] }
   | { type: "setnotification"; payload: NotificationState }
@@ -32,6 +35,9 @@ type Action =
 
 export const reducer: Reducer<AppState, Action> = (state = initialState, action) => {
   switch (action.type) {
+    case "setAuth":
+      return { ...state, isAuthenticated: action.payload };
+
     case "login":
       return { ...state, userInfo: action.payload };
 

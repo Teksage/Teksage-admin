@@ -208,24 +208,39 @@ function GenericTable<T>({
         <Typography variant="h6" component="div">
           {title}
         </Typography>
-        <div style={{ display: "flex", gap: "10px" }}>
-          {/* Change Status Button */}
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+            justifyContent: "flex-end",
+          }}
+        >
           {onStatus && (
             <Button
               variant="outlined"
               color="secondary"
               startIcon={<UpdateIcon />}
-              onClick={onStatus} // Ensure this function is passed as a prop
+              onClick={onStatus}
               disabled={!selected.length}
-              style={{ opacity: !selected.length ? 8 : "" }}
+              style={{
+                opacity: !selected.length ? 0.8 : 1,
+                minWidth: "120px",
+              }}
             >
               Change Status
             </Button>
           )}
 
-          {/* Add New Button */}
           {onAdd && (
-            <Button variant="contained" startIcon={<AddIcon />} onClick={onAdd}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={onAdd}
+              style={{
+                minWidth: "120px",
+              }}
+            >
               Add New
             </Button>
           )}

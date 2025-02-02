@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Menu,
   MenuItem,
@@ -26,14 +27,15 @@ import HelpIcon from "@mui/icons-material/Help";
 import Navbar from "../../components/Dashboard/Navbar";
 
 const menuItems = [
-  { name: "Users", path: "/users", icon: <PeopleIcon /> },
-  { name: "Astrologers", path: "/astrologers", icon: <StarsIcon /> },
-  { name: "Services", path: "/services", icon: <ShoppingCartIcon /> },
-  { name: "FAQs", path: "/faqs", icon: <HelpIcon /> },
-  { name: "Analytics", path: "/analytics", icon: <LayersIcon /> },
+  { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
+  { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
+  { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
+  { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
+  { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 ];
 
 const DashboardLayout = () => {
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const open = Boolean(anchorEl);
@@ -41,8 +43,16 @@ const DashboardLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const pageTitle =
-    menuItems.find((item) => item.path === location.pathname)?.name || "Coupons";
+    menuItems.find((item) => item.path === location.pathname)?.name ||
+    "Coupons";
   const navigate = useNavigate();
+  const isAuthenticated = useSelector((state: any) => state.isAuthenticated);
+  const loginUserDetails = useSelector((state: any) => state.userInfo);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace />;
+    console.log("TEST-ing");
+  }
 
   const handleMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -58,7 +68,9 @@ const DashboardLayout = () => {
   };
 
   const logoutSection = () => {
-    navigate("/");
+    dispatch({ type: "setAuth", payload: false });
+    dispatch({ type: "login", payload: {} });
+    navigate("/auth/login");
   };
 
   return (
@@ -90,37 +102,21 @@ const DashboardLayout = () => {
         >
           <Toolbar sx={{ flexDirection: "column", alignItems: "stretch" }}>
             <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-              <Box sx={{ flexGrow: 1 }}>
-                {!isMobile && (
-                  <>
-                    <Breadcrumbs aria-label="breadcrumb">
-                      <Link
-                        underline="always"
-                        color="inherit"
-                        href="/users"
-                        sx={{
-                          color: "skyblue",
-                          fontWeight: "bold",
-                          "&:hover": { color: "black" },
-                        }}
-                      >
-                        Home
-                      </Link>
-                      <Typography color="text.primary">{pageTitle}</Typography>
-                    </Breadcrumbs>
-                    <Typography
-                      variant="h6"
-                      // sx={{
-                      //   background: "linear-gradient(90deg, skyblue, green, lime, yellow)",
-                      //   WebkitBackgroundClip: "text",
-                      //   WebkitTextFillColor: "transparent",
-                      //   fontWeight: "bold",
-                      // }}
-                    >
-                      Dashboard
-                    </Typography>
-                  </>
-                )}
+              <Box
+                sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    background: "linear-gradient(90deg, white, skyblue, lightgreen, white, yellow)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}                  
+                >
+                  Dashboard
+                </Typography>
               </Box>
               <IconButton
                 onClick={handleMenu}
@@ -163,9 +159,11 @@ const DashboardLayout = () => {
                   <AccountCircle
                     sx={{ fontSize: 60, color: "grey.500", mb: 1 }}
                   />
-                  <Typography variant="subtitle1">Rahul</Typography>
+                  <Typography variant="subtitle1">
+                    {loginUserDetails?.name}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Administrator
+                    {loginUserDetails?.role}
                   </Typography>
                 </Paper>
                 <Divider />

@@ -83,11 +83,11 @@ const ToggleButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const menuItems = [
-  { name: 'Users', path: '/users', icon: <PeopleIcon /> },
-  { name: 'Astrologers', path: '/astrologers', icon: <StarsIcon /> },
-  { name: 'Services', path: '/services', icon: <ShoppingCartIcon /> },
-  { name: 'FAQs', path: '/faqs', icon: <HelpIcon /> },
-  { name: 'Analytics', path: '/analytics', icon: <LayersIcon /> },
+  { name: 'Users', path: '/dashboard/users', icon: <PeopleIcon /> },
+  { name: 'Astrologers', path: '/dashboard/astrologers', icon: <StarsIcon /> },
+  { name: 'Services', path: '/dashboard/services', icon: <ShoppingCartIcon /> },
+  { name: 'FAQs', path: '/dashboard/faqs', icon: <HelpIcon /> },
+  { name: 'Analytics', path: '/dashboard/analytics', icon: <LayersIcon /> },
 ];
 
 const Navbar = ({ open, toggleSidebar }:any) => {
@@ -98,7 +98,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
   const locationPathname = location?.pathname
-  const firstPathSegment = location.pathname.split("/")[1];
+  const firstPathSegment = location.pathname.split("/")[2];
 
   const handleToggleSidebar = () => {
     if (isMobile) {
@@ -119,7 +119,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
   const drawerContent = (
     <>
       <LogoContainer>
-        {open && <Box 
+        {!isMobile && open && <Box 
           sx={{ 
             width: '100%', 
             display: 'flex', 
@@ -147,7 +147,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
             {(open || isMobile) && <ListItemText primary={item.name} />}
           </ListItemButton>
         ))}
-        <ListItemButton onClick={() => {setExpanded(!expanded); navigate('/plans/coupons')}} style={{backgroundColor: firstPathSegment==="plans" ? '#c4dcff':''}}>
+        <ListItemButton onClick={() => {setExpanded(!expanded); navigate('/dashboard/plans/coupons')}} style={{backgroundColor: firstPathSegment==="plans" ? '#c4dcff':''}}>
           <ListItemIcon>
             <BarChartIcon />
           </ListItemIcon>
@@ -160,7 +160,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
             <ListItemButton 
               sx={{ pl: 4 }} 
               onClick={() => handleMenuItemClick('/plans/coupons')}
-              style={{ backgroundColor: locationPathname==="/plans/coupons" ? '#1976d2':'', color: locationPathname==="/plans/coupons" ? 'white' : ''}}
+              style={{ backgroundColor: locationPathname==="/dashboard/plans/coupons" ? '#1976d2':'', color: locationPathname==="/dashboard/plans/coupons" ? 'white' : ''}}
             >
               <ListItemIcon>
                 <LocalOfferIcon />

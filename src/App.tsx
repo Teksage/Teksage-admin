@@ -1,12 +1,10 @@
 import React from "react";
-import AppRoutes from "./AppRoutes";
-// import Notification from "./components/common/Notification";
+import { Outlet } from "react-router-dom";
 
 const App: React.FC = () => {
   return (
     <div style={{backgroundColor: '#bfd9ff'}}>
-      {/* <Notification /> */}
-      <AppRoutes />
+      <Outlet />
     </div>
   );
 };
