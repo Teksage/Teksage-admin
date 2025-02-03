@@ -121,7 +121,6 @@ export const Login: React.FC = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              // onClick={()=>navigate('/dashboard/users')}
             >
               Login
             </Button>
@@ -132,7 +131,7 @@ export const Login: React.FC = () => {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/register" variant="body2">
+                <Link href="/auth/register" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

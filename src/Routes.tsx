@@ -171,8 +171,8 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <Users /> },
               { path: "new", element: <NewUser mode="new" /> },
-              { path: ":userId/edit", element: <NewUser mode="edit" /> },
-              { path: ":userId", element: <UserView mode="view" /> },
+              { path: "edit/:userId", element: <NewUser mode="edit" /> },
+              { path: "view/:userId", element: <UserView mode="view" /> },
             ]
           },
           {
