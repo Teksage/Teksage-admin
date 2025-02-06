@@ -115,7 +115,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
       setMobileOpen(false);
     }
   };
-
+console.log(firstPathSegment, "firstPathSegment")
   const drawerContent = (
     <>
       <LogoContainer>
@@ -158,7 +158,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
               backgroundColor: locationPathname.includes(item?.path)
                 ? "#1976d2"
                 : "",
-              color: item?.path === firstPathSegment ? "white" : "",
+              color: item?.path === locationPathname ? "white" : "",
             }}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>

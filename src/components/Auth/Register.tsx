@@ -30,9 +30,9 @@ const RegisterWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   background: `linear-gradient(135deg, 
-    ${theme.palette.primary.dark} 0%, 
-    ${theme.palette.primary.main} 50%, 
-    ${alpha(theme.palette.primary.light, 0.9)} 100%)`,
+  #1b4d3e 0%, 
+  #2e7d32 50%, 
+  ${alpha('#4caf50', 0.9)} 100%)`,
   position: 'relative',
   overflow: 'hidden',
   '&::before': {
@@ -76,10 +76,16 @@ const LogoBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: theme.spacing(4),
+  position: 'relative',
   '& svg': {
     fontSize: 40,
-    color: theme.palette.primary.main,
+    color: '#2e7d32',
     animation: 'pulse 2s infinite',
+  },
+  '@keyframes pulse': {
+    '0%': { transform: 'scale(1)', opacity: 1 },
+    '50%': { transform: 'scale(1.1)', opacity: 0.7 },
+    '100%': { transform: 'scale(1)', opacity: 1 },
   },
 }));
 
@@ -88,7 +94,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1.5),
   textTransform: 'none',
   fontSize: '1.1rem',
-  background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+  background: `linear-gradient(45deg, #2e7d32, #1b4d3e)`,
   transition: 'all 0.3s ease-in-out',
   '&:hover': {
     transform: 'translateY(-2px)',
@@ -149,7 +155,7 @@ export const Register: React.FC = () => {
               sx={{
                 ml: 2,
                 fontWeight: 700,
-                background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                background: 'linear-gradient(45deg, #1b4d3e, #4caf50)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 color: 'transparent',
@@ -286,7 +292,7 @@ export const Register: React.FC = () => {
                 sx={{
                   color: 'text.secondary',
                   textDecoration: 'none',
-                  '&:hover': { color: 'primary.main' },
+                  '&:hover': { color: '#2e7d32' },
                 }}
               >
                 Already have an account? Sign in
