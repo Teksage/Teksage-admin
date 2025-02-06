@@ -49,7 +49,6 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   return (
     <Box sx={{ maxWidth: "900px", margin: "auto", pt: 3 }}>
-      {/* Back Button */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
           <ArrowBackIcon />
@@ -57,7 +56,6 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         <Typography variant="h5">Go Back</Typography>
       </Box>
 
-      {/* Form Container */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
           {mode === "new"
@@ -69,7 +67,6 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={3}>
-            {/* Name Field */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -82,7 +79,6 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Push Notification Dropdown */}
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Push Notification</InputLabel>
@@ -102,7 +98,6 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Description Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -117,7 +112,6 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Submit Button */}
             {!isViewMode && (
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

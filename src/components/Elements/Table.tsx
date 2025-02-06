@@ -26,7 +26,6 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
-// Generic interfaces
 export interface TableColumn<T> {
   id: keyof T;
   label: string;
@@ -56,22 +55,22 @@ const StyledPaper = styled(Paper)({
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  width: "100%", // Added full width
-  maxWidth: "1400px", // Added max-width for very large screens
-  margin: "0 auto", // Center the table
+  width: "100%",
+  maxWidth: "1400px",
+  margin: "0 auto",
 });
 
 const FiltersContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", // Grid layout for filters
+  gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
   gap: theme.spacing(2),
   borderBottom: `1px solid ${theme.palette.divider}`,
-  width: "100%", // Ensure full width
+  width: "100%",
 }));
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
-  width: "100%", // Make form controls take full width of their grid cell
+  width: "100%",
   "& .MuiSelect-select": {
     width: "100%",
   },
@@ -80,21 +79,21 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   flex: 1,
   overflow: "auto",
-  width: "100%", // Ensure full width
+  width: "100%",
   "& .MuiTable-root": {
-    minWidth: "800px", // Minimum width before horizontal scroll
+    minWidth: "800px",
   },
   "& .MuiTableCell-head": {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
     fontWeight: "bold",
-    whiteSpace: "nowrap", // Prevent header text wrapping
+    whiteSpace: "nowrap",
   },
   "& .MuiTableRow-root:nth-of-type(even)": {
     backgroundColor: theme.palette.action.hover,
   },
   "& .MuiTableCell-root": {
-    padding: theme.spacing(1.5), // Consistent padding
+    padding: theme.spacing(1.5),
   },
 }));
 
@@ -122,7 +121,6 @@ function GenericTable<T>({
   initialRowsPerPage = 10,
   tableHeight = "calc(100vh - 250px)",
 }: TableProps<T>) {
-  // State management
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
   const [selected, setSelected] = useState<(string | number)[]>([]);
@@ -203,7 +201,6 @@ function GenericTable<T>({
 
   return (
     <StyledPaper elevation={3}>
-      {/* Header */}
       <TableToolbar>
         <Typography variant="h6" component="div">
           {title}
@@ -247,7 +244,6 @@ function GenericTable<T>({
         </div>
       </TableToolbar>
 
-      {/* Filters */}
       <FiltersContainer>
         {columns
           .filter((col) => col.filterable)
@@ -279,7 +275,6 @@ function GenericTable<T>({
           ))}
       </FiltersContainer>
 
-      {/* Table */}
       <StyledTableContainer sx={{ height: tableHeight }}>
         <Table stickyHeader>
           <TableHead>
@@ -358,7 +353,6 @@ function GenericTable<T>({
         </Table>
       </StyledTableContainer>
 
-      {/* Pagination */}
       <TablePagination
         component="div"
         count={filteredData.length}

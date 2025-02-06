@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
-import { Switch, Chip } from "@mui/material";
+import { Switch } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 interface ServiceData {

@@ -70,7 +70,6 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
         </Breadcrumbs>
       </Box> */}
 
-      {/* Header with Back Button */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <IconButton 
           onClick={() => navigate(-1)}
@@ -100,7 +99,6 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
             </Card>
           </Grid>
 
-          {/* User Details Section */}
           <Grid item xs={12} md={8}>
             <Card sx={{ height: '100%' }}>
               <CardContent>
@@ -114,7 +112,6 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
                   <Grid item xs={12} md={6}>
                     <InfoItem label="Rasi" value={sampleData.rasi} />
                     <InfoItem label="Nakshatram" value={sampleData.nakshatram} />
-                    {/* <InfoItem label="User ID" value={sampleData.id.toString()} /> */}
                   </Grid>
                 </Grid>
               </CardContent>

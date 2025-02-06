@@ -53,7 +53,6 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      {/* Back Button */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
           <ArrowBackIcon />
@@ -61,7 +60,6 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         <Typography variant="h5">Go Back</Typography>
       </Box>
 
-      {/* Form Container */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
           {mode === "new"
@@ -86,7 +84,6 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Status Dropdown */}
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
@@ -106,7 +103,6 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Question Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -121,7 +117,6 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Answer Field */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -136,7 +131,6 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Submit Button */}
             {!isViewMode && (
               <Grid item xs={12}>
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

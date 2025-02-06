@@ -167,10 +167,10 @@ export const router = createBrowserRouter([
           }
         ]
       },
-      {
-        path: "profile",
-        element: <Profile />,
-      },
+      // {
+      //   path: "profile",
+      //   element: <Profile />,
+      // },
       {
         path: "dashboard",
         element: <DashboardLayout />,
@@ -216,6 +216,10 @@ export const router = createBrowserRouter([
           {
             path: "plans/coupons",
             element: <Coupons />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
           },
         ]
       },

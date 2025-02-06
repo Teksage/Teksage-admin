@@ -4,7 +4,6 @@ import { TableColumn } from "../../Elements/Table";
 import { Chip } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 
-// FAQ Data Interface
 interface FAQData {
   id: number;
   name: string;
@@ -16,7 +15,6 @@ interface FAQData {
 const FAQs: React.FC = () => {
   const navigate = useNavigate();
 
-  // FAQ Table Columns
   const faqColumns: TableColumn<FAQData>[] = [
     { id: 'name', label: 'Name', filterable: true, width: '200px' },
     { id: 'question', label: 'Question', width: '300px' },
@@ -30,7 +28,6 @@ const FAQs: React.FC = () => {
     }
   ];
 
-  // Sample FAQs Data
   const faqData: FAQData[] = [
     {
       id: 1,

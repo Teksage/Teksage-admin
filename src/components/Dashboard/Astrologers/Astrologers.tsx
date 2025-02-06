@@ -1,7 +1,7 @@
 import React from 'react';
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
-import { Chip, Avatar, Box } from '@mui/material';
+import { Chip, Avatar } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 
 interface UserData {

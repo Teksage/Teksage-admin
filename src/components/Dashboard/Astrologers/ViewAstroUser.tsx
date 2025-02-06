@@ -53,24 +53,6 @@ const AstroUserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
 
   return (
     <Box>
-      {/* Breadcrumbs Navigation */}
-      {/* <Box sx={{ mb: 3 }}>
-        <Breadcrumbs>
-          <Link 
-            color="inherit" 
-            href="/users"
-            sx={{ 
-              textDecoration: 'none',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-          >
-            Users
-          </Link>
-          <Typography color="text.primary">View User</Typography>
-        </Breadcrumbs>
-      </Box> */}
-
-      {/* Header with Back Button */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <IconButton 
           onClick={() => navigate(-1)}
@@ -83,7 +65,6 @@ const AstroUserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
 
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
         <Grid container spacing={3}>
-          {/* User Profile Section */}
           <Grid item xs={12} md={4}>
             <Card sx={{ height: '100%', textAlign: 'center', p: 3 }}>
               <AccountCircleIcon sx={{ fontSize: 120, color: 'grey.500', mb: 2 }} />
@@ -100,7 +81,6 @@ const AstroUserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
             </Card>
           </Grid>
 
-          {/* User Details Section */}
           <Grid item xs={12} md={8}>
             <Card sx={{ height: '100%' }}>
               <CardContent>
@@ -114,7 +94,6 @@ const AstroUserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
                   <Grid item xs={12} md={6}>
                     <InfoItem label="Rasi" value={sampleData.rasi} />
                     <InfoItem label="Nakshatram" value={sampleData.nakshatram} />
-                    {/* <InfoItem label="User ID" value={sampleData.id.toString()} /> */}
                   </Grid>
                 </Grid>
               </CardContent>

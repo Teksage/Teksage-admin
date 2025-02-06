@@ -60,8 +60,7 @@ const DashboardLayout = () => {
 
   const handleProfile = () => {
     setAnchorEl(null);
-    navigate("/profile");
-    // Add profile navigation logic here
+    navigate("/dashboard/profile");
   };
 
   const handleClose = () => {
@@ -85,7 +84,6 @@ const DashboardLayout = () => {
         sx={{
           flexGrow: 1,
           overflow: "hidden",
-          // marginLeft: isMobile ? 0 : (sidebarOpen ? '240px' : '60px'),
           transition: theme.transitions.create("margin", {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,

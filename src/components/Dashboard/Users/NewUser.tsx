@@ -140,7 +140,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Grid container spacing={3}>
-            {/* Basic Information */}
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -175,7 +174,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Date and Time */}
             <Grid item xs={12} md={6}>
               <DatePicker
                 label="Date of Birth"
@@ -221,7 +219,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Astrological Information */}
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Rasi</InputLabel>
@@ -258,7 +255,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Account Settings */}
             <Grid item xs={12} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
@@ -316,7 +312,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Submit Button */}
             {!isViewMode && (
               <Grid item xs={12}>
                 <Box
