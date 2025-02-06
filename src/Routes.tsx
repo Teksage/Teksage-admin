@@ -134,11 +134,16 @@ import Register from "./components/Auth/Register";
 import Users from "./components/Dashboard/Users/Users";
 import NewUser from "./components/Dashboard/Users/NewUser";
 import UserView from "./components/Dashboard/Users/ViewUser";
-import Astrologers from "./components/Dashboard/Astrologers";
-import Services from "./components/Dashboard/Services";
-import Faqs from "./components/Dashboard/Faqs";
+import Astrologers from "./components/Dashboard/Astrologers/Astrologers";
+import NewAstroUser from "./components/Dashboard/Astrologers/NewAstroUser";
+import AstroUserView from "./components/Dashboard/Astrologers/ViewAstroUser";
+import Services from "./components/Dashboard/Services/Services";
+import NewService from "./components/Dashboard/Services/AddService";
+import FAQs from "./components/Dashboard/FAQS/FAQs";
+import NewFAQ from "./components/Dashboard/FAQS/AddFaqs";
 import Analytics from "./components/Dashboard/Analytics";
 import Coupons from "./components/Dashboard/Plans/Coupons";
+import Profile from "./components/Profile/Profile";
 
 export const router = createBrowserRouter([
   {
@@ -163,6 +168,10 @@ export const router = createBrowserRouter([
         ]
       },
       {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
         path: "dashboard",
         element: <DashboardLayout />,
         children: [
@@ -177,15 +186,28 @@ export const router = createBrowserRouter([
           },
           {
             path: "astrologers",
-            element: <Astrologers />,
+            children: [
+              { index: true, element: <Astrologers /> },
+              { path: "new", element: <NewAstroUser mode="new" /> },
+              { path: "edit/:userId", element: <NewAstroUser mode="edit" /> },
+              { path: "view/:userId", element: <AstroUserView mode="view" /> },
+            ]
           },
           {
             path: "services",
-            element: <Services />,
+            children: [
+              { index: true, element: <Services /> },
+              { path: "new", element: <NewService mode="new" /> },
+              { path: "edit/:userId", element: <NewService mode="edit" /> },
+            ]
           },
           {
             path: "faqs",
-            element: <Faqs />,
+            children: [
+              { index: true, element: <FAQs /> },
+              { path: "new", element: <NewFAQ mode="new" /> },
+              { path: "edit/:userId", element: <NewFAQ mode="edit" /> },
+            ]
           },
           {
             path: "analytics",

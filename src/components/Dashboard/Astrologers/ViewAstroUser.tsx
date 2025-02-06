@@ -25,7 +25,7 @@ interface UserData {
   plan: string;
 }
 
-const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
+const AstroUserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
   const navigate = useNavigate();
 
   const sampleData: UserData = {
@@ -78,7 +78,7 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5">User Details</Typography>
+        <Typography variant="h5">Astro User Details</Typography>
       </Box>
 
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
@@ -92,7 +92,7 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
               <Button 
                 variant="contained" 
                 color="primary"
-                onClick={() => navigate(`/dashboard/users/edit/${sampleData.id}`)}
+                onClick={() => navigate(`/dashboard/astrologers/edit/${sampleData.id}`)}
                 sx={{ mt: 2 }}
               >
                 Edit Profile
@@ -126,4 +126,4 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
   );
 };
 
-export default UserView;
+export default AstroUserView;

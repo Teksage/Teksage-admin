@@ -60,6 +60,7 @@ const DashboardLayout = () => {
 
   const handleProfile = () => {
     setAnchorEl(null);
+    navigate("/profile");
     // Add profile navigation logic here
   };
 
