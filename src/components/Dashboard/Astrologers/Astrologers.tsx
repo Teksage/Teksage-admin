@@ -10,7 +10,7 @@ interface UserData {
   languageSkills: string;
   areasOfExpertise: string;
   yearsOfExperience: number;
-  profilePicture: string;
+  // profilePicture: string;
   email: string;
   mobile: string;
   status: string;
@@ -21,14 +21,14 @@ const Astrologers: React.FC = () => {
   const navigate = useNavigate();
   
   const columns: TableColumn<UserData>[] = [
-    { 
-      id: 'profilePicture', 
-      label: 'Profile', 
-      width: '100px',
-      render: (value) => (
-        <Avatar src={value} alt="Profile" sx={{ width: 40, height: 40 }} />
-      )
-    },
+    // { 
+    //   id: 'profilePicture', 
+    //   label: 'Profile', 
+    //   width: '100px',
+    //   render: (value) => (
+    //     <Avatar src={value} alt="Profile" sx={{ width: 40, height: 40 }} />
+    //   )
+    // },
     { 
       id: 'name', 
       label: 'Name', 
@@ -78,7 +78,6 @@ const Astrologers: React.FC = () => {
   const userData: UserData[] = [
     {
       id: 1,
-      profilePicture: "https://randomuser.me/api/portraits/men/1.jpg",
       name: "Rahul",
       languageSkills: "English, Hindi, Tamil",
       areasOfExpertise: "Vedic Astrology, Horoscope Analysis",
@@ -90,7 +89,6 @@ const Astrologers: React.FC = () => {
     },
     {
       id: 2,
-      profilePicture: "https://randomuser.me/api/portraits/women/2.jpg",
       name: "Sivakami",
       languageSkills: "Tamil, Telugu, English",
       areasOfExpertise: "Numerology, Tarot Reading",
@@ -102,7 +100,6 @@ const Astrologers: React.FC = () => {
     },
     {
       id: 3,
-      profilePicture: "https://randomuser.me/api/portraits/men/3.jpg",
       name: "Sheik",
       languageSkills: "Urdu, English, Hindi",
       areasOfExpertise: "Palmistry, Face Reading",
@@ -114,7 +111,6 @@ const Astrologers: React.FC = () => {
     },
     {
       id: 4,
-      profilePicture: "https://randomuser.me/api/portraits/men/4.jpg",
       name: "Vasanth",
       languageSkills: "Kannada, English",
       areasOfExpertise: "Career Astrology, Horoscope Matching",
