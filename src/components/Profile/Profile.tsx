@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Typography,
@@ -13,16 +13,17 @@ import {
   InputLabel,
   Paper,
   styled,
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
+  alpha
+} from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileData {
   name: string;
   email: string;
   mobile: string;
   address: string;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
 }
 
 // Styled components
@@ -43,52 +44,64 @@ const Profile: React.FC = () => {
 
   // Sample data
   const [profileData, setProfileData] = React.useState<ProfileData>({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    mobile: '+1 (555) 123-4567',
-    address: '123 Business Avenue, Tech City, TC 12345',
-    status: 'active',
+    name: "John Doe",
+    email: "john.doe@example.com",
+    mobile: "+1 (555) 123-4567",
+    address: "123 Business Avenue, Tech City, TC 12345",
+    status: "active",
   });
 
-  const handleChange = (field: keyof ProfileData) => (
-    event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
-  ) => {
-    setProfileData({
-      ...profileData,
-      [field]: event.target.value,
-    });
-  };
+  const handleChange =
+    (field: keyof ProfileData) =>
+    (event: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => {
+      setProfileData({
+        ...profileData,
+        [field]: event.target.value,
+      });
+    };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log('Profile updated:', profileData);
+    console.log("Profile updated:", profileData);
   };
 
   return (
     <Box
       sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
     >
       <Box
         sx={{
-          bgcolor: 'background.paper',
+          bgcolor: "background.paper",
           borderBottom: 1,
-          borderColor: 'divider',
+          borderColor: "divider",
           zIndex: 1100,
         }}
       >
-        <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box
+          sx={{ px: 3, py: 2, display: "flex", alignItems: "center", gap: 2 }}
+        >
           <IconButton
-            onClick={() => navigate('/dashboard/users')}
-            sx={{ color: 'primary.main' }}
+            onClick={() => navigate("/dashboard/users")}
+            sx={{
+              color: "#1b4d3e", // Your dark green color
+              backgroundColor: alpha("#1b4d3e", 0.1), // Light green background
+              "&:hover": {
+                backgroundColor: alpha("#1b4d3e", 0.2), // Darker on hover
+                color: "#2e7d32", // Medium green on hover
+                transform: "scale(1.1)",
+              },
+              transition: "all 0.2s ease",
+              marginRight: 1,
+            }}
           >
-            <ArrowBackIcon />
+            <ArrowBackIcon fontSize="medium" />
           </IconButton>
-          <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
+          <Typography variant="h6" sx={{ fontWeight: "medium" }}>
             Profile Settings
           </Typography>
         </Box>
@@ -97,7 +110,7 @@ const Profile: React.FC = () => {
       <Box
         sx={{
           flex: 1,
-          overflowY: 'auto',
+          overflowY: "auto",
           px: 3,
           py: 3,
         }}
@@ -106,15 +119,22 @@ const Profile: React.FC = () => {
           <Box component="form" onSubmit={handleSubmit}>
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                alignItems: { xs: 'center', sm: 'flex-start' },
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "center", sm: "flex-start" },
                 gap: 4,
                 mb: 6,
               }}
             >
-              <StyledAvatar>{profileData.name[0].toUpperCase()}</StyledAvatar>
-              <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+              <StyledAvatar
+                sx={{
+                  background:
+                    "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                }}
+              >
+                {profileData.name[0].toUpperCase()}
+              </StyledAvatar>
+              <Box sx={{ flex: 1, textAlign: { xs: "center", sm: "left" } }}>
                 <Typography variant="h5" gutterBottom>
                   {profileData.name}
                 </Typography>
@@ -123,12 +143,18 @@ const Profile: React.FC = () => {
                 </Typography>
                 <Box
                   sx={{
-                    display: 'inline-block',
+                    display: "inline-block",
                     px: 1.5,
                     py: 0.5,
-                    bgcolor: profileData.status === 'active' ? 'success.lighter' : 'error.lighter',
-                    borderRadius: '16px',
-                    color: profileData.status === 'active' ? 'success.darker' : 'error.darker',
+                    bgcolor:
+                      profileData.status === "active"
+                        ? "success.lighter"
+                        : "error.lighter",
+                    borderRadius: "16px",
+                    color:
+                      profileData.status === "active"
+                        ? "success.darker"
+                        : "error.darker",
                   }}
                 >
                   <Box
@@ -136,13 +162,17 @@ const Profile: React.FC = () => {
                     sx={{
                       width: 8,
                       height: 8,
-                      borderRadius: '50%',
-                      display: 'inline-block',
-                      bgcolor: profileData.status === 'active' ? 'success.main' : 'error.main',
+                      borderRadius: "50%",
+                      display: "inline-block",
+                      bgcolor:
+                        profileData.status === "active"
+                          ? "success.main"
+                          : "error.main",
                       mr: 1,
                     }}
                   />
-                  {profileData.status.charAt(0).toUpperCase() + profileData.status.slice(1)}
+                  {profileData.status.charAt(0).toUpperCase() +
+                    profileData.status.slice(1)}
                 </Box>
               </Box>
             </Box>
@@ -153,7 +183,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Full Name"
                   value={profileData.name}
-                  onChange={handleChange('name')}
+                  onChange={handleChange("name")}
                   variant="outlined"
                 />
               </Grid>
@@ -162,7 +192,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Email Address"
                   value={profileData.email}
-                  onChange={handleChange('email')}
+                  onChange={handleChange("email")}
                   variant="outlined"
                   type="email"
                 />
@@ -172,7 +202,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Mobile Number"
                   value={profileData.mobile}
-                  onChange={handleChange('mobile')}
+                  onChange={handleChange("mobile")}
                   variant="outlined"
                 />
               </Grid>
@@ -181,7 +211,7 @@ const Profile: React.FC = () => {
                   <InputLabel>Status</InputLabel>
                   <Select
                     value={profileData.status}
-                    onChange={handleChange('status')}
+                    onChange={handleChange("status")}
                     label="Status"
                   >
                     <MenuItem value="active">Active</MenuItem>
@@ -194,7 +224,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Address"
                   value={profileData.address}
-                  onChange={handleChange('address')}
+                  onChange={handleChange("address")}
                   variant="outlined"
                   multiline
                   rows={3}
@@ -202,15 +232,31 @@ const Profile: React.FC = () => {
               </Grid>
             </Grid>
 
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+            <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
                 sx={{
-                  px: 4,
-                  borderRadius: 2,
-                  textTransform: 'none',
+                  background:
+                    "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  padding: "10px 24px",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  boxShadow: "none",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
+                    boxShadow: "0 4px 12px rgba(27, 77, 62, 0.3)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&:active": {
+                    transform: "translateY(0)",
+                  },
                 }}
               >
                 Update Profile

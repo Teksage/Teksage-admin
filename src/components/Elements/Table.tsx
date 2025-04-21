@@ -388,16 +388,29 @@ import {
   Box,
   Typography,
   alpha,
+  useMediaQuery,
+  useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Chip,
 } from "@mui/material";
 import {
   Visibility as ViewIcon,
   Edit as EditIcon,
   Add as AddIcon,
   Update as UpdateIcon,
+  Close as CloseIcon,
+  FilterList as FilterIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
-// Enhanced styled components with gradient theme
+// Enhanced responsive styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -408,9 +421,13 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   borderRadius: "12px",
   overflow: "hidden",
   boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-  background:
-    "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.95) 100%)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.95) 100%)",
   backdropFilter: "blur(8px)",
+  [theme.breakpoints.down('sm')]: {
+    borderRadius: "0",
+    boxShadow: "none",
+    background: theme.palette.background.paper,
+  },
 }));
 
 const FiltersContainer = styled(Box)(({ theme }) => ({
@@ -443,7 +460,10 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
     minWidth: "800px",
   },
   "& .MuiTableCell-head": {
-    background: `linear-gradient(180deg, ${alpha('#2e7d32', 0.9)} 0%, ${alpha('#1b4d3e', 0.9)} 100%)`,
+    background: `linear-gradient(180deg, ${alpha("#2e7d32", 0.9)} 0%, ${alpha(
+      "#1b4d3e",
+      0.9
+    )} 100%)`,
     color: theme.palette.common.white,
     fontWeight: 600,
     fontSize: "0.875rem",
@@ -585,10 +605,14 @@ function GenericTable<T>({
   initialRowsPerPage = 10,
   tableHeight = "calc(100vh - 250px)",
 }: TableProps<T>) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileRowDetail, setMobileRowDetail] = useState<T | null>(null);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -662,6 +686,267 @@ function GenericTable<T>({
     return options;
   }, [data, columns]);
 
+  // Mobile row click handler
+  const handleMobileRowClick = (row: T) => {
+    setMobileRowDetail(row);
+  };
+
+  // Mobile view
+  if (isMobile) {
+    return (
+      <StyledPaper elevation={0}>
+        {/* Mobile Toolbar */}
+        <TableToolbar sx={{ flexDirection: "column", alignItems: "flex-start", gap: 1 }}>
+          <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" sx={{ 
+              fontWeight: 700,
+              background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              color: "transparent",
+            }}>
+              {title}
+            </Typography>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <IconButton onClick={() => setMobileFiltersOpen(true)}>
+                <FilterIcon />
+              </IconButton>
+              {onAdd && (
+                <IconButton 
+                  color="primary" 
+                  onClick={onAdd}
+                  sx={{ 
+                    background: "linear-gradient(135deg, rgba(16, 177, 0, 0.8) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                    color: "#fff"
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
+          
+          {selected.length > 0 && onStatus && (
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<UpdateIcon />}
+              onClick={onStatus}
+              sx={{
+                borderColor: "#2e7d32",
+                color: "#1b4d3e",
+                "&:hover": {
+                  borderColor: "#1b4d3e",
+                },
+              }}
+            >
+              Update {selected.length} selected
+            </Button>
+          )}
+        </TableToolbar>
+
+        {/* Mobile Data List */}
+        <List sx={{ flex: 1, overflow: "auto" }}>
+          {filteredData
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((row) => {
+              const id = getRowId(row);
+              const isSelected = selected.indexOf(id) !== -1;
+              
+              return (
+                <React.Fragment key={id}>
+                  <ListItem 
+                    button 
+                    onClick={() => handleMobileRowClick(row)}
+                    sx={{
+                      backgroundColor: isSelected ? alpha("#1b4d3e", 0.1) : "inherit",
+                      borderLeft: isSelected ? `4px solid #1b4d3e` : "none",
+                    }}
+                  >
+                    {showCheckbox && (
+                      <Checkbox
+                        checked={isSelected}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleRowSelect(id);
+                        }}
+                        color="primary"
+                        sx={{ mr: 2 }}
+                      />
+                    )}
+                    <ListItemText
+                      primary={columns[0].render ? columns[0].render(row[columns[0].id], row) : row[columns[0].id]?.toString()}
+                      secondary={columns[1].render ? columns[1].render(row[columns[1].id], row) : row[columns[1].id]?.toString()}
+                      primaryTypographyProps={{ fontWeight: 600 }}
+                    />
+                    {showActions && (
+                      <Box sx={{ display: "flex" }}>
+                        {onView && (
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onView(row);
+                            }}
+                            sx={{ color: "#1976d2" }}
+                          >
+                            <ViewIcon />
+                          </IconButton>
+                        )}
+                        {onEdit && (
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(row);
+                            }}
+                            sx={{ color: "#ff9800" }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    )}
+                  </ListItem>
+                  <Divider component="li" />
+                </React.Fragment>
+              );
+            })}
+        </List>
+
+        {/* Mobile Pagination */}
+        <TablePagination
+          component="div"
+          count={filteredData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+          sx={{
+            borderTop: `1px solid ${alpha("#ddd", 0.2)}`,
+            background: alpha("#f9f9f9", 0.8),
+          }}
+        />
+
+        {/* Mobile Filters Dialog */}
+        <Dialog
+          fullScreen
+          open={mobileFiltersOpen}
+          onClose={() => setMobileFiltersOpen(false)}
+        >
+          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6">Filters</Typography>
+            <IconButton onClick={() => setMobileFiltersOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
+              {columns
+                .filter((col) => col.filterable)
+                .map((column) => (
+                  <FormControl key={column.id as string} size="small" fullWidth>
+                    <InputLabel>{`Filter ${column.label}`}</InputLabel>
+                    <Select
+                      value={filters[column.id as string] || ""}
+                      label={`Filter ${column.label}`}
+                      onChange={(e) => handleFilterChange(column.id, e.target.value)}
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      {Array.from(filterOptions[column.id as string] || [])
+                        .sort()
+                        .map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                ))}
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={() => {
+                setFilters({});
+                setMobileFiltersOpen(false);
+              }}
+              color="error"
+            >
+              Clear All
+            </Button>
+            <Button 
+              onClick={() => setMobileFiltersOpen(false)}
+              variant="contained"
+              sx={{
+                background: "linear-gradient(135deg, rgba(16, 177, 0, 0.8) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                color: "#fff"
+              }}
+            >
+              Apply Filters
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Mobile Row Detail Dialog */}
+        {mobileRowDetail && (
+          <Dialog
+            fullScreen
+            open={Boolean(mobileRowDetail)}
+            onClose={() => setMobileRowDetail(null)}
+          >
+            <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Typography variant="h6">Details</Typography>
+              <IconButton onClick={() => setMobileRowDetail(null)}>
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent>
+              <List>
+                {columns.map((column) => (
+                  <React.Fragment key={column.id as string}>
+                    <ListItem>
+                      <ListItemText
+                        primary={column.label}
+                        secondary={column.render 
+                          ? column.render(mobileRowDetail[column.id], mobileRowDetail) 
+                          : mobileRowDetail[column.id]?.toString()}
+                        primaryTypographyProps={{ fontWeight: 600, color: "#1b4d3e" }}
+                      />
+                    </ListItem>
+                    <Divider />
+                  </React.Fragment>
+                ))}
+              </List>
+            </DialogContent>
+            <DialogActions>
+              {onEdit && (
+                <Button
+                  startIcon={<EditIcon />}
+                  onClick={() => {
+                    onEdit(mobileRowDetail);
+                    setMobileRowDetail(null);
+                  }}
+                  sx={{ color: "#ff9800" }}
+                >
+                  Edit
+                </Button>
+              )}
+              <Button
+                onClick={() => setMobileRowDetail(null)}
+                sx={{ color: "#1b4d3e" }}
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+      </StyledPaper>
+    );
+  }
+
+  // Desktop view (keep your existing desktop implementation)
   return (
     <StyledPaper elevation={3}>
       <TableToolbar>
@@ -680,18 +965,28 @@ function GenericTable<T>({
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           {onStatus && (
-            <SecondaryButton
+            <Button
               variant="outlined"
               startIcon={<UpdateIcon />}
               onClick={onStatus}
               disabled={!selected.length}
               sx={{
-                opacity: !selected.length ? 0.7 : 1,
                 minWidth: "140px",
+                borderColor: "#2e7d32",
+                color: "#1b4d3e",
+                "&:hover": {
+                  borderColor: "#1b4d3e",
+                  backgroundColor: alpha("#2e7d32", 0.08),
+                },
+                "&.Mui-disabled": {
+                  borderColor: alpha("#2e7d32", 0.3),
+                  color: alpha("#1b4d3e", 0.3),
+                },
+                opacity: !selected.length ? 0.7 : 1,
               }}
             >
               Change Status
-            </SecondaryButton>
+            </Button>
           )}
 
           {onAdd && (
@@ -810,28 +1105,38 @@ function GenericTable<T>({
                             <IconButton
                               size="small"
                               sx={{
-                                background: alpha("#1b4d3e", 0.1),
+                                background: alpha("#1976d2", 0.1), // Soft blue background
                                 "&:hover": {
-                                  background: alpha("#1b4d3e", 0.2),
+                                  background: alpha("#1976d2", 0.2),
+                                  transform: "scale(1.1)",
                                 },
+                                "& .MuiSvgIcon-root": {
+                                  color: "#1565c0", // Deeper blue icon
+                                },
+                                transition: "all 0.2s ease",
                               }}
                               onClick={() => onView(row)}
                             >
-                              <ViewIcon fontSize="small" color="primary" />
+                              <ViewIcon fontSize="small" />
                             </IconButton>
                           )}
                           {onEdit && (
                             <IconButton
                               size="small"
                               sx={{
-                                background: alpha("#4caf50", 0.1),
+                                background: alpha("#ff9800", 0.1), // Soft orange background
                                 "&:hover": {
-                                  background: alpha("#4caf50", 0.2),
+                                  background: alpha("#ff9800", 0.2),
+                                  transform: "scale(1.1)",
                                 },
+                                "& .MuiSvgIcon-root": {
+                                  color: "#fb8c00", // Deeper orange icon
+                                },
+                                transition: "all 0.2s ease",
                               }}
                               onClick={() => onEdit(row)}
                             >
-                              <EditIcon fontSize="small" color="primary" />
+                              <EditIcon fontSize="small" />
                             </IconButton>
                           )}
                         </Box>

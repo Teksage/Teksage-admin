@@ -401,6 +401,8 @@ const menuItems = [
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
+  { name: "Plans", path: "/dashboard/plans", icon: <BarChartIcon /> },
+  { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
 ];
 
 const Navbar = ({ open, toggleSidebar }) => {
@@ -503,7 +505,7 @@ const Navbar = ({ open, toggleSidebar }) => {
           </NavItem>
         ))}
 
-        <NavItem
+        {/* <NavItem
           open={open}
           onClick={
             open
@@ -534,7 +536,7 @@ const Navbar = ({ open, toggleSidebar }) => {
               </IconButton>
             </>
           )}
-        </NavItem>
+        </NavItem> */}
 
         <Collapse
           in={expanded && (open || isMobile)}

@@ -92,7 +92,28 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
                 variant="contained" 
                 color="primary"
                 onClick={() => navigate(`/dashboard/users/edit/${sampleData.id}`)}
-                sx={{ mt: 2 }}
+                size="large"
+                sx={{
+                  background:
+                    "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                  color: "#fff",
+                  borderRadius: "8px",
+                  padding: "10px 24px",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  boxShadow: "none",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
+                    boxShadow: "0 4px 12px rgba(27, 77, 62, 0.3)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&:active": {
+                    transform: "translateY(0)",
+                  },
+                }}
               >
                 Edit Profile
               </Button>

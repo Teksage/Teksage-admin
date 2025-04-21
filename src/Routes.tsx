@@ -214,7 +214,11 @@ export const router = createBrowserRouter([
             element: <Analytics />,
           },
           {
-            path: "plans/coupons",
+            path: "plans",
+            element: <Coupons />,
+          },
+          {
+            path: "coupons",
             element: <Coupons />,
           },
           {
