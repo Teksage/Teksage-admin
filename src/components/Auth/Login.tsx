@@ -552,6 +552,21 @@ export const Login: React.FC = () => {
     }
   };
 
+  // const loginWithOTP = async (mobile: string, otp: string) => {
+  //   const res = await callAPI({
+  //     endpoint: "/api/auth/otp/login-verify",
+  //     method: "post",
+  //     data: { mobile, otp },
+  //   });
+  
+  //   tokenService.setTokens({
+  //     access: res.access_token,
+  //     refresh: res.refresh_token,
+  //   });
+  
+  //   return res;
+  // };
+
   return (
     <LoginWrapper>
       <Box sx={{ width: '100%', px: 3, display: 'flex', justifyContent: 'center' }}>
