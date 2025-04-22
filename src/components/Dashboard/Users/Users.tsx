@@ -46,12 +46,12 @@ const Users: React.FC = () => {
       filterable: true,
       width: '200px' 
     },
-    { 
-      id: 'last_name', 
-      label: 'Last Name', 
-      filterable: true,
-      width: '200px' 
-    },
+    // { 
+    //   id: 'last_name', 
+    //   label: 'Last Name', 
+    //   filterable: true,
+    //   width: '200px' 
+    // },
     { 
       id: 'email', 
       label: 'Email',
