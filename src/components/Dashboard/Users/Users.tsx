@@ -1,13 +1,16 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
 import { Chip } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import { callAPI } from '../../../api/crudFactory';
 
 interface UserData {
-  id: number;
-  name: string;
+  user_id: number;
+  first_name: string;
+  last_name: string;
   email: string;
+  mobile_number: string;
   user_type: string;
   status: string;
   rasi: string;
@@ -17,11 +20,35 @@ interface UserData {
 
 const Users: React.FC = () => {
   const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await callAPI({
+          endpoint: "api/admin/users",
+          method: "get",
+        });
+        console.log(response, "response")
+        setUsers(response.data); // or response if your `callAPI` returns data directly
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
   
   const columns: TableColumn<UserData>[] = [
     { 
-      id: 'name', 
-      label: 'Name', 
+      id: 'first_name', 
+      label: 'First Name', 
+      filterable: true,
+      width: '200px' 
+    },
+    { 
+      id: 'last_name', 
+      label: 'Last Name', 
       filterable: true,
       width: '200px' 
     },
@@ -31,80 +58,45 @@ const Users: React.FC = () => {
       width: '250px' 
     },
     { 
-      id: 'user_type', 
-      label: 'User Type', 
-      filterable: true
+      id: 'mobile_number', 
+      label: 'Mobile Number',
+      width: '250px' 
     },
     { 
       id: 'status', 
       label: 'Status',
-      // filterable: true,
-      render: (value) => (
-        <Chip 
-          label={value} 
-          color={value === 'Active' ? 'success' : 'default'} 
-        />
-      )
+      render: (value) => {
+        // Handle null/undefined cases safely
+        if (!value) {
+          return <Chip label="N/A" color="default" />;
+        }
+    
+        const formattedValue = 
+          value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    
+        return (
+          <Chip 
+            label={formattedValue} 
+            color={formattedValue === 'Active' ? 'success' : 'default'} 
+          />
+        );
+      }
     },
-    { 
-      id: 'rasi', 
-      label: 'Rasi', 
-      filterable: true
-    },
-    { 
-      id: 'nakshatram', 
-      label: 'Nakshatram', 
-      filterable: true
-    },
-    { 
-      id: 'plan', 
-      label: 'Plan', 
-      filterable: true
-    }
-  ];
-
-  const userData: UserData[] = [
-    {
-      id: 1,
-      name: "Rahul",
-      email: "rahul@test.in",
-      user_type: "Admin",
-      status: "Active",
-      rasi: "Thulam",
-      nakshatram: "Rohini",
-      plan: "Premium"
-      // lastLogin: new Date("2024-01-01"),
-    },
-    {
-      id: 2,
-      name: "Sivakami",
-      email: "sivakami@test.in",
-      user_type: "User",
-      status: "Active",
-      rasi: "Mesham",
-      nakshatram: "Hasta",
-      plan: "Basic"
-    },
-    {
-      id: 3,
-      name: "Sheik",
-      email: "sheik@test.in",
-      user_type: "Astrologer",
-      status: "Inactive",
-      rasi: "Rishabam",
-      nakshatram: "Chitra",
-      plan: "Pro"
-    },
-    {
-      id: 4,
-      name: "Vasanth",
-      email: "vasanth@test.in",
-      user_type: "User",
-      status: "Inactive",
-      rasi: "Kanni",
-      nakshatram: "Swati",
-      plan: "Free"
-    },
+    // { 
+    //   id: 'rasi', 
+    //   label: 'Rasi', 
+    //   filterable: true
+    // },
+    // { 
+    //   id: 'nakshatram', 
+    //   label: 'Nakshatram', 
+    //   filterable: true
+    // },
+    // { 
+    //   id: 'plan', 
+    //   label: 'Plan', 
+    //   filterable: true
+    // }
   ];
 
   const handleAdd = () => {
@@ -116,11 +108,11 @@ const Users: React.FC = () => {
   };
 
   const handleView = (row: UserData) => {
-    navigate(`/dashboard/users/view/${row?.id}`);
+    navigate(`/dashboard/users/view/${row?.user_id}`);
   };
 
   const handleEdit = (row: UserData) => {
-    navigate(`/dashboard/users/edit/${row?.id}`);
+    navigate(`/dashboard/users/edit/${row?.user_id}`);
   };
 
   const handleSelectionChange = (selectedIds: number[]) => {
@@ -130,14 +122,14 @@ const Users: React.FC = () => {
   return (
     <GenericTable<UserData>
       title="Users Management"
-      data={userData}
+      data={users}
       columns={columns}
       onAdd={handleAdd}
       onStatus={handleStatus}
       onView={handleView}
       onEdit={handleEdit}
       onSelectionChange={handleSelectionChange}
-      getRowId={(row) => row.id}
+      getRowId={(row) => row.user_id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={10}
     />
