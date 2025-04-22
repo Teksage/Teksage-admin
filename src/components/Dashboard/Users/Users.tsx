@@ -68,7 +68,7 @@ const Users: React.FC = () => {
       render: (value) => {
         // Handle null/undefined cases safely
         if (!value) {
-          return <Chip label="N/A" color="default" />;
+          return <Chip label="N/A" color="default" />;    
         }
     
         const formattedValue = 

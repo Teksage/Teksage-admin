@@ -1,12 +1,13 @@
-import React from 'react';
+import React, {useEffect, useState} from "react";
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
-import { Chip, Avatar } from '@mui/material';
+import { Chip, Avatar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { callAPI } from "../../../api/crudFactory";
 
 interface UserData {
-  id: number;
-  name: string;
+  astrologer_id: number;
+  first_name: string;
   languageSkills: string;
   areasOfExpertise: string;
   yearsOfExperience: number;
@@ -19,60 +20,70 @@ interface UserData {
 
 const Astrologers: React.FC = () => {
   const navigate = useNavigate();
-  
+  const [Astrologers, setAstrologers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await callAPI({
+          endpoint: "api/admin/astrologers",
+          method: "get",
+        });
+        console.log(response, "response");
+        setAstrologers(response.data); // or response if your `callAPI` returns data directly
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const columns: TableColumn<UserData>[] = [
-    // { 
-    //   id: 'profilePicture', 
-    //   label: 'Profile', 
-    //   width: '100px',
-    //   render: (value) => (
-    //     <Avatar src={value} alt="Profile" sx={{ width: 40, height: 40 }} />
-    //   )
-    // },
-    { 
-      id: 'name', 
-      label: 'Name', 
+    {
+      id: "first_name",
+      label: "Name",
       filterable: true,
-      width: '300px' 
+      // width: "300px",
     },
-    { 
-      id: 'languageSkills', 
-      label: 'Language Skills', 
-      filterable: true 
+    {
+      id: "yearsOfExperience",
+      label: "Yrs of Experience",
     },
-    { 
-      id: 'areasOfExpertise', 
-      label: 'Areas of Expertise', 
-      filterable: true
+    {
+      id: "email",
+      label: "Email",
+      // width: "250px",
     },
-    { 
-      id: 'yearsOfExperience', 
-      label: 'Yrs of Experience' 
-    },
-    { 
-      id: 'email', 
-      label: 'Email',
-      width: '250px' 
-    },
-    { 
-      id: 'mobile', 
-      label: 'Mobile Number' 
+    {
+      id: "mobile",
+      label: "Mobile Number",
     },
     { 
       id: 'status', 
       label: 'Status',
-      render: (value) => (
-        <Chip 
-          label={value} 
-          color={value === 'Active' ? 'success' : 'default'} 
-        />
-      )
+      render: (value) => {
+        // Handle null/undefined cases safely
+        if (!value) {
+          return <Chip label="N/A" color="default" />;
+        }
+    
+        const formattedValue = 
+          value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    
+        return (
+          <Chip 
+            label={formattedValue} 
+            color={formattedValue === 'Active' ? 'success' : 'default'} 
+          />
+        );
+      }
     },
-    { 
-      id: 'plan', 
-      label: 'Plan', 
-      filterable: true
-    }
+    {
+      id: "plan",
+      label: "Plan",
+      filterable: true,
+    },
   ];
 
   const userData: UserData[] = [
@@ -85,7 +96,7 @@ const Astrologers: React.FC = () => {
       email: "rahul@test.in",
       mobile: "+91 9876543210",
       status: "Active",
-      plan: "Premium"
+      plan: "Premium",
     },
     {
       id: 2,
@@ -96,7 +107,7 @@ const Astrologers: React.FC = () => {
       email: "sivakami@test.in",
       mobile: "+91 9123456789",
       status: "Active",
-      plan: "Basic"
+      plan: "Basic",
     },
     {
       id: 3,
@@ -107,7 +118,7 @@ const Astrologers: React.FC = () => {
       email: "sheik@test.in",
       mobile: "+91 8765432109",
       status: "Inactive",
-      plan: "Pro"
+      plan: "Pro",
     },
     {
       id: 4,
@@ -118,24 +129,24 @@ const Astrologers: React.FC = () => {
       email: "vasanth@test.in",
       mobile: "+91 9988776655",
       status: "Inactive",
-      plan: "Free"
-    }
+      plan: "Free",
+    },
   ];
 
   const handleAdd = () => {
-    navigate('/dashboard/astrologers/new');
+    navigate("/dashboard/astrologers/new");
   };
-  
+
   const handleStatus = () => {
     // Handle Status
   };
 
   const handleView = (row: UserData) => {
-    navigate(`/dashboard/astrologers/view/${row?.id}`);
+    navigate(`/dashboard/astrologers/view/${row?.astrologer_id}`);
   };
 
   const handleEdit = (row: UserData) => {
-    navigate(`/dashboard/astrologers/edit/${row?.id}`);
+    navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
   };
 
   const handleSelectionChange = (selectedIds: number[]) => {
@@ -145,14 +156,14 @@ const Astrologers: React.FC = () => {
   return (
     <GenericTable<UserData>
       title="Astrologer Management"
-      data={userData}
+      data={Astrologers}
       columns={columns}
       onAdd={handleAdd}
       onStatus={handleStatus}
       onView={handleView}
       onEdit={handleEdit}
       onSelectionChange={handleSelectionChange}
-      getRowId={(row) => row.id}
+      getRowId={(row) => row.astrologer_id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={10}
     />

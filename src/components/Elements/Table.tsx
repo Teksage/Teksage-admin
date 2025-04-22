@@ -964,7 +964,7 @@ function GenericTable<T>({
           {title}
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
-          {onStatus && (
+          {/* {onStatus && (
             <Button
               variant="outlined"
               startIcon={<UpdateIcon />}
@@ -987,7 +987,7 @@ function GenericTable<T>({
             >
               Change Status
             </Button>
-          )}
+          )} */}
 
           {onAdd && (
             <PrimaryButton
@@ -1046,7 +1046,7 @@ function GenericTable<T>({
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              {showCheckbox && (
+              {/* {showCheckbox && (
                 <TableCell padding="checkbox">
                   <Checkbox
                     indeterminate={
@@ -1062,7 +1062,7 @@ function GenericTable<T>({
                     }}
                   />
                 </TableCell>
-              )}
+              )} */}
               {columns.map((column) => (
                 <TableCell
                   key={column.id as string}
@@ -1082,7 +1082,7 @@ function GenericTable<T>({
                 const isSelected = selected.indexOf(id) !== -1;
                 return (
                   <TableRow hover key={id} selected={isSelected}>
-                    {showCheckbox && (
+                    {/* {showCheckbox && (
                       <TableCell padding="checkbox">
                         <Checkbox
                           checked={isSelected}
@@ -1090,7 +1090,7 @@ function GenericTable<T>({
                           color="primary"
                         />
                       </TableCell>
-                    )}
+                    )} */}
                     {columns.map((column) => (
                       <TableCell key={column.id as string}>
                         {column.render
