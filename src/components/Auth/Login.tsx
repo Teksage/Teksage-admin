@@ -468,31 +468,42 @@ export const Login: React.FC = () => {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     if (!formState.email) {
-      setFormState(prev => ({ ...prev, error: 'Please enter your email' }));
+      setFormState(prev => ({ ...prev, error: "Please enter your email" }));
       return;
     }
-    
+  
     setFormState(prev => ({ ...prev, loading: true, error: null }));
-    
+  
     try {
-      // Simulate API call to send OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await fetch("/api/auth/otp/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: formState.email })
+      });
+  
+      if (!response.ok) throw new Error("Failed to send OTP");
+  
       setFormState(prev => ({
         ...prev,
-        step: 'otp',
+        step: "otp",
         loading: false,
         countdown: 30,
-        otp: Array(6).fill(''),
-        activeOtpIndex: 0,
+        otp: Array(6).fill(""),
+        activeOtpIndex: 0
       }));
-      
-      // Focus first OTP input
+  
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     } catch (error) {
-      console.error('Error sending OTP:', error);
-      setFormState(prev => ({ ...prev, loading: false, error: 'Failed to send OTP' }));
+      console.error("Error sending OTP:", error);
+      setFormState(prev => ({
+        ...prev,
+        loading: false,
+        error: "Failed to send OTP"
+      }));
     }
   };
 
@@ -522,50 +533,72 @@ export const Login: React.FC = () => {
   };
 
   const handleVerifyOtp = async () => {
-    const otp = formState.otp.join('');
+    const otp = formState.otp.join("");
     if (otp.length !== 6) return;
-    
+  
     setFormState(prev => ({ ...prev, loading: true, error: null }));
-    
+  
     try {
-      // Simulate OTP verification API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      dispatch({ type: 'setAuth', payload: true });
-      dispatch({
-        type: 'login',
-        payload: { name: 'Admin', role: 'Administrator', email: formState.email }
+      const response = await fetch("/api/auth/otp/login-verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: formState.email,
+          otp
+        })
       });
-      navigate('/dashboard/users');
+  
+      if (!response.ok) throw new Error("Invalid OTP");
+  
+      const { access_token, refresh_token } = await response.json();
+  
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("refresh_token", refresh_token);
+  
+      // Optionally dispatch to Redux
+      dispatch({ type: "setAuth", payload: true });
+      dispatch({
+        type: "login",
+        payload: { name: "Admin", role: "Administrator", email: formState.email }
+      });
+  
+      navigate("/dashboard/users");
     } catch (error) {
-      console.error('OTP verification error:', error);
+      console.error("OTP verification error:", error);
       setFormState(prev => ({
         ...prev,
         loading: false,
-        error: 'Invalid OTP. Please try again.',
-        otp: Array(6).fill(''),
-        activeOtpIndex: 0,
+        error: "Invalid OTP. Please try again.",
+        otp: Array(6).fill(""),
+        activeOtpIndex: 0
       }));
-      
-      // Focus first OTP input on error
+  
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     }
   };
-
-  // const loginWithOTP = async (mobile: string, otp: string) => {
-  //   const res = await callAPI({
-  //     endpoint: "/api/auth/otp/login-verify",
-  //     method: "post",
-  //     data: { mobile, otp },
+  
+  // const refreshAccessToken = async () => {
+  //   const refreshToken = localStorage.getItem("refresh_token");
+  
+  //   if (!refreshToken) throw new Error("No refresh token found");
+  
+  //   const response = await fetch("/api/auth/refresh", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify({ refresh_token: refreshToken })
   //   });
   
-  //   tokenService.setTokens({
-  //     access: res.access_token,
-  //     refresh: res.refresh_token,
-  //   });
+  //   if (!response.ok) throw new Error("Failed to refresh token");
   
-  //   return res;
-  // };
+  //   const { access_token } = await response.json();
+  //   localStorage.setItem("access_token", access_token);
+  
+  //   return access_token;
+  // };  
 
   return (
     <LoginWrapper>
