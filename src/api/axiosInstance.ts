@@ -2,7 +2,7 @@ import axios from "axios";
 import { tokenService } from "../utils/tokenService";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5173/',
+  baseURL: 'http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -61,7 +61,7 @@ axiosInstance.interceptors.response.use(
       try {
         const refreshToken = tokenService.getRefreshToken();
         const res = await axios.post(
-          "http://localhost:5173/api/auth/refresh",
+          "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/api/auth/refresh",
           { refresh_token: refreshToken }
         );
 
