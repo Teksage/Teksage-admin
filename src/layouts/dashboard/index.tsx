@@ -24,6 +24,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import StarsIcon from "@mui/icons-material/Stars";
 import HelpIcon from "@mui/icons-material/Help";
 import Navbar from "../../components/Dashboard/Navbar";
+import { tokenService } from "../../utils/tokenService";
+import { callAPI } from "../../api/crudFactory";
 
 const menuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
@@ -34,16 +36,18 @@ const menuItems = [
 ];
 
 const GradientAppBar = styled(AppBar)(({ theme }) => ({
-  background: "linear-gradient(90deg, rgba(16, 177, 0, 0.4) -42.06%, rgba(255, 255, 255, 0.7) 100%)",
+  background:
+    "linear-gradient(90deg, rgba(16, 177, 0, 0.4) -42.06%, rgba(255, 255, 255, 0.7) 100%)",
   backdropFilter: "blur(10px)",
   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
   borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
   color: theme.palette.text.primary,
-  transition: theme.transitions.create(['background', 'box-shadow'], {
+  transition: theme.transitions.create(["background", "box-shadow"], {
     duration: theme.transitions.duration.standard,
   }),
   "&:hover": {
-    background: "linear-gradient(90deg, rgba(16, 177, 0, 0.45) -42.06%, rgba(255, 255, 255, 0.75) 100%)",
+    background:
+      "linear-gradient(90deg, rgba(16, 177, 0, 0.45) -42.06%, rgba(255, 255, 255, 0.75) 100%)",
   },
 }));
 
@@ -53,9 +57,12 @@ const ProfileButton = styled(IconButton)(({ theme }) => ({
   borderRadius: "50%",
   backgroundColor: "rgba(255, 255, 255, 0.2)",
   border: "2px solid rgba(255, 255, 255, 0.6)",
-  transition: theme.transitions.create(['transform', 'background-color', 'border'], {
-    duration: theme.transitions.duration.shortest,
-  }),
+  transition: theme.transitions.create(
+    ["transform", "background-color", "border"],
+    {
+      duration: theme.transitions.duration.shortest,
+    }
+  ),
   "&:hover": {
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderColor: "rgba(255, 255, 255, 0.8)",
@@ -67,13 +74,18 @@ const MainContent = styled(Box)(({ theme, sidebarOpen, isMobile }) => ({
   flexGrow: 1,
   overflow: "hidden",
   backgroundColor: theme.palette.background.default,
-  backgroundImage: "linear-gradient(to bottom right, rgba(240, 255, 240, 0.4), rgba(240, 240, 255, 0.4))",
+  backgroundImage:
+    "linear-gradient(to bottom right, rgba(240, 255, 240, 0.4), rgba(240, 240, 255, 0.4))",
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
   marginLeft: 0, // Remove left margin to attach directly to navbar
-  width: isMobile ? "100%" : (sidebarOpen ? `calc(100% - 240px)` : `calc(100% - 72px)`),
+  width: isMobile
+    ? "100%"
+    : sidebarOpen
+    ? `calc(100% - 240px)`
+    : `calc(100% - 72px)`,
 }));
 
 const LayoutContainer = styled(Box)(({ theme }) => ({
@@ -99,8 +111,10 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     // Determine the page title based on current location
-    const currentMenu = menuItems.find((item) => location.pathname.includes(item.path));
-    
+    const currentMenu = menuItems.find((item) =>
+      location.pathname.includes(item.path)
+    );
+
     if (location.pathname.includes("/dashboard/plans/coupons")) {
       setPageTitle("Coupons");
     } else if (location.pathname.includes("/dashboard/profile")) {
@@ -110,7 +124,7 @@ const DashboardLayout = () => {
     } else {
       setPageTitle("Dashboard");
     }
-    
+
     // Close sidebar on mobile when location changes
     if (isMobile) {
       setSidebarOpen(false);
@@ -134,11 +148,33 @@ const DashboardLayout = () => {
     setAnchorEl(null);
   };
 
-  const logoutSection = () => {
-    dispatch({ type: "setAuth", payload: false });
-    dispatch({ type: "login", payload: {} });
-    navigate("/auth/login");
-  };
+  // const logoutSection = () => {
+  //   dispatch({ type: "setAuth", payload: false });
+  //   dispatch({ type: "login", payload: {} });
+  //   navigate("/auth/login");
+  // };
+  const logoutSection = async () => {
+    try {
+      const refreshToken = tokenService.getRefreshToken();
+  
+      if (refreshToken) {
+        await callAPI({
+          endpoint: "api/auth/logout",
+          method: "post",
+          data: {
+            refresh_token: refreshToken,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      tokenService.clearTokens();
+      dispatch({ type: "setAuth", payload: false });
+      dispatch({ type: "login", payload: {} });
+      navigate("/auth/login");
+    }
+  };  
 
   const getInitials = (name) => {
     if (!name) return "U";
@@ -149,6 +185,13 @@ const DashboardLayout = () => {
       .toUpperCase()
       .substring(0, 2);
   };
+
+  // Create a scrollable content area
+  const ScrollableContent = styled(Box)({
+    flexGrow: 1,
+    overflow: "auto", // This area will scroll
+    height: "calc(100vh - 64px)", // Full height minus app bar height
+  });
 
   return (
     <LayoutContainer>
@@ -161,7 +204,13 @@ const DashboardLayout = () => {
           position={isMobile ? "fixed" : "static"}
           sx={isMobile ? { width: "100%", zIndex: 1100 } : {}}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between", minHeight: 64 }}>
+          <Toolbar
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              minHeight: 64,
+            }}
+          >
             <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
               <Typography
                 variant="h6"
@@ -193,20 +242,22 @@ const DashboardLayout = () => {
                 size="large"
               >
                 {loginUserDetails?.avatar ? (
-                  <Avatar 
+                  <Avatar
                     src={loginUserDetails.avatar}
                     alt={loginUserDetails?.name || "User"}
                     sx={{ width: 38, height: 38 }}
                   />
                 ) : (
-                  <Avatar sx={{ 
-                    width: 38, 
-                    height: 38, 
-                    bgcolor: "rgba(16, 177, 0, 0.7)",
-                    color: "#fff",
-                    fontSize: "0.9rem",
-                    fontWeight: 600
-                  }}>
+                  <Avatar
+                    sx={{
+                      width: 38,
+                      height: 38,
+                      bgcolor: "rgba(16, 177, 0, 0.7)",
+                      color: "#fff",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {getInitials(loginUserDetails?.name)}
                   </Avatar>
                 )}
@@ -235,89 +286,102 @@ const DashboardLayout = () => {
                     flexDirection: "column",
                     p: 2.5,
                     alignItems: "center",
-                    backgroundImage: "linear-gradient(to bottom, rgba(16, 177, 0, 0.1), rgba(240, 240, 255, 0.2))",
+                    backgroundImage:
+                      "linear-gradient(to bottom, rgba(16, 177, 0, 0.1), rgba(240, 240, 255, 0.2))",
                     borderBottom: "1px solid rgba(0,0,0,0.06)",
                   }}
                 >
                   {loginUserDetails?.avatar ? (
-                    <Avatar 
+                    <Avatar
                       src={loginUserDetails.avatar}
                       alt={loginUserDetails?.name || "User"}
-                      sx={{ width: 64, height: 64, mb: 1.5, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        mb: 1.5,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      }}
                     />
                   ) : (
-                    <Avatar sx={{ 
-                      width: 64, 
-                      height: 64, 
-                      mb: 1.5,
-                      bgcolor: "rgba(16, 177, 0, 0.7)",
-                      color: "#fff",
-                      fontSize: "1.5rem",
-                      fontWeight: 600,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-                    }}>
+                    <Avatar
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        mb: 1.5,
+                        bgcolor: "rgba(16, 177, 0, 0.7)",
+                        color: "#fff",
+                        fontSize: "1.5rem",
+                        fontWeight: 600,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      }}
+                    >
                       {getInitials(loginUserDetails?.name)}
                     </Avatar>
                   )}
                   <Typography variant="subtitle1" fontWeight={600}>
                     {loginUserDetails?.name || "User"}
                   </Typography>
-                  <Typography 
-                    variant="body2" 
+                  <Typography
+                    variant="body2"
                     color="text.secondary"
-                    sx={{ 
+                    sx={{
                       backgroundColor: "rgba(16, 177, 0, 0.1)",
                       px: 1.5,
                       py: 0.5,
                       borderRadius: 5,
-                      mt: 0.5
+                      mt: 0.5,
                     }}
                   >
                     {loginUserDetails?.role || "User"}
                   </Typography>
                 </Paper>
-                <MenuItem 
-                  onClick={handleProfile} 
-                  sx={{ 
-                    py: 1.5, 
+                <MenuItem
+                  onClick={handleProfile}
+                  sx={{
+                    py: 1.5,
                     px: 2,
                     transition: "background-color 0.2s",
                     "&:hover": {
-                      backgroundColor: "rgba(16, 177, 0, 0.05)"
-                    }
+                      backgroundColor: "rgba(16, 177, 0, 0.05)",
+                    },
                   }}
                 >
-                  <Profile sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} /> 
-                  <Typography variant="body2" fontWeight={500}>Profile</Typography>
+                  <Profile sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} />
+                  <Typography variant="body2" fontWeight={500}>
+                    Profile
+                  </Typography>
                 </MenuItem>
-                <MenuItem 
-                  onClick={logoutSection} 
-                  sx={{ 
-                    py: 1.5, 
+                <MenuItem
+                  onClick={logoutSection}
+                  sx={{
+                    py: 1.5,
                     px: 2,
                     transition: "background-color 0.2s",
                     "&:hover": {
-                      backgroundColor: "rgba(255, 76, 76, 0.05)"
-                    }
+                      backgroundColor: "rgba(255, 76, 76, 0.05)",
+                    },
                   }}
                 >
-                  <Logout sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} /> 
-                  <Typography variant="body2" fontWeight={500}>Logout</Typography>
+                  <Logout sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} />
+                  <Typography variant="body2" fontWeight={500}>
+                    Logout
+                  </Typography>
                 </MenuItem>
               </Menu>
             </Box>
           </Toolbar>
         </GradientAppBar>
-        <Box
-          sx={{
-            p: { xs: 2, sm: 3 },
-            minHeight: `calc(100vh - 64px)`,
-            ...(isMobile ? { mt: "64px" } : {}),
-            borderRadius: 0, // Remove border radius to ensure full attachment
-          }}
-        >
-          <Outlet />
-        </Box>
+        {/* Scrollable content area */}
+        <ScrollableContent>
+          <Box
+            sx={{
+              p: { xs: 2, sm: 3 },
+              minHeight: "100%",
+            }}
+          >
+            <Outlet />
+          </Box>
+        </ScrollableContent>
       </MainContent>
     </LayoutContainer>
   );

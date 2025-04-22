@@ -1,333 +1,3 @@
-// import React, { useState } from "react";
-// import {
-//   Box,
-//   TextField,
-//   Button,
-//   Grid,
-//   MenuItem,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   Typography,
-//   Paper,
-//   IconButton,
-// } from "@mui/material";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-// import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-// import { useNavigate } from "react-router-dom";
-// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
-// interface UserFormData {
-//   first_name: string;
-//   last_name: string;
-//   email: string;
-//   mobile: string;
-//   dateOfBirth: Date | null;
-//   timeOfBirth: Date | null;
-//   placeOfBirth: string;
-//   preferredLocation: string;
-//   rasi: string;
-//   nakshatram: string;
-//   status: string;
-// }
-
-// const rasiOptions = [
-//   "Mesham",
-//   "Rishabam",
-//   "Mithunam",
-//   "Katakam",
-//   "Simmam",
-//   "Kanni",
-//   "Thulam",
-//   "Vrischikam",
-//   "Dhanusu",
-//   "Makaram",
-//   "Kumbham",
-//   "Meenam",
-// ];
-
-// const nakshatramOptions = [
-//   "Ashwini",
-//   "Bharani",
-//   "Krittika",
-//   "Rohini",
-//   "Mrigashira",
-//   "Ardra",
-//   "Punarvasu",
-//   "Pushya",
-//   "Ashlesha",
-//   "Magha",
-//   "Purva Phalguni",
-//   "Uttara Phalguni",
-//   "Hasta",
-//   "Chitra",
-//   "Swati",
-//   "Vishakha",
-//   "Anuradha",
-//   "Jyeshtha",
-//   "Mula",
-//   "Purva Ashadha",
-//   "Uttara Ashadha",
-//   "Shravana",
-//   "Dhanishta",
-//   "Shatabhisha",
-//   "Purva Bhadrapada",
-//   "Uttara Bhadrapada",
-//   "Revati",
-// ];
-
-// const statusOptions = ["Active", "Inactive"];
-
-// const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
-//   const navigate = useNavigate();
-//   const [formData, setFormData] = useState<UserFormData>({
-//     first_name: "",
-//     last_name: "",
-//     email: "",
-//     mobile: "",
-//     dateOfBirth: null,
-//     timeOfBirth: null,
-//     placeOfBirth: "",
-//     preferredLocation: "",
-//     rasi: "",
-//     nakshatram: "",
-//     status: "",
-//   });
-
-//   const handleChange =
-//     (field: keyof UserFormData) =>
-//     (
-//       event: React.ChangeEvent<
-//         HTMLInputElement | { name?: string; value: unknown }
-//       >
-//     ) => {
-//       setFormData(prev => ({
-//         ...prev,
-//         [field]: event.target.value
-//       }));
-//     };
-
-//   const handleSubmit = (event: React.FormEvent) => {
-//     event.preventDefault();
-//     console.log("Form Data:", formData);
-//     // Add your submit logic here
-//   };
-
-//   const isViewMode = mode === "view";
-
-//   return (
-//     <LocalizationProvider dateAdapter={AdapterDateFns}>
-//       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-//         <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
-//           <ArrowBackIcon />
-//         </IconButton>
-//         <Typography variant="h5">Go Back</Typography>
-//       </Box>
-//       <Paper elevation={3} sx={{ p: 3, maxWidth: "1200px", margin: "0 auto" }}>
-//         <Typography variant="h5" gutterBottom>
-//           {mode === "new"
-//             ? "Create New User"
-//             : mode === "edit"
-//             ? "Edit User"
-//             : "View User"}
-//         </Typography>
-
-//         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-//           <Grid container spacing={3}>
-//             <Grid item xs={12} md={6}>
-//               <TextField
-//                 fullWidth
-//                 label="First Name"
-//                 value={formData.first_name}
-//                 onChange={handleChange("first_name")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Last Name"
-//                 value={formData.last_name}
-//                 onChange={handleChange("last_name")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Email"
-//                 type="email"
-//                 value={formData.email}
-//                 onChange={handleChange("email")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Mobile Number"
-//                 value={formData.mobile}
-//                 onChange={handleChange("mobile")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <DatePicker
-//                 label="Date of Birth"
-//                 value={formData.dateOfBirth}
-//                 onChange={(newValue: any) => {
-//                   setFormData((prev) => ({ ...prev, dateOfBirth: newValue }));
-//                 }}
-//                 disabled={isViewMode}
-//                 slotProps={{ textField: { fullWidth: true } }}
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <TimePicker
-//                 label="Time of Birth"
-//                 value={formData.timeOfBirth}
-//                 onChange={(newValue: any) => {
-//                   setFormData((prev) => ({ ...prev, timeOfBirth: newValue }));
-//                 }}
-//                 disabled={isViewMode}
-//                 slotProps={{ textField: { fullWidth: true } }}
-//               />
-//             </Grid>
-
-//             {/* Location Information */}
-//             <Grid item xs={12} md={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Place of Birth"
-//                 value={formData.placeOfBirth}
-//                 onChange={handleChange("placeOfBirth")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Preferred Location"
-//                 value={formData.preferredLocation}
-//                 onChange={handleChange("preferredLocation")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Rasi</InputLabel>
-//                 <Select
-//                   value={formData.rasi}
-//                   label="Rasi"
-//                   //   onChange={handleChange('rasi')}
-//                   disabled={isViewMode}
-//                 >
-//                   {rasiOptions.map((option) => (
-//                     <MenuItem key={option} value={option}>
-//                       {option}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Nakshatram</InputLabel>
-//                 <Select
-//                   value={formData.nakshatram}
-//                   label="Nakshatram"
-//                   //   onChange={handleChange('nakshatram')}
-//                   disabled={isViewMode}
-//                 >
-//                   {nakshatramOptions.map((option) => (
-//                     <MenuItem key={option} value={option}>
-//                       {option}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             <Grid item xs={12} md={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Status</InputLabel>
-//                 <Select
-//                   value={formData.status}
-//                   label="Status"
-//                   //   onChange={handleChange('status')}
-//                   disabled={isViewMode}
-//                   required
-//                 >
-//                   {statusOptions.map((option) => (
-//                     <MenuItem key={option} value={option}>
-//                       {option}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {!isViewMode && (
-//               <Grid item xs={12}>
-//                 <Box
-//                   sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}
-//                 >
-//                   <Button
-//                     type="submit"
-//                     variant="contained"
-//                     size="large"
-//                     sx={{
-//                       background:
-//                         "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
-//                       color: "#fff",
-//                       borderRadius: "8px",
-//                       padding: "10px 24px",
-//                       fontWeight: 600,
-//                       textTransform: "none",
-//                       fontSize: "1rem",
-//                       boxShadow: "none",
-//                       transition: "all 0.3s ease",
-//                       "&:hover": {
-//                         background:
-//                           "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
-//                         boxShadow: "0 4px 12px rgba(27, 77, 62, 0.3)",
-//                         transform: "translateY(-2px)",
-//                       },
-//                       "&:active": {
-//                         transform: "translateY(0)",
-//                       },
-//                     }}
-//                   >
-//                     {mode === "new" ? "Create User" : "Update User"}
-//                   </Button>
-//                 </Box>
-//               </Grid>
-//             )}
-//           </Grid>
-//         </Box>
-//       </Paper>
-//     </LocalizationProvider>
-//   );
-// };
-
-// export default NewUser;
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -347,9 +17,10 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory"; // adjust path as per your project
+import CustomSnackbar from "../../Elements/CustomSnackbar";
 
 interface UserFormData {
   first_name: string;
@@ -377,7 +48,7 @@ const rasiOptions = [
   "Sagittarius",
   "Capricorn",
   "Aquarius",
-  "Pisces"
+  "Pisces",
 ];
 
 const nakshatramOptions: Record<string, string[]> = {
@@ -392,11 +63,12 @@ const nakshatramOptions: Record<string, string[]> = {
   Sagittarius: ["Moola", "Purva Ashadha", "Uttara Ashadha"],
   Capricorn: ["Uttara Ashadha", "Shravana", "Dhanishta"],
   Aquarius: ["Dhanishta", "Shatabhisha", "Purva Bhadrapada"],
-  Pisces: ["Purva Bhadrapada", "Uttara Bhadrapada", "Revati"]
+  Pisces: ["Purva Bhadrapada", "Uttara Bhadrapada", "Revati"],
 };
 
 const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const navigate = useNavigate();
+  const { userId } = useParams<{ userId: string }>();
   const isViewMode = mode === "view";
 
   const [formData, setFormData] = useState<UserFormData>({
@@ -417,17 +89,67 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     Partial<Record<keyof UserFormData, string>>
   >({});
   const [loadingRasiNakshatram, setLoadingRasiNakshatram] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  useEffect(() => {
+    if (mode === "edit" && userId) {
+      (async () => {
+        try {
+          const res = await callAPI({
+            endpoint: `api/admin/users/${userId}`,
+            method: "get",
+          });
+
+          const user = res?.data;
+          console.log(user, "user");
+          setFormData({
+            first_name: user.first_name || "",
+            last_name: user.last_name || "",
+            email: user.email || "",
+            mobile: user.mobile_number || "",
+            dateOfBirth: user.date_of_birth
+              ? new Date(user.date_of_birth)
+              : null,
+            timeOfBirth: user.time_of_birth
+              ? new Date(`1970-01-01T${user.time_of_birth}`)
+              : null,
+            placeOfBirth: user.birth_location || "",
+            preferredLocation: user.preferred_location || "",
+            rasi: user.rasi || "",
+            nakshatram: user.nakshatram || "",
+            status: user.status === "inactive" ? "Inactive" : "Active",
+          });
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+        }
+      })();
+    }
+  }, [mode, userId]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (!formData.first_name.trim()) newErrors.first_name = "First name is required";
-    if (!formData.last_name.trim()) newErrors.last_name = "Last name is required";
+    if (!formData.first_name.trim())
+      newErrors.first_name = "First name is required";
+    if (!formData.last_name.trim())
+      newErrors.last_name = "Last name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
-    if (!formData.timeOfBirth) newErrors.timeOfBirth = "Time of Birth is required";
-    if (!formData.placeOfBirth.trim()) newErrors.placeOfBirth = "Place of Birth is required";
-    if (!formData.preferredLocation.trim()) newErrors.preferredLocation = "Preferred Location is required";
+    if (!formData.dateOfBirth)
+      newErrors.dateOfBirth = "Date of Birth is required";
+    if (!formData.timeOfBirth)
+      newErrors.timeOfBirth = "Time of Birth is required";
+    if (!formData.placeOfBirth.trim())
+      newErrors.placeOfBirth = "Place of Birth is required";
+    if (!formData.preferredLocation.trim())
+      newErrors.preferredLocation = "Preferred Location is required";
     return newErrors;
   };
 
@@ -460,8 +182,9 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     }
     try {
       await callAPI({
-        endpoint: "api/admin/users",
-        method: "post",
+        endpoint:
+          mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
+        method: mode === "edit" ? "put" : "post",
         data: {
           first_name: formData.first_name,
           last_name: formData.last_name,
@@ -476,10 +199,22 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           status: formData.status.toLowerCase(),
         },
       });
-      alert("User created successfully!");
+      setSnackbar({
+        open: true,
+        message:
+          mode === "edit"
+            ? "User updated successfully!"
+            : "User created successfully!",
+        severity: "success",
+      });
+
       navigate(-1);
     } catch (err) {
-      console.error("Submit error:", err);
+      setSnackbar({
+        open: true,
+        message: "Something went wrong. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -515,8 +250,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               birth_location: placeOfBirth,
             },
           });
-
-          console.log(response, "response 909090")
 
           if (response?.data?.nakshatra && response?.data?.rashi) {
             setFormData((prev) => ({
@@ -762,6 +495,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           </Grid>
         </Box>
       </Paper>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </LocalizationProvider>
   );
 };

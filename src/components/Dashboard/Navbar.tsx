@@ -413,7 +413,7 @@ const Navbar = ({ open, toggleSidebar }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
   const locationPathname = location?.pathname;
-  const firstPathSegment = location.pathname.split("/")[2];
+  // const firstPathSegment = location.pathname.split("/")[2];
 
   const handleToggleSidebar = () => {
     if (isMobile) {
@@ -434,13 +434,13 @@ const Navbar = ({ open, toggleSidebar }) => {
     }
   };
 
-  const handleExpandClick = (e) => {
-    e.stopPropagation();
-    setExpanded(!expanded);
-    if (!expanded && open) {
-      navigate("/dashboard/plans/coupons");
-    }
-  };
+  // const handleExpandClick = (e) => {
+  //   e.stopPropagation();
+  //   setExpanded(!expanded);
+  //   if (!expanded && open) {
+  //     navigate("/dashboard/plans/coupons");
+  //   }
+  // };
 
   const isActive = (path) => locationPathname.includes(path);
 
