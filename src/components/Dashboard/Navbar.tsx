@@ -400,14 +400,14 @@ const menuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
   { name: "Consultations", path: "/dashboard/consultations", icon: <ChatIcon /> },
-  { name: "Subscription Plans", path: "/dashboard/plans", icon: <BarChartIcon /> },
+  { name: "Subscription Plans", path: "/dashboard/subscription", icon: <BarChartIcon /> },
   { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 ];
 
-const Navbar = ({ open, toggleSidebar }) => {
+const Navbar = ({ open, toggleSidebar }:any) => {
   const [expanded, setExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -540,7 +540,7 @@ const Navbar = ({ open, toggleSidebar }) => {
           )}
         </NavItem> */}
 
-        <Collapse
+        {/* <Collapse
           in={expanded && (open || isMobile)}
           timeout="auto"
           unmountOnExit
@@ -573,7 +573,7 @@ const Navbar = ({ open, toggleSidebar }) => {
               )}
             </NavItem>
           </List>
-        </Collapse>
+        </Collapse> */}
       </List>
     </>
   );

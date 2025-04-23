@@ -906,7 +906,7 @@ export const Login: React.FC = () => {
                 color: 'transparent',
               }}
             >
-              Astro Admin
+              Astro Prompt
             </Typography>
           </LogoBox>
 

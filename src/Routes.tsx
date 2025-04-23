@@ -16,8 +16,11 @@ import NewFAQ from "./components/Dashboard/FAQS/AddFaqs";
 import Analytics from "./components/Dashboard/Analytics";
 import Coupons from "./components/Dashboard/Coupons/Coupons";
 import Profile from "./components/Profile/Profile";
-import Plans from "./components/Dashboard/Subscription/Subscription";
+import Subscription from "./components/Dashboard/Subscription/Subscription";
 import Consultations from "./components/Dashboard/Consultations/Consultations";
+import NewCoupon from "./components/Dashboard/Coupons/AddCoupons";
+import NewSubscription from "./components/Dashboard/Subscription/AddSubscription";
+import ConsultationView from "./components/Dashboard/Consultations/ViewConsultations";
 
 export const router = createBrowserRouter([
   {
@@ -84,24 +87,35 @@ export const router = createBrowserRouter([
             ]
           },
           {
+            path: "coupons",
+            children: [
+              { index: true, element: <Coupons /> },
+              { path: "new", element: <NewCoupon mode="new" /> },
+              { path: "edit/:userId", element: <NewCoupon mode="edit" /> },
+            ]
+          },
+          {
+            path: "subscription",
+            children: [
+              { index: true, element: <Subscription /> },
+              { path: "new", element: <NewSubscription mode="new" /> },
+              { path: "edit/:userId", element: <NewSubscription mode="edit" /> },
+            ]
+          },
+          {
+            path: "consultations",
+            children: [
+              { index: true, element: <Consultations /> },
+              { path: "view/:consultationId", element: <ConsultationView mode="view" /> },
+            ]
+          },
+          {
             path: "analytics",
             element: <Analytics />,
           },
           {
-            path: "plans",
-            element: <Plans />,
-          },
-          {
-            path: "coupons",
-            element: <Coupons />,
-          },
-          {
             path: "profile",
             element: <Profile />,
-          },
-          {
-            path: "consultations",
-            element: <Consultations />,
           },
         ]
       },

@@ -3,20 +3,23 @@ import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
 import { Switch } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Chip } from "@mui/material";
 
 interface ServiceData {
   id: number;
   name: string;
-  description: string;
+  status: string;
   pushNotificationTrigger: boolean;
+  usage_count: string;
+  plan_name: string; 
 }
 
 const Services: React.FC = () => {
   const navigate = useNavigate();
   const [serviceData, setServiceData] = useState<ServiceData[]>([
-    { id: 1, name: "Consultation", description: "Expert advice", pushNotificationTrigger: true },
-    { id: 2, name: "Tarot Reading", description: "Card-based predictions", pushNotificationTrigger: false },
-    { id: 3, name: "Palmistry", description: "Reading of palm lines", pushNotificationTrigger: true },
+    { id: 1, name: "Consultation", status: "Active", pushNotificationTrigger: true, usage_count: "2", plan_name: "" },
+    { id: 2, name: "Tarot Reading", status: "Active", pushNotificationTrigger: false, usage_count: "3", plan_name: "" },
+    { id: 3, name: "Palmistry", status: "Active", pushNotificationTrigger: true, usage_count: "5", plan_name: "" },
   ]);
 
   const handleToggle = (id: number) => {
@@ -30,8 +33,22 @@ const Services: React.FC = () => {
   };
 
   const columns: TableColumn<ServiceData>[] = [
-    { id: "name", label: "Name", filterable: true, width: "200px" },
-    { id: "description", label: "Description", width: "300px" },
+    { id: "name", label: "Name", width: "200px" },
+    {
+      id: "status",
+      label: "Status",
+      render: (value) => {
+        if (!value) return <Chip label="N/A" color="default" />;
+        const formatted =
+          value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        return (
+          <Chip
+            label={formatted}
+            color={formatted === "Active" ? "success" : "default"}
+          />
+        );
+      },
+    },
     {
       id: "pushNotificationTrigger",
       label: "Push Notification",
@@ -43,6 +60,8 @@ const Services: React.FC = () => {
         />
       ),
     },
+    { id: "usage_count", label: "Usage", width: "200px" },
+    { id: "plan_name", label: "Plan Name", width: "200px" },
   ];
 
   const handleAdd = () => navigate("/dashboard/services/new");

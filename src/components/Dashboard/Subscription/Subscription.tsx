@@ -17,7 +17,7 @@ interface PlanData {
   duration_unit: string;
 }
 
-const Plans: React.FC = () => {
+const Subscription: React.FC = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<PlanData[]>([]);
 
@@ -76,8 +76,44 @@ const Plans: React.FC = () => {
     },
   ];
 
+  const samplePlans: PlanData[] = [
+    {
+      id: 1,
+      plan_name: "Basic Monthly",
+      plan_price: "₹199",
+      services: "Chat only",
+      status: "active",
+      service_type: "Chat Consultation",
+      tenure: "1 Month",
+      duration_value: "1",
+      duration_unit: "month",
+    },
+    {
+      id: 2,
+      plan_name: "Premium Yearly",
+      plan_price: "₹1999",
+      services: "Chat + Call + Report",
+      status: "inactive",
+      service_type: "Full Access",
+      tenure: "12 Months",
+      duration_value: "12",
+      duration_unit: "month",
+    },
+    {
+      id: 3,
+      plan_name: "Trial Pack",
+      plan_price: "Free",
+      services: "Chat (limited)",
+      status: "active",
+      service_type: "Chat Consultation",
+      tenure: "7 Days",
+      duration_value: "7",
+      duration_unit: "day",
+    },
+  ];  
+
   const handleAdd = () => {
-    navigate('/dashboard/users/new');
+    navigate('/dashboard/subscription/new');
   };
 
   const handleView = (row: PlanData) => {
@@ -99,7 +135,7 @@ const Plans: React.FC = () => {
   return (
     <GenericTable<PlanData>
       title="Subscription Plans"
-      data={plans}
+      data={samplePlans}
       columns={columns}
       onAdd={handleAdd}
       onView={handleView}
@@ -113,4 +149,4 @@ const Plans: React.FC = () => {
   );
 };
 
-export default Plans;
+export default Subscription;
