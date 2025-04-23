@@ -44,8 +44,8 @@ const Profile: React.FC = () => {
 
   // Sample data
   const [profileData, setProfileData] = React.useState<ProfileData>({
-    name: "John Doe",
-    email: "john.doe@example.com",
+    name: "Rahul",
+    email: "rahul@example.com",
     mobile: "+1 (555) 123-4567",
     address: "123 Business Avenue, Tech City, TC 12345",
     status: "active",

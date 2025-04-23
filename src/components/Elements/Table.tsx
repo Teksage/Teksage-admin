@@ -383,7 +383,7 @@ function GenericTable<T>({
     return (
       <Box
         sx={{
-          p: 2,
+          p: 1,
           border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
           borderRadius: 2,
         }}

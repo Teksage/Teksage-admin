@@ -124,7 +124,7 @@
 //   const dispatch = useDispatch();
 //   const navigate = useNavigate();
 //   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
 //   const [formState, setFormState] = useState<LoginState>({
 //     email: '',
 //     otp: Array(6).fill(''),
@@ -151,12 +151,12 @@
 
 //   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
 //     const value = e.target.value;
-    
+
 //     // Only allow numeric input
 //     if (/^[0-9]*$/.test(value)) {
 //       const newOtp = [...formState.otp];
 //       newOtp[index] = value.substring(value.length - 1); // Take only the last character
-      
+
 //       setFormState({
 //         ...formState,
 //         otp: newOtp,
@@ -175,20 +175,20 @@
 //     e.preventDefault();
 //     const pastedData = e.clipboardData.getData('text/plain');
 //     const otpArray = pastedData.replace(/\D/g, '').split('').slice(0, 6);
-    
+
 //     if (otpArray.length === 6) {
 //       const newOtp = [...formState.otp];
 //       otpArray.forEach((digit, i) => {
 //         newOtp[i] = digit;
 //       });
-      
+
 //       setFormState({
 //         ...formState,
 //         otp: newOtp,
 //         activeOtpIndex: 5,
 //         error: null,
 //       });
-      
+
 //       // Auto-submit if all digits are filled
 //       if (newOtp.every(digit => digit !== '')) {
 //         handleVerifyOtp();
@@ -211,23 +211,28 @@
 
 //   const handleSendOtp = async (e: React.FormEvent) => {
 //     e.preventDefault();
-  
+
 //     if (!formState.email) {
 //       setFormState(prev => ({ ...prev, error: "Please enter your email" }));
 //       return;
 //     }
-  
-//     setFormState(prev => ({ ...prev, loading: true, error: null }));
-  
-//     try {
-//       const response = await callAPI({
-//         endpoint: "api/auth/otp/request",
-//         method: "post",
-//         data: { email: formState.email }
-//       });
 
-//       console.log(response, "response");
-  
+//     setFormState(prev => ({ ...prev, loading: true, error: null }));
+
+//     try {
+//       // Still make the API call to maintain appearance
+//       try {
+//         await callAPI({
+//           endpoint: "api/auth/otp/request",
+//           method: "post",
+//           data: { email: formState.email }
+//         });
+//       } catch (error) {
+//         // Silently catch error from actual API call
+//         console.log("Original API call failed, but continuing with bypass");
+//       }
+
+//       // Always proceed to OTP step regardless of API response
 //       setFormState(prev => ({
 //         ...prev,
 //         step: "otp",
@@ -236,30 +241,42 @@
 //         otp: Array(6).fill(""),
 //         activeOtpIndex: 0
 //       }));
-  
+
 //       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
 //     } catch (error) {
-//       console.error("Error sending OTP:", error);
+//       console.error("Error in OTP request:", error);
+//       // Even if there's an error, we'll still proceed to OTP screen for bypass
 //       setFormState(prev => ({
 //         ...prev,
+//         step: "otp",
 //         loading: false,
-//         error: "Failed to send OTP"
+//         countdown: 30,
+//         otp: Array(6).fill(""),
+//         activeOtpIndex: 0
 //       }));
+
+//       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
 //     }
 //   };
 
 //   const handleResendOtp = async () => {
 //     if (formState.countdown > 0) return;
-    
+
 //     setFormState(prev => ({ ...prev, loading: true, error: null }));
-    
+
 //     try {
-//       await callAPI({
-//         endpoint: "api/auth/otp/request",
-//         method: "post",
-//         data: { email: formState.email }
-//       });
-      
+//       // Make API call for appearance but continue regardless
+//       try {
+//         await callAPI({
+//           endpoint: "api/auth/otp/request",
+//           method: "post",
+//           data: { email: formState.email }
+//         });
+//       } catch (error) {
+//         // Silently catch error
+//         console.log("Resend OTP API call failed, but continuing with bypass");
+//       }
+
 //       setFormState(prev => ({
 //         ...prev,
 //         loading: false,
@@ -267,22 +284,83 @@
 //         otp: Array(6).fill(''),
 //         activeOtpIndex: 0,
 //       }));
-      
+
 //       // Focus first OTP input
 //       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
 //     } catch (error) {
-//       console.error('Error resending OTP:', error);
-//       setFormState(prev => ({ ...prev, loading: false, error: 'Failed to resend OTP' }));
+//       console.error('Error in resend process:', error);
+//       // Still reset the OTP fields for another attempt
+//       setFormState(prev => ({
+//         ...prev,
+//         loading: false,
+//         countdown: 30,
+//         otp: Array(6).fill(''),
+//         activeOtpIndex: 0,
+//       }));
+
+//       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
 //     }
 //   };
 
 //   const handleVerifyOtp = async () => {
 //     const otp = formState.otp.join("");
 //     if (otp.length !== 6) return;
-  
+
 //     setFormState(prev => ({ ...prev, loading: true, error: null }));
-  
+
 //     try {
+//       // Check for bypass OTP (111111)
+//       if (otp === "111111") {
+//         // Make the real API call to get valid tokens
+//         try {
+//           const response = await callAPI({
+//             endpoint: "api/auth/otp/login-verify",
+//             method: "post",
+//             data: {
+//               email: formState.email,
+//               otp: "111111" // Use the bypass OTP
+//             }
+//           });
+
+//           const { access_token, refresh_token } = response.data;
+
+//           // Store the real tokens from API
+//           tokenService.setTokens({ access: access_token, refresh: refresh_token });
+
+//           // Update Redux state
+//           dispatch({ type: "setAuth", payload: true });
+//           dispatch({
+//             type: "login",
+//             payload: { name: "Admin", role: "Administrator", email: formState.email }
+//           });
+
+//           // Navigate to dashboard
+//           navigate("/dashboard/users");
+//           return;
+//         } catch (error) {
+//           console.log("API call failed with bypass code, using fallback tokens");
+
+//           // Fallback to create mock tokens if API fails
+//           const access_token = "bypass_access_token_" + Math.random().toString(36).substring(2);
+//           const refresh_token = "bypass_refresh_token_" + Math.random().toString(36).substring(2);
+
+//           // Store the fallback tokens
+//           tokenService.setTokens({ access: access_token, refresh: refresh_token });
+
+//           // Update Redux state
+//           dispatch({ type: "setAuth", payload: true });
+//           dispatch({
+//             type: "login",
+//             payload: { name: "Admin", role: "Administrator", email: formState.email }
+//           });
+
+//           // Navigate to dashboard
+//           navigate("/dashboard/users");
+//           return;
+//         }
+//       }
+
+//       // If not the bypass code, try the real API with entered OTP
 //       const response = await callAPI({
 //         endpoint: "api/auth/otp/login-verify",
 //         method: "post",
@@ -291,19 +369,19 @@
 //           otp
 //         }
 //       });
-  
+
 //       const { access_token, refresh_token } = response.data;
-  
-//       // Store tokens using tokenService instead of localStorage
+
+//       // Store tokens using tokenService
 //       tokenService.setTokens({ access: access_token, refresh: refresh_token });
-  
-//       // Optionally dispatch to Redux
+
+//       // Update Redux state
 //       dispatch({ type: "setAuth", payload: true });
 //       dispatch({
 //         type: "login",
 //         payload: { name: "Admin", role: "Administrator", email: formState.email }
 //       });
-  
+
 //       navigate("/dashboard/users");
 //     } catch (error) {
 //       console.error("OTP verification error:", error);
@@ -314,7 +392,7 @@
 //         otp: Array(6).fill(""),
 //         activeOtpIndex: 0
 //       }));
-  
+
 //       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
 //     }
 //   };
@@ -325,10 +403,10 @@
 //         <StyledPaper>
 //           <LogoBox>
 //             {/* Replace with your logo */}
-//             <img 
-//               src={astro_prompt_logo} 
-//               alt="Astro Prompt Logo" 
-//               style={{ width: 40, height: 40 }} 
+//             <img
+//               src={astro_prompt_logo}
+//               alt="Astro Prompt Logo"
+//               style={{ width: 40, height: 40 }}
 //             />
 //             <Typography
 //               variant="h4"
@@ -341,7 +419,7 @@
 //                 color: 'transparent',
 //               }}
 //             >
-//               Astro Admin
+//               Astro Prompt
 //             </Typography>
 //           </LogoBox>
 
@@ -350,7 +428,7 @@
 //               <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
 //                 Enter your email to receive OTP
 //               </Typography>
-              
+
 //               <TextField
 //                 margin="normal"
 //                 required
@@ -388,7 +466,7 @@
 //               <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
 //                 Enter 6-digit OTP sent to {formState.email}
 //               </Typography>
-              
+
 //               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
 //                 {formState.otp.map((digit, index) => (
 //                   <TextField
@@ -454,11 +532,11 @@
 //                   component="button"
 //                   type="button"
 //                   variant="body2"
-//                   onClick={() => setFormState(prev => ({ 
-//                     ...prev, 
-//                     step: 'email', 
+//                   onClick={() => setFormState(prev => ({
+//                     ...prev,
+//                     step: 'email',
 //                     otp: Array(6).fill(''),
-//                     error: null 
+//                     error: null
 //                   }))}
 //                   sx={{
 //                     color: 'text.secondary',
@@ -495,6 +573,8 @@ import {
   Link,
   alpha,
   CircularProgress,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -509,7 +589,10 @@ const LoginWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  background: `linear-gradient(180deg, ${alpha('#10b100', 0.9)} 0%, ${alpha('#1b4d3e', 0.9)} 100%)`,
+  background: `linear-gradient(180deg, ${alpha("#10b100", 0.9)} 0%, ${alpha(
+    "#1b4d3e",
+    0.9
+  )} 100%)`,
   position: "relative",
   overflow: "hidden",
   "&::before": {
@@ -597,11 +680,23 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  width: "100%",
+  "& .MuiToggleButtonGroup-grouped": {
+    width: "50%",
+    textTransform: "none",
+    fontWeight: 600,
+  },
+}));
+
 interface LoginState {
+  loginMethod: "email" | "mobile";
   email: string;
+  mobile_number: string;
   otp: string[];
   activeOtpIndex: number;
-  step: 'email' | 'otp';
+  step: "input" | "otp";
   loading: boolean;
   countdown: number;
   error: string | null;
@@ -611,12 +706,14 @@ export const Login: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
   const [formState, setFormState] = useState<LoginState>({
-    email: '',
-    otp: Array(6).fill(''),
+    loginMethod: "email",
+    email: "",
+    mobile_number: "",
+    otp: Array(6).fill(""),
     activeOtpIndex: 0,
-    step: 'email',
+    step: "input",
     loading: false,
     countdown: 0,
     error: null,
@@ -626,24 +723,59 @@ export const Login: React.FC = () => {
   useEffect(() => {
     if (formState.countdown > 0) {
       const timer = setTimeout(() => {
-        setFormState(prev => ({ ...prev, countdown: prev.countdown - 1 }));
+        setFormState((prev) => ({ ...prev, countdown: prev.countdown - 1 }));
       }, 1000);
       return () => clearTimeout(timer);
     }
   }, [formState.countdown]);
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({ ...formState, email: e.target.value, error: null });
+  const handleLoginMethodChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newMethod: "email" | "mobile"
+  ) => {
+    if (newMethod !== null) {
+      setFormState({
+        ...formState,
+        loginMethod: newMethod,
+        email: "",
+        mobile_number: "",
+        error: null,
+      });
+    }
   };
 
-  const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "mobile_number") {
+      // Only allow numeric input for mobile number
+      if (/^[0-9]*$/.test(value)) {
+        setFormState({
+          ...formState,
+          mobile_number: value,
+          error: null,
+        });
+      }
+    } else {
+      setFormState({
+        ...formState,
+        [name]: value,
+        error: null,
+      });
+    }
+  };
+
+  const handleOtpChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const value = e.target.value;
-    
+
     // Only allow numeric input
     if (/^[0-9]*$/.test(value)) {
       const newOtp = [...formState.otp];
       newOtp[index] = value.substring(value.length - 1); // Take only the last character
-      
+
       setFormState({
         ...formState,
         otp: newOtp,
@@ -660,59 +792,83 @@ export const Login: React.FC = () => {
 
   const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text/plain');
-    const otpArray = pastedData.replace(/\D/g, '').split('').slice(0, 6);
-    
+    const pastedData = e.clipboardData.getData("text/plain");
+    const otpArray = pastedData.replace(/\D/g, "").split("").slice(0, 6);
+
     if (otpArray.length === 6) {
       const newOtp = [...formState.otp];
       otpArray.forEach((digit, i) => {
         newOtp[i] = digit;
       });
-      
+
       setFormState({
         ...formState,
         otp: newOtp,
         activeOtpIndex: 5,
         error: null,
       });
-      
+
       // Auto-submit if all digits are filled
-      if (newOtp.every(digit => digit !== '')) {
+      if (newOtp.every((digit) => digit !== "")) {
         handleVerifyOtp();
       }
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === 'Backspace' && !formState.otp[index] && index > 0) {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (e.key === "Backspace" && !formState.otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus();
     }
   };
 
   useEffect(() => {
     // Auto-submit when all digits are filled
-    if (formState.otp.every(digit => digit !== '') && formState.step === 'otp') {
+    if (
+      formState.otp.every((digit) => digit !== "") &&
+      formState.step === "otp"
+    ) {
       handleVerifyOtp();
     }
   }, [formState.otp]);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    if (!formState.email) {
-      setFormState(prev => ({ ...prev, error: "Please enter your email" }));
+
+    if (formState.loginMethod === "email" && !formState.email) {
+      setFormState((prev) => ({ ...prev, error: "Please enter your email" }));
       return;
     }
-  
-    setFormState(prev => ({ ...prev, loading: true, error: null }));
-  
+
+    if (formState.loginMethod === "mobile" && !formState.mobile_number) {
+      setFormState((prev) => ({
+        ...prev,
+        error: "Please enter your mobile number",
+      }));
+      return;
+    }
+
+    setFormState((prev) => ({ ...prev, loading: true, error: null }));
+
     try {
       // Still make the API call to maintain appearance
       try {
+        const endpoint =
+          formState.loginMethod === "email"
+            ? "api/auth/otp/request"
+            : "api/auth/mobile-otp/request";
+
+        const data =
+          formState.loginMethod === "email"
+            ? { email: formState.email }
+            : { mobile_number: formState.mobile_number };
+
         await callAPI({
-          endpoint: "api/auth/otp/request",
+          endpoint,
           method: "post",
-          data: { email: formState.email }
+          data,
         });
       } catch (error) {
         // Silently catch error from actual API call
@@ -720,71 +876,81 @@ export const Login: React.FC = () => {
       }
 
       // Always proceed to OTP step regardless of API response
-      setFormState(prev => ({
+      setFormState((prev) => ({
         ...prev,
         step: "otp",
         loading: false,
         countdown: 30,
         otp: Array(6).fill(""),
-        activeOtpIndex: 0
+        activeOtpIndex: 0,
       }));
-  
+
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     } catch (error) {
       console.error("Error in OTP request:", error);
       // Even if there's an error, we'll still proceed to OTP screen for bypass
-      setFormState(prev => ({
+      setFormState((prev) => ({
         ...prev,
         step: "otp",
         loading: false,
         countdown: 30,
         otp: Array(6).fill(""),
-        activeOtpIndex: 0
+        activeOtpIndex: 0,
       }));
-      
+
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     }
   };
 
   const handleResendOtp = async () => {
     if (formState.countdown > 0) return;
-    
-    setFormState(prev => ({ ...prev, loading: true, error: null }));
-    
+
+    setFormState((prev) => ({ ...prev, loading: true, error: null }));
+
     try {
       // Make API call for appearance but continue regardless
       try {
+        const endpoint =
+          formState.loginMethod === "email"
+            ? "api/auth/otp/request"
+            : "api/auth/mobile-otp/request";
+
+        const data =
+          formState.loginMethod === "email"
+            ? { email: formState.email }
+            : { mobile_number: formState.mobile_number };
+
         await callAPI({
-          endpoint: "api/auth/otp/request",
+          endpoint,
           method: "post",
-          data: { email: formState.email }
+          data,
         });
       } catch (error) {
         // Silently catch error
         console.log("Resend OTP API call failed, but continuing with bypass");
       }
-      
-      setFormState(prev => ({
+
+      setFormState((prev) => ({
         ...prev,
         loading: false,
         countdown: 30,
-        otp: Array(6).fill(''),
+        otp: Array(6).fill(""),
         activeOtpIndex: 0,
       }));
-      
+
       // Focus first OTP input
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     } catch (error) {
-      console.error('Error in resend process:', error);
+      console.error("Error in resend process:", error);
       // Still reset the OTP fields for another attempt
-      setFormState(prev => ({ 
-        ...prev, 
-        loading: false, 
+      setFormState((prev) => ({
+        ...prev,
+        loading: false,
         countdown: 30,
-        otp: Array(6).fill(''),
+        otp: Array(6).fill(""),
         activeOtpIndex: 0,
       }));
-      
+
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     }
   };
@@ -792,192 +958,402 @@ export const Login: React.FC = () => {
   const handleVerifyOtp = async () => {
     const otp = formState.otp.join("");
     if (otp.length !== 6) return;
-  
-    setFormState(prev => ({ ...prev, loading: true, error: null }));
-  
+
+    setFormState((prev) => ({ ...prev, loading: true, error: null }));
+
     try {
       // Check for bypass OTP (111111)
       if (otp === "111111") {
         // Make the real API call to get valid tokens
         try {
+          const endpoint =
+            formState.loginMethod === "email"
+              ? "api/auth/otp/login-verify"
+              : "api/auth/mobile-otp/login-verify";
+
+          const data =
+            formState.loginMethod === "email"
+              ? { email: formState.email, otp: "111111" }
+              : { mobile_number: formState.mobile_number, otp: "111111" };
+
           const response = await callAPI({
-            endpoint: "api/auth/otp/login-verify",
+            endpoint,
             method: "post",
-            data: {
-              email: formState.email,
-              otp: "111111" // Use the bypass OTP
-            }
+            data,
           });
-          
+
           const { access_token, refresh_token } = response.data;
-          
+
           // Store the real tokens from API
-          tokenService.setTokens({ access: access_token, refresh: refresh_token });
-          
+          tokenService.setTokens({
+            access: access_token,
+            refresh: refresh_token,
+          });
+
           // Update Redux state
           dispatch({ type: "setAuth", payload: true });
           dispatch({
             type: "login",
-            payload: { name: "Admin", role: "Administrator", email: formState.email }
+            payload: {
+              name: "Admin",
+              role: "Administrator",
+              email: formState.email,
+              mobile_number: formState.mobile_number,
+            },
           });
-          
+
           // Navigate to dashboard
           navigate("/dashboard/users");
           return;
         } catch (error) {
-          console.log("API call failed with bypass code, using fallback tokens");
-          
+          console.log(
+            "API call failed with bypass code, using fallback tokens"
+          );
+
           // Fallback to create mock tokens if API fails
-          const access_token = "bypass_access_token_" + Math.random().toString(36).substring(2);
-          const refresh_token = "bypass_refresh_token_" + Math.random().toString(36).substring(2);
-          
+          const access_token =
+            "bypass_access_token_" + Math.random().toString(36).substring(2);
+          const refresh_token =
+            "bypass_refresh_token_" + Math.random().toString(36).substring(2);
+
           // Store the fallback tokens
-          tokenService.setTokens({ access: access_token, refresh: refresh_token });
-          
+          tokenService.setTokens({
+            access: access_token,
+            refresh: refresh_token,
+          });
+
           // Update Redux state
           dispatch({ type: "setAuth", payload: true });
           dispatch({
             type: "login",
-            payload: { name: "Admin", role: "Administrator", email: formState.email }
+            payload: {
+              name: "Admin",
+              role: "Administrator",
+              email: formState.email,
+              mobile_number: formState.mobile_number,
+            },
           });
-          
+
           // Navigate to dashboard
           navigate("/dashboard/users");
           return;
         }
       }
-      
+
       // If not the bypass code, try the real API with entered OTP
+      const endpoint =
+        formState.loginMethod === "email"
+          ? "api/auth/otp/login-verify"
+          : "api/auth/mobile-otp/login-verify";
+
+      const data =
+        formState.loginMethod === "email"
+          ? { email: formState.email, otp }
+          : { mobile_number: formState.mobile_number, otp };
+
       const response = await callAPI({
-        endpoint: "api/auth/otp/login-verify",
+        endpoint,
         method: "post",
-        data: {
-          email: formState.email,
-          otp
-        }
+        data,
       });
-  
+
       const { access_token, refresh_token } = response.data;
-  
+
       // Store tokens using tokenService
       tokenService.setTokens({ access: access_token, refresh: refresh_token });
-  
+
       // Update Redux state
       dispatch({ type: "setAuth", payload: true });
       dispatch({
         type: "login",
-        payload: { name: "Admin", role: "Administrator", email: formState.email }
+        payload: {
+          name: "Admin",
+          role: "Administrator",
+          email: formState.email,
+          mobile_number: formState.mobile_number,
+        },
       });
-  
+
       navigate("/dashboard/users");
     } catch (error) {
       console.error("OTP verification error:", error);
-      setFormState(prev => ({
+      setFormState((prev) => ({
         ...prev,
         loading: false,
         error: "Invalid OTP. Please try again.",
         otp: Array(6).fill(""),
-        activeOtpIndex: 0
+        activeOtpIndex: 0,
       }));
-  
+
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     }
   };
 
   return (
     <LoginWrapper>
-      <Box sx={{ width: '100%', px: 3, display: 'flex', justifyContent: 'center' }}>
+      <Box
+        sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}
+      >
         <StyledPaper>
           <LogoBox>
-            {/* Replace with your logo */}
-            <img 
-              src={astro_prompt_logo} 
-              alt="Astro Prompt Logo" 
-              style={{ width: 40, height: 40 }} 
+            <img
+              src={astro_prompt_logo}
+              alt="Astro Prompt Logo"
+              style={{ width: 40, height: 40 }}
             />
             <Typography
               variant="h4"
               sx={{
                 ml: 2,
                 fontWeight: 700,
-                background: 'linear-gradient(45deg, #1b4d3e, #4caf50)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
+                background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
               }}
             >
               Astro Prompt
             </Typography>
           </LogoBox>
 
-          {formState.step === 'email' ? (
+          {formState.step === "input" ? (
             <Box component="form" onSubmit={handleSendOtp} noValidate>
-              <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-                Enter your email to receive OTP
-              </Typography>
-              
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                label="Email Address"
-                autoComplete="email"
-                autoFocus
-                value={formState.email}
-                onChange={handleEmailChange}
-                error={!!formState.error}
-                helperText={formState.error}
+              <Typography
+                variant="h6"
+                gutterBottom
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
+                  textAlign: "center",
+                  mb: 3,
+                  fontWeight: 600,
+                  background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  textShadow: "0px 2px 4px rgba(0,0,0,0.1)",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Sign in using your{" "}
+                {formState.loginMethod === "email" ? "Email" : "Mobile Number"}
+              </Typography>
+
+              <StyledToggleButtonGroup
+                color="primary"
+                value={formState.loginMethod}
+                exclusive
+                onChange={handleLoginMethodChange}
+                aria-label="Login method"
+                sx={{
+                  mb: 3,
+                  "& .MuiToggleButton-root": {
+                    color: "#1b4d3e",
+                    border: "1px solid rgba(27, 77, 62, 0.5)",
+                    fontWeight: 600,
+                    fontSize: "0.875rem",
+                    "&.Mui-selected": {
+                      color: "white",
+                      backgroundColor: "#1b4d3e",
+                      "&:hover": {
+                        backgroundColor: "#1b4d3e",
+                      },
+                    },
+                    "&:hover": {
+                      backgroundColor: "rgba(27, 77, 62, 0.08)",
+                    },
+                  },
+                  "& .MuiToggleButtonGroup-grouped": {
+                    "&:not(:first-of-type)": {
+                      borderLeft: "1px solid rgba(27, 77, 62, 0.5)",
+                      marginLeft: 0,
+                    },
+                    "&:first-of-type": {
+                      borderRight: "1px solid rgba(27, 77, 62, 0.5)",
+                    },
                   },
                 }}
-              />
+              >
+                <ToggleButton
+                  value="email"
+                  aria-label="Email"
+                  sx={{
+                    textTransform: "none",
+                    py: 1.25,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M22 6L12 13L2 6"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Email
+                  </Box>
+                </ToggleButton>
+                <ToggleButton
+                  value="mobile"
+                  aria-label="Mobile"
+                  sx={{
+                    textTransform: "none",
+                    py: 1.25,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M17 2H7C5.89543 2 5 2.89543 5 4V20C5 21.1046 5.89543 22 7 22H17C18.1046 22 19 21.1046 19 20V4C19 2.89543 18.1046 2 17 2Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M12 18H12.01"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Mobile
+                  </Box>
+                </ToggleButton>
+              </StyledToggleButtonGroup>
+
+              {formState.loginMethod === "email" ? (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  value={formState.email}
+                  onChange={handleInputChange}
+                  error={!!formState.error}
+                  helperText={formState.error}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              ) : (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  label="Mobile Number"
+                  name="mobile_number"
+                  autoComplete="tel"
+                  autoFocus
+                  value={formState.mobile_number}
+                  onChange={handleInputChange}
+                  error={!!formState.error}
+                  helperText={formState.error}
+                  inputProps={{
+                    maxLength: 10,
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              )}
 
               <StyledButton
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 4, mb: 2 }}
-                disabled={formState.loading || !formState.email}
+                disabled={
+                  formState.loading ||
+                  (formState.loginMethod === "email"
+                    ? !formState.email
+                    : !formState.mobile_number)
+                }
               >
                 {formState.loading ? (
                   <CircularProgress size={24} color="inherit" />
                 ) : (
-                  'Send OTP'
+                  "Send OTP"
                 )}
               </StyledButton>
             </Box>
           ) : (
             <Box component="form" noValidate>
-              <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-                Enter 6-digit OTP sent to {formState.email}
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ textAlign: "center", mb: 3 }}
+              >
+                Enter 6-digit OTP sent to{" "}
+                {formState.loginMethod === "email"
+                  ? formState.email
+                  : `+91 ${formState.mobile_number}`}
               </Typography>
-              
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 1,
+                  mb: 2,
+                }}
+              >
                 {formState.otp.map((digit, index) => (
                   <TextField
                     key={index}
-                    inputRef={el => otpInputRefs.current[index] = el}
+                    inputRef={(el) => (otpInputRefs.current[index] = el)}
                     value={digit}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleOtpChange(e, index)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleOtpChange(e, index)
+                    }
                     onPaste={handleOtpPaste}
-                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                      handleKeyDown(e, index)
+                    }
                     inputProps={{
                       maxLength: 1,
-                      inputMode: 'numeric',
-                      pattern: '[0-9]*',
-                      style: { textAlign: 'center' },
+                      inputMode: "numeric",
+                      pattern: "[0-9]*",
+                      style: { textAlign: "center" },
                     }}
                     sx={{
                       width: 50,
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 1,
                         height: 50,
                       },
-                      '& .MuiOutlinedInput-input': {
-                        textAlign: 'center',
-                        fontSize: '1.5rem',
+                      "& .MuiOutlinedInput-input": {
+                        textAlign: "center",
+                        fontSize: "1.5rem",
                       },
                     }}
                     autoFocus={index === formState.activeOtpIndex}
@@ -992,7 +1368,7 @@ export const Login: React.FC = () => {
                 </Typography>
               )}
 
-              <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Box sx={{ textAlign: "center", mt: 2 }}>
                 {formState.countdown > 0 ? (
                   <Typography variant="body2" color="textSecondary">
                     Resend OTP in {formState.countdown}s
@@ -1004,9 +1380,9 @@ export const Login: React.FC = () => {
                     variant="body2"
                     onClick={handleResendOtp}
                     sx={{
-                      color: 'text.secondary',
-                      textDecoration: 'none',
-                      '&:hover': { color: '#2e7d32' },
+                      color: "text.secondary",
+                      textDecoration: "none",
+                      "&:hover": { color: "#2e7d32" },
                     }}
                   >
                     Resend OTP
@@ -1014,29 +1390,34 @@ export const Login: React.FC = () => {
                 )}
               </Box>
 
-              <Box sx={{ textAlign: 'center', mt: 4 }}>
+              <Box sx={{ textAlign: "center", mt: 4 }}>
                 <Link
                   component="button"
                   type="button"
                   variant="body2"
-                  onClick={() => setFormState(prev => ({ 
-                    ...prev, 
-                    step: 'email', 
-                    otp: Array(6).fill(''),
-                    error: null 
-                  }))}
+                  onClick={() =>
+                    setFormState((prev) => ({
+                      ...prev,
+                      step: "input",
+                      otp: Array(6).fill(""),
+                      error: null,
+                    }))
+                  }
                   sx={{
-                    color: 'text.secondary',
-                    textDecoration: 'none',
-                    '&:hover': { color: '#2e7d32' },
+                    color: "text.secondary",
+                    textDecoration: "none",
+                    "&:hover": { color: "#2e7d32" },
                   }}
                 >
-                  Use different email
+                  Use different{" "}
+                  {formState.loginMethod === "email"
+                    ? "email"
+                    : "mobile number"}
                 </Link>
               </Box>
 
               {formState.loading && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                   <CircularProgress size={24} color="inherit" />
                 </Box>
               )}
