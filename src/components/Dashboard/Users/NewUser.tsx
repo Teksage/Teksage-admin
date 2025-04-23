@@ -142,14 +142,14 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       newErrors.last_name = "Last name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
-    if (!formData.dateOfBirth)
-      newErrors.dateOfBirth = "Date of Birth is required";
-    if (!formData.timeOfBirth)
-      newErrors.timeOfBirth = "Time of Birth is required";
-    if (!formData.placeOfBirth.trim())
-      newErrors.placeOfBirth = "Place of Birth is required";
-    if (!formData.preferredLocation.trim())
-      newErrors.preferredLocation = "Preferred Location is required";
+    // if (!formData.dateOfBirth)
+    //   newErrors.dateOfBirth = "Date of Birth is required";
+    // if (!formData.timeOfBirth)
+    //   newErrors.timeOfBirth = "Time of Birth is required";
+    // if (!formData.placeOfBirth.trim())
+    //   newErrors.placeOfBirth = "Place of Birth is required";
+    // if (!formData.preferredLocation.trim())
+    //   newErrors.preferredLocation = "Preferred Location is required";
     return newErrors;
   };
 

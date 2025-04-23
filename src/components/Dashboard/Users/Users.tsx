@@ -22,27 +22,27 @@ const Users: React.FC = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await callAPI({
-          endpoint: "api/admin/users",
-          method: "get",
-        });
-        console.log(response, "response")
-        setUsers(response.data); // or response if your `callAPI` returns data directly
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     try {
+  //       const response = await callAPI({
+  //         endpoint: "api/admin/users",
+  //         method: "get",
+  //       });
+  //       console.log(response, "response")
+  //       setUsers(response.data); // or response if your `callAPI` returns data directly
+  //     } catch (error) {
+  //       console.error("Failed to fetch users:", error);
+  //     }
+  //   };
 
-    fetchUsers();
-  }, []);
+  //   fetchUsers();
+  // }, []);
   
   const columns: TableColumn<UserData>[] = [
     { 
       id: 'first_name', 
-      label: 'First Name', 
+      label: 'Name', 
       filterable: true,
       width: '200px' 
     },
@@ -55,12 +55,19 @@ const Users: React.FC = () => {
     { 
       id: 'email', 
       label: 'Email',
+      filterable: true,
       width: '250px' 
     },
     { 
       id: 'mobile_number', 
       label: 'Mobile Number',
+      filterable: true,
       width: '250px' 
+    },
+    { 
+      id: 'plan', 
+      label: 'Subscription', 
+      filterable: true
     },
     { 
       id: 'status', 
@@ -80,7 +87,8 @@ const Users: React.FC = () => {
             color={formattedValue === 'Active' ? 'success' : 'default'} 
           />
         );
-      }
+      },
+      filterable: true,
     },
     // { 
     //   id: 'rasi', 
@@ -92,11 +100,6 @@ const Users: React.FC = () => {
     //   label: 'Nakshatram', 
     //   filterable: true
     // },
-    // { 
-    //   id: 'plan', 
-    //   label: 'Plan', 
-    //   filterable: true
-    // }
   ];
 
   const handleAdd = () => {
@@ -115,6 +118,10 @@ const Users: React.FC = () => {
     navigate(`/dashboard/users/edit/${row?.user_id}`);
   };
 
+  const handleDelete = (row: UserData) => {
+    // navigate(`/dashboard/users/edit/${row?.id}`);
+  };
+
   const handleSelectionChange = (selectedIds: number[]) => {
     // console.log('Selected:', selectedIds);
   };
@@ -128,6 +135,7 @@ const Users: React.FC = () => {
       onStatus={handleStatus}
       onView={handleView}
       onEdit={handleEdit}
+      onDelete={handleDelete}
       onSelectionChange={handleSelectionChange}
       getRowId={(row) => row.user_id}
       tableHeight="calc(100vh - 250px)"

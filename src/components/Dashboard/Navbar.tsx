@@ -275,6 +275,7 @@ import {
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import ChatIcon from '@mui/icons-material/Chat';
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -398,11 +399,12 @@ const NavItem = styled(ListItemButton)(({ theme, open }) => ({
 const menuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
+  { name: "Consultations", path: "/dashboard/consultations", icon: <ChatIcon /> },
+  { name: "Subscription Plans", path: "/dashboard/plans", icon: <BarChartIcon /> },
+  { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
-  { name: "Plans", path: "/dashboard/plans", icon: <BarChartIcon /> },
-  { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
 ];
 
 const Navbar = ({ open, toggleSidebar }) => {
