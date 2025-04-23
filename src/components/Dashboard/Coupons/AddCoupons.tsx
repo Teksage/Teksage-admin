@@ -155,16 +155,26 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   <Button
                     type="submit"
                     variant="contained"
+                    size="large"
                     sx={{
-                      background: "linear-gradient(to right, #ff6f00, #ff8f00)",
-                      padding: "10px 28px",
+                      background:
+                        "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                      color: "#fff",
+                      borderRadius: "8px",
+                      padding: "10px 24px",
                       fontWeight: 600,
-                      borderRadius: "10px",
-                      fontSize: "1rem",
                       textTransform: "none",
-                      boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
+                      fontSize: "1rem",
+                      boxShadow: "none",
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        background: "linear-gradient(to right, #ffa000, #ffb300)",
+                        background:
+                          "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
+                        boxShadow: "0 4px 12px rgba(27, 77, 62, 0.3)",
+                        transform: "translateY(-2px)",
+                      },
+                      "&:active": {
+                        transform: "translateY(0)",
                       },
                     }}
                   >
