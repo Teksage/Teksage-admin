@@ -24,22 +24,22 @@ const Astrologers: React.FC = () => {
   const navigate = useNavigate();
   const [Astrologers, setAstrologers] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await callAPI({
-          endpoint: "api/admin/astrologers",
-          method: "get",
-        });
-        console.log(response, "response");
-        setAstrologers(response.data); // or response if your `callAPI` returns data directly
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     try {
+  //       const response = await callAPI({
+  //         endpoint: "api/admin/astrologers",
+  //         method: "get",
+  //       });
+  //       console.log(response, "response");
+  //       setAstrologers(response.data); // or response if your `callAPI` returns data directly
+  //     } catch (error) {
+  //       console.error("Failed to fetch users:", error);
+  //     }
+  //   };
 
-    fetchUsers();
-  }, []);
+  //   fetchUsers();
+  // }, []);
 
   const columns: TableColumn<UserData>[] = [
     {

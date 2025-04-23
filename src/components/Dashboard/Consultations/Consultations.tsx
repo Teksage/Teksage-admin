@@ -65,7 +65,7 @@ const Consultations: React.FC = () => {
     {
       id: "booking_date",
       label: "Consultation Date",
-      render: (value) => format(new Date(value), "dd MMM yyyy"),
+      render: (value) => format(new Date(value), "MM/dd/yyyy"), 
       filterable: true,
     },
     {

@@ -23,7 +23,9 @@ interface SubscriptionFormData {
   duration_unit: "days" | "months" | "years";
 }
 
-const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
+const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
+  mode,
+}) => {
   const navigate = useNavigate();
   const { userId } = useParams();
   const [formData, setFormData] = useState<SubscriptionFormData>({
@@ -36,21 +38,54 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
     duration_unit: "months",
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const handleChange =
     (field: keyof SubscriptionFormData) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
       setFormData((prev) => ({
         ...prev,
-        [field]: field === "plan_price" || field === "duration_value" ? +value : value,
+        [field]:
+          field === "plan_price" || field === "duration_value" ? +value : value,
       }));
     };
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.plan_name.trim()) {
+      newErrors.plan_name = "Plan name is required.";
+    }
+    if (!formData.plan_price || formData.plan_price <= 0) {
+      newErrors.plan_price = "Plan price must be greater than 0.";
+    }
+    if (!formData.services.trim()) {
+      newErrors.services = "Services field is required.";
+    }
+    if (!formData.service_type.trim()) {
+      newErrors.service_type = "Service type is required.";
+    }
+    if (!formData.duration_value || formData.duration_value <= 0) {
+      newErrors.duration_value = "Duration value must be greater than 0.";
+    }
+    if (!formData.duration_unit) {
+      newErrors.duration_unit = "Duration unit is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!validateForm()) return;
     try {
       await callAPI({
-        endpoint: mode === "edit" ? `/api/admin/subscriptions/${userId}` : "/api/admin/subscriptions",
+        endpoint:
+          mode === "edit"
+            ? `/api/admin/subscriptions/${userId}`
+            : "/api/admin/subscriptions",
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
@@ -64,15 +99,25 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
 
   return (
     <Box>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
-          <ArrowBackIcon />
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
+          <ArrowBackIcon fontSize="small" />
         </IconButton>
-        <Typography variant="h5">Go Back</Typography>
+        <Typography variant="subtitle1" fontWeight={500}>
+          Back
+        </Typography>
       </Box>
 
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+      <Paper
+        elevation={2}
+        sx={{
+          p: { xs: 2, sm: 3 },
+          mx: "auto",
+          backgroundColor: "#fafafa",
+          borderRadius: "12px",
+        }}
+      >
+        <Typography variant="h6" fontWeight={500} mb={2}>
           {mode === "new"
             ? "Create New Subscription"
             : mode === "edit"
@@ -81,15 +126,23 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Plan Details
+              </Typography>
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Plan Name"
                 fullWidth
+                size="small"
                 value={formData.plan_name}
                 onChange={handleChange("plan_name")}
                 disabled={isViewMode}
-                required
+                error={!!errors.plan_name}
+                helperText={errors.plan_name}
               />
             </Grid>
 
@@ -98,10 +151,12 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
                 type="number"
                 label="Plan Price"
                 fullWidth
+                size="small"
                 value={formData.plan_price}
                 onChange={handleChange("plan_price")}
                 disabled={isViewMode}
-                required
+                error={!!errors.plan_price}
+                helperText={errors.plan_price}
               />
             </Grid>
 
@@ -109,54 +164,77 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
               <TextField
                 label="Services"
                 fullWidth
+                size="small"
                 multiline
                 rows={3}
                 value={formData.services}
                 onChange={handleChange("services")}
                 disabled={isViewMode}
-                required
+                error={!!errors.services}
+                helperText={errors.services}
               />
+            </Grid>
+
+            <Grid item xs={12} mt={1}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Service Configuration
+              </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Service Type"
                 fullWidth
+                size="small"
                 value={formData.service_type}
                 onChange={handleChange("service_type")}
                 disabled={isViewMode}
-                required
+                error={!!errors.service_type}
+                helperText={errors.service_type}
               />
             </Grid>
 
-            <Grid item xs={6} sm={3}>
-              <TextField
-                type="number"
-                label="Duration Value"
-                fullWidth
-                value={formData.duration_value}
-                onChange={handleChange("duration_value")}
-                disabled={isViewMode}
-                required
-              />
+            <Grid item xs={12} sm={6}>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <TextField
+                    type="number"
+                    label="Duration Value"
+                    fullWidth
+                    size="small"
+                    value={formData.duration_value}
+                    onChange={handleChange("duration_value")}
+                    disabled={isViewMode}
+                    error={!!errors.duration_value}
+                    helperText={errors.duration_value}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    select
+                    label="Duration Unit"
+                    fullWidth
+                    size="small"
+                    value={formData.duration_unit}
+                    onChange={handleChange("duration_unit")}
+                    disabled={isViewMode}
+                    error={!!errors.duration_unit}
+                    helperText={errors.duration_unit}
+                  >
+                    {["days", "months", "years"].map((unit) => (
+                      <MenuItem key={unit} value={unit}>
+                        {unit.charAt(0).toUpperCase() + unit.slice(1)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
             </Grid>
 
-            <Grid item xs={6} sm={3}>
-              <TextField
-                select
-                label="Duration Unit"
-                fullWidth
-                value={formData.duration_unit}
-                onChange={handleChange("duration_unit")}
-                disabled={isViewMode}
-                required
-              >
-                {["days", "months", "years"].map((unit) => (
-                  <MenuItem key={unit} value={unit}>
-                    {unit.charAt(0).toUpperCase() + unit.slice(1)}
-                  </MenuItem>
-                ))}
-              </TextField>
+            <Grid item xs={12} mt={1}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Subscription Status
+              </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6}>
@@ -164,10 +242,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
                 select
                 label="Status"
                 fullWidth
+                size="small"
                 value={formData.status}
                 onChange={handleChange("status")}
                 disabled={isViewMode}
-                required
               >
                 <MenuItem value="Active">Active</MenuItem>
                 <MenuItem value="Inactive">Inactive</MenuItem>
@@ -175,35 +253,33 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) 
             </Grid>
 
             {!isViewMode && (
-              <Grid item xs={12}>
+              <Grid item xs={12} mt={2}>
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   <Button
                     type="submit"
                     variant="contained"
-                    size="large"
                     sx={{
                       background:
                         "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
                       color: "#fff",
                       borderRadius: "8px",
-                      padding: "10px 24px",
-                      fontWeight: 600,
+                      padding: "8px 22px",
+                      fontWeight: 500,
                       textTransform: "none",
-                      fontSize: "1rem",
-                      boxShadow: "none",
-                      transition: "all 0.3s ease",
+                      fontSize: "0.875rem",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      transition: "all 0.2s ease",
                       "&:hover": {
                         background:
                           "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
-                        boxShadow: "0 4px 12px rgba(27, 77, 62, 0.3)",
-                        transform: "translateY(-2px)",
-                      },
-                      "&:active": {
-                        transform: "translateY(0)",
+                        boxShadow: "0 3px 8px rgba(27, 77, 62, 0.25)",
+                        transform: "translateY(-1px)",
                       },
                     }}
                   >
-                    {mode === "new" ? "Create Subscription" : "Update Subscription"}
+                    {mode === "new"
+                      ? "Create Subscription"
+                      : "Update Subscription"}
                   </Button>
                 </Box>
               </Grid>

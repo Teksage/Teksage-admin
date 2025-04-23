@@ -13,7 +13,6 @@ import Services from "./components/Dashboard/Services/Services";
 import NewService from "./components/Dashboard/Services/AddService";
 import FAQs from "./components/Dashboard/FAQS/FAQs";
 import NewFAQ from "./components/Dashboard/FAQS/AddFaqs";
-import Analytics from "./components/Dashboard/Analytics";
 import Coupons from "./components/Dashboard/Coupons/Coupons";
 import Profile from "./components/Profile/Profile";
 import Subscription from "./components/Dashboard/Subscription/Subscription";
@@ -21,6 +20,7 @@ import Consultations from "./components/Dashboard/Consultations/Consultations";
 import NewCoupon from "./components/Dashboard/Coupons/AddCoupons";
 import NewSubscription from "./components/Dashboard/Subscription/AddSubscription";
 import ConsultationView from "./components/Dashboard/Consultations/ViewConsultations";
+import Analytics from "./components/Dashboard/Analytics/Analytics";
 
 export const router = createBrowserRouter([
   {

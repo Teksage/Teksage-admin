@@ -278,23 +278,28 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
-          <ArrowBackIcon />
+      {/* Header with back button - more compact and subtle */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
+          <ArrowBackIcon fontSize="small" />
         </IconButton>
-        <Typography variant="h5">Go Back</Typography>
+        <Typography variant="subtitle1" fontWeight={500}>
+          Back
+        </Typography>
       </Box>
 
       <Paper
-        elevation={3}
+        elevation={2}
         sx={{
-          p: 4,
-          maxWidth: "1200px",
+          p: { xs: 2, sm: 3 },
+          // maxWidth: "1000px",
           mx: "auto",
-          backgroundColor: "#fefefe",
+          backgroundColor: "#fafafa",
+          borderRadius: "12px",
         }}
       >
-        <Typography variant="h4" gutterBottom fontWeight={600}>
+        {/* Form title with consistent sizing */}
+        <Typography variant="h6" fontWeight={500} mb={2}>
           {mode === "new"
             ? "Create New User"
             : mode === "edit"
@@ -302,12 +307,20 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             : "View User"}
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+        <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
+            {/* Personal Information */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Personal Information
+              </Typography>
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 label="First Name"
                 fullWidth
+                size="small"
                 value={formData.first_name}
                 onChange={handleChange("first_name")}
                 error={!!errors.first_name}
@@ -319,6 +332,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               <TextField
                 label="Last Name"
                 fullWidth
+                size="small"
                 value={formData.last_name}
                 onChange={handleChange("last_name")}
                 error={!!errors.last_name}
@@ -326,10 +340,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 disabled={isViewMode}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Email"
                 fullWidth
+                size="small"
                 value={formData.email}
                 onChange={handleChange("email")}
                 error={!!errors.email}
@@ -341,6 +357,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               <TextField
                 label="Mobile Number"
                 fullWidth
+                size="small"
                 value={formData.mobile}
                 onChange={handleChange("mobile")}
                 error={!!errors.mobile}
@@ -348,7 +365,15 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 disabled={isViewMode}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+
+            {/* Birth Information */}
+            <Grid item xs={12} mt={1}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Birth Details
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
               <DatePicker
                 label="Date of Birth"
                 value={formData.dateOfBirth}
@@ -357,14 +382,14 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 slotProps={{
                   textField: {
                     fullWidth: true,
+                    size: "small",
                     error: !!errors.dateOfBirth,
                     helperText: errors.dateOfBirth,
                   },
                 }}
               />
             </Grid>
-
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <TimePicker
                 label="Time of Birth"
                 value={formData.timeOfBirth}
@@ -373,16 +398,18 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 slotProps={{
                   textField: {
                     fullWidth: true,
+                    size: "small",
                     error: !!errors.timeOfBirth,
                     helperText: errors.timeOfBirth,
                   },
                 }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} md={4}>
               <TextField
                 label="Place of Birth"
                 fullWidth
+                size="small"
                 value={formData.placeOfBirth}
                 onChange={handleChange("placeOfBirth")}
                 error={!!errors.placeOfBirth}
@@ -390,10 +417,19 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 disabled={isViewMode}
               />
             </Grid>
+
+            {/* Additional Information */}
+            <Grid item xs={12} mt={1}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Additional Details
+              </Typography>
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Preferred Location"
                 fullWidth
+                size="small"
                 value={formData.preferredLocation}
                 onChange={handleChange("preferredLocation")}
                 error={!!errors.preferredLocation}
@@ -404,17 +440,24 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             {loadingRasiNakshatram && (
               <Grid item xs={12}>
-                <Typography variant="body2" color="primary">
+                <Typography
+                  variant="caption"
+                  color="primary"
+                  display="flex"
+                  alignItems="center"
+                >
+                  <CircularProgress size={14} sx={{ mr: 1 }} />
                   Fetching Rasi & Nakshatram based on your input...
                 </Typography>
               </Grid>
             )}
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} md={4}>
               <FormControl
                 fullWidth
                 error={!!errors.rasi}
                 disabled={isViewMode}
+                size="small"
               >
                 <InputLabel>Rasi</InputLabel>
                 <Select
@@ -431,11 +474,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 {errors.rasi && <FormHelperText>{errors.rasi}</FormHelperText>}
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} md={4}>
               <FormControl
                 fullWidth
                 error={!!errors.nakshatram}
                 disabled={isViewMode}
+                size="small"
               >
                 <InputLabel>Nakshatram</InputLabel>
                 <Select
@@ -454,8 +498,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 )}
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth disabled={isViewMode}>
+            <Grid item xs={12} sm={6} md={4}>
+              <FormControl fullWidth disabled={isViewMode} size="small">
                 <InputLabel>Status</InputLabel>
                 <Select
                   value={formData.status}
@@ -467,20 +511,22 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 </Select>
               </FormControl>
             </Grid>
+
+            {/* Submit Button */}
             {!isViewMode && (
-              <Grid item xs={12}>
+              <Grid item xs={12} mt={1}>
                 <Box display="flex" justifyContent="flex-end">
                   <Button
                     type="submit"
                     variant="contained"
                     sx={{
                       background: "linear-gradient(to right, #00C853, #00695C)",
-                      padding: "10px 28px",
-                      fontWeight: 600,
-                      borderRadius: "10px",
-                      fontSize: "1rem",
+                      padding: "8px 22px",
+                      fontWeight: 500,
+                      borderRadius: "8px",
+                      fontSize: "0.875rem",
                       textTransform: "none",
-                      boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                       "&:hover": {
                         background:
                           "linear-gradient(to right, #00E676, #00897B)",
@@ -495,6 +541,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           </Grid>
         </Box>
       </Paper>
+
       <CustomSnackbar
         open={snackbar.open}
         message={snackbar.message}

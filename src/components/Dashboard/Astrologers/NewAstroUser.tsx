@@ -370,12 +370,12 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     const requiredFields: (keyof AstroFormData)[] = [
-      "first_name",
-      "last_name",
-      "email",
-      "mobile_number",
-      "astrologer_profile_info",
-      "experience",
+      // "first_name",
+      // "last_name",
+      // "email",
+      // "mobile_number",
+      // "astrologer_profile_info",
+      // "experience",
       "consulting_fee",
     ];
     requiredFields.forEach((field) => {
@@ -386,7 +386,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       newErrors.languages = "At least one language is required";
     if (!formData.expertises.length)
       newErrors.expertises = "At least one expertise is required";
-    if (!formData.picture) newErrors.picture = "Profile picture is required";
+    // if (!formData.picture) newErrors.picture = "Profile picture is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -418,32 +418,38 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
-          <ArrowBackIcon />
+      {/* Header with back button - more compact and subtle */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
+          <ArrowBackIcon fontSize="small" />
         </IconButton>
-        <Typography variant="h5">Go Back</Typography>
+        <Typography variant="subtitle1" fontWeight={500}>
+          Back
+        </Typography>
       </Box>
 
       <Paper
-        elevation={3}
+        elevation={2}
         sx={{
-          p: 4,
-          maxWidth: "1200px",
+          p: { xs: 2, sm: 3 },
+          // maxWidth: "1000px",
           mx: "auto",
-          backgroundColor: "#fefefe",
+          backgroundColor: "#fafafa",
+          borderRadius: "12px",
         }}
       >
-        <Typography variant="h5" gutterBottom>
+        {/* Form title with consistent sizing */}
+        <Typography variant="h6" fontWeight={500} mb={2}>
           {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro
           User
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sx={{ textAlign: "center" }}>
-              <Typography gutterBottom variant="h6">
-                Upload Profile Picture
+          <Grid container spacing={2}>
+            {/* Profile Picture Section */}
+            <Grid item xs={12} sx={{ textAlign: "center", mb: 1 }}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Profile Picture
               </Typography>
               <Box sx={{ position: "relative", display: "inline-block" }}>
                 <Avatar
@@ -456,11 +462,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   }
                   alt="Astrologer"
                   sx={{
-                    width: 120,
-                    height: 120,
+                    width: 100,
+                    height: 100,
                     mx: "auto",
                     mb: 1,
-                    border: errors.picture ? "2px solid red" : "2px solid #ccc",
+                    border: errors.picture ? "2px solid red" : "1px solid #ddd",
                   }}
                 />
                 {!isViewMode && (
@@ -476,54 +482,93 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                         color="primary"
                         aria-label="upload picture"
                         component="span"
+                        size="small"
                         sx={{
                           position: "absolute",
                           bottom: 0,
-                          right: -10,
+                          right: -5,
                           bgcolor: "#fff",
                           borderRadius: "50%",
-                          boxShadow: 2,
+                          boxShadow: 1,
+                          p: 0.5,
                         }}
                       >
-                        <PhotoCamera />
+                        <PhotoCamera fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </label>
                 )}
               </Box>
               {errors.picture && (
-                <Typography variant="body2" color="error">
+                <Typography variant="caption" color="error">
                   {errors.picture}
                 </Typography>
               )}
             </Grid>
 
-            {[
-              "first_name",
-              "last_name",
-              "email",
-              "mobile_number",
-              "astrologer_profile_info",
-              "experience",
-              "consulting_fee",
-            ].map((key, i) => (
-              <Grid item xs={12} sm={6} key={key}>
-                <TextField
-                  label={key
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                  fullWidth
-                  value={formData[key]}
-                  onChange={handleChange(key)}
-                  error={!!errors[key]}
-                  helperText={errors[key] || ""}
-                  disabled={isViewMode}
-                />
-              </Grid>
-            ))}
+            {/* Personal Information */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Personal Information
+              </Typography>
+            </Grid>
+
+            {/* Map through basic personal info fields */}
+            {["first_name", "last_name", "email", "mobile_number"].map(
+              (key) => (
+                <Grid item xs={12} sm={6} key={key}>
+                  <TextField
+                    label={key
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    fullWidth
+                    size="small"
+                    value={formData[key]}
+                    onChange={handleChange(key)}
+                    error={!!errors[key]}
+                    helperText={errors[key] || ""}
+                    disabled={isViewMode}
+                  />
+                </Grid>
+              )
+            )}
+
+            {/* Professional Information */}
+            <Grid item xs={12} mt={1}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Professional Details
+              </Typography>
+            </Grid>
+
+            {/* Professional fields */}
+            {["astrologer_profile_info", "experience", "consulting_fee"].map(
+              (key) => (
+                <Grid
+                  item
+                  xs={12}
+                  sm={key === "astrologer_profile_info" ? 12 : 6}
+                  key={key}
+                >
+                  <TextField
+                    label={key
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    fullWidth
+                    size="small"
+                    value={formData[key]}
+                    onChange={handleChange(key)}
+                    error={!!errors[key]}
+                    helperText={errors[key] || ""}
+                    disabled={isViewMode}
+                    multiline={key === "astrologer_profile_info"}
+                    minRows={key === "astrologer_profile_info" ? 4 : undefined}
+                  />
+                </Grid>
+              )
+            )}
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth disabled={isViewMode}>
+              <FormControl fullWidth disabled={isViewMode} size="small">
                 <InputLabel>Status</InputLabel>
                 <Select
                   value={formData.status}
@@ -537,32 +582,55 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <Typography variant="h6" gutterBottom>
-                Customer Rating
-              </Typography>
-              <Rating
-                name="customer_rating"
-                value={formData.customer_rating}
-                onChange={(_, newValue) =>
-                  setFormData((prev: any) => ({
-                    ...prev,
-                    customer_rating: newValue,
-                  }))
-                }
-                disabled={isViewMode}
-                sx={{ fontSize: 32 }}
-              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                }}
+              >
+                <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                  Customer Rating
+                </Typography>
+
+                <Rating
+                  name="customer_rating"
+                  value={formData.customer_rating}
+                  onChange={(_, newValue) =>
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      customer_rating: newValue,
+                    }))
+                  }
+                  disabled={isViewMode}
+                  sx={{ fontSize: 36, color: "#FFD700" }} // Optional: Make it pop!
+                />
+
+                {!isViewMode && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 0.5, fontStyle: "italic" }}
+                  >
+                    Click to rate from 1 to 5 stars
+                  </Typography>
+                )}
+              </Box>
             </Grid>
 
+            {/* Languages and Expertise */}
             {["languages", "expertises"].map((field) => (
               <Grid item xs={12} key={field}>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="subtitle2" color="text.secondary" mb={1}>
                   {field === "languages"
                     ? "Languages Known"
                     : "Expertise Areas"}
                 </Typography>
                 <TextField
                   fullWidth
+                  size="small"
                   label={`Add ${field}`}
                   value={field === "languages" ? inputLang : inputExpertise}
                   onChange={(e) =>
@@ -582,6 +650,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     <Chip
                       key={index}
                       label={item}
+                      size="small"
                       onDelete={
                         !isViewMode ? handleTagDelete(field, index) : undefined
                       }
@@ -592,34 +661,29 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               </Grid>
             ))}
 
+            {/* Submit Button */}
             {!isViewMode && (
-              <Grid item xs={12}>
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}
-                >
+              <Grid item xs={12} mt={1}>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   <Button
                     type="submit"
                     variant="contained"
-                    size="large"
                     sx={{
                       background:
                         "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
                       color: "#fff",
                       borderRadius: "8px",
-                      padding: "10px 24px",
-                      fontWeight: 600,
+                      padding: "8px 22px",
+                      fontWeight: 500,
                       textTransform: "none",
-                      fontSize: "1rem",
-                      boxShadow: "none",
-                      transition: "all 0.3s ease",
+                      fontSize: "0.875rem",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      transition: "all 0.2s ease",
                       "&:hover": {
                         background:
                           "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
-                        boxShadow: "0 4px 12px rgba(27, 77, 62, 0.3)",
-                        transform: "translateY(-2px)",
-                      },
-                      "&:active": {
-                        transform: "translateY(0)",
+                        boxShadow: "0 3px 8px rgba(27, 77, 62, 0.25)",
+                        transform: "translateY(-1px)",
                       },
                     }}
                   >
