@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
-import GenericTable from "../../Elements/Table";
-import { TableColumn } from "../../Elements/Table";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+} from "@mui/material";
+import GenericTable, { TableColumn } from "../../Elements/Table";
 import { callAPI } from "../../../api/crudFactory";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../Elements/ConfirmModal";
 
 interface CouponData {
   id: number;
   coupon_name: string;
   coupon_percentage: number;
   max_cap: number;
-  start_date: string; // ISO format assumed
+  start_date: string;
   end_date: string;
   plan_name: string;
 }
@@ -18,31 +27,27 @@ interface CouponData {
 const Coupons: React.FC = () => {
   const navigate = useNavigate();
   const [coupons, setCoupons] = useState<CouponData[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<CouponData | null>(null);
 
   useEffect(() => {
-    const fetchCoupons = async () => {
-      try {
-        const response = await callAPI({
-          endpoint: "/api/admin/coupons",
-          method: "get",
-        });
-        console.log(response, "Coupons Response");
-        setCoupons(response.data);
-      } catch (error) {
-        console.error("Failed to fetch coupons:", error);
-      }
-    };
-
     fetchCoupons();
   }, []);
 
+  const fetchCoupons = async () => {
+    try {
+      const response = await callAPI({
+        endpoint: "/api/admin/coupons",
+        method: "get",
+      });
+      setCoupons(response.data);
+    } catch (error) {
+      console.error("Failed to fetch coupons:", error);
+    }
+  };
+
   const columns: TableColumn<CouponData>[] = [
-    {
-      id: "coupon_name",
-      label: "Name",
-      width: "200px",
-      // filterable: true,
-    },
+    { id: "coupon_name", label: "Name", width: "200px" },
     {
       id: "coupon_percentage",
       label: "Coupon (%)",
@@ -67,47 +72,63 @@ const Coupons: React.FC = () => {
       width: "180px",
       render: (value) => format(new Date(value), "dd MMM yyyy"),
     },
-    {
-      id: "plan_name",
-      label: "Linked Plan",
-      width: "200px",
-    },
+    { id: "plan_name", label: "Linked Plan", width: "200px" },
   ];
 
-  const handleAdd = () => {
-    navigate('/dashboard/coupons/new');
-  };
-
-  const handleView = (row: CouponData) => {
-    navigate(`/dashboard/users/view/${row?.id}`);
-  };
-
-  const handleEdit = (row: CouponData) => {
-    navigate(`/dashboard/users/edit/${row?.id}`);
-  };
+  const handleAdd = () => navigate("/dashboard/coupons/new");
+  const handleView = (row: CouponData) =>
+    navigate(`/dashboard/coupons/view/${row.id}`);
+  const handleEdit = (row: CouponData) =>
+    navigate(`/dashboard/coupons/edit/${row.id}`);
 
   const handleDelete = (row: CouponData) => {
-    // navigate(`/dashboard/users/edit/${row?.id}`);
+    setSelectedRow(row);
+    setDeleteModalOpen(true);
   };
 
-  const handleSelectionChange = (selectedIds: number[]) => {
-    // Handle selected row IDs here
+  const confirmDelete = async () => {
+    try {
+      await callAPI({
+        endpoint: `/api/admin/coupons/${selectedRow?.id}`,
+        method: "delete",
+      });
+      setDeleteModalOpen(false);
+      setSelectedRow(null);
+      fetchCoupons();
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+    }
   };
+
+  const handleSelectionChange = (selectedIds: number[]) => {};
 
   return (
-    <GenericTable<CouponData>
-      title="Coupons Management"
-      data={coupons}
-      columns={columns}
-      onAdd={handleAdd}
-      onView={handleView}
-      onEdit={handleEdit}
-      onDelete={handleDelete}
-      onSelectionChange={handleSelectionChange}
-      getRowId={(row) => row.id}
-      tableHeight="calc(100vh - 250px)"
-      initialRowsPerPage={10}
-    />
+    <>
+      <GenericTable<CouponData>
+        title="Coupons Management"
+        data={coupons}
+        columns={columns}
+        onAdd={handleAdd}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onSelectionChange={handleSelectionChange}
+        getRowId={(row) => row.id}
+        tableHeight="calc(100vh - 250px)"
+        initialRowsPerPage={10}
+      />
+
+      {/* 💬 Delete Confirmation Modal */}
+      <ConfirmModal
+        open={deleteModalOpen}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete "${selectedRow?.coupon_name}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteModalOpen(false)}
+      />
+    </>
   );
 };
 

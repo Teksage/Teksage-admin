@@ -26,6 +26,7 @@ export const callAPI = async ({
     const config = { 
       params,
       headers: {
+        "Content-Type": "application/json",
         ...headers,
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       }

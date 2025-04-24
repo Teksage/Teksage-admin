@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -22,7 +22,7 @@ interface CouponFormData {
   max_cap: number | "";
   start_date: Date | null;
   end_date: Date | null;
-  plan_name: string;
+  plan_id: number;
 }
 
 const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
@@ -34,19 +34,48 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     max_cap: "",
     start_date: null,
     end_date: null,
-    plan_name: "",
+    plan_id: null,
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [planData, setPlanData] = useState([]);
 
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const response = await callAPI({
+          endpoint: "/api/admin/service-catalogs",
+          method: "get",
+        });
+        console.log(response, "service-catalogs Response");
+        const transformedPlans = response?.data?.map((plan: any) => ({
+          id: plan?.plan_id,
+          name: `${plan.plan_name} (${plan.duration_value} ${plan.duration_unit})`,
+        }));
+        console.log(transformedPlans, "transformedPlans");
+        setPlanData(transformedPlans);
+      } catch (error) {
+        console.error("Failed to fetch coupons:", error);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
 
   const handleChange =
     (field: keyof CouponFormData) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
+
       setFormData((prev) => ({
         ...prev,
         [field]:
           field === "coupon_percentage" || field === "max_cap" ? +value : value,
+      }));
+
+      // ✅ Clear the error for this field when user starts typing
+      setErrors((prev: any) => ({
+        ...prev,
+        [field]: "",
       }));
     };
 
@@ -55,10 +84,11 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     if (!formData.coupon_name.trim()) newErrors.coupon_name = true;
     if (formData.coupon_percentage === "" || formData.coupon_percentage < 0)
       newErrors.coupon_percentage = true;
-    if (formData.max_cap === "" || formData.max_cap < 0) newErrors.max_cap = true;
+    if (formData.max_cap === "" || formData.max_cap < 0)
+      newErrors.max_cap = true;
     if (!formData.start_date) newErrors.start_date = true;
     if (!formData.end_date) newErrors.end_date = true;
-    if (!formData.plan_name.trim()) newErrors.plan_name = true;
+    if (!formData.plan_id) newErrors.plan_id = true;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,6 +97,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     event.preventDefault();
     if (!validateForm()) return;
     try {
+      console.log(formData, "formData");
       await callAPI({
         endpoint:
           mode === "edit"
@@ -142,7 +173,10 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 onChange={handleChange("coupon_percentage")}
                 disabled={isViewMode}
                 error={errors.coupon_percentage}
-                helperText={errors.coupon_percentage && "Enter a valid percentage (0 or more)."}
+                helperText={
+                  errors.coupon_percentage &&
+                  "Enter a valid percentage (0 or more)."
+                }
               />
             </Grid>
 
@@ -156,7 +190,9 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 onChange={handleChange("max_cap")}
                 disabled={isViewMode}
                 error={errors.max_cap}
-                helperText={errors.max_cap && "Enter a valid max cap (0 or more)."}
+                helperText={
+                  errors.max_cap && "Enter a valid max cap (0 or more)."
+                }
               />
             </Grid>
 
@@ -170,9 +206,10 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               <DatePicker
                 label="Start Date"
                 value={formData.start_date}
-                onChange={(newValue) =>
-                  setFormData((prev) => ({ ...prev, start_date: newValue }))
-                }
+                onChange={(newValue) => {
+                  setFormData((prev) => ({ ...prev, start_date: newValue }));
+                  setErrors((prev) => ({ ...prev, start_date: "" }));
+                }}
                 disabled={isViewMode}
                 slotProps={{
                   textField: {
@@ -190,9 +227,10 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               <DatePicker
                 label="End Date"
                 value={formData.end_date}
-                onChange={(newValue) =>
-                  setFormData((prev) => ({ ...prev, end_date: newValue }))
-                }
+                onChange={(newValue) => {
+                  setFormData((prev) => ({ ...prev, end_date: newValue }));
+                  setErrors((prev) => ({ ...prev, end_date: "" }));
+                }}
                 disabled={isViewMode}
                 slotProps={{
                   textField: {
@@ -214,15 +252,22 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6}>
               <TextField
+                select
                 label="Plan Name"
                 fullWidth
                 size="small"
-                value={formData.plan_name}
-                onChange={handleChange("plan_name")}
+                value={formData.plan_id}
+                onChange={handleChange("plan_id")}
                 disabled={isViewMode}
-                error={errors.plan_name}
-                helperText={errors.plan_name && "Plan name is required."}
-              />
+                error={!!errors.plan_id}
+                helperText={errors.plan_id && "Plan name is required."}
+              >
+                {planData.map((plan:any) => (
+                  <MenuItem key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
 
             {!isViewMode && (
