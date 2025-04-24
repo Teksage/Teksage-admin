@@ -7,39 +7,33 @@ import { callAPI } from "../../../api/crudFactory";
 
 interface UserData {
   astrologer_id: number;
+  consulting_fee: string;
+  customer_rating: string;
+  experience: number;
   first_name: string;
-  languageSkills: string;
-  areasOfExpertise: string;
-  yearsOfExperience: number;
-  // profilePicture: string;
-  email: string;
-  mobile: string;
   status: string;
-  plan: string;
-  rating: string;
-  consultation_fee: string;
 }
 
 const Astrologers: React.FC = () => {
   const navigate = useNavigate();
   const [Astrologers, setAstrologers] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchUsers = async () => {
-  //     try {
-  //       const response = await callAPI({
-  //         endpoint: "api/admin/astrologers",
-  //         method: "get",
-  //       });
-  //       console.log(response, "response");
-  //       setAstrologers(response.data); // or response if your `callAPI` returns data directly
-  //     } catch (error) {
-  //       console.error("Failed to fetch users:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await callAPI({
+          endpoint: "api/admin/astrologers",
+          method: "get",
+        });
+        console.log(response?.data?.astrologers, "response");
+        setAstrologers(response?.data?.astrologers); // or response if your `callAPI` returns data directly
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
 
-  //   fetchUsers();
-  // }, []);
+    fetchUsers();
+  }, []);
 
   const columns: TableColumn<UserData>[] = [
     {
@@ -49,18 +43,18 @@ const Astrologers: React.FC = () => {
       // width: "300px",
     },
     {
-      id: "yearsOfExperience",
+      id: "experience",
       label: "Experience",
       filterable: true,
     },
     {
-      id: "rating",
+      id: "customer_rating",
       label: "Rating",
       filterable: true,
       // width: "250px",
     },
     {
-      id: "consultation_fee",
+      id: "consulting_fee",
       label: "Consultation Fee",
       filterable: true,
     },
@@ -87,9 +81,9 @@ const Astrologers: React.FC = () => {
     },
   ];
 
-  // const handleAdd = () => {
-  //   navigate("/dashboard/astrologers/new");
-  // };
+  const handleAdd = () => {
+    navigate("/dashboard/astrologers/new");
+  };
 
   const handleStatus = () => {
     // Handle Status
@@ -116,7 +110,7 @@ const Astrologers: React.FC = () => {
       title="Astrologer Management"
       data={Astrologers}
       columns={columns}
-      // onAdd={handleAdd}
+      onAdd={handleAdd}
       onStatus={handleStatus}
       onView={handleView}
       onEdit={handleEdit}

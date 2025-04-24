@@ -27,10 +27,10 @@ export const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      // {
-      //   index: true,
-      //   element: <Navigate to="/auth/login" replace />
-      // },
+      {
+        index: true,
+        element: <Navigate to="/auth/login" replace />
+      },
       {
         path: "auth",
         children: [

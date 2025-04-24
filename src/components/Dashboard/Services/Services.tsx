@@ -64,7 +64,7 @@ const Services: React.FC = () => {
     { id: "plan_name", label: "Plan Name", width: "200px" },
   ];
 
-  const handleAdd = () => navigate("/dashboard/services/new");
+  // const handleAdd = () => navigate("/dashboard/services/new");
   const handleEdit = (row: ServiceData) => navigate(`/dashboard/services/edit/${row.id}`);
   const handleDelete = (row: ServiceData) => {
     // navigate(`/dashboard/users/edit/${row?.id}`);
@@ -75,7 +75,7 @@ const Services: React.FC = () => {
       title="Service Management"
       data={serviceData}
       columns={columns}
-      onAdd={handleAdd}
+      // onAdd={handleAdd}
       onEdit={handleEdit}
       onDelete={handleDelete}
       getRowId={(row) => row.id}

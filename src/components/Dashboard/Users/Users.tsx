@@ -6,52 +6,42 @@ import { useNavigate } from "react-router-dom";
 import { callAPI } from '../../../api/crudFactory';
 
 interface UserData {
-  user_id: number;
-  first_name: string;
-  last_name: string;
+  id: number;
+  name: string;
   email: string;
   mobile_number: string;
-  user_type: string;
   status: string;
-  rasi: string;
-  nakshatram: string;
-  plan: string;
+  user_typeplan_names: string;
 }
 
 const Users: React.FC = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchUsers = async () => {
-  //     try {
-  //       const response = await callAPI({
-  //         endpoint: "api/admin/users",
-  //         method: "get",
-  //       });
-  //       console.log(response, "response")
-  //       setUsers(response.data); // or response if your `callAPI` returns data directly
-  //     } catch (error) {
-  //       console.error("Failed to fetch users:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await callAPI({
+          endpoint: "api/admin/users",
+          method: "get",
+        });
+        console.log(response?.data?.data, "response")
+        setUsers(response?.data?.data); // or response if your `callAPI` returns data directly
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
 
-  //   fetchUsers();
-  // }, []);
+    fetchUsers();
+  }, []);
   
   const columns: TableColumn<UserData>[] = [
     { 
-      id: 'first_name', 
+      id: 'name', 
       label: 'Name', 
       filterable: true,
       width: '200px' 
     },
-    // { 
-    //   id: 'last_name', 
-    //   label: 'Last Name', 
-    //   filterable: true,
-    //   width: '200px' 
-    // },
     { 
       id: 'email', 
       label: 'Email',
@@ -65,7 +55,7 @@ const Users: React.FC = () => {
       width: '250px' 
     },
     { 
-      id: 'plan', 
+      id: 'user_typeplan_names', 
       label: 'Subscription', 
       filterable: true
     },
@@ -90,16 +80,6 @@ const Users: React.FC = () => {
       },
       filterable: true,
     },
-    // { 
-    //   id: 'rasi', 
-    //   label: 'Rasi', 
-    //   filterable: true
-    // },
-    // { 
-    //   id: 'nakshatram', 
-    //   label: 'Nakshatram', 
-    //   filterable: true
-    // },
   ];
 
   const handleAdd = () => {
@@ -111,11 +91,11 @@ const Users: React.FC = () => {
   };
 
   const handleView = (row: UserData) => {
-    navigate(`/dashboard/users/view/${row?.user_id}`);
+    navigate(`/dashboard/users/view/${row?.id}`);
   };
 
   const handleEdit = (row: UserData) => {
-    navigate(`/dashboard/users/edit/${row?.user_id}`);
+    navigate(`/dashboard/users/edit/${row?.id}`);
   };
 
   const handleDelete = (row: UserData) => {
@@ -137,7 +117,7 @@ const Users: React.FC = () => {
       onEdit={handleEdit}
       onDelete={handleDelete}
       onSelectionChange={handleSelectionChange}
-      getRowId={(row) => row.user_id}
+      getRowId={(row) => row.id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={10}
     />

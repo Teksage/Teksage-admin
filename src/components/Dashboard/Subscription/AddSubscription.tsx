@@ -18,7 +18,7 @@ interface SubscriptionFormData {
   plan_price: number | "";
   services: string;
   status: "Active" | "Inactive";
-  service_type: string;
+  service_type: "Free" | "Premium";
   duration_value: number | "";
   duration_unit: "days" | "months" | "years";
 }
@@ -33,7 +33,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     plan_price: "",
     services: "",
     status: "Active",
-    service_type: "",
+    service_type: "Free",
     duration_value: "",
     duration_unit: "months",
   });
@@ -63,9 +63,9 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     if (!formData.services.trim()) {
       newErrors.services = "Services field is required.";
     }
-    if (!formData.service_type.trim()) {
-      newErrors.service_type = "Service type is required.";
-    }
+    // if (!formData.service_type.trim()) {
+    //   newErrors.service_type = "Service type is required.";
+    // }
     if (!formData.duration_value || formData.duration_value <= 0) {
       newErrors.duration_value = "Duration value must be greater than 0.";
     }
@@ -184,6 +184,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Service Type"
+                select
                 fullWidth
                 size="small"
                 value={formData.service_type}
@@ -191,7 +192,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 disabled={isViewMode}
                 error={!!errors.service_type}
                 helperText={errors.service_type}
-              />
+              >
+                <MenuItem value="Free">Free</MenuItem>
+                <MenuItem value="Premium">Premium</MenuItem>
+              </TextField>
             </Grid>
 
             <Grid item xs={12} sm={6}>

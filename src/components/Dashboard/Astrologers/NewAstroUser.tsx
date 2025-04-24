@@ -271,6 +271,9 @@ import {
   MenuItem,
   Avatar,
   Tooltip,
+  Checkbox,
+  ListItemText,
+  FormHelperText,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
@@ -331,32 +334,37 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   const [inputExpertise, setInputExpertise] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange =
-    (field: keyof AstroFormData) =>
-    (
-      e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent
-    ) => {
-      const value =
-        field === "picture" && "files" in e.target
-          ? (e.target as HTMLInputElement).files?.[0] ?? null
-          : e.target.value;
+  const handleChange = (field: keyof AstroFormData) => (e: any) => {
+    const value = e.target.value;
 
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    };
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
 
-  const handleTagAdd =
-    (type: "languages" | "expertises") =>
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      const value = e.currentTarget.value.trim();
-      if (e.key === "Enter" && value) {
-        e.preventDefault();
+    // ✨ Clear the error if the new value is valid
+    if (field === "expertises" && value.length > 0) {
+      setErrors((prev) => ({ ...prev, expertises: "" }));
+    }
+  };
+
+  const handleTagAdd = (field) => (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const value = e.target.value.trim();
+      if (!value) return;
+
+      if (!formData[field].includes(value)) {
         setFormData((prev) => ({
           ...prev,
-          [type]: [...prev[type], value],
+          [field]: [...prev[field], value],
         }));
-        type === "languages" ? setInputLang("") : setInputExpertise("");
+        setErrors((prev) => ({ ...prev, [field]: "" })); // clear error if added
       }
-    };
+
+      setInputLang(""); // only for languages
+    }
+  };
 
   const handleTagDelete =
     (type: "languages" | "expertises", index: number) => () => {
@@ -375,7 +383,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       // "email",
       // "mobile_number",
       // "astrologer_profile_info",
-      // "experience",
+      "experience",
       "consulting_fee",
     ];
     requiredFields.forEach((field) => {
@@ -384,9 +392,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
     if (!formData.languages.length)
       newErrors.languages = "At least one language is required";
-    if (!formData.expertises.length)
-      newErrors.expertises = "At least one expertise is required";
     // if (!formData.picture) newErrors.picture = "Profile picture is required";
+
+    if (!formData.expertises.length) {
+      newErrors.expertises = "At least one expertise is required";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -621,7 +631,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             </Grid>
 
             {/* Languages and Expertise */}
-            {["languages", "expertises"].map((field) => (
+            {/* {["languages", "expertises"].map((field) => (
               <Grid item xs={12} key={field}>
                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
                   {field === "languages"
@@ -659,7 +669,69 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   ))}
                 </Box>
               </Grid>
-            ))}
+            ))} */}
+
+            {/* Languages as Tags */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                Languages Known
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                label="Add Language"
+                value={inputLang}
+                onChange={(e) => setInputLang(e.target.value)}
+                onKeyDown={handleTagAdd("languages")}
+                disabled={isViewMode}
+                error={!!errors.languages}
+                helperText={errors.languages || "Press Enter to add language"}
+              />
+              <Box sx={{ mt: 1 }}>
+                {formData.languages.map((item, index) => (
+                  <Chip
+                    key={index}
+                    label={item}
+                    size="small"
+                    onDelete={
+                      !isViewMode
+                        ? handleTagDelete("languages", index)
+                        : undefined
+                    }
+                    sx={{ mr: 1, mb: 1 }}
+                  />
+                ))}
+              </Box>
+            </Grid>
+
+            {/* Expertise as Dropdown */}
+            <Grid item xs={12}>
+              <FormControl fullWidth size="small" error={!!errors.expertises}>
+                <InputLabel>Expertise Areas</InputLabel>
+                <Select
+                  multiple
+                  value={formData.expertises}
+                  onChange={handleChange("expertises")}
+                  label="Expertise Areas"
+                  disabled={isViewMode}
+                  renderValue={(selected) => selected.join(", ")}
+                >
+                  {["Career", "Health", "Wealth", "Relationship"].map(
+                    (option) => (
+                      <MenuItem key={option} value={option}>
+                        <Checkbox
+                          checked={formData.expertises.includes(option)}
+                        />
+                        <ListItemText primary={option} />
+                      </MenuItem>
+                    )
+                  )}
+                </Select>
+                {!!errors.expertises && (
+                  <FormHelperText>{errors.expertises}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
 
             {/* Submit Button */}
             {!isViewMode && (

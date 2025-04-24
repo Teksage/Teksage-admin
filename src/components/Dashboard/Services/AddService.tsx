@@ -108,7 +108,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 size="small"
                 value={formData.name}
                 onChange={handleChange("name")}
-                disabled={isViewMode}
+                disabled={isViewMode || mode === "edit"}
                 // required
                 error={Boolean(errors.name)}
                 helperText={errors.name}
