@@ -67,8 +67,13 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             method: "get",
           });
           const data = couponResponse?.data;
-          console.log(data, "data")
-          setFormData({...data, status: data?.status.charAt(0).toUpperCase() + data?.status.slice(1).toLowerCase()});
+          console.log(data, "data");
+          setFormData({
+            ...data,
+            status:
+              data?.status.charAt(0).toUpperCase() +
+              data?.status.slice(1).toLowerCase(),
+          });
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -86,6 +91,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         ...prev,
         [field]:
           field === "plan_price" || field === "duration_value" ? +value : value,
+      }));
+      setErrors((prev: any) => ({
+        ...prev,
+        [field]: "",
       }));
     };
 
@@ -218,7 +227,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       .join(", ")
                   }
                 >
-                  {services.map((service:any) => (
+                  {services.map((service: any) => (
                     <MenuItem key={service.id} value={service.id}>
                       <Checkbox
                         checked={formData.services.includes(service.id)}

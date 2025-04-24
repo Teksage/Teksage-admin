@@ -106,7 +106,7 @@ const DashboardLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
-  const isAuthenticated = useSelector((state) => state.isAuthenticated);
+  // const isAuthenticated = useSelector((state) => state.isAuthenticated);
   const loginUserDetails = useSelector((state) => state.userInfo);
 
   useEffect(() => {
@@ -131,9 +131,9 @@ const DashboardLayout = () => {
     }
   }, [location, isMobile]);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/auth/login" replace />;
+  // }
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);

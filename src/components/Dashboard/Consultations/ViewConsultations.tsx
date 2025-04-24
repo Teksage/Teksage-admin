@@ -36,11 +36,11 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
   useEffect(() => {
     const fetchConsultation = async () => {
       try {
-        const res = await callAPI({
-          endpoint: `api/admin/consultations/${consultationId}`,
-          method: 'get'
-        });
-        setConsultationData(res?.data || null);
+        // const res = await callAPI({
+        //   endpoint: `api/admin/consultations/${consultationId}`,
+        //   method: 'get'
+        // });
+        // setConsultationData(res?.data || null);
         setConsultationData({
             first_name: 'Rahul Sharma',
             astrologer_name: 'Astro Meera',

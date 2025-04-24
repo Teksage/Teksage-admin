@@ -497,7 +497,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
               <ListItemText
                 primary={item.name}
                 primaryTypographyProps={{
-                  fontSize: "0.875rem",
+                  fontSize: "0.995rem",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",

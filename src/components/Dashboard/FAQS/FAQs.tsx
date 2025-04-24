@@ -1,70 +1,103 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import GenericTable from "../../Elements/Table";
 import { TableColumn } from "../../Elements/Table";
-import { Chip } from '@mui/material';
+import { callAPI } from "../../../api/crudFactory";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../Elements/ConfirmModal";
 
 interface FAQData {
-  id: number;
+  faq_id: number;
   question: string;
   answer: string;
-  status: string;
 }
 
 const FAQs: React.FC = () => {
   const navigate = useNavigate();
+  const [data, setData] = useState<FAQData[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<FAQData | null>(null);
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    try {
+      const response = await callAPI({
+        endpoint: "/api/faq",
+        method: "get",
+      });
+      console.log(response, "Plans Response");
+      const transformedPlans = response?.data?.map((plan: any) => ({
+        ...plan,
+        tenure: `${plan.duration_value} ${plan.duration_unit}`,
+      }));
+
+      setData(transformedPlans);
+    } catch (error) {
+      console.error("Failed to fetch plans:", error);
+    }
+  };
 
   const faqColumns: TableColumn<FAQData>[] = [
-    { id: 'question', label: 'Query', width: '300px' },
-    { id: 'answer', label: 'Answer', width: '350px' },
-    { 
-      id: 'status', 
-      label: 'Status',
-      render: (value) => (
-        <Chip label={value} color={value === 'Active' ? 'success' : 'default'} />
-      )
-    }
-  ];
-
-  const faqData: FAQData[] = [
-    {
-      id: 1,
-      question: "How do I book a session with an astrologer?",
-      answer: "You can book a session through our website or mobile app under the 'Book Now' section.",
-      status: "Active"
-    },
-    {
-      id: 2,
-      question: "What are the benefits of a Premium plan?",
-      answer: "The Premium plan gives you priority bookings, exclusive reports, and direct consultations.",
-      status: "Active"
-    }
+    { id: "question", label: "Query", width: "300px" },
+    { id: "answer", label: "Answer", width: "350px" }
   ];
 
   const handleAddFAQ = () => {
-    navigate('/dashboard/faqs/new');
+    navigate("/dashboard/faqs/new");
   };
 
   const handleEditFAQ = (row: FAQData) => {
-    navigate(`/dashboard/faqs/edit/${row?.id}`);
+    navigate(`/dashboard/faqs/edit/${row?.faq_id}`);
   };
 
   const handleDelete = (row: FAQData) => {
-    // navigate(`/dashboard/users/edit/${row?.id}`);
+    console.log(row, "row");
+    setSelectedRow(row);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    console.log(selectedRow?.faq_id, "selectedRow?.id");
+    try {
+      await callAPI({
+        endpoint: `/api/faq/${selectedRow?.faq_id}`,
+        method: "delete",
+      });
+      setDeleteModalOpen(false);
+      setSelectedRow(null);
+      fetchPlans();
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+    }
   };
 
   return (
-    <GenericTable<FAQData>
-      title="FAQ Management"
-      data={faqData}
-      columns={faqColumns}
-      onAdd={handleAddFAQ}
-      onEdit={handleEditFAQ}
-      onDelete={handleDelete}
-      getRowId={(row) => row.id}
-      tableHeight="calc(100vh - 250px)"
-      initialRowsPerPage={10}
-    />
+    <>
+      <GenericTable<FAQData>
+        title="FAQ Management"
+        data={data}
+        columns={faqColumns}
+        onAdd={handleAddFAQ}
+        onEdit={handleEditFAQ}
+        onDelete={handleDelete}
+        getRowId={(row) => row.faq_id}
+        tableHeight="calc(100vh - 250px)"
+        initialRowsPerPage={10}
+      />
+
+      {/* 💬 Delete Confirmation Modal */}
+      <ConfirmModal
+        open={deleteModalOpen}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete "${selectedRow?.question}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteModalOpen(false)}
+      />
+    </>
   );
 };
 

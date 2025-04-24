@@ -38,7 +38,7 @@ const Consultations: React.FC = () => {
           method: "get",
         });
         console.log("Consultations Response", response);
-        setConsultations(response.data);
+        setConsultations(response.data?.data);
       } catch (error) {
         console.error("Failed to fetch consultations:", error);
       }
@@ -148,8 +148,8 @@ const Consultations: React.FC = () => {
   ];
   
 
-  const handleView = (row: UserData) => {
-    navigate(`/dashboard/consultations/view/${row?.astrologer_id}`);
+  const handleView = (row: ConsultationData) => {
+    navigate(`/dashboard/consultations/view/${row?.id}`);
   };
 
   const handleSelectionChange = (selectedIds: number[]) => {
@@ -166,7 +166,7 @@ const Consultations: React.FC = () => {
       getRowId={(row) => row.id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={10}
-      showActions={false}
+      showActions={true}
     />
   );
 };

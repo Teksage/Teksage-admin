@@ -1,160 +1,4 @@
-// import React, { useState } from "react";
-// import {
-//   Box,
-//   TextField,
-//   Button,
-//   Grid,
-//   MenuItem,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   Typography,
-//   Paper,
-//   IconButton,
-// } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
-// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
-// interface FAQFormData {
-//   name: string;
-//   question: string;
-//   answer: string;
-//   status: string;
-// }
-
-// const statusOptions = ["Active", "Inactive"];
-
-// const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
-//   const navigate = useNavigate();
-//   const [formData, setFormData] = useState<FAQFormData>({
-//     name: "",
-//     question: "",
-//     answer: "",
-//     status: "Active",
-//   });
-
-//   const handleChange =
-//     (field: keyof FAQFormData) =>
-//     (event: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => {
-//       setFormData((prev) => ({
-//         ...prev,
-//         [field]: event.target.value,
-//       }));
-//     };
-
-//   const handleSubmit = (event: React.FormEvent) => {
-//     event.preventDefault();
-//     console.log(mode === "edit" ? "Updating FAQ" : "Creating FAQ", formData);
-//   };
-
-//   const isViewMode = mode === "view";
-
-//   return (
-//     <LocalizationProvider dateAdapter={AdapterDateFns}>
-//       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-//         <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
-//           <ArrowBackIcon />
-//         </IconButton>
-//         <Typography variant="h5">Go Back</Typography>
-//       </Box>
-
-//       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-//         <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
-//           {mode === "new"
-//             ? "Create New FAQ"
-//             : mode === "edit"
-//             ? "Edit FAQ"
-//             : "View FAQ"}
-//         </Typography>
-
-//         <Box component="form" onSubmit={handleSubmit}>
-//           <Grid container spacing={3}>
-//             {/* Name Field */}
-//             <Grid item xs={12} sm={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Name"
-//                 variant="outlined"
-//                 value={formData.name}
-//                 onChange={handleChange("name")}
-//                 disabled={isViewMode}
-//                 required
-//               />
-//             </Grid>
-
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Status</InputLabel>
-//                 <Select
-//                   value={formData.status}
-//                   label="Status"
-//                   onChange={handleChange("status")}
-//                   disabled={isViewMode}
-//                   required
-//                 >
-//                   {statusOptions.map((option) => (
-//                     <MenuItem key={option} value={option}>
-//                       {option}
-//                     </MenuItem>
-//                   ))}
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             <Grid item xs={12}>
-//               <TextField
-//                 fullWidth
-//                 label="Question"
-//                 variant="outlined"
-//                 value={formData.question}
-//                 onChange={handleChange("question")}
-//                 disabled={isViewMode}
-//                 required
-//                 multiline
-//                 rows={3}
-//               />
-//             </Grid>
-
-//             <Grid item xs={12}>
-//               <TextField
-//                 fullWidth
-//                 label="Answer"
-//                 variant="outlined"
-//                 value={formData.answer}
-//                 onChange={handleChange("answer")}
-//                 disabled={isViewMode}
-//                 required
-//                 multiline
-//                 rows={4}
-//               />
-//             </Grid>
-
-//             {!isViewMode && (
-//               <Grid item xs={12}>
-//                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-//                   <Button
-//                     type="submit"
-//                     variant="contained"
-//                     color="primary"
-//                     size="large"
-//                   >
-//                     {mode === "new" ? "Create FAQ" : "Update FAQ"}
-//                   </Button>
-//                 </Box>
-//               </Grid>
-//             )}
-//           </Grid>
-//         </Box>
-//       </Paper>
-//     </LocalizationProvider>
-//   );
-// };
-
-// export default NewFAQ;
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -177,10 +21,10 @@ import { callAPI } from "../../../api/crudFactory"; // Make sure this path is co
 interface FAQFormData {
   question: string;
   answer: string;
-  status: string;
+  // status: string;
 }
 
-const statusOptions = ["Active", "Inactive"];
+// const statusOptions = ["Active", "Inactive"];
 
 const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const navigate = useNavigate();
@@ -188,11 +32,34 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const [formData, setFormData] = useState<FAQFormData>({
     question: "",
     answer: "",
-    status: "Active",
+    // status: "Active",
   });
   const [errors, setErrors] = useState<
     Partial<Record<keyof FAQFormData, string>>
   >({});
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // If edit mode, fetch coupon details
+        if (mode === "edit" && userId) {
+          const couponResponse = await callAPI({
+            endpoint: `/api/faq/${userId}`,
+            method: "get",
+          });
+          const data = couponResponse?.data;
+          console.log(data, "data");
+          setFormData({
+            ...data,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchInitialData();
+  }, [mode, userId]);
 
   const handleChange =
     (field: keyof FAQFormData) =>
@@ -200,6 +67,10 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setFormData((prev) => ({
         ...prev,
         [field]: event.target.value,
+      }));
+      setErrors((prev: any) => ({
+        ...prev,
+        [field]: "",
       }));
     };
 
@@ -217,8 +88,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     if (!validate()) return;
     try {
       await callAPI({
-        endpoint:
-          mode === "edit" ? `/api/admin/faq/${userId}` : "/api/admin/faq",
+        endpoint: mode === "edit" ? `/api/faq/${userId}` : "/api/faq",
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
@@ -259,7 +129,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           <Box component="form" onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               {/* Status Field */}
-              <Grid item xs={12} sm={6}>
+              {/* <Grid item xs={12} sm={6}>
                 <FormControl fullWidth size="small" variant="outlined">
                   <InputLabel>Status</InputLabel>
                   <Select
@@ -278,16 +148,16 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}></Grid>
+              <Grid item xs={12} sm={6}></Grid> */}
 
               {/* Question Field */}
               <Grid item xs={12}>
-                <Typography
+                {/* <Typography
                   variant="body2"
                   sx={{ mb: 1, fontWeight: 500, color: "#555" }}
                 >
                   Question
-                </Typography>
+                </Typography> */}
                 <TextField
                   fullWidth
                   label="Question"
@@ -303,12 +173,12 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
               {/* Answer Field */}
               <Grid item xs={12}>
-                <Typography
+                {/* <Typography
                   variant="body2"
                   sx={{ mb: 1, fontWeight: 500, color: "#555" }}
                 >
                   Answer
-                </Typography>
+                </Typography> */}
                 <TextField
                   fullWidth
                   label="Answer"
