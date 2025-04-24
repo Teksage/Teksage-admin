@@ -685,7 +685,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       ? typeof formData.picture === "string"
                         ? formData.picture
                         : URL.createObjectURL(formData.picture)
-                      : "https://res.cloudinary.com/cloudinary-marketing/images/w_2000,h_1100/f_auto,q_auto/v1647266871/Automated-Upload_Sharing/Automated-Upload_Sharing-png?_i=AA"
+                      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJaOl3vJfEJpJU4NLddWUUznNoM1LMu_9qAQ&s"
                   }
                   alt="Astrologer"
                   sx={{
