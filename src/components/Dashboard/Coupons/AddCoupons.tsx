@@ -40,26 +40,44 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const [planData, setPlanData] = useState([]);
 
   useEffect(() => {
-    const fetchCoupons = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await callAPI({
+        // Fetch all service catalogs
+        const serviceResponse = await callAPI({
           endpoint: "/api/admin/service-catalogs",
           method: "get",
         });
-        console.log(response, "service-catalogs Response");
-        const transformedPlans = response?.data?.map((plan: any) => ({
+
+        const transformedPlans = serviceResponse?.data?.map((plan: any) => ({
           id: plan?.plan_id,
           name: `${plan.plan_name} (${plan.duration_value} ${plan.duration_unit})`,
         }));
-        console.log(transformedPlans, "transformedPlans");
+
         setPlanData(transformedPlans);
+
+        // If edit mode, fetch coupon details
+        if (mode === "edit" && userId) {
+          const couponResponse = await callAPI({
+            endpoint: `/api/admin/coupons/${userId}`,
+            method: "get",
+          });
+          const data = couponResponse?.data;
+          setFormData({
+            coupon_name: data?.coupon_name || "",
+            coupon_percentage: data?.coupon_percentage || "",
+            max_cap: data?.max_cap || "",
+            start_date: data?.start_date ? new Date(data.start_date) : null,
+            end_date: data?.end_date ? new Date(data.end_date) : null,
+            plan_id: data?.plan_id || null,
+          });
+        }
       } catch (error) {
-        console.error("Failed to fetch coupons:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
 
-    fetchCoupons();
-  }, []);
+    fetchInitialData();
+  }, [mode, userId]);
 
   const handleChange =
     (field: keyof CouponFormData) =>
@@ -256,13 +274,13 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 label="Plan Name"
                 fullWidth
                 size="small"
-                value={formData.plan_id}
+                value={formData.plan_id ?? ""}
                 onChange={handleChange("plan_id")}
                 disabled={isViewMode}
                 error={!!errors.plan_id}
                 helperText={errors.plan_id && "Plan name is required."}
               >
-                {planData.map((plan:any) => (
+                {planData.map((plan: any) => (
                   <MenuItem key={plan.id} value={plan.id}>
                     {plan.name}
                   </MenuItem>

@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../Elements/ConfirmModal";
 
 interface CouponData {
-  id: number;
+  coupon_id: number;
   coupon_name: string;
   coupon_percentage: number;
   max_cap: number;
@@ -76,20 +76,22 @@ const Coupons: React.FC = () => {
   ];
 
   const handleAdd = () => navigate("/dashboard/coupons/new");
-  const handleView = (row: CouponData) =>
-    navigate(`/dashboard/coupons/view/${row.id}`);
+  // const handleView = (row: CouponData) =>
+  //   navigate(`/dashboard/coupons/view/${row.coupon_id}`);
   const handleEdit = (row: CouponData) =>
-    navigate(`/dashboard/coupons/edit/${row.id}`);
+    navigate(`/dashboard/coupons/edit/${row.coupon_id}`);
 
   const handleDelete = (row: CouponData) => {
+    console.log(row, "row")
     setSelectedRow(row);
     setDeleteModalOpen(true);
   };
 
   const confirmDelete = async () => {
+    console.log(selectedRow?.coupon_id, "selectedRow?.id")
     try {
       await callAPI({
-        endpoint: `/api/admin/coupons/${selectedRow?.id}`,
+        endpoint: `/api/admin/coupons/${selectedRow?.coupon_id}`,
         method: "delete",
       });
       setDeleteModalOpen(false);
@@ -109,11 +111,11 @@ const Coupons: React.FC = () => {
         data={coupons}
         columns={columns}
         onAdd={handleAdd}
-        onView={handleView}
+        // onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onSelectionChange={handleSelectionChange}
-        getRowId={(row) => row.id}
+        getRowId={(row) => row.coupon_id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={10}
       />

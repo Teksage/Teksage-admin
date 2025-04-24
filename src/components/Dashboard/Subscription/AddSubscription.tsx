@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -8,6 +8,13 @@ import {
   Paper,
   IconButton,
   MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  FormHelperText,
+  OutlinedInput,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -16,7 +23,7 @@ import { callAPI } from "../../../api/crudFactory";
 interface SubscriptionFormData {
   plan_name: string;
   plan_price: number | "";
-  services: string;
+  services: string[];
   status: "Active" | "Inactive";
   service_type: "Free" | "Premium";
   duration_value: number | "";
@@ -31,7 +38,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   const [formData, setFormData] = useState<SubscriptionFormData>({
     plan_name: "",
     plan_price: "",
-    services: "",
+    services: [],
     status: "Active",
     service_type: "Free",
     duration_value: "",
@@ -39,6 +46,37 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // Fetch all service
+        const serviceResponse = await callAPI({
+          endpoint: "/api/admin/services",
+          method: "get",
+        });
+
+        console.log(serviceResponse, "serviceResponse");
+        setServices(serviceResponse?.data);
+
+        // If edit mode, fetch coupon details
+        if (mode === "edit" && userId) {
+          const couponResponse = await callAPI({
+            endpoint: `/api/admin/service-catalogs/${userId}`,
+            method: "get",
+          });
+          const data = couponResponse?.data;
+          console.log(data, "data")
+          setFormData({...data, status: data?.status.charAt(0).toUpperCase() + data?.status.slice(1).toLowerCase()});
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchInitialData();
+  }, [mode, userId]);
 
   const handleChange =
     (field: keyof SubscriptionFormData) =>
@@ -60,7 +98,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     if (!formData.plan_price || formData.plan_price <= 0) {
       newErrors.plan_price = "Plan price must be greater than 0.";
     }
-    if (!formData.services.trim()) {
+    if (!formData.services.length) {
       newErrors.services = "Services field is required.";
     }
     // if (!formData.service_type.trim()) {
@@ -84,8 +122,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       await callAPI({
         endpoint:
           mode === "edit"
-            ? `/api/admin/subscriptions/${userId}`
-            : "/api/admin/subscriptions",
+            ? `/api/admin/service-catalogs/${userId}`
+            : "/api/admin/service-catalogs",
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
@@ -161,18 +199,36 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                label="Services"
+              <FormControl
                 fullWidth
                 size="small"
-                multiline
-                rows={3}
-                value={formData.services}
-                onChange={handleChange("services")}
-                disabled={isViewMode}
                 error={!!errors.services}
-                helperText={errors.services}
-              />
+                disabled={isViewMode}
+              >
+                <InputLabel>Services</InputLabel>
+                <Select
+                  multiple
+                  value={formData.services}
+                  onChange={handleChange("services")}
+                  input={<OutlinedInput label="Services" />}
+                  renderValue={(selected) =>
+                    services
+                      .filter((item) => selected.includes(item.id))
+                      .map((item) => item.name)
+                      .join(", ")
+                  }
+                >
+                  {services.map((service:any) => (
+                    <MenuItem key={service.id} value={service.id}>
+                      <Checkbox
+                        checked={formData.services.includes(service.id)}
+                      />
+                      <ListItemText primary={service.name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>{errors.services}</FormHelperText>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12} mt={1}>
@@ -193,8 +249,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 error={!!errors.service_type}
                 helperText={errors.service_type}
               >
-                <MenuItem value="Free">Free</MenuItem>
-                <MenuItem value="Premium">Premium</MenuItem>
+                <MenuItem value="free">Free</MenuItem>
+                <MenuItem value="premium">Premium</MenuItem>
               </TextField>
             </Grid>
 

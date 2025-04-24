@@ -4,9 +4,10 @@ import { TableColumn } from "../../Elements/Table";
 import { Chip } from "@mui/material";
 import { callAPI } from "../../../api/crudFactory";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../Elements/ConfirmModal";
 
 interface PlanData {
-  id: number;
+  plan_id: number;
   plan_name: string;
   plan_price: string;
   services: string;
@@ -20,23 +21,30 @@ interface PlanData {
 const Subscription: React.FC = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<PlanData[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<PlanData | null>(null);
 
   useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await callAPI({
-          endpoint: "/api/admin/plans",
-          method: "get",
-        });
-        console.log(response, "Plans Response");
-        setPlans(response.data);
-      } catch (error) {
-        console.error("Failed to fetch plans:", error);
-      }
-    };
-
     fetchPlans();
   }, []);
+
+  const fetchPlans = async () => {
+    try {
+      const response = await callAPI({
+        endpoint: "/api/admin/service-catalogs",
+        method: "get",
+      });
+      console.log(response, "Plans Response");
+      const transformedPlans = response?.data?.map((plan: any) => ({
+        ...plan,
+        tenure: `${plan.duration_value} ${plan.duration_unit}`,
+      }));
+
+      setPlans(transformedPlans);
+    } catch (error) {
+      console.error("Failed to fetch plans:", error);
+    }
+  };
 
   const columns: TableColumn<PlanData>[] = [
     {
@@ -76,76 +84,70 @@ const Subscription: React.FC = () => {
     },
   ];
 
-  const samplePlans: PlanData[] = [
-    {
-      id: 1,
-      plan_name: "Basic Monthly",
-      plan_price: "₹199",
-      services: "Chat only",
-      status: "active",
-      service_type: "Chat Consultation",
-      tenure: "1 Month",
-      duration_value: "1",
-      duration_unit: "month",
-    },
-    {
-      id: 2,
-      plan_name: "Premium Yearly",
-      plan_price: "₹1999",
-      services: "Chat + Call + Report",
-      status: "inactive",
-      service_type: "Full Access",
-      tenure: "12 Months",
-      duration_value: "12",
-      duration_unit: "month",
-    },
-    {
-      id: 3,
-      plan_name: "Trial Pack",
-      plan_price: "Free",
-      services: "Chat (limited)",
-      status: "active",
-      service_type: "Chat Consultation",
-      tenure: "7 Days",
-      duration_value: "7",
-      duration_unit: "day",
-    },
-  ];  
-
   const handleAdd = () => {
-    navigate('/dashboard/subscription/new');
+    navigate("/dashboard/subscription/new");
   };
 
   const handleView = (row: PlanData) => {
-    navigate(`/dashboard/subscription/view/${row?.id}`);
+    navigate(`/dashboard/subscription/view/${row?.plan_id}`);
   };
 
   const handleEdit = (row: PlanData) => {
-    navigate(`/dashboard/subscription/edit/${row?.id}`);
-  };
-
-  const handleDelete = (row: PlanData) => {
-    // navigate(`/dashboard/users/edit/${row?.id}`);
+    navigate(`/dashboard/subscription/edit/${row?.plan_id}`);
   };
 
   const handleSelectionChange = (selectedIds: number[]) => {
     // Handle selected row IDs here
   };
 
+  const handleDelete = (row: planData) => {
+    console.log(row, "row");
+    setSelectedRow(row);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    console.log(selectedRow?.plan_id, "selectedRow?.id");
+    try {
+      await callAPI({
+        endpoint: `/api/admin/coupons/${selectedRow?.plan_id}`,
+        method: "delete",
+      });
+      setDeleteModalOpen(false);
+      setSelectedRow(null);
+      fetchPlans();
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+    }
+  };
+
   return (
-    <GenericTable<PlanData>
-      title="Subscription Plans"
-      data={samplePlans}
-      columns={columns}
-      onAdd={handleAdd}
-      onView={handleView}
-      onEdit={handleEdit}
-      onDelete={handleDelete}
-      onSelectionChange={handleSelectionChange}
-      getRowId={(row) => row.id}
-      tableHeight="calc(100vh - 250px)"
-      initialRowsPerPage={10}
-    />
+    <>
+      <GenericTable<PlanData>
+        title="Subscription Plans"
+        data={plans}
+        columns={columns}
+        onAdd={handleAdd}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onSelectionChange={handleSelectionChange}
+        getRowId={(row) => row.plan_id}
+        tableHeight="calc(100vh - 250px)"
+        initialRowsPerPage={10}
+      />
+
+      {/* 💬 Delete Confirmation Modal */}
+      <ConfirmModal
+        open={deleteModalOpen}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete "${selectedRow?.plan_name}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteModalOpen(false)}
+      />
+    </>
   );
 };
 

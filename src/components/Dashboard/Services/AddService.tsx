@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -12,12 +12,13 @@ import {
   Paper,
   IconButton,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { callAPI } from "../../../api/crudFactory";
 
 interface ServiceFormData {
   name: string;
-  description: string;
+  status: "Active" | "Inactive";
   pushNotificationTrigger: string;
 }
 
@@ -25,12 +26,43 @@ const pushNotificationOptions = ["Yes", "No"];
 
 const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const navigate = useNavigate();
+  const { userId } = useParams();
+
   const [formData, setFormData] = useState<ServiceFormData>({
     name: "",
-    description: "",
+    status: "Active",
     pushNotificationTrigger: "No",
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof ServiceFormData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ServiceFormData, string>>
+  >({});
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // If edit mode, fetch coupon details
+        if (mode === "edit" && userId) {
+          const couponResponse = await callAPI({
+            endpoint: `/api/admin/services/${userId}`,
+            method: "get",
+          });
+          const data = couponResponse?.data;
+          console.log(data, "data");
+          setFormData({
+            name: data?.name,
+            pushNotificationTrigger: data?.push_notification_status ? "Yes" : "No",
+            status:
+              data?.status.charAt(0).toUpperCase() +
+              data?.status.slice(1).toLowerCase(),
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchInitialData();
+  }, [mode, userId]);
 
   const handleChange =
     (field: keyof ServiceFormData) =>
@@ -43,7 +75,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof ServiceFormData, string>> = {};
-    const requiredFields: (keyof ServiceFormData)[] = ["name", "description"];
+    const requiredFields: (keyof ServiceFormData)[] = ["name"];
 
     requiredFields.forEach((field) => {
       if (!formData[field].trim()) newErrors[field] = "This field is required";
@@ -53,13 +85,26 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async(event: React.FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
-    console.log(
-      mode === "edit" ? "Updating Service" : "Creating Service",
-      formData
-    );
+    try {
+      await callAPI({
+        endpoint:
+          mode === "edit"
+            ? `/api/admin/services/${userId}`
+            : "/api/admin/services",
+        method: mode === "edit" ? "put" : "post",
+        data: {
+          name: formData.name,
+          push_notification_status: formData.pushNotificationTrigger==="Yes" ? true : false,
+          status: formData?.status==="Active" ? "active" : "inactive" 
+        },
+      });
+      navigate(-1);
+    } catch (error) {
+      console.error("Error submitting subscription:", error);
+    }
   };
 
   const isViewMode = mode === "view";
@@ -136,25 +181,23 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} mt={1}>
               <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                Service Description
+                Subscription Status
               </Typography>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <TextField
+                select
+                label="Status"
                 fullWidth
-                label="Description"
-                variant="outlined"
                 size="small"
-                value={formData.description}
-                onChange={handleChange("description")}
+                value={formData.status}
+                onChange={handleChange("status")}
                 disabled={isViewMode}
-                // required
-                multiline
-                rows={3}
-                error={Boolean(errors.description)}
-                helperText={errors.description}
-              />
+              >
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </TextField>
             </Grid>
 
             {!isViewMode && (
