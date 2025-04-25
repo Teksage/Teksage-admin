@@ -82,7 +82,7 @@ const FAQs: React.FC = () => {
         onAdd={handleAddFAQ}
         onEdit={handleEditFAQ}
         onDelete={handleDelete}
-        getRowId={(row) => row.faq_id}
+        getRowId={(row) => row.id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={10}
       />

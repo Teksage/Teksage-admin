@@ -40,13 +40,12 @@ const Consultations: React.FC = () => {
           endpoint: "/api/admin/consultations",
           method: "get",
         });
-        console.log("Consultations Response", response?.data?.data);
+        console.log(response?.data?.data);
         setConsultations(response.data?.data);
       } catch (error) {
         console.error("Failed to fetch consultations:", error);
       }
     };
-
     fetchConsultations();
   }, []);
 
