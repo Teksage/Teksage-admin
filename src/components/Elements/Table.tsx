@@ -929,6 +929,8 @@
 
 // export default GenericTable;
 
+// -------------------> COMPONENT - 01
+
 import React, { useState, useMemo } from "react";
 import {
   Table,
@@ -941,8 +943,8 @@ import {
   TablePagination,
   IconButton,
   Button,
-  Select,
-  MenuItem,
+  Autocomplete, // Added
+  TextField,
   FormControl,
   InputLabel,
   Box,
@@ -959,7 +961,6 @@ import {
   ListItemText,
   Divider,
   Slider,
-  TextField,
 } from "@mui/material";
 import {
   Visibility as ViewIcon,
@@ -1127,12 +1128,13 @@ export interface TableProps<T> {
   getRowId: (row: T) => string | number;
   initialRowsPerPage?: number;
   tableHeight?: string;
-  totalCount?: number; // Total number of rows for server-side pagination
-  page?: number; // Controlled page
-  rowsPerPage?: number; // Controlled rows per page
-  onPageChange?: (newPage: number) => void; // Page change handler
-  onRowsPerPageChange?: (newRowsPerPage: number) => void; // Rows per page change handler
-  onFilterChange?: (filters: Record<string, string>) => void; // Filter change handler
+  totalCount?: number;
+  page?: number;
+  rowsPerPage?: number;
+  onPageChange?: (newPage: number) => void;
+  onRowsPerPageChange?: (newRowsPerPage: number) => void;
+  onFilterChange?: (filters: Record<string, string>) => void;
+  feeRangeLimits?: { min: number; max: number }; // Added
 }
 
 function GenericTable<T>({

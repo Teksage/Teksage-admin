@@ -579,7 +579,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import astro_prompt_logo from "../../assets/astro_prompt_logo.png";
+import astro_prompt_logo_login from "../../assets/astro_prompt_logo_login.png";
 import { callAPI } from "../../api/crudFactory"; // Import the callAPI function
 import { tokenService } from "../../utils/tokenService"; // Import tokenService
 
@@ -1097,11 +1097,11 @@ export const Login: React.FC = () => {
         <StyledPaper>
           <LogoBox>
             <img
-              src={astro_prompt_logo}
+              src={astro_prompt_logo_login}
               alt="Astro Prompt Logo"
-              style={{ width: 40, height: 40 }}
+              // style={{ width: 40, height: 40 }}
             />
-            <Typography
+            {/* <Typography
               variant="h4"
               sx={{
                 ml: 2,
@@ -1113,7 +1113,7 @@ export const Login: React.FC = () => {
               }}
             >
               Astro Prompt
-            </Typography>
+            </Typography> */}
           </LogoBox>
 
           {formState.step === "input" ? (
@@ -1124,11 +1124,11 @@ export const Login: React.FC = () => {
                 sx={{
                   textAlign: "center",
                   mb: 3,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
                   backgroundClip: "text",
                   WebkitBackgroundClip: "text",
-                  color: "transparent",
+                  // color: "transparent",
                   textShadow: "0px 2px 4px rgba(0,0,0,0.1)",
                   letterSpacing: "0.5px",
                 }}
@@ -1291,7 +1291,13 @@ export const Login: React.FC = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 4, mb: 2 }}
+                sx={{
+                  mt: 4,
+                  mb: 2,
+                  "&.Mui-disabled": {
+                    color: "rgba(255, 255, 255, 0.8)",
+                  },
+                }}
                 disabled={
                   formState.loading ||
                   (formState.loginMethod === "email"
