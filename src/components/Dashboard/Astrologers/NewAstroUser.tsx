@@ -666,16 +666,22 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
           fontWeight={600}
           mb={3}
           color="#1a237e"
-          sx={{ letterSpacing: "0.3px", textAlign: "center" }}
+          sx={{ letterSpacing: "0.3px", textAlign: "start" }}
         >
-          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro User
+          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro
+          User
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             {/* Profile Picture Section - Centered and refined */}
             <Grid item xs={12} sx={{ textAlign: "center", mb: 1 }}>
-              <Typography variant="subtitle1" fontWeight={500} color="#546e7a" mb={1.5}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={500}
+                color="#546e7a"
+                mb={1.5}
+              >
                 Profile Picture
               </Typography>
               <Box sx={{ position: "relative", display: "inline-block" }}>
@@ -693,7 +699,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     height: 90,
                     mx: "auto",
                     mb: 1,
-                    border: errors.picture ? "2px solid #e57373" : "2px solid #e0e0e0",
+                    border: errors.picture
+                      ? "2px solid #e57373"
+                      : "2px solid #e0e0e0",
                     boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease",
                     "&:hover": { transform: "scale(1.05)" },
@@ -739,117 +747,170 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
             {/* Personal Information */}
             <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight={500} color="#546e7a" mb={1.5}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={500}
+                color="#546e7a"
+                mb={1.5}
+              >
                 Personal Information
               </Typography>
             </Grid>
 
             {/* Personal info fields - Compact and aligned */}
-            {["first_name", "last_name", "email", "mobile_number"].map((key) => (
-              <Grid item xs={12} sm={6} key={key}>
-                <TextField
-                  label={key
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                  fullWidth
-                  size="small"
-                  value={formData[key]}
-                  onChange={handleChange(key)}
-                  error={!!errors[key]}
-                  helperText={errors[key] || ""}
-                  disabled={isViewMode}
-                  InputLabelProps={{
-                    sx: { fontSize: "0.95rem", fontWeight: 500, color: "#455a64" },
-                  }}
-                  InputProps={{
-                    sx: { fontSize: "0.9rem", borderRadius: "6px" },
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#cfd8dc" },
-                      "&:hover fieldset": { borderColor: "#3f51b5" },
-                      "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                    },
-                    "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                  }}
-                />
-              </Grid>
-            ))}
+            {["first_name", "last_name", "email", "mobile_number"].map(
+              (key) => (
+                <Grid item xs={12} sm={6} key={key}>
+                  <TextField
+                    label={key
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    fullWidth
+                    size="small"
+                    value={formData[key]}
+                    onChange={handleChange(key)}
+                    error={!!errors[key]}
+                    helperText={errors[key] || ""}
+                    disabled={isViewMode}
+                    InputLabelProps={{
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      },
+                    }}
+                    InputProps={{
+                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    }}
+                  />
+                </Grid>
+              )
+            )}
 
             {/* Professional Information */}
             <Grid item xs={12} mt={1}>
-              <Typography variant="subtitle1" fontWeight={500} color="#546e7a" mb={1.5}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={500}
+                color="#546e7a"
+                mb={1.5}
+              >
                 Professional Details
               </Typography>
             </Grid>
 
             {/* Professional fields - Optimized spacing */}
-            {["astrologer_profile_info", "experience", "consulting_fee"].map((key) => (
-              <Grid
-                item
-                xs={12}
-                sm={key === "astrologer_profile_info" ? 12 : 6}
-                key={key}
-              >
-                <TextField
-                  label={key
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                  fullWidth
-                  size="small"
-                  value={formData[key]}
-                  onChange={handleChange(key)}
-                  error={!!errors[key]}
-                  helperText={errors[key] || ""}
-                  disabled={isViewMode}
-                  multiline={key === "astrologer_profile_info"}
-                  minRows={key === "astrologer_profile_info" ? 3 : undefined}
-                  InputLabelProps={{
-                    sx: { fontSize: "0.95rem", fontWeight: 500, color: "#455a64" },
-                  }}
-                  InputProps={{
-                    sx: { fontSize: "0.9rem", borderRadius: "6px" },
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#cfd8dc" },
-                      "&:hover fieldset": { borderColor: "#3f51b5" },
-                      "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                    },
-                    "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                  }}
-                />
-              </Grid>
-            ))}
+            {["astrologer_profile_info", "experience", "consulting_fee"].map(
+              (key) => (
+                <Grid
+                  item
+                  xs={12}
+                  sm={key === "astrologer_profile_info" ? 12 : 6}
+                  key={key}
+                >
+                  <TextField
+                    label={key
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    fullWidth
+                    size="small"
+                    value={formData[key]}
+                    onChange={handleChange(key)}
+                    error={!!errors[key]}
+                    helperText={errors[key] || ""}
+                    disabled={isViewMode}
+                    multiline={key === "astrologer_profile_info"}
+                    minRows={key === "astrologer_profile_info" ? 3 : undefined}
+                    InputLabelProps={{
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      },
+                    }}
+                    InputProps={{
+                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    }}
+                  />
+                </Grid>
+              )
+            )}
 
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth disabled={isViewMode} size="small">
-                <InputLabel sx={{ fontSize: "0.95rem", fontWeight: 500, color: "#455a64" }}>
-                  Status
+            {/* Expertise as Dropdown */}
+            <Grid item xs={12}>
+              <FormControl fullWidth size="small" error={!!errors.expertises}>
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  }}
+                >
+                  Expertise Areas
                 </InputLabel>
                 <Select
-                  value={formData.status}
-                  onChange={handleChange("status")}
-                  label="Status"
+                  multiple
+                  value={formData.expertises}
+                  onChange={handleChange("expertises")}
+                  label="Expertise Areas"
+                  disabled={isViewMode}
+                  renderValue={(selected) => selected.join(", ")}
                   sx={{
                     fontSize: "0.9rem",
                     borderRadius: "6px",
-                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "#cfd8dc" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
                   }}
                 >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  {["Career", "Health", "Wealth", "Relationship"].map(
+                    (option) => (
+                      <MenuItem key={option} value={option}>
+                        <Checkbox
+                          checked={formData.expertises.includes(option)}
+                        />
+                        <ListItemText
+                          primary={option}
+                          sx={{
+                            "& .MuiTypography-root": { fontSize: "0.9rem" },
+                          }}
+                        />
+                      </MenuItem>
+                    )
+                  )}
                 </Select>
+                {!!errors.expertises && (
+                  <FormHelperText sx={{ fontSize: "0.75rem" }}>
+                    {errors.expertises}
+                  </FormHelperText>
+                )}
               </FormControl>
             </Grid>
 
             {/* Languages as Tags */}
             <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight={500} color="#546e7a" mb={1.5}>
-                Languages Known
-              </Typography>
               <TextField
                 fullWidth
                 size="small"
@@ -861,7 +922,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 error={!!errors.languages}
                 helperText={errors.languages || "Press Enter to add language"}
                 InputLabelProps={{
-                  sx: { fontSize: "0.95rem", fontWeight: 500, color: "#455a64" },
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
                 }}
                 InputProps={{
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
@@ -899,44 +964,45 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               </Box>
             </Grid>
 
-            {/* Expertise as Dropdown */}
-            <Grid item xs={12}>
-              <FormControl fullWidth size="small" error={!!errors.expertises}>
-                <InputLabel sx={{ fontSize: "0.95rem", fontWeight: 500, color: "#455a64" }}>
-                  Expertise Areas
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth disabled={isViewMode} size="small">
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  }}
+                >
+                  Status
                 </InputLabel>
                 <Select
-                  multiple
-                  value={formData.expertises}
-                  onChange={handleChange("expertises")}
-                  label="Expertise Areas"
-                  disabled={isViewMode}
-                  renderValue={(selected) => selected.join(", ")}
+                  value={formData.status}
+                  onChange={handleChange("status")}
+                  label="Status"
                   sx={{
                     fontSize: "0.9rem",
                     borderRadius: "6px",
-                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "#cfd8dc" },
-                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
                   }}
                 >
-                  {["Career", "Health", "Wealth", "Relationship"].map((option) => (
-                    <MenuItem key={option} value={option}>
-                      <Checkbox checked={formData.expertises.includes(option)} />
-                      <ListItemText primary={option} sx={{ "& .MuiTypography-root": { fontSize: "0.9rem" } }} />
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="Inactive">Inactive</MenuItem>
                 </Select>
-                {!!errors.expertises && (
-                  <FormHelperText sx={{ fontSize: "0.75rem" }}>{errors.expertises}</FormHelperText>
-                )}
               </FormControl>
             </Grid>
 
             {/* Submit Button - Centered and styled */}
             {!isViewMode && (
               <Grid item xs={12} mt={2}>
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Box sx={{ display: "flex", justifyContent: "end" }}>
                   <Button
                     type="submit"
                     variant="contained"
