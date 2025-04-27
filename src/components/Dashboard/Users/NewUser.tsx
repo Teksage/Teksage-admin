@@ -1,4 +1,581 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState, useRef } from "react";
+// import {
+//   Box,
+//   TextField,
+//   Button,
+//   Grid,
+//   MenuItem,
+//   FormControl,
+//   InputLabel,
+//   Select,
+//   Typography,
+//   Paper,
+//   IconButton,
+//   FormHelperText,
+//   CircularProgress
+// } from "@mui/material";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+// import { useNavigate, useParams } from "react-router-dom";
+// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+// import { callAPI } from "../../../api/crudFactory"; // adjust path as per your project
+// import CustomSnackbar from "../../Elements/CustomSnackbar";
+
+// interface UserFormData {
+//   first_name: string;
+//   last_name: string;
+//   email: string;
+//   mobile: string;
+//   dateOfBirth: Date | null;
+//   timeOfBirth: Date | null;
+//   placeOfBirth: string;
+//   preferredLocation: string;
+//   rashi: string;
+//   nakshatra: string;
+//   status: string;
+// }
+
+// const rasiOptions = [
+//   "Aries",
+//   "Taurus",
+//   "Gemini",
+//   "Cancer",
+//   "Leo",
+//   "Virgo",
+//   "Libra",
+//   "Scorpio",
+//   "Sagittarius",
+//   "Capricorn",
+//   "Aquarius",
+//   "Pisces",
+// ];
+
+// const nakshatramOptions: Record<string, string[]> = {
+//   Aries: ["Ashwini", "Bharani", "Krittika"],
+//   Taurus: ["Krittika", "Rohini", "Mrigashira"],
+//   Gemini: ["Mrigashira", "Ardra", "Punarvasu"],
+//   Cancer: ["Punarvasu", "Pushya", "Ashlesha"],
+//   Leo: ["Magha", "Purva Phalguni", "Uttara Phalguni"],
+//   Virgo: ["Uttara Phalguni", "Hasta", "Chitra"],
+//   Libra: ["Chitra", "Swati", "Vishaka"],
+//   Scorpio: ["Vishaka", "Anuradha", "Jyeshta"],
+//   Sagittarius: ["Moola", "Purva Ashadha", "Uttara Ashadha"],
+//   Capricorn: ["Uttara Ashadha", "Shravana", "Dhanishta"],
+//   Aquarius: ["Dhanishta", "Shatabhisha", "Purva Bhadrapada"],
+//   Pisces: ["Purva Bhadrapada", "Uttara Bhadrapada", "Revati"],
+// };
+
+// const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
+//   const navigate = useNavigate();
+//   const { userId } = useParams<{ userId: string }>();
+//   const isViewMode = mode === "view";
+//   const isFirstRender = useRef(true);
+
+//   const [formData, setFormData] = useState<UserFormData>({
+//     first_name: "",
+//     last_name: "",
+//     email: "",
+//     mobile: "",
+//     dateOfBirth: null,
+//     timeOfBirth: null,
+//     placeOfBirth: "",
+//     preferredLocation: "",
+//     rashi: "",
+//     nakshatra: "",
+//     status: "Active",
+//   });
+
+//   const [errors, setErrors] = useState<
+//     Partial<Record<keyof UserFormData, string>>
+//   >({});
+//   const [loadingRasiNakshatram, setLoadingRasiNakshatram] = useState(false);
+//   const [snackbar, setSnackbar] = useState<{
+//     open: boolean;
+//     message: string;
+//     severity: "success" | "error" | "info" | "warning";
+//   }>({
+//     open: false,
+//     message: "",
+//     severity: "success",
+//   });
+
+//   useEffect(() => {
+//     if (mode === "edit" && userId) {
+//       (async () => {
+//         try {
+//           const res = await callAPI({
+//             endpoint: `api/admin/users/${userId}`,
+//             method: "get",
+//           });
+
+//           const user = res?.data;
+//           console.log(user, "user");
+//           setFormData({
+//             first_name: user.first_name || "",
+//             last_name: user.last_name || "",
+//             email: user.email || "",
+//             mobile: user.mobile_number || "",
+//             dateOfBirth: user.date_of_birth
+//               ? new Date(user.date_of_birth)
+//               : null,
+//             timeOfBirth: user.time_of_birth
+//               ? new Date(`1970-01-01T${user.time_of_birth}`)
+//               : null,
+//             placeOfBirth: user.place_of_birth || "",
+//             preferredLocation: user.preferred_location || "",
+//             rashi: user.rashi || "",
+//             nakshatra: user.nakshatra || "",
+//             status: user.status === "inactive" ? "Inactive" : "Active",
+//           });
+//         } catch (err) {
+//           console.error("Error fetching user data:", err);
+//         }
+//       })();
+//     }
+//   }, [mode, userId]);
+
+//   const validate = () => {
+//     const newErrors: typeof errors = {};
+//     if (!formData.first_name.trim())
+//       newErrors.first_name = "First name is required";
+//     if (!formData.last_name.trim())
+//       newErrors.last_name = "Last name is required";
+//     if (!formData.email.trim()) newErrors.email = "Email is required";
+//     if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
+//     // if (!formData.dateOfBirth)
+//     //   newErrors.dateOfBirth = "Date of Birth is required";
+//     // if (!formData.timeOfBirth)
+//     //   newErrors.timeOfBirth = "Time of Birth is required";
+//     // if (!formData.placeOfBirth.trim())
+//     //   newErrors.placeOfBirth = "Place of Birth is required";
+//     // if (!formData.preferredLocation.trim())
+//     //   newErrors.preferredLocation = "Preferred Location is required";
+//     return newErrors;
+//   };
+
+//   const handleChange =
+//     (field: keyof UserFormData) =>
+//     (event: React.ChangeEvent<{ value: unknown }>) => {
+//       setFormData((prev) => ({
+//         ...prev,
+//         [field]: event.target.value as string,
+//       }));
+//       setErrors((prev) => ({ ...prev, [field]: "" }));
+//     };
+
+//   const handleDateChange = (value: Date | null) => {
+//     setFormData((prev) => ({ ...prev, dateOfBirth: value }));
+//     setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+//   };
+
+//   const handleTimeChange = (value: Date | null) => {
+//     setFormData((prev) => ({ ...prev, timeOfBirth: value }));
+//     setErrors((prev) => ({ ...prev, timeOfBirth: "" }));
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     const validationErrors = validate();
+//     if (Object.keys(validationErrors).length > 0) {
+//       setErrors(validationErrors);
+//       return;
+//     }
+//     console.log({
+//       first_name: formData.first_name,
+//       last_name: formData.last_name,
+//       preferred_location: formData.preferredLocation,
+//       email: formData.email,
+//       mobile_number: formData.mobile,
+//       place_of_birth: formData.placeOfBirth,
+//       date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+//       time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+//       rashi: formData.rashi,
+//       nakshatra: formData.nakshatra,
+//       status: formData.status.toLowerCase(),
+//     }, "formData")
+//     try {
+//       await callAPI({
+//         endpoint:
+//           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
+//         method: mode === "edit" ? "put" : "post",
+//         data: {
+//           first_name: formData.first_name,
+//           last_name: formData.last_name,
+//           preferred_location: formData.preferredLocation,
+//           email: formData.email,
+//           mobile_number: formData.mobile,
+//           place_of_birth: formData.placeOfBirth,
+//           date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+//           time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+//           rashi: formData.rashi,
+//           nakshatra: formData.nakshatra,
+//           status: formData.status.toLowerCase(),
+//         },
+//       });
+//       setSnackbar({
+//         open: true,
+//         message:
+//           mode === "edit"
+//             ? "User updated successfully!"
+//             : "User created successfully!",
+//         severity: "success",
+//       });
+
+//       navigate(-1);
+//     } catch (err) {
+//       setSnackbar({
+//         open: true,
+//         message: "Something went wrong. Please try again.",
+//         severity: "error",
+//       });
+//     }
+//   };
+
+//   useEffect(() => {
+//     // Reset nakshatra when rashi changes
+//     setFormData((prev) => ({
+//       ...prev,
+//       nakshatra: "",
+//     }));
+//   }, [formData.rashi]);
+
+//   // ⏳ Auto trigger rashi & nakshatra fetch
+//   useEffect(() => {
+//     if (mode === "edit" && isFirstRender.current) {
+//       isFirstRender.current = false;
+//       console.log("object")
+//       return; // Skip API call on first render in edit mode
+//     }
+//     console.log("object 21")
+//     const { dateOfBirth, timeOfBirth, placeOfBirth, preferredLocation } =
+//       formData;
+
+//     if (
+//       dateOfBirth &&
+//       timeOfBirth &&
+//       placeOfBirth.trim() &&
+//       preferredLocation.trim()
+//     ) {
+//       const fetchRasiNakshatra = async () => {
+//         try {
+//           setLoadingRasiNakshatram(true);
+//           const response = await callAPI({
+//             endpoint: "api/auth/rashi-nakshatra",
+//             method: "post",
+//             data: {
+//               preferred_location: preferredLocation,
+//               date_of_birth: dateOfBirth.toISOString().split("T")[0],
+//               time_of_birth: timeOfBirth.toTimeString().slice(0, 5),
+//               birth_location: placeOfBirth,
+//             },
+//           });
+
+//           if (response?.data?.nakshatra && response?.data?.rashi) {
+//             setFormData((prev) => ({
+//               ...prev,
+//               rashi: response?.data?.rashi,
+//               nakshatra: response?.data?.nakshatra,
+//             }));
+//           }
+//         } catch (err) {
+//           console.error("Failed to fetch rashi and nakshatra:", err);
+//         } finally {
+//           setLoadingRasiNakshatram(false);
+//         }
+//       };
+
+//       fetchRasiNakshatra();
+//     }
+//   }, [
+//     formData.dateOfBirth,
+//     formData.timeOfBirth,
+//     formData.placeOfBirth,
+//     formData.preferredLocation,
+//   ]);
+
+//   const availableNakshatrams = nakshatramOptions[formData.rashi] || [];
+
+//   return (
+//     <LocalizationProvider dateAdapter={AdapterDateFns}>
+//       {/* Header with back button - more compact and subtle */}
+//       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+//         <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
+//           <ArrowBackIcon fontSize="small" />
+//         </IconButton>
+//         <Typography variant="subtitle1" fontWeight={500}>
+//           Back
+//         </Typography>
+//       </Box>
+
+//       <Paper
+//         elevation={2}
+//         sx={{
+//           p: { xs: 2, sm: 3 },
+//           // maxWidth: "1000px",
+//           mx: "auto",
+//           backgroundColor: "#fafafa",
+//           borderRadius: "12px",
+//         }}
+//       >
+//         {/* Form title with consistent sizing */}
+//         <Typography variant="h6" fontWeight={500} mb={2}>
+//           {mode === "new"
+//             ? "Create New User"
+//             : mode === "edit"
+//             ? "Edit User"
+//             : "View User"}
+//         </Typography>
+
+//         <Box component="form" onSubmit={handleSubmit}>
+//           <Grid container spacing={2}>
+//             {/* Personal Information */}
+//             <Grid item xs={12}>
+//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
+//                 Personal Information
+//               </Typography>
+//             </Grid>
+
+//             <Grid item xs={12} sm={6}>
+//               <TextField
+//                 label="First Name"
+//                 fullWidth
+//                 size="small"
+//                 value={formData.first_name}
+//                 onChange={handleChange("first_name")}
+//                 error={!!errors.first_name}
+//                 helperText={errors.first_name}
+//                 disabled={isViewMode}
+//               />
+//             </Grid>
+//             <Grid item xs={12} sm={6}>
+//               <TextField
+//                 label="Last Name"
+//                 fullWidth
+//                 size="small"
+//                 value={formData.last_name}
+//                 onChange={handleChange("last_name")}
+//                 error={!!errors.last_name}
+//                 helperText={errors.last_name}
+//                 disabled={isViewMode}
+//               />
+//             </Grid>
+
+//             <Grid item xs={12} sm={6}>
+//               <TextField
+//                 label="Email"
+//                 fullWidth
+//                 size="small"
+//                 value={formData.email}
+//                 onChange={handleChange("email")}
+//                 error={!!errors.email}
+//                 helperText={errors.email}
+//                 disabled={isViewMode}
+//               />
+//             </Grid>
+//             <Grid item xs={12} sm={6}>
+//               <TextField
+//                 label="Mobile Number"
+//                 fullWidth
+//                 size="small"
+//                 value={formData.mobile}
+//                 onChange={handleChange("mobile")}
+//                 error={!!errors.mobile}
+//                 helperText={errors.mobile}
+//                 disabled={isViewMode}
+//               />
+//             </Grid>
+
+//             {/* Birth Information */}
+//             <Grid item xs={12} mt={1}>
+//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
+//                 Birth Details
+//               </Typography>
+//             </Grid>
+
+//             <Grid item xs={12} md={4}>
+//               <DatePicker
+//                 label="Date of Birth"
+//                 value={formData.dateOfBirth}
+//                 onChange={handleDateChange}
+//                 disabled={isViewMode}
+//                 slotProps={{
+//                   textField: {
+//                     fullWidth: true,
+//                     size: "small",
+//                     error: !!errors.dateOfBirth,
+//                     helperText: errors.dateOfBirth,
+//                   },
+//                 }}
+//               />
+//             </Grid>
+//             <Grid item xs={12} md={4}>
+//               <TimePicker
+//                 label="Time of Birth"
+//                 value={formData.timeOfBirth}
+//                 onChange={handleTimeChange}
+//                 disabled={isViewMode}
+//                 slotProps={{
+//                   textField: {
+//                     fullWidth: true,
+//                     size: "small",
+//                     error: !!errors.timeOfBirth,
+//                     helperText: errors.timeOfBirth,
+//                   },
+//                 }}
+//               />
+//             </Grid>
+//             <Grid item xs={12} md={4}>
+//               <TextField
+//                 label="Place of Birth"
+//                 fullWidth
+//                 size="small"
+//                 value={formData.placeOfBirth}
+//                 onChange={handleChange("placeOfBirth")}
+//                 error={!!errors.placeOfBirth}
+//                 helperText={errors.placeOfBirth}
+//                 disabled={isViewMode}
+//               />
+//             </Grid>
+
+//             {/* Additional Information */}
+//             <Grid item xs={12} mt={1}>
+//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
+//                 Additional Details
+//               </Typography>
+//             </Grid>
+
+//             <Grid item xs={12} sm={6}>
+//               <TextField
+//                 label="Preferred Location"
+//                 fullWidth
+//                 size="small"
+//                 value={formData.preferredLocation}
+//                 onChange={handleChange("preferredLocation")}
+//                 error={!!errors.preferredLocation}
+//                 helperText={errors.preferredLocation}
+//                 disabled={isViewMode}
+//               />
+//             </Grid>
+
+//             {loadingRasiNakshatram && (
+//               <Grid item xs={12}>
+//                 <Typography
+//                   variant="caption"
+//                   color="primary"
+//                   display="flex"
+//                   alignItems="center"
+//                 >
+//                   <CircularProgress size={14} sx={{ mr: 1 }} />
+//                   Fetching rashi & nakshatra based on your input...
+//                 </Typography>
+//               </Grid>
+//             )}
+
+//             <Grid item xs={12} sm={6} md={4}>
+//               <FormControl
+//                 fullWidth
+//                 error={!!errors.rashi}
+//                 disabled={isViewMode}
+//                 size="small"
+//               >
+//                 <InputLabel>rashi</InputLabel>
+//                 <Select
+//                   value={formData.rashi}
+//                   onChange={handleChange("rashi")}
+//                   label="Rashi"
+//                 >
+//                   {rasiOptions.map((option) => (
+//                     <MenuItem key={option} value={option}>
+//                       {option}
+//                     </MenuItem>
+//                   ))}
+//                 </Select>
+//                 {errors.rashi && <FormHelperText>{errors.rashi}</FormHelperText>}
+//               </FormControl>
+//             </Grid>
+//             <Grid item xs={12} sm={6} md={4}>
+//               <FormControl
+//                 fullWidth
+//                 error={!!errors.nakshatra}
+//                 disabled={isViewMode}
+//                 size="small"
+//               >
+//                 <InputLabel>Nakshatra</InputLabel>
+//                 <Select
+//                   value={formData.nakshatra}
+//                   onChange={handleChange("nakshatra")}
+//                   label="Nakshatra"
+//                 >
+//                   {availableNakshatrams.map((option) => (
+//                     <MenuItem key={option} value={option}>
+//                       {option}
+//                     </MenuItem>
+//                   ))}
+//                 </Select>
+//                 {errors.nakshatra && (
+//                   <FormHelperText>{errors.nakshatra}</FormHelperText>
+//                 )}
+//               </FormControl>
+//             </Grid>
+//             <Grid item xs={12} sm={6} md={4}>
+//               <FormControl fullWidth disabled={isViewMode} size="small">
+//                 <InputLabel>Status</InputLabel>
+//                 <Select
+//                   value={formData.status}
+//                   onChange={handleChange("status")}
+//                   label="Status"
+//                 >
+//                   <MenuItem value="Active">Active</MenuItem>
+//                   <MenuItem value="Inactive">Inactive</MenuItem>
+//                 </Select>
+//               </FormControl>
+//             </Grid>
+
+//             {/* Submit Button */}
+//             {!isViewMode && (
+//               <Grid item xs={12} mt={1}>
+//                 <Box display="flex" justifyContent="flex-end">
+//                   <Button
+//                     type="submit"
+//                     variant="contained"
+//                     sx={{
+//                       background: "linear-gradient(to right, #00C853, #00695C)",
+//                       padding: "8px 22px",
+//                       fontWeight: 500,
+//                       borderRadius: "8px",
+//                       fontSize: "0.875rem",
+//                       textTransform: "none",
+//                       boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+//                       "&:hover": {
+//                         background:
+//                           "linear-gradient(to right, #00E676, #00897B)",
+//                       },
+//                     }}
+//                   >
+//                     {mode === "new" ? "Create User" : "Update User"}
+//                   </Button>
+//                 </Box>
+//               </Grid>
+//             )}
+//           </Grid>
+//         </Box>
+//       </Paper>
+
+//       <CustomSnackbar
+//         open={snackbar.open}
+//         message={snackbar.message}
+//         severity={snackbar.severity}
+//         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+//       />
+//     </LocalizationProvider>
+//   );
+// };
+
+// export default NewUser;
+
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   TextField,
@@ -32,9 +609,10 @@ interface UserFormData {
   timeOfBirth: Date | null;
   placeOfBirth: string;
   preferredLocation: string;
-  rasi: string;
-  nakshatram: string;
+  rashi: string;
+  nakshatra: string;
   status: string;
+  user_type: string;
 }
 
 const rasiOptions = [
@@ -67,10 +645,13 @@ const nakshatramOptions: Record<string, string[]> = {
   Pisces: ["Purva Bhadrapada", "Uttara Bhadrapada", "Revati"],
 };
 
+const userTypeOptions = ["Customer", "Astrologer", "Admin"];
+
 const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const isViewMode = mode === "view";
+  const isFirstRender = useRef(true);
 
   const [formData, setFormData] = useState<UserFormData>({
     first_name: "",
@@ -81,9 +662,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     timeOfBirth: null,
     placeOfBirth: "",
     preferredLocation: "",
-    rasi: "",
-    nakshatram: "",
+    rashi: "",
+    nakshatra: "",
     status: "Active",
+    user_type: "Customer",
   });
 
   const [errors, setErrors] = useState<
@@ -122,11 +704,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             timeOfBirth: user.time_of_birth
               ? new Date(`1970-01-01T${user.time_of_birth}`)
               : null,
-            placeOfBirth: user.birth_location || "",
+            placeOfBirth: user.place_of_birth || "",
             preferredLocation: user.preferred_location || "",
-            rasi: user.rasi || "",
-            nakshatram: user.nakshatram || "",
+            rashi: user.rashi || "",
+            nakshatra: user.nakshatra || "",
             status: user.status === "inactive" ? "Inactive" : "Active",
+            user_type: user.user_type || "Customer",
           });
         } catch (err) {
           console.error("Error fetching user data:", err);
@@ -143,14 +726,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       newErrors.last_name = "Last name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
-    // if (!formData.dateOfBirth)
-    //   newErrors.dateOfBirth = "Date of Birth is required";
-    // if (!formData.timeOfBirth)
-    //   newErrors.timeOfBirth = "Time of Birth is required";
-    // if (!formData.placeOfBirth.trim())
-    //   newErrors.placeOfBirth = "Place of Birth is required";
-    // if (!formData.preferredLocation.trim())
-    //   newErrors.preferredLocation = "Preferred Location is required";
     return newErrors;
   };
 
@@ -181,8 +756,22 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setErrors(validationErrors);
       return;
     }
+    console.log({
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      preferred_location: formData.preferredLocation,
+      email: formData.email,
+      mobile_number: formData.mobile,
+      place_of_birth: formData.placeOfBirth,
+      date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+      time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+      rashi: formData.rashi,
+      nakshatra: formData.nakshatra,
+      status: formData.status.toLowerCase(),
+      user_type: formData.user_type,
+    }, "formData");
     try {
-      await callAPI({
+      const response = await callAPI({
         endpoint:
           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
         method: mode === "edit" ? "put" : "post",
@@ -192,14 +781,16 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           preferred_location: formData.preferredLocation,
           email: formData.email,
           mobile_number: formData.mobile,
-          birth_location: formData.placeOfBirth,
+          place_of_birth: formData.placeOfBirth,
           date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
           time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
-          rasi: formData.rasi,
-          nakshatram: formData.nakshatram,
+          rashi: formData.rashi,
+          nakshatra: formData.nakshatra,
           status: formData.status.toLowerCase(),
+          user_type: formData.user_type,
         },
       });
+      console.log(response, "response")
       setSnackbar({
         open: true,
         message:
@@ -220,15 +811,21 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   };
 
   useEffect(() => {
-    // Reset nakshatram when rasi changes
+    // Reset nakshatra when rashi changes
     setFormData((prev) => ({
       ...prev,
-      nakshatram: "",
+      nakshatra: "",
     }));
-  }, [formData.rasi]);
+  }, [formData.rashi]);
 
-  // ⏳ Auto trigger Rasi & Nakshatram fetch
+  // ⏳ Auto trigger rashi & nakshatra fetch
   useEffect(() => {
+    if (mode === "edit" && isFirstRender.current) {
+      isFirstRender.current = false;
+      console.log("object");
+      return; // Skip API call on first render in edit mode
+    }
+    console.log("object 21");
     const { dateOfBirth, timeOfBirth, placeOfBirth, preferredLocation } =
       formData;
 
@@ -255,12 +852,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           if (response?.data?.nakshatra && response?.data?.rashi) {
             setFormData((prev) => ({
               ...prev,
-              rasi: response?.data?.rashi,
-              nakshatram: response?.data?.nakshatra,
+              rashi: response?.data?.rashi,
+              nakshatra: response?.data?.nakshatra,
             }));
           }
         } catch (err) {
-          console.error("Failed to fetch rasi and nakshatra:", err);
+          console.error("Failed to fetch rashi and nakshatra:", err);
         } finally {
           setLoadingRasiNakshatram(false);
         }
@@ -275,16 +872,16 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     formData.preferredLocation,
   ]);
 
-  const availableNakshatrams = nakshatramOptions[formData.rasi] || [];
+  const availableNakshatrams = nakshatramOptions[formData.rashi] || [];
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      {/* Header with back button - more compact and subtle */}
+      {/* Header with back button - compact and aligned */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
-          <ArrowBackIcon fontSize="small" />
+        <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+          <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
         </IconButton>
-        <Typography variant="subtitle1" fontWeight={500}>
+        <Typography variant="body1" fontWeight={600} color="#3f51b5">
           Back
         </Typography>
       </Box>
@@ -293,26 +890,35 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         elevation={2}
         sx={{
           p: { xs: 2, sm: 3 },
-          // maxWidth: "1000px",
+          maxWidth: "800px", // Constrain width for better alignment
           mx: "auto",
-          backgroundColor: "#fafafa",
+          backgroundColor: "#f9f9fb",
           borderRadius: "12px",
+          boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+          border: "1px solid #e0e0e0",
         }}
       >
-        {/* Form title with consistent sizing */}
-        <Typography variant="h6" fontWeight={500} mb={2}>
-          {mode === "new"
-            ? "Create New User"
-            : mode === "edit"
-            ? "Edit User"
-            : "View User"}
+        {/* Form title - balanced size and styling */}
+        <Typography
+          variant="h5"
+          fontWeight={600}
+          mb={3}
+          color="#1a237e"
+          sx={{ letterSpacing: "0.3px", textAlign: "start" }}
+        >
+          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} User
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             {/* Personal Information */}
             <Grid item xs={12}>
-              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={500}
+                color="#546e7a"
+                mb={1.5}
+              >
                 Personal Information
               </Typography>
             </Grid>
@@ -325,8 +931,26 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.first_name}
                 onChange={handleChange("first_name")}
                 error={!!errors.first_name}
-                helperText={errors.first_name}
+                helperText={errors.first_name || ""}
                 disabled={isViewMode}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -337,8 +961,26 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.last_name}
                 onChange={handleChange("last_name")}
                 error={!!errors.last_name}
-                helperText={errors.last_name}
+                helperText={errors.last_name || ""}
                 disabled={isViewMode}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
               />
             </Grid>
 
@@ -350,8 +992,26 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.email}
                 onChange={handleChange("email")}
                 error={!!errors.email}
-                helperText={errors.email}
+                helperText={errors.email || ""}
                 disabled={isViewMode}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -362,19 +1022,42 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.mobile}
                 onChange={handleChange("mobile")}
                 error={!!errors.mobile}
-                helperText={errors.mobile}
+                helperText={errors.mobile || ""}
                 disabled={isViewMode}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
               />
             </Grid>
 
             {/* Birth Information */}
             <Grid item xs={12} mt={1}>
-              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={500}
+                color="#546e7a"
+                mb={1.5}
+              >
                 Birth Details
               </Typography>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6} md={4}>
               <DatePicker
                 label="Date of Birth"
                 value={formData.dateOfBirth}
@@ -385,12 +1068,30 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fullWidth: true,
                     size: "small",
                     error: !!errors.dateOfBirth,
-                    helperText: errors.dateOfBirth,
+                    helperText: errors.dateOfBirth || "",
+                    InputLabelProps: {
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      },
+                    },
+                    InputProps: {
+                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                    },
+                    sx: {
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    },
                   },
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6} md={4}>
               <TimePicker
                 label="Time of Birth"
                 value={formData.timeOfBirth}
@@ -401,12 +1102,30 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fullWidth: true,
                     size: "small",
                     error: !!errors.timeOfBirth,
-                    helperText: errors.timeOfBirth,
+                    helperText: errors.timeOfBirth || "",
+                    InputLabelProps: {
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      },
+                    },
+                    InputProps: {
+                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                    },
+                    sx: {
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    },
                   },
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} sm={6} md={4}>
               <TextField
                 label="Place of Birth"
                 fullWidth
@@ -414,14 +1133,37 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.placeOfBirth}
                 onChange={handleChange("placeOfBirth")}
                 error={!!errors.placeOfBirth}
-                helperText={errors.placeOfBirth}
+                helperText={errors.placeOfBirth || ""}
                 disabled={isViewMode}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
               />
             </Grid>
 
             {/* Additional Information */}
             <Grid item xs={12} mt={1}>
-              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={500}
+                color="#546e7a"
+                mb={1.5}
+              >
                 Additional Details
               </Typography>
             </Grid>
@@ -434,8 +1176,26 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.preferredLocation}
                 onChange={handleChange("preferredLocation")}
                 error={!!errors.preferredLocation}
-                helperText={errors.preferredLocation}
+                helperText={errors.preferredLocation || ""}
                 disabled={isViewMode}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
               />
             </Grid>
 
@@ -448,7 +1208,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   alignItems="center"
                 >
                   <CircularProgress size={14} sx={{ mr: 1 }} />
-                  Fetching Rasi & Nakshatram based on your input...
+                  Fetching rashi & nakshatra based on your input...
                 </Typography>
               </Grid>
             )}
@@ -456,15 +1216,36 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             <Grid item xs={12} sm={6} md={4}>
               <FormControl
                 fullWidth
-                error={!!errors.rasi}
+                error={!!errors.rashi}
                 disabled={isViewMode}
                 size="small"
               >
-                <InputLabel>Rasi</InputLabel>
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  }}
+                >
+                  Rashi
+                </InputLabel>
                 <Select
-                  value={formData.rasi}
-                  onChange={handleChange("rasi")}
-                  label="Rasi"
+                  value={formData.rashi}
+                  onChange={handleChange("rashi")}
+                  label="Rashi"
+                  sx={{
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
                 >
                   {rasiOptions.map((option) => (
                     <MenuItem key={option} value={option}>
@@ -472,21 +1253,46 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     </MenuItem>
                   ))}
                 </Select>
-                {errors.rasi && <FormHelperText>{errors.rasi}</FormHelperText>}
+                {errors.rashi && (
+                  <FormHelperText sx={{ fontSize: "0.75rem" }}>
+                    {errors.rashi}
+                  </FormHelperText>
+                )}
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <FormControl
                 fullWidth
-                error={!!errors.nakshatram}
+                error={!!errors.nakshatra}
                 disabled={isViewMode}
                 size="small"
               >
-                <InputLabel>Nakshatram</InputLabel>
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  }}
+                >
+                  Nakshatra
+                </InputLabel>
                 <Select
-                  value={formData.nakshatram}
-                  onChange={handleChange("nakshatram")}
-                  label="Nakshatram"
+                  value={formData.nakshatra}
+                  onChange={handleChange("nakshatra")}
+                  label="Nakshatra"
+                  sx={{
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
                 >
                   {availableNakshatrams.map((option) => (
                     <MenuItem key={option} value={option}>
@@ -494,18 +1300,86 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     </MenuItem>
                   ))}
                 </Select>
-                {errors.nakshatram && (
-                  <FormHelperText>{errors.nakshatram}</FormHelperText>
+                {errors.nakshatra && (
+                  <FormHelperText sx={{ fontSize: "0.75rem" }}>
+                    {errors.nakshatra}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth disabled={isViewMode} size="small">
-                <InputLabel>Status</InputLabel>
+              <FormControl
+                fullWidth
+                disabled={isViewMode}
+                size="small"
+              >
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  }}
+                >
+                  User Type
+                </InputLabel>
+                <Select
+                  value={formData.user_type}
+                  onChange={handleChange("user_type")}
+                  label="User Type"
+                  sx={{
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
+                >
+                  {userTypeOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FormControl
+                fullWidth
+                disabled={isViewMode}
+                size="small"
+              >
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  }}
+                >
+                  Status
+                </InputLabel>
                 <Select
                   value={formData.status}
                   onChange={handleChange("status")}
                   label="Status"
+                  sx={{
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
                 >
                   <MenuItem value="Active">Active</MenuItem>
                   <MenuItem value="Inactive">Inactive</MenuItem>
@@ -513,24 +1387,29 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Submit Button */}
+            {/* Submit Button - Centered and styled */}
             {!isViewMode && (
-              <Grid item xs={12} mt={1}>
-                <Box display="flex" justifyContent="flex-end">
+              <Grid item xs={12} mt={2}>
+                <Box sx={{ display: "flex", justifyContent: "end" }}>
                   <Button
                     type="submit"
                     variant="contained"
                     sx={{
-                      background: "linear-gradient(to right, #00C853, #00695C)",
-                      padding: "8px 22px",
-                      fontWeight: 500,
+                      background:
+                        "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+                      color: "#fff",
                       borderRadius: "8px",
-                      fontSize: "0.875rem",
+                      padding: "8px 24px",
+                      fontWeight: 600,
+                      fontSize: "0.95rem",
                       textTransform: "none",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s ease",
                       "&:hover": {
                         background:
-                          "linear-gradient(to right, #00E676, #00897B)",
+                          "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                        transform: "scale(1.02)",
                       },
                     }}
                   >

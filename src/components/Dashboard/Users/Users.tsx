@@ -194,7 +194,7 @@ const Users: React.FC = () => {
         method: "get",
       });
 
-      console.log(response?.data?.data, "response?.data?.data")
+      console.log(response?.data, "response?.data?.data")
 
       console.log(response?.data?.data || {
         name: [],
@@ -287,9 +287,9 @@ const Users: React.FC = () => {
     navigate(`/dashboard/users/edit/${row?.id}`);
   };
 
-  const handleDelete = (row: UserData) => {
-    // Implement delete logic
-  };
+  // const handleDelete = (row: UserData) => {
+  //   // Implement delete logic
+  // };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -307,14 +307,14 @@ const Users: React.FC = () => {
 
   return (
     <GenericTable<UserData>
-      title="Users Management"
+      title="User Management"
       data={users}
       columns={columns}
       totalCount={totalCount} // Pass total count for pagination
       onAdd={handleAdd}
       onView={handleView}
       onEdit={handleEdit}
-      onDelete={handleDelete}
+      // onDelete={handleDelete}
       getRowId={(row) => row.id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={rowsPerPage}

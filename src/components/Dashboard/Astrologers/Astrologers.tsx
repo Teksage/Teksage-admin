@@ -343,9 +343,9 @@ const Astrologers: React.FC = () => {
     navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
   };
 
-  const handleDelete = (row: UserData) => {
-    // Implement delete logic
-  };
+  // const handleDelete = (row: UserData) => {
+  //   // Implement delete logic
+  // };
 
   const handleSelectionChange = (selectedIds: number[]) => {
     console.log("Selected:", selectedIds);
@@ -381,7 +381,7 @@ const Astrologers: React.FC = () => {
         onStatus={handleStatus}
         onView={handleView}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        // onDelete={handleDelete}
         onSelectionChange={handleSelectionChange}
         getRowId={(row) => row.astrologer_id}
         tableHeight="calc(100vh - 250px)"

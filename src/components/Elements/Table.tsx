@@ -10,8 +10,8 @@
 //   TablePagination,
 //   IconButton,
 //   Button,
-//   Select,
-//   MenuItem,
+//   Autocomplete, // Added
+//   TextField,
 //   FormControl,
 //   InputLabel,
 //   Box,
@@ -28,13 +28,12 @@
 //   ListItemText,
 //   Divider,
 //   Slider,
-//   TextField,
+//   Select, MenuItem
 // } from "@mui/material";
 // import {
 //   Visibility as ViewIcon,
 //   Edit as EditIcon,
 //   Add as AddIcon,
-//   Update as UpdateIcon,
 //   Close as CloseIcon,
 //   FilterList as FilterIcon,
 //   Delete as DeleteIcon,
@@ -46,7 +45,7 @@
 // import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // import { styled } from "@mui/material/styles";
 
-// // Enhanced responsive styled components
+// // Styled components remain the same as in your original code
 // const StyledPaper = styled(Paper)(({ theme }) => ({
 //   display: "flex",
 //   flexDirection: "column",
@@ -180,6 +179,7 @@
 //   id: keyof T;
 //   label: string;
 //   filterable?: boolean;
+//   filterOptions?: string[]; // New prop for custom filter options
 //   width?: string;
 //   render?: (value: any, row: T) => React.ReactNode;
 // }
@@ -196,6 +196,13 @@
 //   getRowId: (row: T) => string | number;
 //   initialRowsPerPage?: number;
 //   tableHeight?: string;
+//   totalCount?: number;
+//   page?: number;
+//   rowsPerPage?: number;
+//   onPageChange?: (newPage: number) => void;
+//   onRowsPerPageChange?: (newRowsPerPage: number) => void;
+//   onFilterChange?: (filters: Record<string, string>) => void;
+//   feeRangeLimits?: { min: number; max: number }; // Added
 // }
 
 // function GenericTable<T>({
@@ -210,11 +217,15 @@
 //   getRowId,
 //   initialRowsPerPage = 10,
 //   tableHeight = "calc(100vh - 250px)",
+//   totalCount = data.length, // Default to client-side count if not provided
+//   page = 0,
+//   rowsPerPage = initialRowsPerPage,
+//   onPageChange,
+//   onRowsPerPageChange,
+//   onFilterChange,
 // }: TableProps<T>) {
 //   const theme = useTheme();
 //   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
 //   const [filters, setFilters] = useState<Record<string, string>>({});
 //   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 //   const [mobileRowDetail, setMobileRowDetail] = useState<T | null>(null);
@@ -238,93 +249,53 @@
 //     [columns]
 //   );
 
-//   const filteredData = useMemo(() => {
-//     return data.filter((item) => {
-//       return Object.entries(filters).every(([key, value]) => {
-//         if (!value) return true;
-
-//         const itemValue = item[key as keyof T];
-//         if (itemValue === undefined || itemValue === null) return false;
-
-//         // Handle fee range filter
-//         if (key === "consultation_fee" || key === "fee") {
-//           const [minStr, maxStr] = value.split("-");
-//           const feeValue =
-//             typeof itemValue === "string"
-//               ? parseInt(itemValue.replace(/[^0-9]/g, "")) || 0
-//               : Number(itemValue);
-//           const min = minStr ? Number(minStr) : null;
-//           const max = maxStr ? Number(maxStr) : null;
-
-//           if (min !== null && feeValue < min) return false;
-//           if (max !== null && feeValue > max) return false;
-//           return true;
-//         }
-
-//         // Handle date range filter
-//         if (key === "booking_date" || key.includes("date")) {
-//           const [startStr, endStr] = value.split("-");
-//           const dateValue = new Date(itemValue as any);
-//           const startDate = startStr ? new Date(startStr) : null;
-//           const endDate = endStr ? new Date(endStr) : null;
-
-//           if (startDate && dateValue < startDate) return false;
-//           if (endDate && dateValue > endDate) return false;
-//           return true;
-//         }
-
-//         // Default string filter
-//         return itemValue
-//           ?.toString()
-//           .toLowerCase()
-//           .includes(value.toLowerCase());
-//       });
-//     });
-//   }, [data, filters]);
-
+//   // Handle filter changes and notify parent
 //   const handleFilterChange = (columnId: keyof T, value: string) => {
-//     setFilters((prev) => ({ ...prev, [columnId as string]: value }));
-//     setPage(0);
+//     const newFilters = { ...filters, [columnId as string]: value };
+//     setFilters(newFilters);
+//     onFilterChange?.(newFilters);
 //   };
 
 //   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
 //     setDateRange({ start, end });
-//     setFilters((prev) => ({
-//       ...prev,
+//     const newFilters = {
+//       ...filters,
 //       booking_date:
 //         start || end
 //           ? `${start?.toISOString() || ""}-${end?.toISOString() || ""}`
 //           : "",
-//     }));
-//     setPage(0);
+//     };
+//     setFilters(newFilters);
+//     onFilterChange?.(newFilters);
 //   };
 
 //   const handleFeeRangeChange = (min: number | null, max: number | null) => {
 //     setFeeRange({ min, max });
-//     setFilters((prev) => ({
-//       ...prev,
+//     const newFilters = {
+//       ...filters,
 //       consultation_fee:
 //         min !== null || max !== null ? `${min || ""}-${max || ""}` : "",
-//     }));
-//     setPage(0);
+//     };
+//     setFilters(newFilters);
+//     onFilterChange?.(newFilters);
 //   };
 
 //   const clearAllFilters = () => {
 //     setFilters({});
 //     setDateRange({ start: null, end: null });
 //     setFeeRange({ min: null, max: null });
-//     setPage(0);
+//     onFilterChange?.({});
 //   };
 
 //   const handleChangePage = (event: unknown, newPage: number) => {
-//     setPage(newPage);
+//     onPageChange?.(newPage);
 //   };
 
 //   const handleChangeRowsPerPage = (
 //     event: React.ChangeEvent<HTMLInputElement>
 //   ) => {
-//     setRowsPerPage(parseInt(event.target.value, 10));
-//     setPage(0);
+//     const newRowsPerPage = parseInt(event.target.value, 10);
+//     onRowsPerPageChange?.(newRowsPerPage);
 //   };
 
 //   const renderDateFilter = () => (
@@ -365,6 +336,7 @@
 //   );
 
 //   const renderFeeFilter = () => {
+//     // For server-side, you may need to fetch min/max fee values from API
 //     const feeValues = data
 //       .map((item) => {
 //         const value =
@@ -442,16 +414,19 @@
 //   };
 
 //   const renderSelectFilter = (column: TableColumn<T>) => {
-//     const uniqueValues = Array.from(
-//       new Set(
-//         data
-//           .map((item) => {
-//             const value = item[column.id];
-//             return value?.toString() || "";
-//           })
-//           .filter(Boolean)
-//       )
-//     ).sort();
+//     // Use filterOptions from column if provided, otherwise fall back to data-derived values
+//     const uniqueValues = column.filterOptions?.length
+//       ? column.filterOptions
+//       : Array.from(
+//           new Set(
+//             data
+//               .map((item) => {
+//                 const value = item[column.id];
+//                 return value?.toString() || "";
+//               })
+//               .filter(Boolean)
+//           )
+//         ).sort();
 
 //     return (
 //       <StyledFormControl key={column.id as string} size="small" fullWidth>
@@ -483,7 +458,6 @@
 //           height: "100%",
 //         }}
 //       >
-//         {/* Mobile Header */}
 //         <Box
 //           sx={{
 //             p: 2,
@@ -515,7 +489,6 @@
 //           )}
 //         </Box>
 
-//         {/* Mobile Filters Button */}
 //         {hasFilterableColumns && (
 //           <Box
 //             sx={{
@@ -538,9 +511,8 @@
 //           </Box>
 //         )}
 
-//         {/* Mobile Data List */}
 //         <List sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
-//           {filteredData
+//           {data
 //             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 //             .map((row, index) => {
 //               const id = getRowId(row);
@@ -571,9 +543,9 @@
 //                           : row[columns[0].id]?.toString()
 //                       }
 //                       secondary={
-//                         columns[1].render
+//                         columns[1]?.render
 //                           ? columns[1].render(row[columns[1].id], row)
-//                           : row[columns[1].id]?.toString()
+//                           : row[columns[1]?.id]?.toString()
 //                       }
 //                       primaryTypographyProps={{ fontWeight: 600 }}
 //                     />
@@ -600,10 +572,9 @@
 //             })}
 //         </List>
 
-//         {/* Mobile Pagination */}
 //         <TablePagination
 //           component="div"
-//           count={filteredData.length}
+//           count={totalCount}
 //           rowsPerPage={rowsPerPage}
 //           page={page}
 //           onPageChange={handleChangePage}
@@ -618,24 +589,19 @@
 //           }}
 //         />
 
-//         {/* Mobile Filters Dialog */}
 //         <Dialog
 //           fullScreen
 //           open={mobileFiltersOpen}
 //           onClose={() => setMobileFiltersOpen(false)}
 //         >
-//           <DialogTitle
-//             sx={{ display: "flex", justifyContent: "space-between" }}
-//           >
+//           <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
 //             <Typography variant="h6">Filters</Typography>
 //             <IconButton onClick={() => setMobileFiltersOpen(false)}>
 //               <CloseIcon />
 //             </IconButton>
 //           </DialogTitle>
 //           <DialogContent>
-//             <Box
-//               sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
-//             >
+//             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
 //               {columns
 //                 .filter((col) => col.filterable)
 //                 .map((column) => (
@@ -644,24 +610,14 @@
 //                     <Select
 //                       value={filters[column.id as string] || ""}
 //                       label={`Filter ${column.label}`}
-//                       onChange={(e) =>
-//                         handleFilterChange(column.id, e.target.value)
-//                       }
+//                       onChange={(e) => handleFilterChange(column.id, e.target.value)}
 //                     >
 //                       <MenuItem value="">All</MenuItem>
-//                       {Array.from(
-//                         new Set(
-//                           data
-//                             .map((item) => item[column.id]?.toString())
-//                             .filter(Boolean)
-//                         )
-//                       )
-//                         .sort()
-//                         .map((option) => (
-//                           <MenuItem key={option} value={option}>
-//                             {option}
-//                           </MenuItem>
-//                         ))}
+//                       {(column.filterOptions || []).map((option) => (
+//                         <MenuItem key={option} value={option}>
+//                           {option}
+//                         </MenuItem>
+//                       ))}
 //                     </Select>
 //                   </FormControl>
 //                 ))}
@@ -672,7 +628,10 @@
 //               Clear All
 //             </Button>
 //             <Button
-//               onClick={() => setMobileFiltersOpen(false)}
+//               onClick={() => {
+//                 onFilterChange?.(filters); // Ensure filters are applied
+//                 setMobileFiltersOpen(false);
+//               }}
 //               variant="contained"
 //               sx={{
 //                 background:
@@ -685,16 +644,13 @@
 //           </DialogActions>
 //         </Dialog>
 
-//         {/* Mobile Row Detail Dialog */}
 //         {mobileRowDetail && (
 //           <Dialog
 //             fullScreen
 //             open={Boolean(mobileRowDetail)}
 //             onClose={() => setMobileRowDetail(null)}
 //           >
-//             <DialogTitle
-//               sx={{ display: "flex", justifyContent: "space-between" }}
-//             >
+//             <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
 //               <Typography variant="h6">Details</Typography>
 //               <IconButton onClick={() => setMobileRowDetail(null)}>
 //                 <CloseIcon />
@@ -709,10 +665,7 @@
 //                         primary={column.label}
 //                         secondary={
 //                           column.render
-//                             ? column.render(
-//                                 mobileRowDetail[column.id],
-//                                 mobileRowDetail
-//                               )
+//                             ? column.render(mobileRowDetail[column.id], mobileRowDetail)
 //                             : mobileRowDetail[column.id]?.toString()
 //                         }
 //                         primaryTypographyProps={{
@@ -739,6 +692,18 @@
 //                   Edit
 //                 </Button>
 //               )}
+//               {onDelete && (
+//                 <Button
+//                   startIcon={<DeleteIcon />}
+//                   onClick={() => {
+//                     onDelete(mobileRowDetail);
+//                     setMobileRowDetail(null);
+//                   }}
+//                   sx={{ color: "#f44336" }}
+//                 >
+//                   Delete
+//                 </Button>
+//               )}
 //               <Button
 //                 onClick={() => setMobileRowDetail(null)}
 //                 sx={{ color: "#1b4d3e" }}
@@ -752,94 +717,90 @@
 //     );
 //   }
 
-//   // Desktop View
-//   return (
-//     <StyledPaper elevation={3}>
-//       <TableToolbar>
-//         <Typography
-//           variant="h6"
-//           component="div"
-//           sx={{
-//             fontWeight: 700,
-//             background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
-//             backgroundClip: "text",
-//             WebkitBackgroundClip: "text",
-//             color: "transparent",
-//           }}
-//         >
-//           {title}
-//         </Typography>
-//         <Box sx={{ display: "flex", gap: 2 }}>
-//           {hasFilterableColumns && (
-//             <Button
-//               variant="outlined"
-//               onClick={clearAllFilters}
-//               disabled={Object.keys(filters).length === 0}
-//               sx={{
-//                 borderColor: theme.palette.error.main,
-//                 color: theme.palette.error.main,
-//                 "&:hover": {
-//                   borderColor: theme.palette.error.dark,
-//                 },
-//                 "&:disabled": {
-//                   borderColor: alpha(theme.palette.action.disabled, 0.12),
-//                   color: alpha(theme.palette.action.disabled, 0.38),
-//                 },
-//               }}
-//             >
-//               Clear Filters
-//             </Button>
-//           )}
-//           {onAdd && (
-//             <PrimaryButton
-//               variant="contained"
-//               startIcon={<AddIcon />}
-//               onClick={onAdd}
-//             >
-//               Add New
-//             </PrimaryButton>
-//           )}
-//         </Box>
-//       </TableToolbar>
+//     // Desktop View
+//     return (
+//       <StyledPaper elevation={3}>
+//         <TableToolbar>
+//           <Typography
+//             variant="h6"
+//             component="div"
+//             sx={{
+//               fontWeight: 700,
+//               background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
+//               backgroundClip: "text",
+//               WebkitBackgroundClip: "text",
+//               color: "transparent",
+//             }}
+//           >
+//             {title}
+//           </Typography>
+//           <Box sx={{ display: "flex", gap: 2 }}>
+//             {hasFilterableColumns && (
+//               <Button
+//                 variant="outlined"
+//                 onClick={clearAllFilters}
+//                 disabled={Object.keys(filters).length === 0}
+//                 sx={{
+//                   borderColor: theme.palette.error.main,
+//                   color: theme.palette.error.main,
+//                   "&:hover": {
+//                     borderColor: theme.palette.error.dark,
+//                   },
+//                   "&:disabled": {
+//                     borderColor: alpha(theme.palette.action.disabled, 0.12),
+//                     color: alpha(theme.palette.action.disabled, 0.38),
+//                   },
+//                 }}
+//               >
+//                 Clear Filters
+//               </Button>
+//             )}
+//             {onAdd && (
+//               <PrimaryButton
+//                 variant="contained"
+//                 startIcon={<AddIcon />}
+//                 onClick={onAdd}
+//               >
+//                 Add New
+//               </PrimaryButton>
+//             )}
+//           </Box>
+//         </TableToolbar>
 
-//       {/* Filters Section */}
-//       {hasFilterableColumns && (
-//         <FiltersContainer>
-//           {columns.some((c) => c.id.toString().includes("date")) &&
-//             renderDateFilter()}
-//           {columns.some((c) => c.id.toString().includes("fee")) &&
-//             renderFeeFilter()}
-//           {columns
-//             .filter(
-//               (col) =>
-//                 col.filterable &&
-//                 !col.id.toString().includes("date") &&
-//                 !col.id.toString().includes("fee")
-//             )
-//             .map((column) => renderSelectFilter(column))}
-//         </FiltersContainer>
-//       )}
+//         {hasFilterableColumns && (
+//           <FiltersContainer>
+//             {columns.some((c) => c.id.toString().includes("date")) &&
+//               renderDateFilter()}
+//             {columns.some((c) => c.id.toString().includes("fee")) &&
+//               renderFeeFilter()}
+//             {columns
+//               .filter(
+//                 (col) =>
+//                   col.filterable &&
+//                   !col.id.toString().includes("date") &&
+//                   !col.id.toString().includes("fee")
+//               )
+//               .map((column) => renderSelectFilter(column))}
+//           </FiltersContainer>
+//         )}
 
-//       {/* Table Container */}
-//       <StyledTableContainer sx={{ height: tableHeight }}>
-//         <Table stickyHeader>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell sx={{ width: "60px", textAlign: "center" }}>
-//                 S.No.
-//               </TableCell>
-//               {columns.map((column) => (
-//                 <TableCell key={column.id as string}>{column.label}</TableCell>
-//               ))}
-//               {showActions && (
-//                 <TableCell sx={{ width: "150px" }}>Actions</TableCell>
-//               )}
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {filteredData
-//               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-//               .map((row, index) => {
+//         <StyledTableContainer sx={{ height: tableHeight }}>
+//           <Table stickyHeader>
+//             <TableHead>
+//               <TableRow>
+//                 <TableCell sx={{ width: "60px", textAlign: "center" }}>
+//                   S.No.
+//                 </TableCell>
+//                 {columns.map((column) => (
+//                   <TableCell key={column.id as string}>{column.label}</TableCell>
+//                 ))}
+//                 {showActions && (
+//                   <TableCell sx={{ width: "150px" }}>Actions</TableCell>
+//                 )}
+//               </TableRow>
+//             </TableHead>
+//             <TableBody>
+//               {data.map((row, index) => {
 //                 const id = getRowId(row);
 //                 const serialNumber = page * rowsPerPage + index + 1;
 
@@ -910,26 +871,24 @@
 //                   </TableRow>
 //                 );
 //               })}
-//           </TableBody>
-//         </Table>
-//       </StyledTableContainer>
+//             </TableBody>
+//           </Table>
+//         </StyledTableContainer>
 
-//       <TablePagination
-//         component="div"
-//         count={filteredData.length}
-//         rowsPerPage={rowsPerPage}
-//         page={page}
-//         onPageChange={handleChangePage}
-//         onRowsPerPageChange={handleChangeRowsPerPage}
-//         rowsPerPageOptions={[5, 10, 25, 50]}
-//       />
-//     </StyledPaper>
-//   );
+//         <TablePagination
+//           component="div"
+//           count={totalCount} // Use totalCount for server-side pagination
+//           rowsPerPage={rowsPerPage}
+//           page={page}
+//           onPageChange={handleChangePage}
+//           onRowsPerPageChange={handleChangeRowsPerPage}
+//           rowsPerPageOptions={[5, 10, 25, 50]}
+//         />
+//       </StyledPaper>
+//     );
 // }
 
 // export default GenericTable;
-
-// -------------------> COMPONENT - 01
 
 import React, { useState, useMemo } from "react";
 import {
@@ -943,7 +902,7 @@ import {
   TablePagination,
   IconButton,
   Button,
-  Autocomplete, // Added
+  Autocomplete,
   TextField,
   FormControl,
   InputLabel,
@@ -961,6 +920,13 @@ import {
   ListItemText,
   Divider,
   Slider,
+  Select,
+  MenuItem,
+  Badge,
+  CircularProgress,
+  TableSortLabel,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   Visibility as ViewIcon,
@@ -971,13 +937,24 @@ import {
   Delete as DeleteIcon,
   DateRange as DateRangeIcon,
   AttachMoney as FeeIcon,
+  FirstPage as FirstPageIcon,
+  LastPage as LastPageIcon,
+  Download as DownloadIcon,
 } from "@mui/icons-material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { styled } from "@mui/material/styles";
+import {
+  format,
+  subDays,
+  startOfDay,
+  endOfDay,
+  subWeeks,
+  subMonths,
+} from "date-fns";
 
-// Styled components remain the same as in your original code
+// Styled components
 const StyledPaper = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -1107,11 +1084,123 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
+const DateFilterDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: "12px",
+    background: "linear-gradient(135deg, #6B5B95, #957DAD)", // Purple gradient from the image
+    color: theme.palette.common.white,
+    padding: 0,
+    overflow: "hidden",
+    width: "600px",
+    maxWidth: "90%",
+  },
+  "& .MuiDialogTitle-root": {
+    background: "transparent",
+    color: theme.palette.common.white,
+    fontWeight: 600,
+    padding: theme.spacing(2),
+    borderBottom: "none",
+  },
+  "& .MuiDialogContent-root": {
+    padding: 0,
+    display: "flex",
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(2),
+    background: "rgba(255, 255, 255, 0.1)",
+  },
+  "& .MuiButton-root": {
+    borderRadius: "8px",
+    textTransform: "none",
+    fontWeight: 600,
+    padding: theme.spacing(1, 2),
+    "&:hover": {
+      transform: "translateY(-1px)",
+    },
+  },
+}));
+
+const DateFilterSidebar = styled(Box)(({ theme }) => ({
+  width: "150px",
+  background: "rgba(255, 255, 255, 0.1)",
+  padding: theme.spacing(2),
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(1),
+  borderRight: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+}));
+
+const DateFilterPresetButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "active",
+})<{ active?: boolean }>(({ theme, active }) => ({
+  textTransform: "none",
+  justifyContent: "flex-start",
+  color: active
+    ? theme.palette.common.white
+    : alpha(theme.palette.common.white, 0.7),
+  background: active ? alpha(theme.palette.primary.main, 0.3) : "transparent",
+  "&:hover": {
+    background: alpha(theme.palette.primary.main, 0.2),
+    color: theme.palette.common.white,
+  },
+}));
+
+const DateFilterCalendarContainer = styled(Box)(({ theme }) => ({
+  flex: 1,
+  padding: theme.spacing(2),
+  "& .MuiTextField-root": {
+    background: "rgba(255, 255, 255, 0.1)",
+    borderRadius: "8px",
+    "& .MuiOutlinedInput-root": {
+      color: theme.palette.common.white,
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: alpha(theme.palette.common.white, 0.3),
+    },
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: theme.palette.common.white,
+    },
+    "& .MuiInputLabel-root": {
+      color: alpha(theme.palette.common.white, 0.7),
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: theme.palette.common.white,
+    },
+  },
+  "& .MuiPickersDay-root": {
+    color: theme.palette.common.white,
+    "&.Mui-selected": {
+      backgroundColor: theme.palette.primary.main,
+    },
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+    },
+  },
+  "& .MuiPickersDay-today": {
+    border: `1px solid ${theme.palette.common.white}`,
+  },
+}));
+
+const FilterTab = styled(Tab)(({ theme }) => ({
+  borderRadius: "8px",
+  textTransform: "none",
+  fontWeight: 600,
+  background: alpha(theme.palette.primary.light, 0.1),
+  "&.Mui-selected": {
+    background: theme.palette.primary.main,
+    color: theme.palette.common.white,
+  },
+  "&:hover": {
+    background: alpha(theme.palette.primary.main, 0.2),
+  },
+}));
+
 export interface TableColumn<T> {
   id: keyof T;
   label: string;
   filterable?: boolean;
-  filterOptions?: string[]; // New prop for custom filter options
+  filterOptions?: string[];
+  sortable?: boolean;
   width?: string;
   render?: (value: any, row: T) => React.ReactNode;
 }
@@ -1134,7 +1223,8 @@ export interface TableProps<T> {
   onPageChange?: (newPage: number) => void;
   onRowsPerPageChange?: (newRowsPerPage: number) => void;
   onFilterChange?: (filters: Record<string, string>) => void;
-  feeRangeLimits?: { min: number; max: number }; // Added
+  onSortChange?: (sortBy: keyof T, sortOrder: "asc" | "desc") => void;
+  loading?: boolean;
 }
 
 function GenericTable<T>({
@@ -1149,19 +1239,29 @@ function GenericTable<T>({
   getRowId,
   initialRowsPerPage = 10,
   tableHeight = "calc(100vh - 250px)",
-  totalCount = data.length, // Default to client-side count if not provided
+  totalCount = data.length,
   page = 0,
   rowsPerPage = initialRowsPerPage,
   onPageChange,
   onRowsPerPageChange,
   onFilterChange,
+  onSortChange,
+  loading = false,
 }: TableProps<T>) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [showFilters, setShowFilters] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [mobileRowDetail, setMobileRowDetail] = useState<T | null>(null);
   const [dateRange, setDateRange] = useState<{
+    start: Date | null;
+    end: Date | null;
+  }>({
+    start: null,
+    end: null,
+  });
+  const [tempDateRange, setTempDateRange] = useState<{
     start: Date | null;
     end: Date | null;
   }>({
@@ -1175,13 +1275,60 @@ function GenericTable<T>({
     min: null,
     max: null,
   });
+  const [dateFilterOpen, setDateFilterOpen] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<string>("Custom");
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof T | null;
+    direction: "asc" | "desc";
+  }>({ key: null, direction: "asc" });
+
+  // Define getFilterValues first
+  const getFilterValues = (column: TableColumn<T>) => {
+    return column.filterOptions?.length
+      ? column.filterOptions
+      : Array.from(
+          new Set(
+            data
+              .map((item) => {
+                const value = item[column.id];
+                return value?.toString() || "";
+              })
+              .filter(Boolean)
+          )
+        ).sort();
+  };
 
   const hasFilterableColumns = useMemo(
-    () => columns.some((col) => col.filterable),
-    [columns]
+    () =>
+      columns.some((col) => {
+        if (!col.filterable) return false;
+        const values = getFilterValues(col);
+        return values.length > 0;
+      }),
+    [columns, data]
   );
 
-  // Handle filter changes and notify parent
+  const hasDateData = useMemo(
+    () =>
+      data.some(
+        (item) => item["booking_date" as keyof T] || item["date" as keyof T]
+      ),
+    [data]
+  );
+
+  const hasFeeData = useMemo(() => {
+    const feeValues = data
+      .map((item) => {
+        const value = (item as any)["consultation_fee"] || (item as any)["fee"];
+        return typeof value === "string"
+          ? parseInt(value.replace(/[^0-9]/g, "")) || null // Return null for invalid strings
+          : value;
+      })
+      .filter((value) => value !== null && value !== 0 && !isNaN(value)); // Exclude null, 0, and NaN
+    console.log(feeValues, "feeValues");
+    return feeValues.length > 0;
+  }, [data]);
+
   const handleFilterChange = (columnId: keyof T, value: string) => {
     const newFilters = { ...filters, [columnId as string]: value };
     setFilters(newFilters);
@@ -1201,6 +1348,64 @@ function GenericTable<T>({
     onFilterChange?.(newFilters);
   };
 
+  const handleTempDateRangeChange = (start: Date | null, end: Date | null) => {
+    setTempDateRange({ start, end });
+    setSelectedPreset("Custom");
+  };
+
+  const applyDateFilter = () => {
+    handleDateRangeChange(tempDateRange.start, tempDateRange.end);
+    setDateFilterOpen(false);
+  };
+
+  const clearDateFilter = () => {
+    setTempDateRange({ start: null, end: null });
+    handleDateRangeChange(null, null);
+    setSelectedPreset("Custom");
+    setDateFilterOpen(false);
+  };
+
+  const handlePresetChange = (preset: string) => {
+    const today = new Date();
+    let start: Date | null = null;
+    let end: Date | null = null;
+
+    switch (preset) {
+      case "Today":
+        start = startOfDay(today);
+        end = endOfDay(today);
+        break;
+      case "Yesterday":
+        start = startOfDay(subDays(today, 1));
+        end = endOfDay(subDays(today, 1));
+        break;
+      case "Last Week":
+        start = startOfDay(subWeeks(today, 1));
+        end = endOfDay(today);
+        break;
+      case "Last Month":
+        start = startOfDay(subMonths(today, 1));
+        end = endOfDay(today);
+        break;
+      case "Last 7 days":
+        start = startOfDay(subDays(today, 7));
+        end = endOfDay(today);
+        break;
+      case "Last 30 days":
+        start = startOfDay(subDays(today, 30));
+        end = endOfDay(today);
+        break;
+      case "Custom":
+      default:
+        start = tempDateRange.start;
+        end = tempDateRange.end;
+        break;
+    }
+
+    setTempDateRange({ start, end });
+    setSelectedPreset(preset);
+  };
+
   const handleFeeRangeChange = (min: number | null, max: number | null) => {
     setFeeRange({ min, max });
     const newFilters = {
@@ -1212,11 +1417,30 @@ function GenericTable<T>({
     onFilterChange?.(newFilters);
   };
 
+  const clearFeeFilter = () => {
+    setFeeRange({ min: null, max: null });
+    const newFilters = {
+      ...filters,
+      consultation_fee: "",
+    };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
+  };
+
   const clearAllFilters = () => {
     setFilters({});
     setDateRange({ start: null, end: null });
+    setTempDateRange({ start: null, end: null });
     setFeeRange({ min: null, max: null });
+    setSelectedPreset("Custom");
     onFilterChange?.({});
+  };
+
+  const handleSort = (columnId: keyof T) => {
+    const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";
+    const newDirection = isAsc ? "desc" : "asc";
+    setSortConfig({ key: columnId, direction: newDirection });
+    onSortChange?.(columnId, newDirection);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -1228,47 +1452,110 @@ function GenericTable<T>({
   ) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     onRowsPerPageChange?.(newRowsPerPage);
+    onPageChange?.(0);
   };
 
-  const renderDateFilter = () => (
-    <Box
-      sx={{
-        p: 2,
-        border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-        borderRadius: 2,
-      }}
-    >
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <DateRangeIcon color="primary" sx={{ mr: 1 }} />
-        <Typography variant="subtitle1">Date Range</Typography>
-      </Box>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <DatePicker
-          label="From Date"
-          value={dateRange.start}
-          onChange={(newValue) =>
-            handleDateRangeChange(newValue, dateRange.end)
-          }
-          renderInput={(params) => (
-            <TextField {...params} size="small" fullWidth sx={{ mb: 2 }} />
-          )}
-        />
-        <DatePicker
-          label="To Date"
-          value={dateRange.end}
-          onChange={(newValue) =>
-            handleDateRangeChange(dateRange.start, newValue)
-          }
-          renderInput={(params) => (
-            <TextField {...params} size="small" fullWidth />
-          )}
-        />
-      </LocalizationProvider>
-    </Box>
-  );
+  const handleExport = () => {
+    const csv = [
+      columns.map((col) => col.label).join(","),
+      ...data.map((row) =>
+        columns
+          .map((col) => {
+            const value = row[col.id];
+            return `"${value?.toString().replace(/"/g, '""') || ""}"`;
+          })
+          .join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const formatDateRange = (start: Date | null, end: Date | null) => {
+    if (!start || !end) return "Select Date Range";
+    return `${format(start, "d MMM yyyy")} – ${format(end, "d MMM yyyy")}`;
+  };
+
+  const renderDateFilterDialog = () => {
+    return (
+      <DateFilterDialog
+        open={dateFilterOpen}
+        onClose={() => setDateFilterOpen(false)}
+      >
+        <DialogTitle>
+          {formatDateRange(tempDateRange.start, tempDateRange.end)}
+        </DialogTitle>
+        <DialogContent>
+          <DateFilterSidebar>
+            {[
+              "Custom",
+              "Today",
+              "Yesterday",
+              "Last Week",
+              "Last Month",
+              "Last 7 days",
+              "Last 30 days",
+            ].map((preset) => (
+              <DateFilterPresetButton
+                key={preset}
+                active={selectedPreset === preset}
+                onClick={() => handlePresetChange(preset)}
+              >
+                {preset}
+              </DateFilterPresetButton>
+            ))}
+          </DateFilterSidebar>
+          <DateFilterCalendarContainer>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <DatePicker
+                  label="Start Date"
+                  value={tempDateRange.start}
+                  onChange={(newValue) =>
+                    handleTempDateRangeChange(newValue, tempDateRange.end)
+                  }
+                  slots={{ textField: TextField }}
+                  slotProps={{ textField: { size: "small", sx: { flex: 1 } } }}
+                />
+                <DatePicker
+                  label="End Date"
+                  value={tempDateRange.end}
+                  onChange={(newValue) =>
+                    handleTempDateRangeChange(tempDateRange.start, newValue)
+                  }
+                  slots={{ textField: TextField }}
+                  slotProps={{ textField: { size: "small", sx: { flex: 1 } } }}
+                />
+              </Box>
+            </LocalizationProvider>
+          </DateFilterCalendarContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={clearDateFilter} color="error">
+            Clear
+          </Button>
+          <Button onClick={() => setDateFilterOpen(false)}>Cancel</Button>
+          <Button
+            onClick={applyDateFilter}
+            variant="contained"
+            disabled={!tempDateRange.start && !tempDateRange.end}
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </DateFilterDialog>
+    );
+  };
 
   const renderFeeFilter = () => {
-    // For server-side, you may need to fetch min/max fee values from API
+    if (!hasFeeData) return null;
+
     const feeValues = data
       .map((item) => {
         const value =
@@ -1278,8 +1565,6 @@ function GenericTable<T>({
           : value;
       })
       .filter((value) => !isNaN(value));
-
-    if (feeValues.length === 0) return null;
 
     const minFee = Math.min(...feeValues);
     const maxFee = Math.max(...feeValues);
@@ -1341,40 +1626,66 @@ function GenericTable<T>({
           valueLabelDisplay="auto"
           valueLabelFormat={(value) => `₹${value}`}
         />
+        <Button
+          onClick={clearFeeFilter}
+          color="error"
+          size="small"
+          sx={{ mt: 1 }}
+        >
+          Clear
+        </Button>
       </Box>
     );
   };
 
   const renderSelectFilter = (column: TableColumn<T>) => {
-    // Use filterOptions from column if provided, otherwise fall back to data-derived values
-    const uniqueValues = column.filterOptions?.length
-      ? column.filterOptions
-      : Array.from(
-          new Set(
-            data
-              .map((item) => {
-                const value = item[column.id];
-                return value?.toString() || "";
-              })
-              .filter(Boolean)
-          )
-        ).sort();
+    const uniqueValues = getFilterValues(column);
+    if (uniqueValues.length === 0) return null;
 
     return (
       <StyledFormControl key={column.id as string} size="small" fullWidth>
-        <InputLabel>Filter {column.label}</InputLabel>
-        <Select
+        <Autocomplete
+          options={["Select All", ...uniqueValues]}
+          getOptionLabel={(option) =>
+            option === "Select All" ? "Select All" : option
+          }
           value={filters[column.id as string] || ""}
-          label={`Filter ${column.label}`}
-          onChange={(e) => handleFilterChange(column.id, e.target.value)}
-        >
-          <MenuItem value="">All</MenuItem>
-          {uniqueValues.map((value) => (
-            <MenuItem key={value} value={value}>
-              {value}
-            </MenuItem>
-          ))}
-        </Select>
+          onChange={(event, newValue) =>
+            handleFilterChange(
+              column.id,
+              newValue === "Select All" ? "" : newValue || ""
+            )
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={`${column.label}`}
+              size="small"
+              variant="outlined"
+              value={
+                filters[column.id as string] === ""
+                  ? ""
+                  : filters[column.id as string]
+              }
+            />
+          )}
+          renderOption={(props, option) => (
+            <li
+              {...props}
+              style={{
+                fontWeight: option === "Select All" ? 600 : 400,
+                background:
+                  option === "Select All" && !filters[column.id as string]
+                    ? alpha(theme.palette.primary.main, 0.1)
+                    : "transparent",
+              }}
+            >
+              {option}
+            </li>
+          )}
+          disableClearable={false}
+          freeSolo={false}
+        />
       </StyledFormControl>
     );
   };
@@ -1420,8 +1731,8 @@ function GenericTable<T>({
             </IconButton>
           )}
         </Box>
-  
-        {hasFilterableColumns && (
+
+        {(hasFilterableColumns || hasDateData || hasFeeData) && (
           <Box
             sx={{
               p: 1,
@@ -1433,77 +1744,96 @@ function GenericTable<T>({
               background: theme.palette.background.paper,
             }}
           >
-            <Button
-              startIcon={<FilterIcon />}
-              onClick={() => setMobileFiltersOpen(true)}
-              size="small"
+            <Badge
+              badgeContent={Object.keys(filters).length}
+              color="primary"
+              invisible={Object.keys(filters).length === 0}
             >
-              Filters
-            </Button>
+              <Button
+                startIcon={<FilterIcon />}
+                onClick={() => setMobileFiltersOpen(true)}
+                size="small"
+              >
+                Filters
+              </Button>
+            </Badge>
           </Box>
         )}
-  
-        <List sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
-          {data
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((row, index) => {
-              const id = getRowId(row);
-              const serialNumber = page * rowsPerPage + index + 1;
-  
-              return (
-                <React.Fragment key={id}>
-                  <ListItem
-                    button
-                    onClick={() => setMobileRowDetail(row)}
-                    sx={{ pl: 2, py: 1.5 }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 600,
-                        color: theme.palette.text.secondary,
-                        minWidth: "24px",
-                        mr: 1,
-                      }}
+
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flex: 1,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <List sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
+            {data
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                const id = getRowId(row);
+                const serialNumber = page * rowsPerPage + index + 1;
+
+                return (
+                  <React.Fragment key={id}>
+                    <ListItem
+                      button
+                      onClick={() => setMobileRowDetail(row)}
+                      sx={{ pl: 2, py: 1.5 }}
                     >
-                      {serialNumber}.
-                    </Typography>
-                    <ListItemText
-                      primary={
-                        columns[0].render
-                          ? columns[0].render(row[columns[0].id], row)
-                          : row[columns[0].id]?.toString()
-                      }
-                      secondary={
-                        columns[1]?.render
-                          ? columns[1].render(row[columns[1].id], row)
-                          : row[columns[1]?.id]?.toString()
-                      }
-                      primaryTypographyProps={{ fontWeight: 600 }}
-                    />
-                    {showActions && (
-                      <Box sx={{ display: "flex" }}>
-                        {onView && (
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onView(row);
-                            }}
-                            sx={{ color: "#1976d2" }}
-                          >
-                            <ViewIcon fontSize="small" />
-                          </IconButton>
-                        )}
-                      </Box>
-                    )}
-                  </ListItem>
-                  <Divider component="li" />
-                </React.Fragment>
-              );
-            })}
-        </List>
-  
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.text.secondary,
+                          minWidth: "24px",
+                          mr: 1,
+                        }}
+                      >
+                        {serialNumber}.
+                      </Typography>
+                      <ListItemText
+                        primary={
+                          columns[0].render
+                            ? columns[0].render(row[columns[0].id], row)
+                            : row[columns[0].id]?.toString()
+                        }
+                        secondary={
+                          columns[1]?.render
+                            ? columns[1].render(row[columns[1].id], row)
+                            : row[columns[1]?.id]?.toString()
+                        }
+                        primaryTypographyProps={{ fontWeight: 600 }}
+                      />
+                      {showActions && (
+                        <Box sx={{ display: "flex" }}>
+                          {onView && (
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onView(row);
+                              }}
+                              sx={{ color: "#1976d2" }}
+                            >
+                              <ViewIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Box>
+                      )}
+                    </ListItem>
+                    <Divider component="li" />
+                  </React.Fragment>
+                );
+              })}
+          </List>
+        )}
+
         <TablePagination
           component="div"
           count={totalCount}
@@ -1519,40 +1849,126 @@ function GenericTable<T>({
             bottom: 0,
             zIndex: 2,
           }}
+          ActionsComponent={(props) => {
+            const { count, page, rowsPerPage, onPageChange } = props;
+            return (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton
+                  onClick={() => onPageChange(null, 0)}
+                  disabled={page === 0}
+                  aria-label="first page"
+                >
+                  <FirstPageIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => onPageChange(null, page - 1)}
+                  disabled={page === 0}
+                  aria-label="previous page"
+                >
+                  {theme.direction === "rtl" ? ">" : "<"}
+                </IconButton>
+                <IconButton
+                  onClick={() => onPageChange(null, page + 1)}
+                  disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                  aria-label="next page"
+                >
+                  {theme.direction === "rtl" ? "<" : ">"}
+                </IconButton>
+                <IconButton
+                  onClick={() =>
+                    onPageChange(
+                      null,
+                      Math.max(0, Math.ceil(count / rowsPerPage) - 1)
+                    )
+                  }
+                  disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                  aria-label="last page"
+                >
+                  <LastPageIcon />
+                </IconButton>
+              </Box>
+            );
+          }}
         />
-  
+
         <Dialog
           fullScreen
           open={mobileFiltersOpen}
           onClose={() => setMobileFiltersOpen(false)}
         >
-          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             <Typography variant="h6">Filters</Typography>
             <IconButton onClick={() => setMobileFiltersOpen(false)}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
+            >
               {columns
-                .filter((col) => col.filterable)
+                .filter(
+                  (col) => col.filterable && getFilterValues(col).length > 0
+                )
                 .map((column) => (
-                  <FormControl key={column.id as string} size="small" fullWidth>
-                    <InputLabel>{`Filter ${column.label}`}</InputLabel>
-                    <Select
-                      value={filters[column.id as string] || ""}
-                      label={`Filter ${column.label}`}
-                      onChange={(e) => handleFilterChange(column.id, e.target.value)}
-                    >
-                      <MenuItem value="">All</MenuItem>
-                      {(column.filterOptions || []).map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <Autocomplete
+                    key={column.id as string}
+                    options={["Select All", ...getFilterValues(column)]}
+                    getOptionLabel={(option) =>
+                      option === "Select All" ? "Select All" : option
+                    }
+                    value={filters[column.id as string] || ""}
+                    onChange={(event, newValue) =>
+                      handleFilterChange(
+                        column.id,
+                        newValue === "Select All" ? "" : newValue || ""
+                      )
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={`${column.label}`}
+                        size="small"
+                        variant="outlined"
+                        value={
+                          filters[column.id as string] === ""
+                            ? ""
+                            : filters[column.id as string]
+                        }
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <li
+                        {...props}
+                        style={{
+                          fontWeight: option === "Select All" ? 600 : 400,
+                          background:
+                            option === "Select All" &&
+                            !filters[column.id as string]
+                              ? alpha(theme.palette.primary.main, 0.1)
+                              : "transparent",
+                        }}
+                      >
+                        {option}
+                      </li>
+                    )}
+                    disableClearable={false}
+                    freeSolo={false}
+                    fullWidth
+                  />
                 ))}
+              {hasDateData && (
+                <Button
+                  startIcon={<DateRangeIcon />}
+                  onClick={() => setDateFilterOpen(true)}
+                  variant="outlined"
+                >
+                  Date Filter
+                </Button>
+              )}
+              {hasFeeData && renderFeeFilter()}
             </Box>
           </DialogContent>
           <DialogActions>
@@ -1561,7 +1977,7 @@ function GenericTable<T>({
             </Button>
             <Button
               onClick={() => {
-                onFilterChange?.(filters); // Ensure filters are applied
+                onFilterChange?.(filters);
                 setMobileFiltersOpen(false);
               }}
               variant="contained"
@@ -1575,14 +1991,18 @@ function GenericTable<T>({
             </Button>
           </DialogActions>
         </Dialog>
-  
+
+        {renderDateFilterDialog()}
+
         {mobileRowDetail && (
           <Dialog
             fullScreen
             open={Boolean(mobileRowDetail)}
             onClose={() => setMobileRowDetail(null)}
           >
-            <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+            <DialogTitle
+              sx={{ display: "flex", justifyContent: "space-between" }}
+            >
               <Typography variant="h6">Details</Typography>
               <IconButton onClick={() => setMobileRowDetail(null)}>
                 <CloseIcon />
@@ -1597,7 +2017,10 @@ function GenericTable<T>({
                         primary={column.label}
                         secondary={
                           column.render
-                            ? column.render(mobileRowDetail[column.id], mobileRowDetail)
+                            ? column.render(
+                                mobileRowDetail[column.id],
+                                mobileRowDetail
+                              )
                             : mobileRowDetail[column.id]?.toString()
                         }
                         primaryTypographyProps={{
@@ -1649,25 +2072,64 @@ function GenericTable<T>({
     );
   }
 
-    // Desktop View
-    return (
-      <StyledPaper elevation={3}>
-        <TableToolbar>
-          <Typography
-            variant="h6"
-            component="div"
+  // Desktop View
+  return (
+    <StyledPaper elevation={3}>
+      <TableToolbar>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{
+            fontWeight: 700,
+            background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
+          }}
+        >
+          {title}
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={handleExport}
             sx={{
-              fontWeight: 700,
-              background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
+              borderColor: theme.palette.grey[400],
+              color: theme.palette.grey[700],
             }}
           >
-            {title}
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            {hasFilterableColumns && (
+            Export
+          </Button>
+          {(hasFilterableColumns || hasDateData || hasFeeData) && (
+            // <Badge
+            //   badgeContent={Object.keys(filters).length}
+            //   color="primary"
+            //   invisible={Object.keys(filters).length === 0}
+            // >
+              <Button
+                variant="outlined"
+                startIcon={<FilterIcon />}
+                onClick={() => setShowFilters(!showFilters)}
+                sx={{
+                  borderColor: showFilters
+                    ? theme.palette.primary.main
+                    : theme.palette.grey[400],
+                  color: showFilters
+                    ? theme.palette.primary.main
+                    : theme.palette.grey[700],
+                }}
+              >
+                {!showFilters ? "Hide Filters" : "Show Filters"}
+              </Button>
+            // </Badge>
+          )}
+          {(hasFilterableColumns || hasDateData || hasFeeData) && (
+            <Badge
+              badgeContent={Object.keys(filters).length}
+              color="primary"
+              invisible={Object.keys(filters).length === 0}
+            >
               <Button
                 variant="outlined"
                 onClick={clearAllFilters}
@@ -1686,45 +2148,95 @@ function GenericTable<T>({
               >
                 Clear Filters
               </Button>
-            )}
-            {onAdd && (
-              <PrimaryButton
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={onAdd}
-              >
-                Add New
-              </PrimaryButton>
-            )}
+            </Badge>
+          )}
+          {onAdd && (
+            <PrimaryButton
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={onAdd}
+            >
+              Add New
+            </PrimaryButton>
+          )}
+        </Box>
+      </TableToolbar>
+
+      {!showFilters && (hasFilterableColumns || hasDateData || hasFeeData) && (
+        <FiltersContainer>
+          {hasDateData && (
+            <Tabs
+              value={false}
+              variant="scrollable"
+              scrollButtons="auto"
+              // style={{ border: "1px solid black" }}
+            >
+              <FilterTab
+                label="Date Filter"
+                icon={<DateRangeIcon />}
+                onClick={() => setDateFilterOpen(true)}
+              />
+            </Tabs>
+          )}
+          {columns
+            .filter(
+              (col) =>
+                col.filterable &&
+                !col.id.toString().includes("date") &&
+                !col.id.toString().includes("fee") &&
+                getFilterValues(col).length > 0
+            )
+            .map((column) => renderSelectFilter(column))}
+          {hasFeeData && hasFilterableColumns && renderFeeFilter()}
+        </FiltersContainer>
+      )}
+
+      {renderDateFilterDialog()}
+
+      <StyledTableContainer sx={{ height: tableHeight }}>
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
           </Box>
-        </TableToolbar>
-
-        {hasFilterableColumns && (
-          <FiltersContainer>
-            {columns.some((c) => c.id.toString().includes("date")) &&
-              renderDateFilter()}
-            {columns.some((c) => c.id.toString().includes("fee")) &&
-              renderFeeFilter()}
-            {columns
-              .filter(
-                (col) =>
-                  col.filterable &&
-                  !col.id.toString().includes("date") &&
-                  !col.id.toString().includes("fee")
-              )
-              .map((column) => renderSelectFilter(column))}
-          </FiltersContainer>
-        )}
-
-        <StyledTableContainer sx={{ height: tableHeight }}>
-          <Table stickyHeader>
+        ) : (
+          <Table stickyHeader aria-label="data table">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ width: "60px", textAlign: "center" }}>
                   S.No.
                 </TableCell>
                 {columns.map((column) => (
-                  <TableCell key={column.id as string}>{column.label}</TableCell>
+                  <TableCell
+                    key={column.id as string}
+                    sortDirection={
+                      sortConfig.key === column.id
+                        ? sortConfig.direction
+                        : false
+                    }
+                  >
+                    {column.sortable ? (
+                      <TableSortLabel
+                        active={sortConfig.key === column.id}
+                        direction={
+                          sortConfig.key === column.id
+                            ? sortConfig.direction
+                            : "asc"
+                        }
+                        onClick={() => handleSort(column.id)}
+                      >
+                        {column.label}
+                      </TableSortLabel>
+                    ) : (
+                      column.label
+                    )}
+                  </TableCell>
                 ))}
                 {showActions && (
                   <TableCell sx={{ width: "150px" }}>Actions</TableCell>
@@ -1765,6 +2277,7 @@ function GenericTable<T>({
                                   background: alpha("#1976d2", 0.2),
                                 },
                               }}
+                              aria-label="view"
                             >
                               <ViewIcon fontSize="small" />
                             </IconButton>
@@ -1779,6 +2292,7 @@ function GenericTable<T>({
                                   background: alpha("#ff9800", 0.2),
                                 },
                               }}
+                              aria-label="edit"
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
@@ -1793,6 +2307,7 @@ function GenericTable<T>({
                                   background: alpha("#f44336", 0.2),
                                 },
                               }}
+                              aria-label="delete"
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
@@ -1805,19 +2320,60 @@ function GenericTable<T>({
               })}
             </TableBody>
           </Table>
-        </StyledTableContainer>
+        )}
+      </StyledTableContainer>
 
-        <TablePagination
-          component="div"
-          count={totalCount} // Use totalCount for server-side pagination
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-        />
-      </StyledPaper>
-    );
+      <TablePagination
+        component="div"
+        count={totalCount}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        ActionsComponent={(props) => {
+          const { count, page, rowsPerPage, onPageChange } = props;
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconButton
+                onClick={() => onPageChange(null, 0)}
+                disabled={page === 0}
+                aria-label="first page"
+              >
+                <FirstPageIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => onPageChange(null, page - 1)}
+                disabled={page === 0}
+                aria-label="previous page"
+              >
+                {theme.direction === "rtl" ? ">" : "<"}
+              </IconButton>
+              <IconButton
+                onClick={() => onPageChange(null, page + 1)}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="next page"
+              >
+                {theme.direction === "rtl" ? "<" : ">"}
+              </IconButton>
+              <IconButton
+                onClick={() =>
+                  onPageChange(
+                    null,
+                    Math.max(0, Math.ceil(count / rowsPerPage) - 1)
+                  )
+                }
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="last page"
+              >
+                <LastPageIcon />
+              </IconButton>
+            </Box>
+          );
+        }}
+      />
+    </StyledPaper>
+  );
 }
 
 export default GenericTable;

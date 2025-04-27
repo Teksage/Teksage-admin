@@ -83,9 +83,10 @@ const Services: React.FC = () => {
   // const handleAdd = () => navigate("/dashboard/services/new");
   const handleEdit = (row: ServiceData) =>
     navigate(`/dashboard/services/edit/${row.id}`);
-  const handleDelete = (row: ServiceData) => {
-    // navigate(`/dashboard/users/edit/${row?.id}`);
-  };
+
+  // const handleDelete = (row: ServiceData) => {
+  //   // navigate(`/dashboard/users/edit/${row?.id}`);
+  // };
 
   return (
     <GenericTable<ServiceData>
@@ -94,7 +95,7 @@ const Services: React.FC = () => {
       columns={columns}
       // onAdd={handleAdd}
       onEdit={handleEdit}
-      onDelete={handleDelete}
+      // onDelete={handleDelete}
       getRowId={(row) => row.id}
       tableHeight="calc(100vh - 250px)"
       initialRowsPerPage={10}
