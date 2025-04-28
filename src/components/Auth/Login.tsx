@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import astro_prompt_logo_login from "../../assets/astro_prompt_logo_login.png";
 import { callAPI } from "../../api/crudFactory"; // Import the callAPI function
 import { tokenService } from "../../utils/tokenService"; // Import tokenService
+import OfflineNotification from "../Elements/OfflineNotification";
 
 // Styled components (same as before)
 const LoginWrapper = styled(Box)(({ theme }) => ({
@@ -72,17 +73,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     borderRadius: "0 0 0 100%",
   },
 }));
-
-const LogoImage = styled("img")({
-  width: 40,
-  height: 40,
-  animation: "pulse 2s infinite",
-  "@keyframes pulse": {
-    "0%": { transform: "scale(1)", opacity: 1 },
-    "50%": { transform: "scale(1.1)", opacity: 0.7 },
-    "100%": { transform: "scale(1)", opacity: 1 },
-  },
-});
 
 const LogoBox = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -526,6 +516,7 @@ export const Login: React.FC = () => {
 
   return (
     <LoginWrapper>
+      <OfflineNotification /> {/* Automatically handled */}
       <Box
         sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}
       >
