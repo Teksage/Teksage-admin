@@ -919,7 +919,6 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  Slider,
   Select,
   MenuItem,
   Badge,
@@ -1087,7 +1086,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
 const DateFilterDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     borderRadius: "12px",
-    background: "linear-gradient(135deg, #6B5B95, #957DAD)", // Purple gradient from the image
+    background: "linear-gradient(135deg, #6B5B95, #957DAD)",
     color: theme.palette.common.white,
     padding: 0,
     overflow: "hidden",
@@ -1281,6 +1280,7 @@ function GenericTable<T>({
     key: keyof T | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
+  const [isFocused, setIsFocused] = useState(false); // Moved to top level
 
   // Define getFilterValues first
   const getFilterValues = (column: TableColumn<T>) => {
@@ -1319,12 +1319,15 @@ function GenericTable<T>({
   const hasFeeData = useMemo(() => {
     const feeValues = data
       .map((item) => {
-        const value = (item as any)["consultation_fee"] || (item as any)["fee"];
+        const value =
+          (item as any)["consultation_fee"] ||
+          (item as any)["fee"] ||
+          (item as any)["consulting_fee"];
         return typeof value === "string"
-          ? parseInt(value.replace(/[^0-9]/g, "")) || null // Return null for invalid strings
+          ? parseInt(value.replace(/[^0-9]/g, "")) || null
           : value;
       })
-      .filter((value) => value !== null && value !== 0 && !isNaN(value)); // Exclude null, 0, and NaN
+      .filter((value) => value !== null && value !== 0 && !isNaN(value));
     console.log(feeValues, "feeValues");
     return feeValues.length > 0;
   }, [data]);
@@ -1556,85 +1559,51 @@ function GenericTable<T>({
   const renderFeeFilter = () => {
     if (!hasFeeData) return null;
 
-    const feeValues = data
-      .map((item) => {
-        const value =
-          (item as any)["consultation_fee"] || (item as any)["fee"] || 0;
-        return typeof value === "string"
-          ? parseInt(value.replace(/[^0-9]/g, "")) || 0
-          : value;
-      })
-      .filter((value) => !isNaN(value));
+    const feeRanges = [
+      "< 500",
+      "500 - 1000",
+      "> 1000",
+    ];
 
-    const minFee = Math.min(...feeValues);
-    const maxFee = Math.max(...feeValues);
+    const handleRangeSelect = (value: string) => {
+      console.log(value, "value")
+      handleFilterChange("consultation_fee" as keyof T, value);
+    };
 
     return (
-      <Box
-        sx={{
-          p: 1,
-          border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-          borderRadius: 2,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-          <FeeIcon color="primary" sx={{ mr: 1 }} />
-          <Typography variant="subtitle1">Fee Range</Typography>
-        </Box>
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
-            label="Min"
-            type="number"
-            size="small"
-            value={feeRange.min ?? ""}
-            onChange={(e) =>
-              handleFeeRangeChange(
-                e.target.value ? Number(e.target.value) : null,
-                feeRange.max
-              )
-            }
-            sx={{ flex: 1 }}
-            InputProps={{
-              startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography>,
-            }}
-          />
-          <TextField
-            label="Max"
-            type="number"
-            size="small"
-            value={feeRange.max ?? ""}
-            onChange={(e) =>
-              handleFeeRangeChange(
-                feeRange.min,
-                e.target.value ? Number(e.target.value) : null
-              )
-            }
-            sx={{ flex: 1 }}
-            InputProps={{
-              startAdornment: <Typography sx={{ mr: 1 }}>₹</Typography>,
-            }}
-          />
-        </Box>
-        <Slider
-          value={[feeRange.min ?? minFee, feeRange.max ?? maxFee]}
-          min={minFee}
-          max={maxFee}
-          onChange={(_, newValue) => {
-            const [min, max] = newValue as number[];
-            handleFeeRangeChange(min, max);
+      <StyledFormControl size="small" sx={{ minWidth: 150 }}>
+        <InputLabel>Fee Range</InputLabel>
+        <Select
+          value={filters["consultation_fee"] || ""}
+          onChange={(e) => handleRangeSelect(e.target.value as string)}
+          label="Fee Range"
+          sx={{
+            "& .MuiSelect-select": {
+              padding: "6px 10px",
+              fontSize: "0.9rem",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#e0e0e0",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#3f51b5",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#3f51b5",
+            },
+            borderRadius: 1,
           }}
-          valueLabelDisplay="auto"
-          valueLabelFormat={(value) => `₹${value}`}
-        />
-        <Button
-          onClick={clearFeeFilter}
-          color="error"
-          size="small"
-          sx={{ mt: 1 }}
         >
-          Clear
-        </Button>
-      </Box>
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          {feeRanges.map((range) => (
+            <MenuItem key={range} value={range}>
+              {range}
+            </MenuItem>
+          ))}
+        </Select>
+      </StyledFormControl>
     );
   };
 
@@ -2102,27 +2071,21 @@ function GenericTable<T>({
             Export
           </Button>
           {(hasFilterableColumns || hasDateData || hasFeeData) && (
-            // <Badge
-            //   badgeContent={Object.keys(filters).length}
-            //   color="primary"
-            //   invisible={Object.keys(filters).length === 0}
-            // >
-              <Button
-                variant="outlined"
-                startIcon={<FilterIcon />}
-                onClick={() => setShowFilters(!showFilters)}
-                sx={{
-                  borderColor: showFilters
-                    ? theme.palette.primary.main
-                    : theme.palette.grey[400],
-                  color: showFilters
-                    ? theme.palette.primary.main
-                    : theme.palette.grey[700],
-                }}
-              >
-                {!showFilters ? "Hide Filters" : "Show Filters"}
-              </Button>
-            // </Badge>
+            <Button
+              variant="outlined"
+              startIcon={<FilterIcon />}
+              onClick={() => setShowFilters(!showFilters)}
+              sx={{
+                borderColor: showFilters
+                  ? theme.palette.primary.main
+                  : theme.palette.grey[400],
+                color: showFilters
+                  ? theme.palette.primary.main
+                  : theme.palette.grey[700],
+              }}
+            >
+              {!showFilters ? "Hide Filters" : "Show Filters"}
+            </Button>
           )}
           {(hasFilterableColumns || hasDateData || hasFeeData) && (
             <Badge
@@ -2169,7 +2132,6 @@ function GenericTable<T>({
               value={false}
               variant="scrollable"
               scrollButtons="auto"
-              // style={{ border: "1px solid black" }}
             >
               <FilterTab
                 label="Date Filter"
@@ -2187,7 +2149,7 @@ function GenericTable<T>({
                 getFilterValues(col).length > 0
             )
             .map((column) => renderSelectFilter(column))}
-          {hasFeeData && hasFilterableColumns && renderFeeFilter()}
+          {hasFeeData && renderFeeFilter()}
         </FiltersContainer>
       )}
 

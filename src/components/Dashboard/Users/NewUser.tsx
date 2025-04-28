@@ -589,7 +589,7 @@ import {
   Paper,
   IconButton,
   FormHelperText,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -709,7 +709,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             rashi: user.rashi || "",
             nakshatra: user.nakshatra || "",
             status: user.status === "inactive" ? "Inactive" : "Active",
-            user_type: user.user_type || "Customer",
+            user_type: user.user_type.charAt(0).toUpperCase() + user.user_type.slice(1).toLowerCase() || "Customer",
           });
         } catch (err) {
           console.error("Error fetching user data:", err);
@@ -720,12 +720,27 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (!formData.first_name.trim())
+
+    if (!formData.first_name.trim()) {
       newErrors.first_name = "First name is required";
-    if (!formData.last_name.trim())
+    }
+
+    if (!formData.last_name.trim()) {
       newErrors.last_name = "Last name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (!formData.mobile.trim()) {
+      newErrors.mobile = "Mobile number is required";
+    } else if (!/^\d{10}$/.test(formData.mobile)) {
+      newErrors.mobile = "Mobile number must be exactly 10 digits";
+    }
+
     return newErrors;
   };
 
@@ -756,20 +771,23 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setErrors(validationErrors);
       return;
     }
-    console.log({
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      preferred_location: formData.preferredLocation,
-      email: formData.email,
-      mobile_number: formData.mobile,
-      place_of_birth: formData.placeOfBirth,
-      date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
-      time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
-      rashi: formData.rashi,
-      nakshatra: formData.nakshatra,
-      status: formData.status.toLowerCase(),
-      user_type: formData.user_type,
-    }, "formData");
+    console.log(
+      {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        preferred_location: formData.preferredLocation,
+        email: formData.email,
+        mobile_number: formData.mobile,
+        place_of_birth: formData.placeOfBirth,
+        date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+        time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+        rashi: formData.rashi,
+        nakshatra: formData.nakshatra,
+        status: formData.status.toLowerCase(),
+        user_type: formData.user_type,
+      },
+      "formData"
+    );
     try {
       const response = await callAPI({
         endpoint:
@@ -790,7 +808,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           user_type: formData.user_type,
         },
       });
-      console.log(response, "response")
+      console.log(response, "response");
       setSnackbar({
         open: true,
         message:
@@ -1020,7 +1038,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 fullWidth
                 size="small"
                 value={formData.mobile}
-                onChange={handleChange("mobile")}
+                onChange={(e) => {
+                  const numericValue = e.target.value.replace(/\D/g, "");
+                  handleChange("mobile")({ target: { value: numericValue } });
+                }}
                 error={!!errors.mobile}
                 helperText={errors.mobile || ""}
                 disabled={isViewMode}
@@ -1308,11 +1329,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl
-                fullWidth
-                disabled={isViewMode}
-                size="small"
-              >
+              <FormControl fullWidth disabled={isViewMode} size="small">
                 <InputLabel
                   sx={{
                     fontSize: "0.95rem",
@@ -1349,11 +1366,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl
-                fullWidth
-                disabled={isViewMode}
-                size="small"
-              >
+              <FormControl fullWidth disabled={isViewMode} size="small">
                 <InputLabel
                   sx={{
                     fontSize: "0.95rem",
