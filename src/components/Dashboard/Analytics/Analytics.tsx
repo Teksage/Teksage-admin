@@ -672,9 +672,10 @@ const Analytics: React.FC = () => {
   // Current date for "Previous 12 Months" calculation (April 28, 2025)
   const currentDate = new Date(2025, 3, 28); // April 2025 (month is 0-based in JS)
 
-  // Calculate the start date for "Previous 12 Months" and prepare Plans data
+  // Prepare Plans data for "Previous 12 Months" filter
   const getPrevious12MonthsData = () => {
-    let data: any[] = [];
+    let allData: any[] = [];
+
     // Collect all plans data from all years
     for (const year in yearlyData) {
       if (yearlyData[year].plans) {
@@ -683,39 +684,19 @@ const Analytics: React.FC = () => {
           Basic: month.Basic,
           Premium: month.Premium,
         }));
-        data = data.concat(yearPlans);
+        allData = allData.concat(yearPlans);
       }
     }
 
-    // Filter data to ensure it's within the last 12 months
-    const twelveMonthsAgo = new Date(currentDate);
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-    data = data.filter(item => {
-      const [month, yearStr] = item.name.split(" ");
-      const itemDate = new Date(parseInt(yearStr), monthOrder.indexOf(month), 1);
-      return itemDate >= twelveMonthsAgo && itemDate <= currentDate;
-    });
-
-    // Sort data chronologically
-    data.sort((a, b) => {
+    // Sort allData chronologically
+    allData.sort((a, b) => {
       const [aMonth, aYear] = a.name.split(" ");
       const [bMonth, bYear] = b.name.split(" ");
       return new Date(parseInt(aYear), monthOrder.indexOf(aMonth), 1) - new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1);
     });
 
-    // Prepend a zero point for the start of the 12-month range (May 2024)
-    const startMonth = "May";
-    const startYear = 2024;
-    const hasStartMonthData = data.some(item => item.name === `${startMonth} ${startYear}`);
-    if (!hasStartMonthData) {
-      data.unshift({
-        name: `${startMonth} ${startYear}`,
-        Basic: 0,
-        Premium: 0,
-      });
-    }
-
-    return data;
+    // Return only the months with actual data, skipping gaps
+    return allData;
   };
 
   // Prepare Plans data for Year-wise filter with a zero point
@@ -785,7 +766,7 @@ const Analytics: React.FC = () => {
       return (
         <Box
           sx={{
-            background: "rgba(255, 255, 255, 0.95)",
+            background: "rgba(255, 255, 252, 0.95)",
             border: "none",
             borderRadius: "6px",
             padding: "10px",

@@ -784,7 +784,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         rashi: formData.rashi,
         nakshatra: formData.nakshatra,
         status: formData.status.toLowerCase(),
-        user_type: formData.user_type,
+        user_type: formData.user_type.toLowerCase(),
       },
       "formData"
     );
@@ -805,7 +805,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           rashi: formData.rashi,
           nakshatra: formData.nakshatra,
           status: formData.status.toLowerCase(),
-          user_type: formData.user_type,
+          user_type: formData.user_type.toLowerCase(),
         },
       });
       console.log(response, "response");
