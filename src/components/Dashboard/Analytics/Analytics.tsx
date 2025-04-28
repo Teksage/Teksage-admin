@@ -609,18 +609,7 @@ import { Typography, Grid, Box, Paper, useTheme, MenuItem, Select, useMediaQuery
 const yearlyData = {
   2023: {
     plans: [
-      // { name: "Jan", Basic: 40, Standard: 70, Premium: 90, Enterprise: 50 },
-      // { name: "Feb", Basic: 42, Standard: 72, Premium: 92, Enterprise: 52 },
-      // { name: "Mar", Basic: 45, Standard: 75, Premium: 95, Enterprise: 55 },
       { name: "Apr", Basic: 48, Standard: 78, Premium: 98, Enterprise: 58 },
-      // { name: "May", Basic: 50, Standard: 80, Premium: 100, Enterprise: 60 },
-      // { name: "Jun", Basic: 52, Standard: 82, Premium: 102, Enterprise: 62 },
-      // { name: "Jul", Basic: 55, Standard: 85, Premium: 105, Enterprise: 65 },
-      // { name: "Aug", Basic: 58, Standard: 88, Premium: 108, Enterprise: 68 },
-      // { name: "Sep", Basic: 60, Standard: 90, Premium: 110, Enterprise: 70 },
-      // { name: "Oct", Basic: 62, Standard: 92, Premium: 112, Enterprise: 72 },
-      // { name: "Nov", Basic: 65, Standard: 95, Premium: 115, Enterprise: 75 },
-      // { name: "Dec", Basic: 68, Standard: 98, Premium: 118, Enterprise: 78 },
     ],
     services: [
       { name: "Jan", Love: 120, Career: 80, Finance: 65, Marriage: 95 },
@@ -639,18 +628,9 @@ const yearlyData = {
   },
   2024: {
     plans: [
-      // { name: "Jan", Basic: 50, Standard: 80, Premium: 100, Enterprise: 60 },
-      // { name: "Feb", Basic: 52, Standard: 82, Premium: 102, Enterprise: 62 },
-      // { name: "Mar", Basic: 55, Standard: 85, Premium: 105, Enterprise: 65 },
-      // { name: "Apr", Basic: 58, Standard: 88, Premium: 108, Enterprise: 68 },
-      // { name: "May", Basic: 60, Standard: 90, Premium: 110, Enterprise: 70 },
       { name: "Jun", Basic: 62, Standard: 92, Premium: 112, Enterprise: 72 },
       { name: "Jul", Basic: 65, Standard: 95, Premium: 115, Enterprise: 75 },
       { name: "Aug", Basic: 68, Standard: 98, Premium: 118, Enterprise: 78 },
-      // { name: "Sep", Basic: 70, Standard: 100, Premium: 120, Enterprise: 80 },
-      // { name: "Oct", Basic: 72, Standard: 102, Premium: 122, Enterprise: 82 },
-      // { name: "Nov", Basic: 75, Standard: 105, Premium: 125, Enterprise: 85 },
-      // { name: "Dec", Basic: 78, Standard: 108, Premium: 128, Enterprise: 88 },
     ],
     services: [
       { name: "Jan", Love: 140, Career: 90, Finance: 75, Marriage: 105 },
@@ -685,58 +665,54 @@ const Analytics: React.FC = () => {
 
   // Determine the earliest month and year in the data
   const earliestYear = availableYears[0];
-  const earliestMonth = yearlyData[earliestYear].plans[0].name; // "Jan"
+  const earliestMonth = yearlyData[earliestYear].plans[0].name; // "Apr"
   const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const earliestMonthIndex = monthOrder.indexOf(earliestMonth);
 
   // Current date for "Previous 12 Months" calculation (April 28, 2025)
   const currentDate = new Date(2025, 3, 28); // April 2025 (month is 0-based in JS)
-  const currentYear = currentDate.getFullYear();
-  const currentMonthIndex = currentDate.getMonth(); // 3 (April)
 
   // Calculate the start date for "Previous 12 Months" and prepare Plans data
   const getPrevious12MonthsData = () => {
     let data: any[] = [];
-    let year = currentYear;
-    let monthIndex = currentMonthIndex;
-
-    for (let i = 0; i < 12; i++) {
-      const monthName = monthOrder[monthIndex];
-      // Check if the year and month are within the available data range
-      if (year < earliestYear || (year === earliestYear && monthIndex < earliestMonthIndex)) {
-        break; // Stop if we go before the earliest available data (Jan 2023)
-      }
-      if (yearlyData[year] && yearlyData[year].plans) {
-        const monthData = yearlyData[year].plans.find((m: any) => m.name === monthName);
-        if (monthData) {
-          data.unshift({ name: `${monthName} ${year}`, Basic: monthData.Basic, Premium: monthData.Premium });
-        }
-      }
-      monthIndex--;
-      if (monthIndex < 0) {
-        monthIndex = 11;
-        year--;
+    // Collect all plans data from all years
+    for (const year in yearlyData) {
+      if (yearlyData[year].plans) {
+        const yearPlans = yearlyData[year].plans.map((month: any) => ({
+          name: `${month.name} ${year}`,
+          Basic: month.Basic,
+          Premium: month.Premium,
+        }));
+        data = data.concat(yearPlans);
       }
     }
 
-    // Prepend a zero point for the previous month if the earliest month in the data is not the start of the range
-    if (data.length > 0) {
-      const firstDataMonth = data[0].name.split(" ")[0]; // e.g., "May" (from "May 2024")
-      const firstDataYear = parseInt(data[0].name.split(" ")[1]); // e.g., 2024
-      let prevMonthIndex = monthOrder.indexOf(firstDataMonth) - 1;
-      let prevYear = firstDataYear;
-      if (prevMonthIndex < 0) {
-        prevMonthIndex = 11;
-        prevYear--;
-      }
-      // Only prepend if the previous month/year is before the earliest data or not in the data
-      if (prevYear >= earliestYear && !(yearlyData[prevYear]?.plans?.find((m: any) => m.name === monthOrder[prevMonthIndex]))) {
-        data.unshift({
-          name: `${monthOrder[prevMonthIndex]} ${prevYear}`,
-          Basic: 0,
-          Premium: 0,
-        });
-      }
+    // Filter data to ensure it's within the last 12 months
+    const twelveMonthsAgo = new Date(currentDate);
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    data = data.filter(item => {
+      const [month, yearStr] = item.name.split(" ");
+      const itemDate = new Date(parseInt(yearStr), monthOrder.indexOf(month), 1);
+      return itemDate >= twelveMonthsAgo && itemDate <= currentDate;
+    });
+
+    // Sort data chronologically
+    data.sort((a, b) => {
+      const [aMonth, aYear] = a.name.split(" ");
+      const [bMonth, bYear] = b.name.split(" ");
+      return new Date(parseInt(aYear), monthOrder.indexOf(aMonth), 1) - new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1);
+    });
+
+    // Prepend a zero point for the start of the 12-month range (May 2024)
+    const startMonth = "May";
+    const startYear = 2024;
+    const hasStartMonthData = data.some(item => item.name === `${startMonth} ${startYear}`);
+    if (!hasStartMonthData) {
+      data.unshift({
+        name: `${startMonth} ${startYear}`,
+        Basic: 0,
+        Premium: 0,
+      });
     }
 
     return data;
@@ -751,7 +727,7 @@ const Analytics: React.FC = () => {
     }));
 
     // Prepend a zero point for the previous month of the earliest month in the year
-    const firstMonth = data[0].name; // e.g., "Jan" for 2023
+    const firstMonth = data[0].name; // e.g., "Apr" for 2023
     let prevMonthIndex = monthOrder.indexOf(firstMonth) - 1;
     let prevYear = year;
     if (prevMonthIndex < 0) {
@@ -773,7 +749,7 @@ const Analytics: React.FC = () => {
   // Prepare data for the LineChart based on filter
   const planData = filterType === "previous12" ? getPrevious12MonthsData() : getYearWiseData(selectedYear);
 
-  // Aggregate data for Services (PieChart)
+  // Aggregate data for Services (PieChart) for the full selected year (no filter applied)
   const serviceData = Object.values(yearlyData[selectedYear].services).reduce((acc: any, curr: any) => {
     return {
       Love: (acc.Love || 0) + (curr.Love || 0),
