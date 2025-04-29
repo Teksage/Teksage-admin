@@ -126,12 +126,16 @@ interface ConsultationData {
   category: string | null;
   start_time: string;
   status: string;
+  customer_name: string;
+  consultation_fee: string;
 }
 
 interface FilterOptions {
   astrologer_name: string[];
   category: string[];
   status: string[];
+  customer_name: string[];
+  consultation_fee: string[];
 }
 
 const Consultations: React.FC = () => {
@@ -145,6 +149,8 @@ const Consultations: React.FC = () => {
     astrologer_name: [],
     category: [],
     status: [],
+    customer_name: [],
+    consultation_fee: []
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -258,6 +264,13 @@ const Consultations: React.FC = () => {
   const columns: TableColumn<ConsultationData>[] = useMemo(
     () => [
       {
+        id: "customer_name",
+        label: "User",
+        width: "180px",
+        filterable: true,
+        filterOptions: filterOptions.astrologer_name,
+      },
+      {
         id: "astrologer_name",
         label: "Astrologer",
         width: "180px",
@@ -267,6 +280,22 @@ const Consultations: React.FC = () => {
       {
         id: "category",
         label: "Category",
+        filterable: true,
+        filterOptions: filterOptions.category,
+        width: "140px",
+        render: (value) => value || "N/A",
+      },
+      {
+        id: "consultation_fee",
+        label: "Consultation Fee",
+        filterable: true,
+        filterOptions: filterOptions.category,
+        width: "140px",
+        render: (value) => value || "N/A",
+      },
+      {
+        id: "start_date",
+        label: "Consultation Date",
         filterable: true,
         filterOptions: filterOptions.category,
         width: "140px",

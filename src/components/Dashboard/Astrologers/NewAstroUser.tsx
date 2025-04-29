@@ -1,481 +1,4 @@
-// import React, { useState, FormEvent } from "react";
-// import {
-//   Box,
-//   Button,
-//   Grid,
-//   TextField,
-//   Typography,
-//   Paper,
-//   IconButton,
-//   Rating,
-//   Chip,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   MenuItem,
-//   Avatar,
-//   Tooltip,
-//   Checkbox,
-//   ListItemText,
-//   FormHelperText,
-// } from "@mui/material";
-// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-// import { useNavigate, useParams } from "react-router-dom";
-// import { callAPI } from "../../../api/crudFactory";
-// import { styled } from "@mui/system";
-// import PhotoCamera from "@mui/icons-material/PhotoCamera";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
-// // Input styling
-// const Input = styled("input")({
-//   display: "none",
-// });
-
-// // Define props and types
-// type Mode = "new" | "edit" | "view";
-
-// interface AstroFormData {
-//   first_name: string;
-//   last_name: string;
-//   email: string;
-//   mobile_number: string;
-//   status: string;
-//   astrologer_profile_info: string;
-//   experience: string;
-//   consulting_fee: string;
-//   picture: File | string | null;
-//   // customer_rating: number;
-//   languages: string[];
-//   expertises: string[];
-// }
-
-// interface Props {
-//   mode: Mode;
-// }
-
-// const NewAstroUser: React.FC<Props> = ({ mode }) => {
-//   const navigate = useNavigate();
-//   const { userId } = useParams<{ userId: string }>();
-//   const isViewMode = mode === "view";
-
-//   const [formData, setFormData] = useState<AstroFormData>({
-//     first_name: "",
-//     last_name: "",
-//     email: "",
-//     mobile_number: "",
-//     status: "Active",
-//     astrologer_profile_info: "",
-//     experience: "",
-//     consulting_fee: "",
-//     picture: null,
-//     // customer_rating: 0,
-//     languages: [],
-//     expertises: [],
-//   });
-
-//   const [inputLang, setInputLang] = useState<string>("");
-//   const [errors, setErrors] = useState<Record<string, string>>({});
-
-//   const handleChange = (field: keyof AstroFormData) => (e: any) => {
-//     const value = e.target.value;
-
-//     setFormData((prev) => ({
-//       ...prev,
-//       [field]: value,
-//     }));
-
-//     // ✨ Clear the error if the new value is valid
-//     if (field === "expertises" && value.length > 0) {
-//       setErrors((prev) => ({ ...prev, expertises: "" }));
-//     }
-//   };
-
-//   const handleTagAdd = (field) => (e) => {
-//     if (e.key === "Enter") {
-//       e.preventDefault();
-//       const value = e.target.value.trim();
-//       if (!value) return;
-
-//       if (!formData[field].includes(value)) {
-//         setFormData((prev) => ({
-//           ...prev,
-//           [field]: [...prev[field], value],
-//         }));
-//         setErrors((prev) => ({ ...prev, [field]: "" })); // clear error if added
-//       }
-
-//       setInputLang(""); // only for languages
-//     }
-//   };
-
-//   const handleTagDelete =
-//     (type: "languages" | "expertises", index: number) => () => {
-//       setFormData((prev) => {
-//         const updated = [...prev[type]];
-//         updated.splice(index, 1);
-//         return { ...prev, [type]: updated };
-//       });
-//     };
-
-//   const validate = (): boolean => {
-//     const newErrors: Record<string, string> = {};
-//     const requiredFields: (keyof AstroFormData)[] = [
-//       // "first_name",
-//       // "last_name",
-//       // "email",
-//       // "mobile_number",
-//       // "astrologer_profile_info",
-//       "experience",
-//       "consulting_fee",
-//     ];
-//     requiredFields.forEach((field) => {
-//       if (!formData[field]) newErrors[field] = "This field is required";
-//     });
-
-//     if (!formData.languages.length)
-//       newErrors.languages = "At least one language is required";
-//     // if (!formData.picture) newErrors.picture = "Profile picture is required";
-
-//     if (!formData.expertises.length) {
-//       newErrors.expertises = "At least one expertise is required";
-//     }
-
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
-
-//   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     if (!validate()) return;
-
-//     const payload = new FormData();
-//     Object.keys(formData).forEach((key) => {
-//       const val = formData[key as keyof AstroFormData];
-//       if (Array.isArray(val)) {
-//         val.forEach((v) => payload.append(`${key}[]`, v));
-//       } else if (val !== null) {
-//         payload.append(key, val as string | Blob);
-//       }
-//     });
-
-//     await callAPI({
-//       endpoint:
-//         mode === "edit"
-//           ? `api/admin/astrologers/${userId}`
-//           : "api/admin/astrologers",
-//       method: mode === "edit" ? "put" : "post",
-//       formData: payload,
-//     });
-//   };
-
-//   return (
-//     <LocalizationProvider dateAdapter={AdapterDateFns}>
-//       {/* Header with back button - more compact and subtle */}
-//       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-//         <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
-//           <ArrowBackIcon fontSize="small" />
-//         </IconButton>
-//         <Typography variant="subtitle1" fontWeight={500}>
-//           Back
-//         </Typography>
-//       </Box>
-
-//       <Paper
-//         elevation={2}
-//         sx={{
-//           p: { xs: 2, sm: 3 },
-//           // maxWidth: "1000px",
-//           mx: "auto",
-//           backgroundColor: "#fafafa",
-//           borderRadius: "12px",
-//         }}
-//       >
-//         {/* Form title with consistent sizing */}
-//         <Typography variant="h6" fontWeight={500} mb={2}>
-//           {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro
-//           User
-//         </Typography>
-
-//         <Box component="form" onSubmit={handleSubmit}>
-//           <Grid container spacing={2}>
-//             {/* Profile Picture Section */}
-//             <Grid item xs={12} sx={{ textAlign: "center", mb: 1 }}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
-//                 Profile Picture
-//               </Typography>
-//               <Box sx={{ position: "relative", display: "inline-block" }}>
-//                 <Avatar
-//                   src={
-//                     formData.picture
-//                       ? typeof formData.picture === "string"
-//                         ? formData.picture
-//                         : URL.createObjectURL(formData.picture)
-//                       : "https://res.cloudinary.com/cloudinary-marketing/images/w_2000,h_1100/f_auto,q_auto/v1647266871/Automated-Upload_Sharing/Automated-Upload_Sharing-png?_i=AA"
-//                   }
-//                   alt="Astrologer"
-//                   sx={{
-//                     width: 100,
-//                     height: 100,
-//                     mx: "auto",
-//                     mb: 1,
-//                     border: errors.picture ? "2px solid red" : "1px solid #ddd",
-//                   }}
-//                 />
-//                 {!isViewMode && (
-//                   <label htmlFor="icon-button-file">
-//                     <Input
-//                       accept="image/*"
-//                       id="icon-button-file"
-//                       type="file"
-//                       onChange={handleChange("picture")}
-//                     />
-//                     <Tooltip title="Upload">
-//                       <IconButton
-//                         color="primary"
-//                         aria-label="upload picture"
-//                         component="span"
-//                         size="small"
-//                         sx={{
-//                           position: "absolute",
-//                           bottom: 0,
-//                           right: -5,
-//                           bgcolor: "#fff",
-//                           borderRadius: "50%",
-//                           boxShadow: 1,
-//                           p: 0.5,
-//                         }}
-//                       >
-//                         <PhotoCamera fontSize="small" />
-//                       </IconButton>
-//                     </Tooltip>
-//                   </label>
-//                 )}
-//               </Box>
-//               {errors.picture && (
-//                 <Typography variant="caption" color="error">
-//                   {errors.picture}
-//                 </Typography>
-//               )}
-//             </Grid>
-
-//             {/* Personal Information */}
-//             <Grid item xs={12}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
-//                 Personal Information
-//               </Typography>
-//             </Grid>
-
-//             {/* Map through basic personal info fields */}
-//             {["first_name", "last_name", "email", "mobile_number"].map(
-//               (key) => (
-//                 <Grid item xs={12} sm={6} key={key}>
-//                   <TextField
-//                     label={key
-//                       .replace(/_/g, " ")
-//                       .replace(/\b\w/g, (l) => l.toUpperCase())}
-//                     fullWidth
-//                     size="small"
-//                     value={formData[key]}
-//                     onChange={handleChange(key)}
-//                     error={!!errors[key]}
-//                     helperText={errors[key] || ""}
-//                     disabled={isViewMode}
-//                   />
-//                 </Grid>
-//               )
-//             )}
-
-//             {/* Professional Information */}
-//             <Grid item xs={12} mt={1}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
-//                 Professional Details
-//               </Typography>
-//             </Grid>
-
-//             {/* Professional fields */}
-//             {["astrologer_profile_info", "experience", "consulting_fee"].map(
-//               (key) => (
-//                 <Grid
-//                   item
-//                   xs={12}
-//                   sm={key === "astrologer_profile_info" ? 12 : 6}
-//                   key={key}
-//                 >
-//                   <TextField
-//                     label={key
-//                       .replace(/_/g, " ")
-//                       .replace(/\b\w/g, (l) => l.toUpperCase())}
-//                     fullWidth
-//                     size="small"
-//                     value={formData[key]}
-//                     onChange={handleChange(key)}
-//                     error={!!errors[key]}
-//                     helperText={errors[key] || ""}
-//                     disabled={isViewMode}
-//                     multiline={key === "astrologer_profile_info"}
-//                     minRows={key === "astrologer_profile_info" ? 4 : undefined}
-//                   />
-//                 </Grid>
-//               )
-//             )}
-
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth disabled={isViewMode} size="small">
-//                 <InputLabel>Status</InputLabel>
-//                 <Select
-//                   value={formData.status}
-//                   onChange={handleChange("status")}
-//                   label="Status"
-//                 >
-//                   <MenuItem value="Active">Active</MenuItem>
-//                   <MenuItem value="Inactive">Inactive</MenuItem>
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {/* <Grid item xs={12} sm={6}>
-//               <Box
-//                 sx={{
-//                   display: "flex",
-//                   flexDirection: "column",
-//                   alignItems: "center",
-//                   justifyContent: "center",
-//                   textAlign: "center",
-//                 }}
-//               >
-//                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
-//                   Customer Rating
-//                 </Typography>
-
-//                 <Rating
-//                   name="customer_rating"
-//                   value={formData.customer_rating}
-//                   onChange={(_, newValue) =>
-//                     setFormData((prev: any) => ({
-//                       ...prev,
-//                       customer_rating: newValue,
-//                     }))
-//                   }
-//                   disabled={isViewMode}
-//                   sx={{ fontSize: 36, color: "#FFD700" }} // Optional: Make it pop!
-//                 />
-
-//                 {!isViewMode && (
-//                   <Typography
-//                     variant="caption"
-//                     color="text.secondary"
-//                     sx={{ mt: 0.5, fontStyle: "italic" }}
-//                   >
-//                     Click to rate from 1 to 5 stars
-//                   </Typography>
-//                 )}
-//               </Box>
-//             </Grid> */}
-
-//             {/* Languages as Tags */}
-//             <Grid item xs={12}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
-//                 Languages Known
-//               </Typography>
-//               <TextField
-//                 fullWidth
-//                 size="small"
-//                 label="Add Language"
-//                 value={inputLang}
-//                 onChange={(e) => setInputLang(e.target.value)}
-//                 onKeyDown={handleTagAdd("languages")}
-//                 disabled={isViewMode}
-//                 error={!!errors.languages}
-//                 helperText={errors.languages || "Press Enter to add language"}
-//               />
-//               <Box sx={{ mt: 1 }}>
-//                 {formData.languages.map((item, index) => (
-//                   <Chip
-//                     key={index}
-//                     label={item}
-//                     size="small"
-//                     onDelete={
-//                       !isViewMode
-//                         ? handleTagDelete("languages", index)
-//                         : undefined
-//                     }
-//                     sx={{ mr: 1, mb: 1 }}
-//                   />
-//                 ))}
-//               </Box>
-//             </Grid>
-
-//             {/* Expertise as Dropdown */}
-//             <Grid item xs={12}>
-//               <FormControl fullWidth size="small" error={!!errors.expertises}>
-//                 <InputLabel>Expertise Areas</InputLabel>
-//                 <Select
-//                   multiple
-//                   value={formData.expertises}
-//                   onChange={handleChange("expertises")}
-//                   label="Expertise Areas"
-//                   disabled={isViewMode}
-//                   renderValue={(selected) => selected.join(", ")}
-//                 >
-//                   {["Career", "Health", "Wealth", "Relationship"].map(
-//                     (option) => (
-//                       <MenuItem key={option} value={option}>
-//                         <Checkbox
-//                           checked={formData.expertises.includes(option)}
-//                         />
-//                         <ListItemText primary={option} />
-//                       </MenuItem>
-//                     )
-//                   )}
-//                 </Select>
-//                 {!!errors.expertises && (
-//                   <FormHelperText>{errors.expertises}</FormHelperText>
-//                 )}
-//               </FormControl>
-//             </Grid>
-
-//             {/* Submit Button */}
-//             {!isViewMode && (
-//               <Grid item xs={12} mt={1}>
-//                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-//                   <Button
-//                     type="submit"
-//                     variant="contained"
-//                     sx={{
-//                       background:
-//                         "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
-//                       color: "#fff",
-//                       borderRadius: "8px",
-//                       padding: "8px 22px",
-//                       fontWeight: 500,
-//                       textTransform: "none",
-//                       fontSize: "0.875rem",
-//                       boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-//                       transition: "all 0.2s ease",
-//                       "&:hover": {
-//                         background:
-//                           "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
-//                         boxShadow: "0 3px 8px rgba(27, 77, 62, 0.25)",
-//                         transform: "translateY(-1px)",
-//                       },
-//                     }}
-//                   >
-//                     {mode === "new" ? "Create User" : "Update User"}
-//                   </Button>
-//                 </Box>
-//               </Grid>
-//             )}
-//           </Grid>
-//         </Box>
-//       </Paper>
-//     </LocalizationProvider>
-//   );
-// };
-
-// export default NewAstroUser;
-
-import React, { useState, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import {
   Box,
   Button,
@@ -502,6 +25,7 @@ import { styled } from "@mui/system";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import CustomSnackbar from "../../Elements/CustomSnackbar";
 
 // Input styling for file upload
 const Input = styled("input")({
@@ -550,24 +74,95 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
   const [inputLang, setInputLang] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
-  const handleChange = (field: keyof AstroFormData) => (e: any) => {
-    const value = e.target.value;
-
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    if (field === "expertises" && value.length > 0) {
-      setErrors((prev) => ({ ...prev, expertises: "" }));
+  // Fetch astrologer data in edit/view mode
+  useEffect(() => {
+    if (mode === "edit" || mode === "view") {
+      const fetchAstrologer = async () => {
+        try {
+          const response = await callAPI({
+            endpoint: `api/admin/astrologers/${userId}`,
+            method: "get",
+          });
+          const data = response.data;
+          setFormData({
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            email: data.email || "",
+            mobile_number: data.mobile_number || "",
+            status: data.status || "Active",
+            astrologer_profile_info: data.astrologer_profile_info || "",
+            experience: data.experience || "",
+            consulting_fee: data.consulting_fee || "",
+            picture: data.picture || null, // Expecting a URL string from API
+            languages: data.languages || [],
+            expertises: data.expertises || [],
+          });
+        } catch (err) {
+          console.error("Failed to fetch astrologer data:", err);
+          setSnackbar({
+            open: true,
+            message: "Failed to load astrologer data.",
+            severity: "error",
+          });
+        }
+      };
+      fetchAstrologer();
     }
+  }, [mode, userId]);
+
+  // Format consulting_fee for display with commas
+  const formatNumberWithCommas = (value: string): string => {
+    if (!value) return "";
+    const number = value.replace(/[^0-9]/g, "");
+    return Number(number).toLocaleString("en-IN");
   };
 
-  const handleTagAdd = (field) => (e) => {
+  // Remove commas for API submission
+  const removeCommas = (value: string): string => {
+    return value.replace(/,/g, "");
+  };
+
+  const handleChange = (field: keyof AstroFormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    let value: any = e.target.value;
+
+    if (field === "consulting_fee") {
+      const rawValue = value.replace(/[^0-9]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [field]: rawValue,
+      }));
+    } else if (field === "picture") {
+      const files = (e.target as HTMLInputElement).files;
+      if (files && files[0]) {
+        setFormData((prev) => ({
+          ...prev,
+          [field]: files[0], // Set the File object
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
+
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  const handleTagAdd = (field: keyof AstroFormData) => (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      const value = e.target.value.trim();
+      const value = (e.target as HTMLInputElement).value.trim();
       if (!value) return;
 
       if (!formData[field].includes(value)) {
@@ -582,14 +177,13 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     }
   };
 
-  const handleTagDelete =
-    (type: "languages" | "expertises", index: number) => () => {
-      setFormData((prev) => {
-        const updated = [...prev[type]];
-        updated.splice(index, 1);
-        return { ...prev, [type]: updated };
-      });
-    };
+  const handleTagDelete = (type: "languages" | "expertises", index: number) => () => {
+    setFormData((prev) => {
+      const updated = [...prev[type]];
+      updated.splice(index, 1);
+      return { ...prev, [type]: updated };
+    });
+  };
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -612,28 +206,59 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (!validate()) return;
 
-    const payload = new FormData();
-    Object.keys(formData).forEach((key) => {
-      const val = formData[key as keyof AstroFormData];
-      if (Array.isArray(val)) {
-        val.forEach((v) => payload.append(`${key}[]`, v));
-      } else if (val !== null) {
-        payload.append(key, val as string | Blob);
-      }
-    });
+    try {
+      const payload = new FormData();
 
-    await callAPI({
-      endpoint:
-        mode === "edit"
-          ? `api/admin/astrologers/${userId}`
-          : "api/admin/astrologers",
-      method: mode === "edit" ? "put" : "post",
-      formData: payload,
-    });
+      Object.keys(formData).forEach((key) => {
+        const val = formData[key as keyof AstroFormData];
+
+        if (key === "consulting_fee") {
+          payload.append(key, removeCommas(formData.consulting_fee));
+        } else if (key === "picture" && val instanceof File) {
+          payload.append(key, val); // Ensure picture is sent as a File
+        } else if (Array.isArray(val)) {
+          val.forEach((v) => payload.append(`${key}[]`, v));
+        } else if (val !== null && val !== undefined && key !== "picture") {
+          payload.append(key, val as string);
+        }
+      });
+
+      console.log(formData, "formData");
+
+      const response = await callAPI({
+        endpoint:
+          mode === "edit"
+            ? `api/admin/astrologers/${userId}`
+            : "api/admin/astrologers",
+        method: mode === "edit" ? "put" : "post",
+        data: payload,
+      });
+
+      console.log(response, "response");
+
+      setSnackbar({
+        open: true,
+        message:
+          mode === "edit"
+            ? "Astrologer updated successfully!"
+            : "Astrologer created successfully!",
+        severity: "success",
+      });
+
+      navigate(-1);
+    } catch (err) {
+      console.error(err);
+      setSnackbar({
+        open: true,
+        message: "Something went wrong. Please try again.",
+        severity: "error",
+      });
+    }
   };
 
   return (
@@ -652,7 +277,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         elevation={2}
         sx={{
           p: { xs: 2, sm: 3 },
-          maxWidth: "800px", // Constrain width for better alignment
+          maxWidth: "800px",
           mx: "auto",
           backgroundColor: "#f9f9fb",
           borderRadius: "12px",
@@ -687,10 +312,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               <Box sx={{ position: "relative", display: "inline-block" }}>
                 <Avatar
                   src={
-                    formData.picture
-                      ? typeof formData.picture === "string"
-                        ? formData.picture
-                        : URL.createObjectURL(formData.picture)
+                    formData.picture instanceof File
+                      ? URL.createObjectURL(formData.picture)
+                      : typeof formData.picture === "string" && formData.picture
+                      ? formData.picture
                       : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJaOl3vJfEJpJU4NLddWUUznNoM1LMu_9qAQ&s"
                   }
                   alt="Astrologer"
@@ -822,7 +447,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       .replace(/\b\w/g, (l) => l.toUpperCase())}
                     fullWidth
                     size="small"
-                    value={formData[key]}
+                    value={
+                      key === "consulting_fee"
+                        ? formatNumberWithCommas(formData.consulting_fee)
+                        : formData[key]
+                    }
                     onChange={handleChange(key)}
                     error={!!errors[key]}
                     helperText={errors[key] || ""}
@@ -1033,8 +662,14 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
           </Grid>
         </Box>
       </Paper>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </LocalizationProvider>
   );
 };
 
-export default NewAstroUser;
+export default NewAstroUser;  

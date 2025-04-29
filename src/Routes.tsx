@@ -22,6 +22,10 @@ import NewSubscription from "./components/Dashboard/Subscription/AddSubscription
 import ConsultationView from "./components/Dashboard/Consultations/ViewConsultations";
 import Analytics from "./components/Dashboard/Analytics/Analytics";
 
+// Notification Components
+import SendNotification from "./components/Dashboard/Notifications/SendNotification";
+import NotificationsLog from "./components/Dashboard/Notifications/NotificationsLog";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -29,20 +33,20 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/auth/login" replace />
+        element: <Navigate to="/auth/login" replace />,
       },
       {
         path: "auth",
         children: [
           {
             path: "login",
-            element: <Login />
+            element: <Login />,
           },
           // {
           //   path: "register",
           //   element: <Register />
           // }
-        ]
+        ],
       },
       // {
       //   path: "profile",
@@ -59,7 +63,7 @@ export const router = createBrowserRouter([
               { path: "new", element: <NewUser mode="new" /> },
               { path: "edit/:userId", element: <NewUser mode="edit" /> },
               { path: "view/:userId", element: <UserView mode="view" /> },
-            ]
+            ],
           },
           {
             path: "astrologers",
@@ -68,7 +72,7 @@ export const router = createBrowserRouter([
               { path: "new", element: <NewAstroUser mode="new" /> },
               { path: "edit/:userId", element: <NewAstroUser mode="edit" /> },
               { path: "view/:userId", element: <AstroUserView mode="view" /> },
-            ]
+            ],
           },
           {
             path: "services",
@@ -76,7 +80,7 @@ export const router = createBrowserRouter([
               { index: true, element: <Services /> },
               { path: "new", element: <NewService mode="new" /> },
               { path: "edit/:userId", element: <NewService mode="edit" /> },
-            ]
+            ],
           },
           {
             path: "faqs",
@@ -84,7 +88,7 @@ export const router = createBrowserRouter([
               { index: true, element: <FAQs /> },
               { path: "new", element: <NewFAQ mode="new" /> },
               { path: "edit/:userId", element: <NewFAQ mode="edit" /> },
-            ]
+            ],
           },
           {
             path: "coupons",
@@ -92,22 +96,28 @@ export const router = createBrowserRouter([
               { index: true, element: <Coupons /> },
               { path: "new", element: <NewCoupon mode="new" /> },
               { path: "edit/:userId", element: <NewCoupon mode="edit" /> },
-            ]
+            ],
           },
           {
             path: "subscription",
             children: [
               { index: true, element: <Subscription /> },
               { path: "new", element: <NewSubscription mode="new" /> },
-              { path: "edit/:userId", element: <NewSubscription mode="edit" /> },
-            ]
+              {
+                path: "edit/:userId",
+                element: <NewSubscription mode="edit" />,
+              },
+            ],
           },
           {
             path: "consultations",
             children: [
               { index: true, element: <Consultations /> },
-              { path: "view/:consultationId", element: <ConsultationView mode="view" /> },
-            ]
+              {
+                path: "view/:consultationId",
+                element: <ConsultationView mode="view" />,
+              },
+            ],
           },
           {
             path: "analytics",
@@ -117,12 +127,30 @@ export const router = createBrowserRouter([
             path: "profile",
             element: <Profile />,
           },
-        ]
+          {
+            path: "notifications",
+            children: [
+              {
+                path: "send",
+                element: <SendNotification />,
+              },
+              {
+                path: "log",
+                element: <NotificationsLog />,
+              },
+              // Redirect to send notifications as default
+              {
+                index: true,
+                element: <Navigate to="send" replace />,
+              },
+            ],
+          },
+        ],
       },
       {
         path: "*",
         element: <Navigate to="/auth/login" replace />,
       },
-    ]
-  }
+    ],
+  },
 ]);

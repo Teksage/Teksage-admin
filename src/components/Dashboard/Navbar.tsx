@@ -1,262 +1,3 @@
-// import { useState } from "react";
-// import { styled, useTheme } from "@mui/material/styles";
-// import {
-//   Drawer,
-//   List,
-//   ListItemButton,
-//   ListItemIcon,
-//   ListItemText,
-//   Collapse,
-//   Box,
-//   IconButton,
-//   useMediaQuery,
-//   SwipeableDrawer,
-// } from "@mui/material";
-// import BarChartIcon from "@mui/icons-material/BarChart";
-// import ExpandLess from "@mui/icons-material/ExpandLess";
-// import ExpandMore from "@mui/icons-material/ExpandMore";
-// import MenuIcon from "@mui/icons-material/Menu";
-// import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-// import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-// import PeopleIcon from "@mui/icons-material/People";
-// import StarsIcon from "@mui/icons-material/Stars";
-// import HelpIcon from "@mui/icons-material/Help";
-// import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-// import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-// import LayersIcon from "@mui/icons-material/Layers";
-// import astro_prompt_logo from "../../assets/astro_prompt_logo.png";
-
-// import { useNavigate, useLocation } from "react-router-dom";
-
-// const DRAWER_WIDTH = 240;
-// const DRAWER_COLLAPSED_WIDTH = 60;
-
-// const Sidebar = styled(Drawer, {
-//   shouldForwardProp: (prop) => prop !== "open",
-// })(({ theme, open }) => ({
-//   width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
-//   flexShrink: 0,
-//   whiteSpace: "nowrap",
-//   transition: theme.transitions.create("width", {
-//     easing: theme.transitions.easing.sharp,
-//     duration: theme.transitions.duration.enteringScreen,
-//   }),
-//   "& .MuiDrawer-paper": {
-//     width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
-//     boxSizing: "border-box",
-//     overflowX: "hidden",
-//     position: "relative",
-//     transition: theme.transitions.create("width", {
-//       easing: theme.transitions.easing.sharp,
-//       duration: theme.transitions.duration.leavingScreen,
-//     }),
-//   },
-// }));
-
-// const LogoContainer = styled(Box)(({ theme }) => ({
-//   position: "relative",
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "center",
-//   padding: theme.spacing(2),
-//   paddingRight: theme.spacing(6),
-// }));
-
-// const ToggleButton = styled(IconButton)(({ theme }) => ({
-//   position: "absolute",
-//   right: -30,
-//   top: "100%",
-//   transform: "translateY(-50%)",
-//   backgroundColor: theme.palette.background.paper,
-//   boxShadow: theme.shadows[2],
-//   zIndex: 1,
-//   width: 50,
-//   height: 50,
-//   "& svg": {
-//     position: "absolute",
-//     left: "50%",
-//     top: "50%",
-//     transform: "translate(-50%, -50%)",
-//   },
-//   "&:hover": {
-//     backgroundColor: theme.palette.action.hover,
-//   },
-// }));
-
-// const menuItems = [
-//   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
-//   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
-//   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
-//   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
-//   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
-// ];
-
-// const Navbar = ({ open, toggleSidebar }: any) => {
-//   const [expanded, setExpanded] = useState(false);
-//   const [mobileOpen, setMobileOpen] = useState(false);
-//   const navigate = useNavigate();
-//   const theme = useTheme();
-//   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-//   const location = useLocation();
-//   const locationPathname = location?.pathname;
-//   const firstPathSegment = location.pathname.split("/")[2];
-
-//   const handleToggleSidebar = () => {
-//     if (isMobile) {
-//       setMobileOpen(!mobileOpen);
-//     } else {
-//       toggleSidebar();
-//       setExpanded(false);
-//     }
-//   };
-
-//   const handleMenuItemClick = (path: string) => {
-//     navigate(path);
-//     if (isMobile) {
-//       setMobileOpen(false);
-//     }
-//   };
-
-//   const drawerContent = (
-//     <>
-//       <LogoContainer>
-//         {!isMobile && open && (
-//           <Box
-//             sx={{
-//               width: "100%",
-//               display: "flex",
-//               justifyContent: open ? "flex-start" : "center",
-//               "& img": {
-//                 maxWidth: open ? "150px" : "100px",
-//                 height: "auto",
-//                 transition: "all 0.3s ease",
-//               },
-//             }}
-//           >
-//             <img
-//               src={astro_prompt_logo}
-//               alt="Logo"
-//               style={{ borderRadius: "1px 20px 1px 20px" }}
-//             />
-//           </Box>
-//         )}
-//         {!isMobile && (
-//           <ToggleButton onClick={handleToggleSidebar} size="small">
-//             {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-//           </ToggleButton>
-//         )}
-//       </LogoContainer>
-
-//       <List>
-//         {menuItems.map((item) => (
-//           <ListItemButton
-//             key={item.name}
-//             onClick={() => {
-//               handleMenuItemClick(item.path);
-//               setExpanded(false);
-//             }}
-//             style={{
-//               backgroundColor: locationPathname.includes(item?.path)
-//                 ? "#1976d2"
-//                 : "",
-//               color: item?.path === locationPathname ? "white" : "",
-//             }}
-//           >
-//             <ListItemIcon>{item.icon}</ListItemIcon>
-//             {(open || isMobile) && <ListItemText primary={item.name} />}
-//           </ListItemButton>
-//         ))}
-//         <ListItemButton
-//           onClick={() => {
-//             setExpanded(!expanded);
-//             navigate("/dashboard/plans/coupons");
-//           }}
-//           style={{
-//             backgroundColor: firstPathSegment === "plans" ? "#c4dcff" : "",
-//           }}
-//         >
-//           <ListItemIcon>
-//             <BarChartIcon />
-//           </ListItemIcon>
-//           {(open || isMobile) && <ListItemText primary="Plans" />}
-//           {expanded ? <ExpandLess /> : <ExpandMore />}
-//         </ListItemButton>
-
-//         <Collapse in={expanded} timeout="auto" unmountOnExit>
-//           <List component="div" disablePadding>
-//             <ListItemButton
-//               sx={{ pl: 4 }}
-//               onClick={() => handleMenuItemClick("/plans/coupons")}
-//               style={{
-//                 backgroundColor:
-//                   locationPathname === "/dashboard/plans/coupons"
-//                     ? "#1976d2"
-//                     : "",
-//                 color:
-//                   locationPathname === "/dashboard/plans/coupons"
-//                     ? "white"
-//                     : "",
-//               }}
-//             >
-//               <ListItemIcon>
-//                 <LocalOfferIcon />
-//               </ListItemIcon>
-//               {(open || isMobile) && <ListItemText primary="Coupon Code" />}
-//             </ListItemButton>
-//           </List>
-//         </Collapse>
-//       </List>
-//     </>
-//   );
-
-//   if (isMobile) {
-//     return (
-//       <>
-//         <IconButton
-//           color="inherit"
-//           aria-label="open drawer"
-//           edge="start"
-//           onClick={handleToggleSidebar}
-//           sx={{
-//             mr: 2,
-//             position: "absolute",
-//             left: 10,
-//             top: 10,
-//             zIndex: 1201,
-//           }}
-//         >
-//           <MenuIcon />
-//         </IconButton>
-//         <SwipeableDrawer
-//           variant="temporary"
-//           anchor="left"
-//           open={mobileOpen}
-//           onClose={handleToggleSidebar}
-//           onOpen={handleToggleSidebar}
-//           ModalProps={{
-//             keepMounted: true, // Better open performance on mobile.
-//           }}
-//           sx={{
-//             "& .MuiDrawer-paper": {
-//               paddingTop: "6px", // Creates space between the IconButton and drawer content
-//             },
-//           }}
-//         >
-//           <Box sx={{ py: 2 }}>{drawerContent}</Box>
-//         </SwipeableDrawer>
-//       </>
-//     );
-//   }
-
-//   return (
-//     <Sidebar variant="permanent" open={open} anchor="left">
-//       {drawerContent}
-//     </Sidebar>
-//   );
-// };
-
-// export default Navbar;
-
 import { useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import {
@@ -275,7 +16,7 @@ import {
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import ChatIcon from '@mui/icons-material/Chat';
+import ChatIcon from "@mui/icons-material/Chat";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -287,6 +28,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LayersIcon from "@mui/icons-material/Layers";
 import astro_prompt_logo from "../../assets/astro_prompt_logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SendIcon from "@mui/icons-material/Send";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 
 const DRAWER_WIDTH = 240;
 const DRAWER_COLLAPSED_WIDTH = 72;
@@ -396,19 +140,29 @@ const NavItem = styled(ListItemButton)(({ theme, open }) => ({
   ),
 }));
 
+// Update menuItems to include Notifications
 const menuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
-  { name: "Consultations", path: "/dashboard/consultations", icon: <ChatIcon /> },
-  { name: "Subscription Plans", path: "/dashboard/subscription", icon: <BarChartIcon /> },
+  {
+    name: "Consultations",
+    path: "/dashboard/consultations",
+    icon: <ChatIcon />,
+  },
+  {
+    name: "Subscription Plans",
+    path: "/dashboard/subscription",
+    icon: <BarChartIcon />,
+  },
   { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 ];
 
-const Navbar = ({ open, toggleSidebar }:any) => {
+const Navbar = ({ open, toggleSidebar }: any) => {
   const [expanded, setExpanded] = useState(false);
+  const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const theme = useTheme();
@@ -416,6 +170,14 @@ const Navbar = ({ open, toggleSidebar }:any) => {
   const location = useLocation();
   const locationPathname = location?.pathname;
   // const firstPathSegment = location.pathname.split("/")[2];
+
+  const handleNotificationsClick = (e) => {
+    e.stopPropagation();
+    setNotificationsExpanded(!notificationsExpanded);
+    if (!notificationsExpanded && open) {
+      navigate("/dashboard/notifications/send");
+    }
+  };
 
   const handleToggleSidebar = () => {
     if (isMobile) {
@@ -485,6 +247,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
       </LogoContainer>
 
       <List sx={{ px: 0.5, pt: 1 }}>
+        {/* Render main menu items */}
         {menuItems.map((item) => (
           <NavItem
             key={item.name}
@@ -507,45 +270,49 @@ const Navbar = ({ open, toggleSidebar }:any) => {
           </NavItem>
         ))}
 
-        {/* <NavItem
+        {/* Add Notifications section with expandable items */}
+        <NavItem
           open={open}
           onClick={
             open
-              ? () => navigate("/dashboard/plans/coupons")
-              : handleExpandClick
+              ? handleNotificationsClick
+              : () => navigate("/dashboard/notifications/send")
           }
-          selected={firstPathSegment === "plans"}
+          selected={locationPathname.includes("/dashboard/notifications")}
         >
           <ListItemIcon sx={{ color: "inherit" }}>
-            <BarChartIcon />
+            <NotificationsIcon />
           </ListItemIcon>
           {(open || isMobile) && (
             <>
               <ListItemText
-                primary="Plans"
+                primary="Notifications"
                 primaryTypographyProps={{
-                  fontSize: "0.875rem",
+                  fontSize: "0.995rem",
                   whiteSpace: "nowrap",
                 }}
                 sx={{ flexGrow: 1 }}
               />
-              <IconButton
-                size="small"
-                onClick={handleExpandClick}
-                sx={{ padding: 0.5, ml: -1 }}
-              >
-                {expanded ? <ExpandLess /> : <ExpandMore />}
-              </IconButton>
+              {open && (
+                <IconButton
+                  size="small"
+                  onClick={handleNotificationsClick}
+                  sx={{ padding: 0.5, ml: -1 }}
+                >
+                  {notificationsExpanded ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
+              )}
             </>
           )}
-        </NavItem> */}
+        </NavItem>
 
-        {/* <Collapse
-          in={expanded && (open || isMobile)}
+        <Collapse
+          in={notificationsExpanded && (open || isMobile)}
           timeout="auto"
           unmountOnExit
         >
           <List component="div" disablePadding>
+            {/* Send Notifications */}
             <NavItem
               sx={{
                 pl: open ? 4 : 2,
@@ -554,15 +321,47 @@ const Navbar = ({ open, toggleSidebar }:any) => {
                 borderRadius: theme.shape.borderRadius,
               }}
               open={open}
-              onClick={() => handleMenuItemClick("/dashboard/plans/coupons")}
-              selected={locationPathname === "/dashboard/plans/coupons"}
+              onClick={() =>
+                handleMenuItemClick("/dashboard/notifications/send")
+              }
+              selected={locationPathname === "/dashboard/notifications/send"}
             >
               <ListItemIcon sx={{ color: "inherit" }}>
-                <LocalOfferIcon />
+                <SendIcon fontSize="small" />
               </ListItemIcon>
               {(open || isMobile) && (
                 <ListItemText
-                  primary="Coupon Code"
+                  primary="Send Notifications"
+                  primaryTypographyProps={{
+                    fontSize: "0.875rem",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                />
+              )}
+            </NavItem>
+
+            {/* Notifications Log */}
+            <NavItem
+              sx={{
+                pl: open ? 4 : 2,
+                ml: 1,
+                mr: 1,
+                borderRadius: theme.shape.borderRadius,
+              }}
+              open={open}
+              onClick={() =>
+                handleMenuItemClick("/dashboard/notifications/log")
+              }
+              selected={locationPathname === "/dashboard/notifications/log"}
+            >
+              <ListItemIcon sx={{ color: "inherit" }}>
+                <ListAltIcon fontSize="small" />
+              </ListItemIcon>
+              {(open || isMobile) && (
+                <ListItemText
+                  primary="Notifications Log"
                   primaryTypographyProps={{
                     fontSize: "0.875rem",
                     whiteSpace: "nowrap",
@@ -573,7 +372,7 @@ const Navbar = ({ open, toggleSidebar }:any) => {
               )}
             </NavItem>
           </List>
-        </Collapse> */}
+        </Collapse>
       </List>
     </>
   );
