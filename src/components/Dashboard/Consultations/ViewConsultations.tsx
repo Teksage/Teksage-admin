@@ -59,24 +59,6 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
         console.log(res?.data);
         setTimeInput(formatTimeRange(`${res?.data.start_time} - ${res?.data.end_time}`))
         setConsultationData(res?.data || null);
-        // setConsultationData({
-        //     first_name: 'Rahul Sharma',
-        //     astrologer_name: 'Astro Meera',
-        //     user_horoscope: 'https://example.com/horoscope.pdf',
-        //     category: 'Career Guidance',
-        //     languages: ['English', 'Tamil'],
-        //     booking_date: '2025-04-20',
-        //     start_time: '2:00 PM',
-        //     end_time: '2:30 PM',
-        //     consultation_fee: '750',
-        //     rating: 4.2,
-        //     astrologer_share: '525',
-        //     astroprompt_share: '225',
-        //     status: 'Completed',
-        //     consultation_duration: '30 mins',
-        //     question: 'Will I get a job abroad?',
-        //     answer: 'Yes, there are chances after June 2025 based on your planetary positions.'
-        //   });
       } catch (err) {
         setConsultationData(null);
       } finally {
@@ -104,7 +86,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
         ) : consultationData ? (
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <InfoItem label="User Name" value={consultationData.first_name} />
+              <InfoItem label="User Name" value={consultationData.customer_name} />
             </Grid>
             <Grid item xs={12} md={6}>
               <InfoItem
@@ -136,7 +118,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
             <Grid item xs={12} md={6}>
               <InfoItem
                 label="Consultation Fee"
-                value={`₹${consultationData.consultation_fee}`}
+                value={`₹${consultationData.consutation_fee}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>

@@ -1559,14 +1559,10 @@ function GenericTable<T>({
   const renderFeeFilter = () => {
     if (!hasFeeData) return null;
 
-    const feeRanges = [
-      "< 500",
-      "500 - 1000",
-      "> 1000",
-    ];
+    const feeRanges = ["< 500", "500 - 1000", "> 1000"];
 
     const handleRangeSelect = (value: string) => {
-      console.log(value, "value")
+      console.log(value, "value");
       handleFilterChange("consultation_fee" as keyof T, value);
     };
 
@@ -1733,12 +1729,16 @@ function GenericTable<T>({
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
               alignItems: "center",
-              flex: 1,
+              justifyContent: "center",
+              height: "100%",
+              my: 4,
+              gap: 1,
             }}
           >
-            <CircularProgress />
+            <CircularProgress size={40} thickness={4} />
+            <Box sx={{ fontSize: 14, color: "#666" }}>Fetching data...</Box>
           </Box>
         ) : (
           <List sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
@@ -2128,11 +2128,7 @@ function GenericTable<T>({
       {!showFilters && (hasFilterableColumns || hasDateData || hasFeeData) && (
         <FiltersContainer>
           {hasDateData && (
-            <Tabs
-              value={false}
-              variant="scrollable"
-              scrollButtons="auto"
-            >
+            <Tabs value={false} variant="scrollable" scrollButtons="auto">
               <FilterTab
                 label="Date Filter"
                 icon={<DateRangeIcon />}
@@ -2160,12 +2156,16 @@ function GenericTable<T>({
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
               height: "100%",
+              my: 4,
+              gap: 1,
             }}
           >
-            <CircularProgress />
+            <CircularProgress size={40} thickness={4} />
+            <Box sx={{ fontSize: 14, color: "#666" }}>Fetching data...</Box>
           </Box>
         ) : (
           <Table stickyHeader aria-label="data table">

@@ -11,7 +11,7 @@
 //   email: string;
 //   mobile_number: string;
 //   status: string;
-//   user_typeplan_names: string;
+//   plan_names: string;
 // }
 
 // const Users: React.FC = () => {
@@ -55,7 +55,7 @@
 //       width: "250px",
 //     },
 //     {
-//       id: "user_typeplan_names",
+//       id: "plan_names",
 //       label: "Subscription",
 //       filterable: true,
 //     },
@@ -138,14 +138,14 @@ interface UserData {
   email: string;
   mobile_number: string;
   status: string;
-  user_typeplan_names: string;
+  plan_names: string;
 }
 
 interface FilterOptions {
   name: string[];
   email: string[];
   mobile_number: string[];
-  user_typeplan_names: string[];
+  plan_names: string[];
   status: string[];
 }
 
@@ -160,7 +160,7 @@ const Users: React.FC = () => {
     name: [],
     email: [],
     mobile_number: [],
-    user_typeplan_names: [],
+    plan_names: [],
     status: [],
   }); // Unique filter values
 
@@ -200,7 +200,7 @@ const Users: React.FC = () => {
         name: [],
         email: [],
         mobile_number: [],
-        user_typeplan_names: [],
+        plan_names: [],
         status: [],
       }, "response123")
 
@@ -208,7 +208,7 @@ const Users: React.FC = () => {
         name: [],
         email: [],
         mobile_number: [],
-        user_typeplan_names: [],
+        plan_names: [],
         status: [],
       });
     } catch (error) {
@@ -249,10 +249,10 @@ const Users: React.FC = () => {
       width: "250px",
     },
     {
-      id: "user_typeplan_names",
+      id: "plan_names",
       label: "Subscription",
       filterable: true,
-      filterOptions: filterOptions.user_typeplan_names,
+      filterOptions: filterOptions.plan_names,
     },
     {
       id: "status",

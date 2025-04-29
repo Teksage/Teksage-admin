@@ -115,7 +115,7 @@
 //   const [visibleServices, setVisibleServices] = useState<string[]>(["Love", "Career", "Finance", "Marriage"]);
 //   const [visibleConsultations, setVisibleConsultations] = useState<string[]>(["30mins", "1hr"]);
 //   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+
 //   const currentYearData = yearlyData[selectedYear];
 
 //   const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -165,10 +165,10 @@
 
 //   // Plans
 //   const { enhancedData: enhancedPlanData, stats: planStats } = enhanceData(currentYearData.plans, ["Basic", "Standard", "Premium", "Enterprise"]);
-  
+
 //   // Services
 //   const { enhancedData: enhancedServiceData, stats: serviceStats } = enhanceData(currentYearData.services, ["Love", "Career", "Finance", "Marriage"]);
-  
+
 //   // Consultations
 //   const { enhancedData: enhancedConsultationData, stats: consultationStats } = enhanceData(currentYearData.consultations, ["30mins", "1hr"]);
 
@@ -220,13 +220,13 @@
 //         minHeight: "100vh",
 //       }}
 //     >
-//       <Box sx={{ 
-//         display: 'flex', 
+//       <Box sx={{
+//         display: 'flex',
 //         flexDirection: { xs: 'column', sm: 'row' },
-//         justifyContent: 'space-between', 
+//         justifyContent: 'space-between',
 //         alignItems: { xs: 'flex-start', sm: 'center' },
-//         maxWidth: "1200px", 
-//         mx: "auto", 
+//         maxWidth: "1200px",
+//         mx: "auto",
 //         mb: 3,
 //         gap: 2
 //       }}>
@@ -249,7 +249,7 @@
 //         >
 //           Analytics Dashboard
 //         </Typography>
-        
+
 //         <Select
 //           value={selectedYear}
 //           onChange={handleYearChange}
@@ -270,12 +270,12 @@
 //       </Box>
 
 //       {/* Column layout for charts */}
-//       <Box sx={{ 
-//         display: 'flex', 
-//         flexDirection: 'column', 
-//         gap: 3, 
-//         maxWidth: "1200px", 
-//         mx: "auto" 
+//       <Box sx={{
+//         display: 'flex',
+//         flexDirection: 'column',
+//         gap: 3,
+//         maxWidth: "1200px",
+//         mx: "auto"
 //       }}>
 //         {/* Plan-wise User Count */}
 //         <Paper
@@ -589,7 +589,7 @@
 
 // export default Analytics;
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -603,88 +603,101 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { Typography, Grid, Box, Paper, useTheme, MenuItem, Select, useMediaQuery } from "@mui/material";
-
-// Data with monthly counts for plans and services
-const yearlyData = {
-  2023: {
-    plans: [
-      { name: "Apr", Basic: 8, Standard: 7, Premium: 16, Enterprise: 58 },
-      { name: "Mar", Basic: 48, Standard: 78, Premium: 8, Enterprise: 58 },
-    ],
-    services: [
-      { name: "Jan", Love: 120, Career: 80, Finance: 65, Marriage: 95 },
-      { name: "Feb", Love: 90, Career: 70, Finance: 55, Marriage: 85 },
-      { name: "Mar", Love: 110, Career: 75, Finance: 60, Marriage: 90 },
-      { name: "Apr", Love: 130, Career: 85, Finance: 70, Marriage: 100 },
-      { name: "May", Love: 115, Career: 80, Finance: 65, Marriage: 95 },
-      { name: "Jun", Love: 125, Career: 90, Finance: 75, Marriage: 105 },
-      { name: "Jul", Love: 135, Career: 95, Finance: 80, Marriage: 110 },
-      { name: "Aug", Love: 140, Career: 100, Finance: 85, Marriage: 115 },
-      { name: "Sep", Love: 130, Career: 90, Finance: 75, Marriage: 105 },
-      { name: "Oct", Love: 145, Career: 105, Finance: 90, Marriage: 120 },
-      { name: "Nov", Love: 160, Career: 115, Finance: 100, Marriage: 135 },
-      { name: "Dec", Love: 180, Career: 130, Finance: 115, Marriage: 150 }
-    ],
-  },
-  2024: {
-    plans: [
-      { name: "Jun", Basic: 62, Standard: 92, Premium: 112, Enterprise: 72 },
-      { name: "Jul", Basic: 65, Standard: 95, Premium: 115, Enterprise: 75 },
-      { name: "Aug", Basic: 68, Standard: 98, Premium: 118, Enterprise: 78 },
-    ],
-    services: [
-      { name: "Jan", Love: 140, Career: 90, Finance: 75, Marriage: 105 },
-      { name: "Feb", Love: 110, Career: 80, Finance: 65, Marriage: 95 },
-      { name: "Mar", Love: 130, Career: 85, Finance: 70, Marriage: 100 },
-      { name: "Apr", Love: 150, Career: 95, Finance: 80, Marriage: 110 },
-      { name: "May", Love: 135, Career: 90, Finance: 75, Marriage: 105 },
-      { name: "Jun", Love: 145, Career: 100, Finance: 85, Marriage: 115 },
-      { name: "Jul", Love: 155, Career: 110, Finance: 95, Marriage: 125 },
-      { name: "Aug", Love: 160, Career: 115, Finance: 100, Marriage: 130 },
-      { name: "Sep", Love: 150, Career: 105, Finance: 90, Marriage: 120 },
-      { name: "Oct", Love: 165, Career: 120, Finance: 105, Marriage: 140 },
-      { name: "Nov", Love: 180, Career: 130, Finance: 115, Marriage: 155 },
-      { name: "Dec", Love: 200, Career: 150, Finance: 130, Marriage: 170 }
-    ]
-  }
-};
+import {
+  Typography,
+  Grid,
+  Box,
+  Paper,
+  useTheme,
+  MenuItem,
+  Select,
+  useMediaQuery,
+} from "@mui/material";
+import { callAPI } from "../../../api/crudFactory";
 
 const COLORS = ["#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 const Analytics: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Dynamically get available years from data
-  const availableYears = Object.keys(yearlyData).map(year => parseInt(year)).sort((a, b) => a - b);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [filterType, setFilterType] = useState<string>("year"); // Reintroduce filterType
+  const [analyticsData, setAnalyticsData] = useState<any>({
+    subscription: {},
+    users_per_service: [],
+  });
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Set the default selectedYear to the latest available year
-  const [selectedYear, setSelectedYear] = useState<number>(availableYears[availableYears.length - 1]);
-  const [filterType, setFilterType] = useState<string>("year");
-  const [visiblePlans, setVisiblePlans] = useState<string[]>(["Basic", "Premium"]); // Show only Basic and Premium
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
 
-  // Determine the earliest month and year in the data
-  const earliestYear = availableYears[0];
-  const earliestMonth = yearlyData[earliestYear].plans[0].name; // "Apr"
-  const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const earliestMonthIndex = monthOrder.indexOf(earliestMonth);
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const response = await callAPI({
+        endpoint: "/api/admin/analytics",
+        method: "get",
+      });
+      setAnalyticsData(response.data);
+      const availableYears = Object.keys(response.data.subscription)
+        .map((year) => parseInt(year))
+        .sort((a, b) => a - b);
+      if (availableYears.length > 0) {
+        setSelectedYear(availableYears[availableYears.length - 1]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch analytics:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Current date for "Previous 12 Months" calculation (April 28, 2025)
-  const currentDate = new Date(2025, 3, 28); // April 2025 (month is 0-based in JS)
+  // Get available years from API data
+  const availableYears = Object.keys(analyticsData.subscription)
+    .map((year) => parseInt(year))
+    .sort((a, b) => a - b);
+
+  // Month order for sorting
+  const monthOrder = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  // Prepare Plans data for LineChart (Year-wise)
+  const getYearWiseData = (year: number) => {
+    if (!analyticsData.subscription[year]?.plans) return [];
+    const plans = analyticsData.subscription[year].plans;
+    return plans.map((month: any) => ({
+      name: month.name,
+      ...month,
+    }));
+  };
 
   // Prepare Plans data for "Previous 12 Months" filter
   const getPrevious12MonthsData = () => {
     let allData: any[] = [];
 
     // Collect all plans data from all years
-    for (const year in yearlyData) {
-      if (yearlyData[year].plans) {
-        const yearPlans = yearlyData[year].plans.map((month: any) => ({
-          name: `${month.name} ${year}`,
-          Basic: month.Basic,
-          Premium: month.Premium,
-        }));
+    for (const year in analyticsData.subscription) {
+      if (analyticsData.subscription[year].plans) {
+        const yearPlans = analyticsData.subscription[year].plans.map(
+          (month: any) => ({
+            name: `${month.name} ${year}`,
+            ...month,
+          })
+        );
         allData = allData.concat(yearPlans);
       }
     }
@@ -693,76 +706,88 @@ const Analytics: React.FC = () => {
     allData.sort((a, b) => {
       const [aMonth, aYear] = a.name.split(" ");
       const [bMonth, bYear] = b.name.split(" ");
-      return new Date(parseInt(aYear), monthOrder.indexOf(aMonth), 1) - new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1);
+      return (
+        new Date(parseInt(aYear), monthOrder.indexOf(aMonth), 1) -
+        new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1)
+      );
     });
 
     // Return only the months with actual data, skipping gaps
     return allData;
   };
 
-  // Prepare Plans data for Year-wise filter with a zero point
-  const getYearWiseData = (year: number) => {
-    let data = yearlyData[year].plans.map((month: any) => ({
-      name: month.name,
-      Basic: month.Basic,
-      Premium: month.Premium,
-    }));
-
-    // Prepend a zero point for the previous month of the earliest month in the year
-    const firstMonth = data[0].name; // e.g., "Apr" for 2023
-    let prevMonthIndex = monthOrder.indexOf(firstMonth) - 1;
-    let prevYear = year;
-    if (prevMonthIndex < 0) {
-      prevMonthIndex = 11;
-      prevYear--;
-    }
-    // Only prepend if the previous month/year is before the earliest data or not in the data
-    if (prevYear >= earliestYear && !(yearlyData[prevYear]?.plans?.find((m: any) => m.name === monthOrder[prevMonthIndex]))) {
-      data.unshift({
-        name: `${monthOrder[prevMonthIndex]} ${prevYear}`,
-        Basic: 0,
-        Premium: 0,
+  // Get all plan names dynamically from the data for the selected year
+  const getPlanNames = (year: number) => {
+    if (!analyticsData.subscription[year]?.plans) return [];
+    const plans = analyticsData.subscription[year].plans;
+    const planNames = new Set<string>();
+    plans.forEach((month: any) => {
+      Object.keys(month).forEach((key) => {
+        if (key !== "name") {
+          planNames.add(key);
+        }
       });
-    }
-
-    return data;
+    });
+    return Array.from(planNames);
   };
 
   // Prepare data for the LineChart based on filter
-  const planData = filterType === "previous12" ? getPrevious12MonthsData() : getYearWiseData(selectedYear);
+  const planData =
+    filterType === "previous12"
+      ? getPrevious12MonthsData()
+      : selectedYear
+      ? getYearWiseData(selectedYear)
+      : [];
 
-  // Aggregate data for Services (PieChart) for the full selected year (no filter applied)
-  const serviceData = Object.values(yearlyData[selectedYear].services).reduce((acc: any, curr: any) => {
-    return {
-      Love: (acc.Love || 0) + (curr.Love || 0),
-      Career: (acc.Career || 0) + (curr.Career || 0),
-      Finance: (acc.Finance || 0) + (curr.Finance || 0),
-      Marriage: (acc.Marriage || 0) + (curr.Marriage || 0),
-    };
-  }, {});
-  const pieData = [
-    { name: "Love", value: serviceData.Love },
-    { name: "Career", value: serviceData.Career },
-    { name: "Finance", value: serviceData.Finance },
-    { name: "Marriage", value: serviceData.Marriage },
-  ];
+  // Prepare data for the PieChart (Service Usage)
+  const pieData =
+    analyticsData.users_per_service?.length > 0
+      ? analyticsData.users_per_service.map((service: any) => ({
+          name: service.name,
+          value: service.user_count > 0 ? service.user_count : 0.01, // Use a small value for rendering
+        }))
+      : [];
+
+  // Check if all values in pieData are effectively 0 (excluding the small value we added)
+  const allValuesZero = analyticsData.users_per_service?.every(
+    (service: any) => service.user_count === 0
+  );
+
+  // Prepare data for Compact Stats Row (Latest month's plan counts)
+  const latestMonthData = selectedYear && analyticsData.subscription[selectedYear]?.plans?.length > 0
+  ? analyticsData.subscription[selectedYear].plans.reduce((acc: any, month: any) => {
+      Object.keys(month).forEach((key) => {
+        if (key !== "name") {
+          acc[key] = (acc[key] || 0) + month[key];
+        }
+      });
+      return acc;
+    }, {})
+  : {};
+
+const compactStatsData = Object.keys(latestMonthData)
+  .filter((key) => key !== "name")
+  .map((plan, index) => ({
+    plan_name: plan,
+    users: latestMonthData[plan] || 0,
+    colorIndex: index % COLORS.length,
+  }));
 
   const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedYear(event.target.value as number);
-    setFilterType("year");
+    setFilterType("year"); // Reset to year-wise when changing year
   };
 
   const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setFilterType(event.target.value as string);
   };
 
-  const handleLegendClick = (entry: any) => {
-    const key = entry.dataKey;
-    setVisiblePlans(prev => prev.includes(key) ? prev.filter(p => p !== key) : [...prev, key]);
-  };
-
   // Custom Tooltip for LineChart
-  const CustomTooltip: React.FC<{ active?: boolean; payload?: any[]; label?: string }> = ({ active, payload, label }) => {
+  const CustomTooltip: React.FC<{
+    active?: boolean;
+    payload?: any[];
+    label?: string;
+  }> = ({ active, payload, label }) => {
     if (active && payload && payload.length && label) {
       return (
         <Box
@@ -775,7 +800,9 @@ const Analytics: React.FC = () => {
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
           }}
         >
-          <Typography variant="caption" sx={{ fontWeight: 600 }}>{label}</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 600 }}>
+            {label}
+          </Typography>
           {payload.map((entry, index) => (
             <Box key={index} sx={{ color: entry.color }}>
               <Typography variant="caption">
@@ -789,6 +816,17 @@ const Analytics: React.FC = () => {
     return null;
   };
 
+  // Custom Label for PieChart to handle zero values
+  const renderCustomLabel = ({
+    name,
+    value,
+  }: {
+    name: string;
+    value: number;
+  }) => {
+    return `${name}: ${Math.round(value * 100) / 100}`; // Round to 2 decimal places
+  };
+
   return (
     <Box
       sx={{
@@ -797,16 +835,18 @@ const Analytics: React.FC = () => {
         minHeight: "100vh",
       }}
     >
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between', 
-        alignItems: { xs: 'flex-start', sm: 'center' },
-        maxWidth: "1200px", 
-        mx: "auto", 
-        mb: 3,
-        gap: 2
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", sm: "center" },
+          maxWidth: "1200px",
+          mx: "auto",
+          mb: 3,
+          gap: 2,
+        }}
+      >
         <Typography
           variant="h5"
           sx={{
@@ -826,8 +866,8 @@ const Analytics: React.FC = () => {
         >
           Analytics Dashboard
         </Typography>
-        
-        <Box sx={{ display: 'flex', gap: 2 }}>
+
+        <Box sx={{ display: "flex", gap: 2 }}>
           <Select
             value={filterType}
             onChange={handleFilterChange}
@@ -840,13 +880,14 @@ const Analytics: React.FC = () => {
                 py: 1,
               },
             }}
+            disabled={loading}
           >
             <MenuItem value="previous12">Previous 12 Months</MenuItem>
             <MenuItem value="year">Year-wise</MenuItem>
           </Select>
           {filterType === "year" && (
             <Select
-              value={selectedYear}
+              value={selectedYear || ""}
               onChange={handleYearChange}
               sx={{
                 minWidth: 120,
@@ -857,9 +898,12 @@ const Analytics: React.FC = () => {
                   py: 1,
                 },
               }}
+              disabled={availableYears.length === 0 || loading}
             >
-              {availableYears.map(year => (
-                <MenuItem key={year} value={year}>{year}</MenuItem>
+              {availableYears.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
               ))}
             </Select>
           )}
@@ -867,13 +911,15 @@ const Analytics: React.FC = () => {
       </Box>
 
       {/* Column layout for charts */}
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: 3, 
-        maxWidth: "1200px", 
-        mx: "auto" 
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+          maxWidth: "1200px",
+          mx: "auto",
+        }}
+      >
         {/* Plan-wise User Count (LineChart) */}
         <Paper
           elevation={0}
@@ -904,51 +950,111 @@ const Analytics: React.FC = () => {
               },
             }}
           >
-            Users by Plan {filterType === "year" ? `(${selectedYear})` : "(Previous 12 Months)"}
+            Users by Plan{" "}
+            {filterType === "year" && selectedYear
+              ? `(${selectedYear})`
+              : filterType === "previous12"
+              ? "(Previous 12 Months)"
+              : ""}
           </Typography>
-          <Box sx={{ height: isMobile ? '250px' : '350px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={planData}
-                margin={{ top: 20, right: 15, left: 0, bottom: 0 }}
+          <Box sx={{ height: isMobile ? "250px" : "350px" }}>
+            {loading ? (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", mt: 2 }}
               >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: "#1b4d3e", fontSize: "12px" }}
-                  axisLine={{ stroke: "#1b4d3e", opacity: 0.2 }}
-                />
-                <YAxis
-                  tick={{ fill: "#1b4d3e", fontSize: "12px" }}
-                  axisLine={{ stroke: "#1b4d3e", opacity: 0.2 }}
-                  label={{ value: "User Count", angle: -90, position: "insideLeft", fill: "#1b4d3e", fontSize: "12px" }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  onClick={handleLegendClick}
-                  wrapperStyle={{
-                    paddingTop: isMobile ? '10px' : '0',
-                    cursor: 'pointer'
-                  }}
-                />
-                {["Basic", "Premium"].map((plan, index) => (
-                  visiblePlans.includes(plan) && (
-                    <Line
-                      key={plan}
-                      type="monotone"
-                      dataKey={plan}
-                      stroke={index === 0 ? "#00C49F" : "#FF8042"} // Colors like Lorem (blue) and Ipsum (pink)
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                      name={`${plan} Users`}
-                    />
-                  )
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+                Loading...
+              </Typography>
+            ) : planData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={planData}
+                  margin={{ top: 20, right: 15, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#1b4d3e", fontSize: "12px" }}
+                    axisLine={{ stroke: "#1b4d3e", opacity: 0.2 }}
+                  />
+                  <YAxis
+                    tick={{ fill: "#1b4d3e", fontSize: "12px" }}
+                    axisLine={{ stroke: "#1b4d3e", opacity: 0.2 }}
+                    label={{
+                      value: "User Count",
+                      angle: -90,
+                      position: "insideLeft",
+                      fill: "#1b4d3e",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend
+                    wrapperStyle={{ paddingTop: isMobile ? "10px" : "0" }}
+                  />
+                  {selectedYear &&
+                    (filterType === "year"
+                      ? getPlanNames(selectedYear)
+                      : getPlanNames(selectedYear)
+                    ).map((plan, index) => (
+                      <Line
+                        key={plan}
+                        type="monotone"
+                        dataKey={plan}
+                        stroke={COLORS[index % COLORS.length]}
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                        name={`${plan} Users`}
+                      />
+                    ))}
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", mt: 2 }}
+              >
+                No plan data available.
+              </Typography>
+            )}
           </Box>
         </Paper>
+
+        {/* Compact Stats Row */}
+        <Grid container spacing={2}>
+          {compactStatsData.map((plan: any, index: number) => (
+            <Grid item xs={6} sm={3} key={index}>
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: "8px",
+                  background: `linear-gradient(135deg, ${
+                    COLORS[plan.colorIndex]
+                  }, ${COLORS[(plan.colorIndex + 1) % COLORS.length]})`,
+                  color: "white",
+                  textAlign: "center",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, fontSize: "1.25rem" }}
+                >
+                  {plan.users}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ opacity: 0.9, fontSize: "0.75rem" }}
+                >
+                  {plan.plan_name} Users
+                </Typography>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
 
         {/* Service Usage (PieChart) */}
         <Paper
@@ -980,127 +1086,73 @@ const Analytics: React.FC = () => {
               },
             }}
           >
-            Service Usage ({selectedYear})
+            Service Usage
           </Typography>
-          <Box sx={{ height: isMobile ? '250px' : '350px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
-                  outerRadius={isMobile ? 80 : 120}
-                  fill="#8884d8"
-                  dataKey="value"
+          <Box sx={{ height: isMobile ? "250px" : "350px" }}>
+            {loading ? (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", mt: 2 }}
+              >
+                Loading...
+              </Typography>
+            ) : pieData.length > 0 ? (
+              allValuesZero ? (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: "center", mt: 2 }}
                 >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ paddingTop: isMobile ? '10px' : '0' }} />
-              </PieChart>
-            </ResponsiveContainer>
+                  No usage recorded for any service.
+                </Typography>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomLabel}
+                      outerRadius={isMobile ? 80 : 120}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieData.map((entry: any, index: number) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                          opacity={entry.value === 0.01 ? 0.3 : 1} // Adjust opacity for zero values
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number, name: string) => [
+                        value === 0.01 ? 0 : value,
+                        name,
+                      ]}
+                    />
+                    <Legend
+                      wrapperStyle={{ paddingTop: isMobile ? "10px" : "0" }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )
+            ) : (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", mt: 2 }}
+              >
+                No service usage data available.
+              </Typography>
+            )}
           </Box>
         </Paper>
-
-        {/* Compact Stats Row */}
-        <Grid container spacing={2}>
-          {[
-            { plan_name: "Basic", users: yearlyData[selectedYear].plans[yearlyData[selectedYear].plans.length - 1].Basic },
-            { plan_name: "Standard", users: yearlyData[selectedYear].plans[yearlyData[selectedYear].plans.length - 1].Standard },
-            { plan_name: "Premium", users: yearlyData[selectedYear].plans[yearlyData[selectedYear].plans.length - 1].Premium },
-            { plan_name: "Enterprise", users: yearlyData[selectedYear].plans[yearlyData[selectedYear].plans.length - 1].Enterprise },
-          ].map((plan, index) => (
-            <Grid item xs={6} sm={3} key={index}>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: "8px",
-                  background: `linear-gradient(135deg, ${COLORS[index]}, ${COLORS[(index + 1) % COLORS.length]})`,
-                  color: "white",
-                  textAlign: "center",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                }}
-              >
-                <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.25rem" }}>
-                  {plan.users}
-                </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
-                  {plan.plan_name} Users
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
       </Box>
     </Box>
   );
 };
 
 export default Analytics;
-
-// const yearlyData = {
-//   2023: {
-//     plans: [
-//       { name: "Jan", Basic: 40, Standard: 70, Premium: 90, Enterprise: 50 },
-//       { name: "Feb", Basic: 42, Standard: 72, Premium: 92, Enterprise: 52 },
-//       { name: "Mar", Basic: 45, Standard: 75, Premium: 95, Enterprise: 55 },
-//       { name: "Apr", Basic: 48, Standard: 78, Premium: 98, Enterprise: 58 },
-//       { name: "May", Basic: 50, Standard: 80, Premium: 100, Enterprise: 60 },
-//       { name: "Jun", Basic: 52, Standard: 82, Premium: 102, Enterprise: 62 },
-//       { name: "Jul", Basic: 55, Standard: 85, Premium: 105, Enterprise: 65 },
-//       { name: "Aug", Basic: 58, Standard: 88, Premium: 108, Enterprise: 68 },
-//       { name: "Sep", Basic: 60, Standard: 90, Premium: 110, Enterprise: 70 },
-//       { name: "Oct", Basic: 62, Standard: 92, Premium: 112, Enterprise: 72 },
-//       { name: "Nov", Basic: 65, Standard: 95, Premium: 115, Enterprise: 75 },
-//       { name: "Dec", Basic: 68, Standard: 98, Premium: 118, Enterprise: 78 },
-//     ],
-//     services: [
-//       { name: "Jan", Love: 120, Career: 80, Finance: 65, Marriage: 95 },
-//       { name: "Feb", Love: 90, Career: 70, Finance: 55, Marriage: 85 },
-//       { name: "Mar", Love: 110, Career: 75, Finance: 60, Marriage: 90 },
-//       { name: "Apr", Love: 130, Career: 85, Finance: 70, Marriage: 100 },
-//       { name: "May", Love: 115, Career: 80, Finance: 65, Marriage: 95 },
-//       { name: "Jun", Love: 125, Career: 90, Finance: 75, Marriage: 105 },
-//       { name: "Jul", Love: 135, Career: 95, Finance: 80, Marriage: 110 },
-//       { name: "Aug", Love: 140, Career: 100, Finance: 85, Marriage: 115 },
-//       { name: "Sep", Love: 130, Career: 90, Finance: 75, Marriage: 105 },
-//       { name: "Oct", Love: 145, Career: 105, Finance: 90, Marriage: 120 },
-//       { name: "Nov", Love: 160, Career: 115, Finance: 100, Marriage: 135 },
-//       { name: "Dec", Love: 180, Career: 130, Finance: 115, Marriage: 150 }
-//     ],
-//   },
-//   2024: {
-//     plans: [
-//       { name: "Jan", Basic: 50, Standard: 80, Premium: 100, Enterprise: 60 },
-//       { name: "Feb", Basic: 52, Standard: 82, Premium: 102, Enterprise: 62 },
-//       { name: "Mar", Basic: 55, Standard: 85, Premium: 105, Enterprise: 65 },
-//       { name: "Apr", Basic: 58, Standard: 88, Premium: 108, Enterprise: 68 },
-//       { name: "May", Basic: 60, Standard: 90, Premium: 110, Enterprise: 70 },
-//       { name: "Jun", Basic: 62, Standard: 92, Premium: 112, Enterprise: 72 },
-//       { name: "Jul", Basic: 65, Standard: 95, Premium: 115, Enterprise: 75 },
-//       { name: "Aug", Basic: 68, Standard: 98, Premium: 118, Enterprise: 78 },
-//       { name: "Sep", Basic: 70, Standard: 100, Premium: 120, Enterprise: 80 },
-//       { name: "Oct", Basic: 72, Standard: 102, Premium: 122, Enterprise: 82 },
-//       { name: "Nov", Basic: 75, Standard: 105, Premium: 125, Enterprise: 85 },
-//       { name: "Dec", Basic: 78, Standard: 108, Premium: 128, Enterprise: 88 },
-//     ],
-//     services: [
-//       { name: "Jan", Love: 140, Career: 90, Finance: 75, Marriage: 105 },
-//       { name: "Feb", Love: 110, Career: 80, Finance: 65, Marriage: 95 },
-//       { name: "Mar", Love: 130, Career: 85, Finance: 70, Marriage: 100 },
-//       { name: "Apr", Love: 150, Career: 95, Finance: 80, Marriage: 110 },
-//       { name: "May", Love: 135, Career: 90, Finance: 75, Marriage: 105 },
-//       { name: "Jun", Love: 145, Career: 100, Finance: 85, Marriage: 115 },
-//       { name: "Jul", Love: 155, Career: 110, Finance: 95, Marriage: 125 },
-//       { name: "Aug", Love: 160, Career: 115, Finance: 100, Marriage: 130 },
-//       { name: "Sep", Love: 150, Career: 105, Finance: 90, Marriage: 120 },
-//       { name: "Oct", Love: 165, Career: 120, Finance: 105, Marriage: 140 },
-//       { name: "Nov", Love: 180, Career: 130, Finance: 115, Marriage: 155 },
-//       { name: "Dec", Love: 200, Career: 150, Finance: 130, Marriage: 170 }
-//     ]
-//   }
-// }
