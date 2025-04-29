@@ -108,7 +108,6 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   // const isAuthenticated = useSelector((state) => state.isAuthenticated);
   const loginUserDetails = useSelector((state) => state.userInfo);
-  console.log(loginUserDetails, "loginUserDetails")
 
   useEffect(() => {
     // Determine the page title based on current location

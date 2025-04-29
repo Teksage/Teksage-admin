@@ -9,7 +9,9 @@ import {
   Paper,
   Button,
   Skeleton,
-  Divider
+  Divider,
+  Chip,
+  CardActions
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -17,6 +19,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {callAPI} from '../../../api/crudFactory'; // adjust path if needed
 import DescriptionIcon from '@mui/icons-material/Description';
 import StarIcon from '@mui/icons-material/Star';
+import { dateFormat } from '../../Elements/DateFormat';
 
 interface UserData {
   user_id: number;
@@ -72,26 +75,21 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
     const fetchUser = async () => {
       try {
         const res = await callAPI({ endpoint: `api/admin/users/${userId}`, method: 'get' });
+        console.log(res?.data)
         setUserData(res?.data || null);
-        // setSubscriptionData(res?.data?.subscription || null);
-        // setConsultationData(res?.data?.consultation || null);
-        setSubscriptionData({
-          plan_name: 'Premium Plan',
-          date_of_subscription: '2025-04-01',
-          subscription_end_date: '2025-07-01'
-        }
-        );
-        setConsultationData({
-          user_horoscope: 'https://example.com/horoscope.pdf',
-          category: 'Love & Relationship',
-          languages: ['English', 'Hindi'],
-          booking_date: '2025-04-15',
-          start_time: '10:00 AM',
-          end_time: '10:30 AM',
-          consultation_fee: '500',
-          rating: 4.5,
-          astrologer_name: 'Astro Suresh'
-        });
+        setSubscriptionData(res?.data?.subscription || null);
+        setConsultationData(res?.data?.events || null);
+        // setConsultationData({
+        //   user_horoscope: 'https://example.com/horoscope.pdf',
+        //   category: 'Love & Relationship',
+        //   languages: ['English', 'Hindi'],
+        //   booking_date: '2025-04-15',
+        //   start_time: '10:00 AM',
+        //   end_time: '10:30 AM',
+        //   consultation_fee: '500',
+        //   rating: 4.5,
+        //   astrologer_name: 'Astro Suresh'
+        // });
       } catch (err) {
         setUserData(null);
         setSubscriptionData(null);
@@ -189,7 +187,7 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
                       <>
                         <InfoItem label="Email" value={userData?.email} />
                         <InfoItem label="Status" value={userData?.status} />
-                        <InfoItem label="Plan" value={userData?.plan} />
+                        {/* <InfoItem label="Plan" value={userData?.plan} /> */}
                       </>
                     )}
                   </Grid>
@@ -201,8 +199,8 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
                       </>
                     ) : (
                       <>
-                        <InfoItem label="Rasi" value={userData?.rasi} />
-                        <InfoItem label="Nakshatram" value={userData?.nakshatram} />
+                        <InfoItem label="Rasi" value={userData?.rashi} />
+                        <InfoItem label="Nakshatram" value={userData?.nakshatra} />
                       </>
                     )}
                   </Grid>
@@ -221,8 +219,8 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
         ) : subscriptionData ? (
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}><InfoItem label="Plan Name" value={subscriptionData.plan_name} /></Grid>
-            <Grid item xs={12} md={4}><InfoItem label="Subscribed On" value={subscriptionData.date_of_subscription} /></Grid>
-            <Grid item xs={12} md={4}><InfoItem label="Ends On" value={subscriptionData.subscription_end_date} /></Grid>
+            <Grid item xs={12} md={4}><InfoItem label="Subscribed On" value={dateFormat(subscriptionData.date_of_subcription, "DD MMM YYYY")} /></Grid>
+            <Grid item xs={12} md={4}><InfoItem label="Ends On" value={dateFormat(subscriptionData.subscription_end_date, "DD MMM YYYY")} /></Grid>
           </Grid>
         ) : (
           <Typography color="text.disabled">No subscription data available.</Typography>
@@ -230,7 +228,8 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
       </Paper>
 
       {/* Consultation Info */}
-      <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
+      <ConsultationDetails loading={loading} consultationData={consultationData} />
+      {/* <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
         <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>Consultation Details</Typography>
         {loading ? (
           <Skeleton height={120} />
@@ -265,9 +264,140 @@ const UserView: React.FC<{ mode: 'view' }> = ({ mode }) => {
         ) : (
           <Typography color="text.disabled">No consultation data available.</Typography>
         )}
-      </Paper>
+      </Paper> */}
     </Box>
   );
 };
 
 export default UserView;
+
+const ConsultationDetails = ({ loading, consultationData }:any) => {
+  return (
+    <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
+      <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+        Consultation Details
+      </Typography>
+      {loading ? (
+        <Skeleton height={120} />
+      ) : consultationData && consultationData.length > 0 ? (
+        <Grid container spacing={3}>
+          {consultationData.map((consultation:any, index:number) => {
+            const event = consultation.event;
+            const astrologerName = `${consultation.astrologer_first_name} ${consultation.astrologer_last_name}`;
+            const hasHoroscope = event.share_horoscope && event.user_horoscope;
+            const languages = event.languages ? event.languages.join(", ") : "N/A";
+            const category = event.category ? event.category.join(", ") : "N/A";
+            const rating = event.rating || "Not Rated";
+
+            return (
+              <Grid item xs={12} sm={6} md={4} key={event.id || index}>
+                <Card
+                  elevation={2}
+                  sx={{
+                    borderRadius: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    transition: "transform 0.2s ease-in-out",
+                    "&:hover": {
+                      transform: "scale(1.02)",
+                      boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1" fontWeight={600} color="primary">
+                      Consultation #{index+1}
+                    </Typography>
+                    <Divider sx={{ my: 1 }} />
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Category:</strong> {category}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Astrologer:</strong> {astrologerName}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Booking Date:</strong> {event.booking_date || "N/A"}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Time:</strong>{" "}
+                        {event.start_time && event.end_time
+                          ? `${event.start_time.slice(11, 16)} - ${event.end_time.slice(11, 16)}`
+                          : "N/A"}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Fee:</strong> ₹{event.consutation_fee || 0}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 1, display: "flex", alignItems: "center" }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Rating:</strong>{" "}
+                      </Typography>
+                      {typeof rating === "number" ? (
+                        <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
+                          <StarIcon sx={{ color: "#fbc02d", fontSize: 18, mr: 0.5 }} />
+                          <Typography variant="body2">{rating}</Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant="body2" sx={{ ml: 1 }}>
+                          {rating}
+                        </Typography>
+                      )}
+                    </Box>
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Languages:</strong> {languages}
+                      </Typography>
+                    </Box>
+                    {event.feedback && (
+                      <Box sx={{ mb: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Feedback:</strong> {event.feedback}
+                        </Typography>
+                      </Box>
+                    )}
+                    {event.status && (
+                      <Box sx={{ mt: 1 }}>
+                        <Chip
+                          label={event.status.toUpperCase()}
+                          color={event.status === "new" ? "info" : "default"}
+                          size="small"
+                          sx={{ fontWeight: 500 }}
+                        />
+                      </Box>
+                    )}
+                  </CardContent>
+                  {hasHoroscope && (
+                    <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        startIcon={<DescriptionIcon />}
+                        href={event.user_horoscope.horoscope_details}
+                        target="_blank"
+                        sx={{ textTransform: "none", fontWeight: 500 }}
+                      >
+                        View Horoscope
+                      </Button>
+                    </CardActions>
+                  )}
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+      ) : (
+        <Typography color="text.disabled">No consultation data available.</Typography>
+      )}
+    </Paper>
+  );
+};
