@@ -302,6 +302,7 @@ const UserView: React.FC<{ mode: "view" }> = ({ mode }) => {
 
       {/* Consultation Info */}
       <ConsultationDetails
+        fullName={fullName}
         loading={loading}
         consultationData={consultationData}
       />
@@ -309,7 +310,7 @@ const UserView: React.FC<{ mode: "view" }> = ({ mode }) => {
   );
 };
 
-const ConsultationDetails = ({ loading, consultationData }: any) => {
+const ConsultationDetails = ({ fullName, loading, consultationData }: any) => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedHoroscope, setSelectedHoroscope] = useState<any>(null);
 
@@ -337,7 +338,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
               const event = consultation.event;
               const astrologerName = `${consultation.astrologer_first_name} ${consultation.astrologer_last_name}`;
               const hasHoroscope =
-                // event.share_horoscope && 
+                // event.share_horoscope &&
                 event.user_horoscope;
               const languages = event.languages
                 ? event.languages.join(", ")
@@ -505,21 +506,20 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: { xs: "95%", sm: 650, md: 850 },
-            maxHeight: "95vh", // This limits the maximum height
+            maxHeight: "95vh",
             bgcolor: "transparent",
             borderRadius: 4,
-            overflow: "hidden", // This was preventing scrolling
             boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
             border: "none",
-            display: "flex", // Added
-            flexDirection: "column", // Added
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           {/* Inner container that will scroll */}
           <Box
             sx={{
-              overflowY: "auto", // This enables scrolling
-              maxHeight: "calc(95vh - 64px)", // Account for header/footer
+              overflowY: "auto",
+              maxHeight: "calc(95vh - 64px)",
               width: "100%",
             }}
           >
@@ -527,8 +527,8 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
             <Box
               sx={{
                 position: "relative",
-                height: "100%",
                 width: "100%",
+                minHeight: "700px",
                 overflowY: "auto",
                 "&::before": {
                   content: '""',
@@ -644,9 +644,9 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                         background:
                           "linear-gradient(145deg, rgba(255,255,255,0.8) 0%, rgba(240,247,250,0.8) 100%)",
                         boxShadow: `
-                  0 4px 6px rgba(0,0,0,0.05),
-                  inset 0 0 0 1px rgba(16, 177, 0, 0.2)
-                `,
+                    0 4px 6px rgba(0,0,0,0.05),
+                    inset 0 0 0 1px rgba(16, 177, 0, 0.2)
+                  `,
                         position: "relative",
                         overflow: "hidden",
                         "&::before": {
@@ -705,7 +705,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
-                              <strong>Name:</strong> Sathish
+                              <strong>Name:</strong> {fullName}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -887,11 +887,14 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                             background: "rgba(255,255,255,0.7)",
                             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                             border: "1px solid rgba(16, 177, 0, 0.15)",
-                            height: "100%",
+                            minHeight: "350px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                           }}
                         >
                           <AstroChart
-                            chartData={selectedHoroscope.rasi_chart}
+                            chartHtml={selectedHoroscope.rasi_chart}
                             chartType="Rasi"
                           />
                         </Box>
@@ -906,11 +909,14 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                             background: "rgba(255,255,255,0.7)",
                             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                             border: "1px solid rgba(16, 177, 0, 0.15)",
-                            height: "100%",
+                            minHeight: "350px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                           }}
                         >
                           <AstroChart
-                            chartData={selectedHoroscope.navamsa_chart}
+                            chartHtml={selectedHoroscope.navamsa_chart}
                             chartType="Navamsa"
                           />
                         </Box>

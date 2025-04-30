@@ -217,7 +217,9 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
                       variant="outlined"
                       color="primary"
                       startIcon={<DescriptionIcon />}
-                      onClick={() => handleOpenModal(consultationData.user_horoscope)}
+                      onClick={() =>
+                        handleOpenModal(consultationData.user_horoscope)
+                      }
                       sx={{ textTransform: "none", fontWeight: 500 }}
                     >
                       View Horoscope
@@ -251,21 +253,20 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: { xs: "95%", sm: 650, md: 850 },
-            maxHeight: "95vh", // This limits the maximum height
+            maxHeight: "95vh",
             bgcolor: "transparent",
             borderRadius: 4,
-            overflow: "hidden", // This was preventing scrolling
             boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
             border: "none",
-            display: "flex", // Added
-            flexDirection: "column", // Added
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           {/* Inner container that will scroll */}
           <Box
             sx={{
-              overflowY: "auto", // This enables scrolling
-              maxHeight: "calc(95vh - 64px)", // Account for header/footer
+              overflowY: "auto",
+              maxHeight: "calc(95vh - 64px)",
               width: "100%",
             }}
           >
@@ -273,9 +274,8 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
             <Box
               sx={{
                 position: "relative",
-                height: "100%",
                 width: "100%",
-                overflowY: "auto",
+                minHeight: "700px", // Ensure enough space for charts
                 "&::before": {
                   content: '""',
                   position: "absolute",
@@ -390,9 +390,9 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
                         background:
                           "linear-gradient(145deg, rgba(255,255,255,0.8) 0%, rgba(240,247,250,0.8) 100%)",
                         boxShadow: `
-                      0 4px 6px rgba(0,0,0,0.05),
-                      inset 0 0 0 1px rgba(16, 177, 0, 0.2)
-                    `,
+                    0 4px 6px rgba(0,0,0,0.05),
+                    inset 0 0 0 1px rgba(16, 177, 0, 0.2)
+                  `,
                         position: "relative",
                         overflow: "hidden",
                         "&::before": {
@@ -633,11 +633,14 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
                             background: "rgba(255,255,255,0.7)",
                             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                             border: "1px solid rgba(16, 177, 0, 0.15)",
-                            height: "100%",
+                            minHeight: "350px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                           }}
                         >
                           <AstroChart
-                            chartData={selectedHoroscope.rasi_chart}
+                            chartHtml={selectedHoroscope.rasi_chart}
                             chartType="Rasi"
                           />
                         </Box>
@@ -652,11 +655,14 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
                             background: "rgba(255,255,255,0.7)",
                             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                             border: "1px solid rgba(16, 177, 0, 0.15)",
-                            height: "100%",
+                            minHeight: "350px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                           }}
                         >
                           <AstroChart
-                            chartData={selectedHoroscope.navamsa_chart}
+                            chartHtml={selectedHoroscope.navamsa_chart}
                             chartType="Navamsa"
                           />
                         </Box>

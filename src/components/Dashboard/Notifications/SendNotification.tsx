@@ -339,7 +339,7 @@ const SendNotification = () => {
             <SectionHeader onClick={() => toggleSection("nakshatra")}>
               <Star sx={{ mr: 2, color: "#10B100", fontSize: isMobile ? "1.25rem" : "1.5rem" }} />
               <Typography variant={subtitleVariant} sx={{ flexGrow: 1, fontWeight: 600 }}>
-                Nakshatra-Based Targeting
+                Nakshatra-Based Users
               </Typography>
               {expandedSection === "nakshatra" ? <ExpandLess /> : <ExpandMore />}
             </SectionHeader>
@@ -449,7 +449,7 @@ const SendNotification = () => {
             <SectionHeader onClick={() => toggleSection("rashi")}>
               <Schema sx={{ mr: 2, color: "#10B100", fontSize: isMobile ? "1.25rem" : "1.5rem" }} />
               <Typography variant={subtitleVariant} sx={{ flexGrow: 1, fontWeight: 600 }}>
-                Rashi-Based Targeting
+                Rashi-Based Users
               </Typography>
               {expandedSection === "rashi" ? <ExpandLess /> : <ExpandMore />}
             </SectionHeader>
