@@ -1,119 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import GenericTable from "../../Elements/Table";
-// import { TableColumn } from "../../Elements/Table";
-// import { callAPI } from "../../../api/crudFactory";
-// import { Chip, Link } from "@mui/material";
-// import { format } from "date-fns";
-// import { useNavigate } from "react-router-dom";
-
-// interface ConsultationData {
-//   id: number;
-//   astrologer_name: string;
-//   category: string;
-//   // booking_date: string;
-//   start_time: string;
-//   // consultation_fee: number;
-//   status: string;
-// }
-
-// // "id": 2,
-// // "astrologer_name": "First name",
-// // "category": null,
-// // "customer_name": "Astrolger" -->
-// // "start_time": "2025-05-15T09:00:00", -->
-// // "status": "new",
-
-// // astrologer_name
-// // category
-// // consultation_fee
-// // booking_date
-// // status
-
-// const Consultations: React.FC = () => {
-//   const navigate = useNavigate();
-//   const [consultations, setConsultations] = useState<ConsultationData[]>([]);
-
-//   useEffect(() => {
-//     const fetchConsultations = async () => {
-//       try {
-//         const response = await callAPI({
-//           endpoint: "/api/admin/consultations",
-//           method: "get",
-//         });
-//         console.log(response?.data?.data);
-//         setConsultations(response.data?.data);
-//       } catch (error) {
-//         console.error("Failed to fetch consultations:", error);
-//       }
-//     };
-//     fetchConsultations();
-//   }, []);
-
-//   const columns: TableColumn<ConsultationData>[] = [
-//     // { id: "first_name", label: "User", width: "160px", filterable: true },
-//     {
-//       id: "astrologer_name",
-//       label: "Astrologer",
-//       width: "180px",
-//       filterable: true,
-//     },
-//     { id: "category", label: "Category", filterable: true, width: "140px" },
-//     // {
-//     //   id: "consultation_fee",
-//     //   label: "Consultation Fee",
-//     //   render: (value) => `₹${value}`,
-//     //   filterable: true,
-//     // },
-//     // {
-//     //   id: "booking_date",
-//     //   label: "Consultation Date",
-//     //   render: (value) => format(new Date(value), "MM/dd/yyyy"), 
-//     //   filterable: true,
-//     // },
-//     {
-//       id: "status",
-//       label: "Status",
-//       render: (value) => (
-//         <Chip
-//           label={value}
-//           color={
-//             value === "Completed"
-//               ? "success"
-//               : value === "Pending"
-//               ? "warning"
-//               : "default"
-//           }
-//         />
-//       ),
-//       filterable: true,
-//     },
-//   ];
-
-//   const handleView = (row: ConsultationData) => {
-//     navigate(`/dashboard/consultations/view/${row?.id}`);
-//   };
-
-//   const handleSelectionChange = (selectedIds: number[]) => {
-//     // Optional: Handle row selection
-//   };
-
-//   return (
-//     <GenericTable<ConsultationData>
-//       title="Consultations"
-//       data={consultations}
-//       columns={columns}
-//       onView={handleView}
-//       onSelectionChange={handleSelectionChange}
-//       getRowId={(row) => row.id}
-//       tableHeight="calc(100vh - 250px)"
-//       initialRowsPerPage={10}
-//       showActions={true}
-//     />
-//   );
-// };
-
-// export default Consultations;
-
 import React, { useEffect, useState, useMemo } from "react";
 import GenericTable, { TableColumn } from "../../Elements/Table";
 import { Chip, Alert } from "@mui/material";
@@ -127,7 +11,7 @@ interface ConsultationData {
   start_time: string;
   status: string;
   customer_name: string;
-  consultation_fee: string;
+  consultation_fee: string | number | null;
 }
 
 interface FilterOptions {
@@ -136,6 +20,7 @@ interface FilterOptions {
   status: string[];
   customer_name: string[];
   consultation_fee: string[];
+  start_time: string[];
 }
 
 const Consultations: React.FC = () => {
@@ -150,7 +35,8 @@ const Consultations: React.FC = () => {
     category: [],
     status: [],
     customer_name: [],
-    consultation_fee: []
+    consultation_fee: [],
+    start_time: [],
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -216,10 +102,7 @@ const Consultations: React.FC = () => {
           params: { per_page: perPage, page: currentPage },
         });
 
-        // console.log(`fetchFilterOptions response (page ${currentPage}):`, response); // Debug log
-
-        const consultData:any = response?.data?.data || [];
-        console.log(consultData, "consultData")
+        const consultData = response?.data?.data || [];
         total = response?.data?.total || 0;
 
         if (!Array.isArray(consultData)) {
@@ -228,18 +111,35 @@ const Consultations: React.FC = () => {
 
         allConsultations = [...allConsultations, ...consultData];
         currentPage++;
-      } while (allConsultations.length < total && consultData?.length > 0);
+      } while (allConsultations.length < total);
 
-      // Extract unique values for each filterable field
+      // Extract unique values for each filterable field, excluding null and empty values
       const options: FilterOptions = {
         astrologer_name: [
-          ...new Set(allConsultations.map((consult) => consult.astrologer_name).filter(Boolean)),
+          ...new Set(allConsultations.map((consult) => consult.astrologer_name).filter((val): val is string => val !== null && val !== "")),
         ].sort(),
         category: [
-          ...new Set(allConsultations.map((consult) => consult.category).filter(Boolean)),
+          ...new Set(allConsultations.map((consult) => consult.category).filter((val): val is string => val !== null && val !== "")),
         ].sort(),
         status: [
-          ...new Set(allConsultations.map((consult) => consult.status).filter(Boolean)),
+          ...new Set(allConsultations.map((consult) => consult.status).filter((val): val is string => val !== null && val !== "")),
+        ].sort(),
+        customer_name: [
+          ...new Set(allConsultations.map((consult) => consult.customer_name).filter((val): val is string => val !== null && val !== "")),
+        ].sort(),
+        consultation_fee: [
+          ...new Set(
+            allConsultations
+              .map((consult) => (consult.consultation_fee !== null ? consult.consultation_fee.toString() : null))
+              .filter((val): val is string => val !== null && val !== "")
+          ),
+        ].sort(),
+        start_time: [
+          ...new Set(
+            allConsultations
+              .map((consult) => new Date(consult.start_time).toISOString().split("T")[0])
+              .filter((val): val is string => val !== null && val !== "")
+          ),
         ].sort(),
       };
 
@@ -260,7 +160,6 @@ const Consultations: React.FC = () => {
     fetchFilterOptions();
   }, []);
 
-  // Use useMemo to ensure columns update with filterOptions
   const columns: TableColumn<ConsultationData>[] = useMemo(
     () => [
       {
@@ -268,7 +167,7 @@ const Consultations: React.FC = () => {
         label: "User",
         width: "180px",
         filterable: true,
-        filterOptions: filterOptions.astrologer_name,
+        filterOptions: filterOptions.customer_name,
       },
       {
         id: "astrologer_name",
@@ -289,17 +188,27 @@ const Consultations: React.FC = () => {
         id: "consultation_fee",
         label: "Consultation Fee",
         filterable: true,
-        filterOptions: filterOptions.category,
+        filterOptions: filterOptions.consultation_fee,
         width: "140px",
-        render: (value) => value || "N/A",
+        render: (value) => (value !== null ? value.toString() : "N/A"),
       },
       {
-        id: "start_date",
+        id: "start_time",
         label: "Consultation Date",
         filterable: true,
-        filterOptions: filterOptions.category,
+        filterType: "date",
+        filterOptions: filterOptions.start_time,
         width: "140px",
-        render: (value) => value || "N/A",
+        render: (value) =>
+          value
+            ? new Date(value).toLocaleString("en-US", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "N/A",
       },
       {
         id: "status",
@@ -314,7 +223,7 @@ const Consultations: React.FC = () => {
                 ? "success"
                 : value === "Pending"
                 ? "warning"
-                : value === "New"
+                : value === "new"
                 ? "info"
                 : "default"
             }
