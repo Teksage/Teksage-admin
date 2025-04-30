@@ -20,7 +20,7 @@ import { tokenService } from "../../utils/tokenService"; // Import tokenService
 import OfflineNotification from "../Elements/OfflineNotification";
 
 // Styled components (same as before)
-const LoginWrapper = styled(Box)(({ theme }) => ({
+const LoginWrapper = styled(Box)(() => ({
   minHeight: "100vh",
   display: "flex",
   alignItems: "center",
@@ -158,6 +158,7 @@ export const Login: React.FC = () => {
     event: React.MouseEvent<HTMLElement>,
     newMethod: "email" | "mobile"
   ) => {
+    console.log(event)
     if (newMethod !== null) {
       setFormState({
         ...formState,

@@ -2,7 +2,7 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import DashboardLayout from "./layouts/dashboard";
 import Login from "./components/Auth/Login";
-import Register from "./components/Auth/Register";
+// import Register from "./components/Auth/Register";
 import Users from "./components/Dashboard/Users/Users";
 import NewUser from "./components/Dashboard/Users/NewUser";
 import UserView from "./components/Dashboard/Users/ViewUser";

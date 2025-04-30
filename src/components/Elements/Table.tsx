@@ -935,7 +935,6 @@ import {
   FilterList as FilterIcon,
   Delete as DeleteIcon,
   DateRange as DateRangeIcon,
-  AttachMoney as FeeIcon,
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
   Download as DownloadIcon,
@@ -1253,13 +1252,13 @@ function GenericTable<T>({
   const [showFilters, setShowFilters] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [mobileRowDetail, setMobileRowDetail] = useState<T | null>(null);
-  const [dateRange, setDateRange] = useState<{
-    start: Date | null;
-    end: Date | null;
-  }>({
-    start: null,
-    end: null,
-  });
+  // const [dateRange, setDateRange] = useState<{
+  //   start: Date | null;
+  //   end: Date | null;
+  // }>({
+  //   start: null,
+  //   end: null,
+  // });
   const [tempDateRange, setTempDateRange] = useState<{
     start: Date | null;
     end: Date | null;
@@ -1267,20 +1266,20 @@ function GenericTable<T>({
     start: null,
     end: null,
   });
-  const [feeRange, setFeeRange] = useState<{
-    min: number | null;
-    max: number | null;
-  }>({
-    min: null,
-    max: null,
-  });
+  // const [feeRange, setFeeRange] = useState<{
+  //   min: number | null;
+  //   max: number | null;
+  // }>({
+  //   min: null,
+  //   max: null,
+  // });
   const [dateFilterOpen, setDateFilterOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string>("Custom");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
-  const [isFocused, setIsFocused] = useState(false); // Moved to top level
+  // const [isFocused, setIsFocused] = useState(false); // Moved to top level
 
   // Define getFilterValues first
   const getFilterValues = (column: TableColumn<T>) => {
@@ -1318,7 +1317,7 @@ function GenericTable<T>({
 
   const hasFeeData = useMemo(() => {
     const feeValues = data
-      .map((item) => {
+      .map((item:any) => {
         const value =
           (item as any)["consultation_fee"] ||
           (item as any)["fee"] ||
@@ -1339,7 +1338,7 @@ function GenericTable<T>({
   };
 
   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
-    setDateRange({ start, end });
+    // setDateRange({ start, end });
     const newFilters = {
       ...filters,
       booking_date:
@@ -1409,32 +1408,32 @@ function GenericTable<T>({
     setSelectedPreset(preset);
   };
 
-  const handleFeeRangeChange = (min: number | null, max: number | null) => {
-    setFeeRange({ min, max });
-    const newFilters = {
-      ...filters,
-      consultation_fee:
-        min !== null || max !== null ? `${min || ""}-${max || ""}` : "",
-    };
-    setFilters(newFilters);
-    onFilterChange?.(newFilters);
-  };
+  // const handleFeeRangeChange = (min: number | null, max: number | null) => {
+  //   setFeeRange({ min, max });
+  //   const newFilters = {
+  //     ...filters,
+  //     consultation_fee:
+  //       min !== null || max !== null ? `${min || ""}-${max || ""}` : "",
+  //   };
+  //   setFilters(newFilters);
+  //   onFilterChange?.(newFilters);
+  // };
 
-  const clearFeeFilter = () => {
-    setFeeRange({ min: null, max: null });
-    const newFilters = {
-      ...filters,
-      consultation_fee: "",
-    };
-    setFilters(newFilters);
-    onFilterChange?.(newFilters);
-  };
+  // const clearFeeFilter = () => {
+  //   setFeeRange({ min: null, max: null });
+  //   const newFilters = {
+  //     ...filters,
+  //     consultation_fee: "",
+  //   };
+  //   setFilters(newFilters);
+  //   onFilterChange?.(newFilters);
+  // };
 
   const clearAllFilters = () => {
     setFilters({});
-    setDateRange({ start: null, end: null });
+    // setDateRange({ start: null, end: null });
     setTempDateRange({ start: null, end: null });
-    setFeeRange({ min: null, max: null });
+    // setFeeRange({ min: null, max: null });
     setSelectedPreset("Custom");
     onFilterChange?.({});
   };
@@ -1751,7 +1750,7 @@ function GenericTable<T>({
                 return (
                   <React.Fragment key={id}>
                     <ListItem
-                      button
+                      component="button"
                       onClick={() => setMobileRowDetail(row)}
                       sx={{ pl: 2, py: 1.5 }}
                     >

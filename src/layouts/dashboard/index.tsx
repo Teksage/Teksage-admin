@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Menu,
@@ -13,27 +13,21 @@ import {
   useMediaQuery,
   useTheme,
   Avatar,
+  Theme
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import Logout from "@mui/icons-material/Logout";
 import Profile from "@mui/icons-material/Person";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import LayersIcon from "@mui/icons-material/Layers";
-import PeopleIcon from "@mui/icons-material/People";
-import StarsIcon from "@mui/icons-material/Stars";
-import HelpIcon from "@mui/icons-material/Help";
 import Navbar from "../../components/Dashboard/Navbar";
 import { tokenService } from "../../utils/tokenService";
 import { callAPI } from "../../api/crudFactory";
 
-const menuItems = [
-  { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
-  { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
-  { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
-  { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
-  { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
-];
+// Define the props interface for MainContent
+interface MainContentProps {
+  sidebarOpen: boolean;
+  isMobile: boolean;
+  theme?: Theme; // Optional theme prop (already handled by MUI)
+}
 
 const GradientAppBar = styled(AppBar)(({ theme }) => ({
   background:
@@ -70,7 +64,10 @@ const ProfileButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const MainContent = styled(Box)(({ theme, sidebarOpen, isMobile }) => ({
+const MainContent = styled(Box, {
+  shouldForwardProp: (prop) =>
+    prop !== "sidebarOpen" && prop !== "isMobile",
+})<MainContentProps>(({ theme, sidebarOpen, isMobile }) => ({
   flexGrow: 1,
   overflow: "hidden",
   backgroundColor: theme.palette.background.default,
@@ -88,7 +85,7 @@ const MainContent = styled(Box)(({ theme, sidebarOpen, isMobile }) => ({
     : `calc(100% - 72px)`,
 }));
 
-const LayoutContainer = styled(Box)(({ theme }) => ({
+const LayoutContainer = styled(Box)(() => ({
   display: "flex",
   minHeight: "100vh",
   backgroundColor: "#f5f5f7",
@@ -100,42 +97,21 @@ const DashboardLayout = () => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [pageTitle, setPageTitle] = useState("Dashboard");
   const open = Boolean(anchorEl);
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
-  // const isAuthenticated = useSelector((state) => state.isAuthenticated);
-  const loginUserDetails = useSelector((state) => state.userInfo);
+  const loginUserDetails = useSelector((state:any) => state.userInfo);
 
   useEffect(() => {
-    // Determine the page title based on current location
-    const currentMenu = menuItems.find((item) =>
-      location.pathname.includes(item.path)
-    );
-
-    if (location.pathname.includes("/dashboard/plans/coupons")) {
-      setPageTitle("Coupons");
-    } else if (location.pathname.includes("/dashboard/profile")) {
-      setPageTitle("Profile");
-    } else if (currentMenu) {
-      setPageTitle(currentMenu.name);
-    } else {
-      setPageTitle("Dashboard");
-    }
-
     // Close sidebar on mobile when location changes
     if (isMobile) {
       setSidebarOpen(false);
     }
   }, [location, isMobile]);
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/auth/login" replace />;
-  // }
-
-  const handleMenu = (event) => {
+  const handleMenu = (event:any) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -148,11 +124,6 @@ const DashboardLayout = () => {
     setAnchorEl(null);
   };
 
-  // const logoutSection = () => {
-  //   dispatch({ type: "setAuth", payload: false });
-  //   dispatch({ type: "login", payload: {} });
-  //   navigate("/auth/login");
-  // };
   const logoutSection = async () => {
     try {
       const refreshToken = tokenService.getRefreshToken();
@@ -176,7 +147,7 @@ const DashboardLayout = () => {
     }
   };  
 
-  const getInitials = (name) => {
+  const getInitials = (name:any) => {
     if (!name) return "U";
     return name
       .split(" ")
@@ -186,7 +157,6 @@ const DashboardLayout = () => {
       .substring(0, 2);
   };
 
-  // Create a scrollable content area
   const ScrollableContent = styled(Box)({
     flexGrow: 1,
     overflow: "auto", // This area will scroll
