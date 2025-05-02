@@ -11,6 +11,7 @@ import {
   Typography,
   Paper,
   IconButton,
+  SelectChangeEvent,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -50,7 +51,9 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           console.log(data, "data");
           setFormData({
             name: data?.name,
-            pushNotificationTrigger: data?.push_notification_status ? "Yes" : "No",
+            pushNotificationTrigger: data?.push_notification_status
+              ? "Yes"
+              : "No",
             status:
               data?.status.charAt(0).toUpperCase() +
               data?.status.slice(1).toLowerCase(),
@@ -64,12 +67,23 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     fetchInitialData();
   }, [mode, userId]);
 
-  const handleChange =
+  // For TextField
+  const handleTextChange =
     (field: keyof ServiceFormData) =>
-    (event: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => {
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setFormData((prev) => ({
         ...prev,
-        [field]: event.target.value as string,
+        [field]: event.target.value,
+      }));
+    };
+
+  // For Select
+  const handleSelectChange =
+    (field: keyof ServiceFormData) =>
+    (event: SelectChangeEvent<string>, _: React.ReactNode) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: event.target.value,
       }));
     };
 
@@ -85,7 +99,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async(event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
     try {
@@ -97,8 +111,9 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         method: mode === "edit" ? "put" : "post",
         data: {
           name: formData.name,
-          push_notification_status: formData.pushNotificationTrigger==="Yes" ? true : false,
-          status: formData?.status==="Active" ? "active" : "inactive" 
+          push_notification_status:
+            formData.pushNotificationTrigger === "Yes" ? true : false,
+          status: formData?.status === "Active" ? "active" : "inactive",
         },
       });
       navigate(-1);
@@ -152,7 +167,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 variant="outlined"
                 size="small"
                 value={formData.name}
-                onChange={handleChange("name")}
+                onChange={handleTextChange("name")}
                 disabled={isViewMode || mode === "edit"}
                 // required
                 error={Boolean(errors.name)}
@@ -166,7 +181,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 <Select
                   value={formData.pushNotificationTrigger}
                   label="Push Notification"
-                  onChange={handleChange("pushNotificationTrigger")}
+                  onChange={handleSelectChange("pushNotificationTrigger")}
                   disabled={isViewMode}
                   // required
                 >
@@ -192,7 +207,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 fullWidth
                 size="small"
                 value={formData.status}
-                onChange={handleChange("status")}
+                onChange={handleTextChange("status")}
                 disabled={isViewMode}
               >
                 <MenuItem value="Active">Active</MenuItem>
