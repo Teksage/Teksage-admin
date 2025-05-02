@@ -79,13 +79,13 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   // For Select
   const handleSelectChange =
-    (field: keyof ServiceFormData) =>
-    (event: SelectChangeEvent<string>, _: React.ReactNode) => {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
-    };
+  (field: keyof ServiceFormData) =>
+  (event: SelectChangeEvent<string>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof ServiceFormData, string>> = {};

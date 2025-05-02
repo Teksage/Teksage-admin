@@ -379,6 +379,7 @@ import {
   OutlinedInput,
   Checkbox,
   ListItemText,
+  SelectChangeEvent
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -409,7 +410,9 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     duration_unit: "months",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof SubscriptionFormData, string>>
+  >({});
   const [services, setServices] = useState([]);
 
   useEffect(() => {
@@ -447,9 +450,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     fetchInitialData();
   }, [mode, userId]);
 
-  const handleChange =
+  // For TextField
+  const handleTextChange =
     (field: keyof SubscriptionFormData) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const value = event.target.value;
       setFormData((prev) => ({
         ...prev,
@@ -461,6 +465,20 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         [field]: "",
       }));
     };
+
+  // For Select
+  const handleSelectChange =
+  (field: keyof SubscriptionFormData) =>
+  (event: SelectChangeEvent<string[]>, _: React.ReactNode) => {
+    const {
+      target: { value },
+    } = event;
+
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -564,7 +582,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 fullWidth
                 size="small"
                 value={formData.plan_name}
-                onChange={handleChange("plan_name")}
+                onChange={handleTextChange("plan_name")}
                 disabled={isViewMode}
                 error={!!errors.plan_name}
                 helperText={errors.plan_name || ""}
@@ -596,7 +614,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 fullWidth
                 size="small"
                 value={formData.plan_price}
-                onChange={handleChange("plan_price")}
+                onChange={handleTextChange("plan_price")}
                 disabled={isViewMode}
                 error={!!errors.plan_price}
                 helperText={errors.plan_price || ""}
@@ -637,15 +655,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 >
                   Services
                 </InputLabel>
-                <Select
+                <Select<string[]>
                   multiple
                   value={formData.services}
-                  onChange={handleChange("services")}
+                  onChange={handleSelectChange("services")}
                   input={<OutlinedInput label="Services" />}
                   renderValue={(selected) =>
                     services
-                      .filter((item) => selected.includes(item.id))
-                      .map((item) => item.name)
+                      .filter((item:any) => selected.includes(item.id))
+                      .map((item:any) => item.name)
                       .join(", ")
                   }
                   sx={{
@@ -707,7 +725,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 </InputLabel>
                 <Select
                   value={formData.service_type}
-                  onChange={handleChange("service_type")}
+                  onChange={handleSelectChange("service_type")}
                   label="Service Type"
                   sx={{
                     fontSize: "0.9rem",
@@ -741,7 +759,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fullWidth
                     size="small"
                     value={formData.duration_value}
-                    onChange={handleChange("duration_value")}
+                    onChange={handleTextChange("duration_value")}
                     disabled={isViewMode}
                     error={!!errors.duration_value}
                     helperText={errors.duration_value || ""}
@@ -783,7 +801,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     </InputLabel>
                     <Select
                       value={formData.duration_unit}
-                      onChange={handleChange("duration_unit")}
+                      onChange={handleSelectChange("duration_unit")}
                       label="Duration Unit"
                       sx={{
                         fontSize: "0.9rem",
@@ -826,11 +844,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl
-                fullWidth
-                disabled={isViewMode}
-                size="small"
-              >
+              <FormControl fullWidth disabled={isViewMode} size="small">
                 <InputLabel
                   sx={{
                     fontSize: "0.95rem",
@@ -842,7 +856,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 </InputLabel>
                 <Select
                   value={formData.status}
-                  onChange={handleChange("status")}
+                  onChange={handleSelectChange("status")}
                   label="Status"
                   sx={{
                     fontSize: "0.9rem",

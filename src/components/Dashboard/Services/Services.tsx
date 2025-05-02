@@ -68,7 +68,7 @@ const Services: React.FC = () => {
     {
       id: "push_notification_status",
       label: "Push Notification",
-      render: (value, row) => (
+      render: (value) => (
         <Switch
           checked={value}
           // disabled
