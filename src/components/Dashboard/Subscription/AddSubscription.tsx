@@ -469,7 +469,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   // For Select
   const handleSelectChange =
   (field: keyof SubscriptionFormData) =>
-  (event: SelectChangeEvent<string[]>, _: React.ReactNode) => {
+  (event: SelectChangeEvent<string>) => {
     const {
       target: { value },
     } = event;

@@ -13,10 +13,13 @@ import {
   InputLabel,
   Paper,
   styled,
-  alpha
+  alpha,
+  SelectChangeEvent,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../../redux/store";
 
 interface ProfileData {
   name: string;
@@ -41,6 +44,19 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
+  // // Fetch data from the Redux store using useSelector
+  // const userInfo = useSelector((state: RootState) => state.userInfo);
+  // const isAuthenticated = useSelector((state: RootState) => state.isAuthenticated);
+  // const users = useSelector((state: RootState) => state.users);
+  // const notification = useSelector((state: RootState) => state.notification);
+  // const isLoading = useSelector((state: RootState) => state.isLoading);
+
+  // // Log the fetched data for debugging
+  // console.log("Fetched userInfo from Redux:", userInfo);
+  // console.log("Fetched isAuthenticated from Redux:", isAuthenticated);
+  // console.log("Fetched users from Redux:", users);
+  // console.log("Fetched notification from Redux:", notification);
+  // console.log("Fetched isLoading from Redux:", isLoading);
 
   // Sample data
   const [profileData, setProfileData] = React.useState<ProfileData>({
@@ -51,9 +67,19 @@ const Profile: React.FC = () => {
     status: "active",
   });
 
-  const handleChange =
+  // For TextField
+  const handleTextChange =
     (field: keyof ProfileData) =>
-    (event: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => {
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setProfileData({
+        ...profileData,
+        [field]: event.target.value,
+      });
+    };
+
+  // For Select
+  const handleSelectChange =
+    (field: keyof ProfileData) => (event: SelectChangeEvent<string>) => {
       setProfileData({
         ...profileData,
         [field]: event.target.value,
@@ -183,7 +209,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Full Name"
                   value={profileData.name}
-                  onChange={handleChange("name")}
+                  onChange={handleTextChange("name")}
                   variant="outlined"
                 />
               </Grid>
@@ -192,7 +218,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Email Address"
                   value={profileData.email}
-                  onChange={handleChange("email")}
+                  onChange={handleTextChange("email")}
                   variant="outlined"
                   type="email"
                 />
@@ -202,7 +228,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Mobile Number"
                   value={profileData.mobile}
-                  onChange={handleChange("mobile")}
+                  onChange={handleTextChange("mobile")}
                   variant="outlined"
                 />
               </Grid>
@@ -211,7 +237,7 @@ const Profile: React.FC = () => {
                   <InputLabel>Status</InputLabel>
                   <Select
                     value={profileData.status}
-                    onChange={handleChange("status")}
+                    onChange={handleSelectChange("status")}
                     label="Status"
                   >
                     <MenuItem value="active">Active</MenuItem>
@@ -224,7 +250,7 @@ const Profile: React.FC = () => {
                   fullWidth
                   label="Address"
                   value={profileData.address}
-                  onChange={handleChange("address")}
+                  onChange={handleTextChange("address")}
                   variant="outlined"
                   multiline
                   rows={3}

@@ -126,15 +126,16 @@
 //             method: "get",
 //           });
 //           const data = response.data;
+//           console.log(data, "data")
 //           setFormData({
-//             first_name: data.first_name || "",
-//             last_name: data.last_name || "",
-//             email: data.email || "",
-//             mobile_number: data.mobile_number || "",
+//             first_name: data.user.first_name || "",
+//             last_name: data.user.last_name || "",
+//             email: data.user.email || "",
+//             mobile_number: data.user.mobile_number || "",
 //             status: data.status || "Active",
 //             astrologer_profile_info: data.astrologer_profile_info || "",
 //             experience: data.experience || "",
-//             consulting_fee: data.consulting_fee || "",
+//             consulting_fee: data.consulting_fee.toString() || "",
 //             picture: data.picture || null,
 //             languages: data.languages || [],
 //             expertises: data.expertises || [],
@@ -172,7 +173,7 @@
 //         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 //       >
 //     ) => {
-//       let value: any = e.target.value;
+//       const value: any = e.target.value;
 
 //       if (field === "consulting_fee") {
 //         const rawValue = value.replace(/[^0-9]/g, "");
@@ -245,20 +246,44 @@
 //   const validate = (): boolean => {
 //     const newErrors: Record<string, string> = {};
 //     const requiredFields: (keyof AstroFormData)[] = [
+//       "first_name",
+//       "last_name",
+//       "email",
+//       "mobile_number",
 //       "experience",
 //       "consulting_fee",
+//       "status",
 //     ];
+
+//     // Validate required fields
 //     requiredFields.forEach((field) => {
-//       if (!formData[field]) newErrors[field] = "This field is required";
+//       if (!formData[field]) {
+//         newErrors[field] = "This field is required";
+//       }
 //     });
 
-//     if (!formData.languages.length)
+//     // Validate email format
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (formData.email && !emailRegex.test(formData.email)) {
+//       newErrors.email = "Please enter a valid email address";
+//     }
+
+//     // Validate mobile number format (basic validation: 10 digits)
+//     const mobileRegex = /^\d{10}$/;
+//     if (formData.mobile_number && !mobileRegex.test(formData.mobile_number)) {
+//       newErrors.mobile_number = "Please enter a valid 10-digit mobile number";
+//     }
+
+//     // Validate languages and expertises
+//     if (!formData.languages.length) {
 //       newErrors.languages = "At least one language is required";
+//     }
 
 //     if (!formData.expertises.length) {
 //       newErrors.expertises = "At least one expertise is required";
 //     }
 
+//     // Validate user_id in "new" mode
 //     if (mode === "new" && !formData.user_id) {
 //       newErrors.user_id = "Please select an astrologer user";
 //     }
@@ -275,27 +300,27 @@
 //     try {
 //       const payload = new FormData();
 
-//       Object.keys(formData).forEach((key) => {
-//         const val = formData[key as keyof AstroFormData];
+//       // Append string/number fields
+//       payload.append("first_name", formData.first_name);
+//       payload.append("last_name", formData.last_name);
+//       payload.append("email", formData.email);
+//       payload.append("mobile_number", formData.mobile_number);
+//       payload.append("status", formData.status);
+//       if (formData.user_id !== null) {
+//         payload.append("user_id", formData.user_id.toString());
+//       }
+//       payload.append("astrologer_profile_info", formData.astrologer_profile_info);
+//       payload.append("experience", formData.experience);
+//       payload.append("consulting_fee", removeCommas(formData.consulting_fee));
 
-//         if (key === "consulting_fee") {
-//           payload.append(key, removeCommas(formData.consulting_fee));
-//         } else if (key === "picture" && val instanceof File) {
-//           payload.append(key, val);
-//         } else if (Array.isArray(val)) {
-//           val.forEach((v) => payload.append(`${key}[]`, v));
-//         } else if (val !== null && val !== undefined && key !== "picture") {
-//           payload.append(key, val.toString());
-//         }
-//       });
+//       // Append array fields (languages and expertises)
+//       formData.languages.forEach((lang) => payload.append("languages[]", lang));
+//       formData.expertises.forEach((exp) => payload.append("expertises[]", exp));
 
-//       console.log(
-//         {
-//           ...formData,
-//           consulting_fee: removeCommas(formData.consulting_fee),
-//         },
-//         "formData"
-//       );
+//       // Append file field (picture)
+//       if (formData.picture instanceof File) {
+//         payload.append("picture", formData.picture);
+//       }
 
 //       await callAPI({
 //         endpoint:
@@ -303,9 +328,9 @@
 //             ? `api/admin/astrologers/${userId}`
 //             : "api/admin/astrologers",
 //         method: mode === "edit" ? "put" : "post",
-//         data: {
-//           ...formData,
-//           consulting_fee: removeCommas(formData.consulting_fee),
+//         data: payload, // Send FormData directly
+//         headers: {
+//           "Content-Type": "multipart/form-data",
 //         },
 //       });
 
@@ -319,11 +344,15 @@
 //       });
 
 //       navigate(-1);
-//     } catch (err) {
-//       console.error(err);
+//     } catch (err: any) {
+//       console.error("API Error:", err);
+//       let errorMessage = "Something went wrong. Please try again.";
+//       if (err.response && err.response.data) {
+//         errorMessage = err.response.data.message || JSON.stringify(err.response.data);
+//       }
 //       setSnackbar({
 //         open: true,
-//         message: "Something went wrong. Please try again.",
+//         message: errorMessage,
 //         severity: "error",
 //       });
 //     }
@@ -451,7 +480,6 @@
 //             </Grid>
 
 //             {/* Astrologer User Dropdown */}
-//             {/* {mode === "new" && ( */}
 //             <Grid item xs={12} sm={6}>
 //               <FormControl fullWidth size="small" error={!!errors.user_id}>
 //                 <InputLabel
@@ -502,7 +530,6 @@
 //                 )}
 //               </FormControl>
 //             </Grid>
-//             {/* )} */}
 
 //             {/* Personal info fields - Compact and aligned */}
 //             {["first_name", "last_name", "email", "mobile_number"].map(
@@ -754,6 +781,11 @@
 //                   <MenuItem value="Active">Active</MenuItem>
 //                   <MenuItem value="Inactive">Inactive</MenuItem>
 //                 </Select>
+//                 {errors.status && (
+//                   <FormHelperText sx={{ fontSize: "0.75rem" }}>
+//                     {errors.status}
+//                   </FormHelperText>
+//                 )}
 //               </FormControl>
 //             </Grid>
 
@@ -822,6 +854,7 @@ import {
   Checkbox,
   ListItemText,
   FormHelperText,
+  SelectChangeEvent,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
@@ -852,7 +885,7 @@ interface AstroFormData {
   picture: File | string | null;
   languages: string[];
   expertises: string[];
-  user_id: number | null; // Added for dropdown selection
+  user_id: number | null;
 }
 
 interface DropdownAstrologer {
@@ -884,11 +917,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     picture: null,
     languages: [],
     expertises: [],
-    user_id: null, // Initialize with null
+    user_id: null,
   });
 
   const [inputLang, setInputLang] = useState<string>("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof AstroFormData, string>>>({});
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -898,7 +931,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     message: "",
     severity: "success",
   });
-  const [astrologers, setAstrologers] = useState<DropdownAstrologer[]>([]); // State for dropdown data
+  const [astrologers, setAstrologers] = useState<DropdownAstrologer[]>([]);
 
   // Fetch dropdown astrologers on mount
   useEffect(() => {
@@ -931,7 +964,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             method: "get",
           });
           const data = response.data;
-          console.log(data, "data")
+          console.log(data, "data");
           setFormData({
             first_name: data.user.first_name || "",
             last_name: data.user.last_name || "",
@@ -971,85 +1004,86 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     return value.replace(/,/g, "");
   };
 
-  const handleChange =
-    (field: keyof AstroFormData) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      let value: any = e.target.value;
+  const handleChange = (field: keyof AstroFormData) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string | string[]>
+  ) => {
+    const value = e.target.value;
 
-      if (field === "consulting_fee") {
-        const rawValue = value.replace(/[^0-9]/g, "");
+    if (field === "consulting_fee") {
+      const rawValue = value.toString().replace(/[^0-9]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [field]: rawValue,
+      }));
+    } else if (field === "picture") {
+      const files = (e.target as HTMLInputElement).files;
+      if (files && files[0]) {
         setFormData((prev) => ({
           ...prev,
-          [field]: rawValue,
+          [field]: files[0],
         }));
-      } else if (field === "picture") {
-        const files = (e.target as HTMLInputElement).files;
-        if (files && files[0]) {
-          setFormData((prev) => ({
-            ...prev,
-            [field]: files[0],
-          }));
-        }
-      } else if (field === "user_id" && mode === "new") {
-        const selectedUserId = Number(value);
-        const selectedAstrologer = astrologers.find(
-          (astrologer) => astrologer.user_id === selectedUserId
-        );
-        if (selectedAstrologer) {
-          setFormData((prev) => ({
-            ...prev,
-            user_id: selectedUserId,
-            first_name: selectedAstrologer.first_name || "",
-            last_name: selectedAstrologer.last_name || "",
-            email: selectedAstrologer.email || "",
-            mobile_number: selectedAstrologer.mobile_number || "",
-          }));
-        }
-      } else {
+      }
+    } else if (field === "user_id" && mode === "new") {
+      const selectedUserId = Number(value);
+      const selectedAstrologer = astrologers.find(
+        (astrologer) => astrologer.user_id === selectedUserId
+      );
+      if (selectedAstrologer) {
         setFormData((prev) => ({
           ...prev,
-          [field]: value,
+          user_id: selectedUserId,
+          first_name: selectedAstrologer.first_name ?? "",
+          last_name: selectedAstrologer.last_name ?? "",
+          email: selectedAstrologer.email ?? "",
+          mobile_number: selectedAstrologer.mobile_number ?? "",
         }));
       }
+    } else if (field === "expertises") {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value as string[],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value as string,
+      }));
+    }
 
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    };
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
 
-  const handleTagAdd =
-    (field: keyof AstroFormData) =>
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const value = (e.target as HTMLInputElement).value.trim();
-        if (!value) return;
-
-        if (!formData[field].includes(value)) {
-          setFormData((prev) => ({
-            ...prev,
-            [field]: [...prev[field], value],
-          }));
-          setErrors((prev) => ({ ...prev, [field]: "" }));
-        }
-
-        setInputLang("");
+  const handleTagAdd = (field: "languages" | "expertises") => (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!e.target) return; // Add null check for e.target
+      const value = (e.target as HTMLInputElement).value.trim();
+      if (!value) return;
+  
+      if (!formData[field].includes(value)) {
+        setFormData((prev) => ({
+          ...prev,
+          [field]: [...prev[field], value],
+        }));
+        setErrors((prev) => ({ ...prev, [field]: "" }));
       }
-    };
+  
+      setInputLang("");
+    }
+  };
 
-  const handleTagDelete =
-    (type: "languages" | "expertises", index: number) => () => {
-      setFormData((prev) => {
-        const updated = [...prev[type]];
-        updated.splice(index, 1);
-        return { ...prev, [type]: updated };
-      });
-    };
+  const handleTagDelete = (type: "languages" | "expertises", index: number) => () => {
+    setFormData((prev) => {
+      const updated = [...(prev[type] as string[])];
+      updated.splice(index, 1);
+      return { ...prev, [type]: updated };
+    });
+  };
 
   const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Partial<Record<keyof AstroFormData, string>> = {};
     const requiredFields: (keyof AstroFormData)[] = [
       "first_name",
       "last_name",
@@ -1089,7 +1123,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     }
 
     // Validate user_id in "new" mode
-    if (mode === "new" && !formData.user_id) {
+    if (mode === "new" && formData.user_id === null) {
       newErrors.user_id = "Please select an astrologer user";
     }
 
@@ -1133,7 +1167,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             ? `api/admin/astrologers/${userId}`
             : "api/admin/astrologers",
         method: mode === "edit" ? "put" : "post",
-        data: payload, // Send FormData directly
+        data: payload,
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -1165,7 +1199,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      {/* Header with back button - compact and aligned */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
@@ -1187,7 +1220,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
           border: "1px solid #e0e0e0",
         }}
       >
-        {/* Form title - balanced size and styling */}
         <Typography
           variant="h5"
           fontWeight={600}
@@ -1201,7 +1233,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            {/* Profile Picture Section - Centered and refined */}
+            {/* Profile Picture Section */}
             <Grid item xs={12} sx={{ textAlign: "center", mb: 1 }}>
               <Typography
                 variant="subtitle1"
@@ -1297,12 +1329,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   Astrologer User
                 </InputLabel>
                 <Select
-                  value={formData.user_id || ""}
-                  onChange={(e) =>
-                    handleChange("user_id")({
-                      target: { value: e.target.value },
-                    } as any)
-                  }
+                  value={formData.user_id !== null ? formData.user_id.toString() : ""}
+                  onChange={handleChange("user_id")}
                   label="Astrologer User"
                   disabled={isViewMode || mode === "edit"}
                   sx={{
@@ -1322,7 +1350,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   {astrologers.map((astrologer) => (
                     <MenuItem
                       key={astrologer.user_id}
-                      value={astrologer.user_id}
+                      value={astrologer.user_id.toString()}
                     >
                       {`${astrologer.first_name} (${astrologer.email})`}
                     </MenuItem>
@@ -1336,8 +1364,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Personal info fields - Compact and aligned */}
-            {["first_name", "last_name", "email", "mobile_number"].map(
+            {/* Personal info fields */}
+            {(["first_name", "last_name", "email", "mobile_number"] as (keyof AstroFormData)[]).map(
               (key) => (
                 <Grid item xs={12} sm={6} key={key}>
                   <TextField
@@ -1393,8 +1421,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               </Typography>
             </Grid>
 
-            {/* Professional fields - Optimized spacing */}
-            {["astrologer_profile_info", "experience", "consulting_fee"].map(
+            {/* Professional fields */}
+            {(["astrologer_profile_info", "experience", "consulting_fee"] as (keyof AstroFormData)[]).map(
               (key) => (
                 <Grid
                   item
@@ -1594,7 +1622,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               </FormControl>
             </Grid>
 
-            {/* Submit Button - Centered and styled */}
+            {/* Submit Button */}
             {!isViewMode && (
               <Grid item xs={12} mt={2}>
                 <Box sx={{ display: "flex", justifyContent: "end" }}>
