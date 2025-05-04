@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -10,11 +10,16 @@ import {
   Avatar,
   Divider,
   InputAdornment,
-  Paper,
   Grid,
   Collapse,
   useTheme,
   useMediaQuery,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import {
   Send,
@@ -23,11 +28,20 @@ import {
   Star,
   Schema,
   Close,
-  CheckCircle,
   ExpandMore,
   ExpandLess,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+
+// Interfaces for TypeScript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+type Nakshatra = string;
+type Rashi = string;
 
 // Styled Components
 const CelestialCard = styled(Card)(({ theme }) => ({
@@ -58,15 +72,18 @@ const SectionHeader = styled(Box)(({ theme }) => ({
   },
 }));
 
-const SendNotification = () => {
+const SendNotification: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  
-  const [expandedSection, setExpandedSection] = useState(null);
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [selectedNakshatras, setSelectedNakshatras] = useState([]);
-  const [selectedRashis, setSelectedRashis] = useState([]);
+
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [selectedNakshatras, setSelectedNakshatras] = useState<Nakshatra[]>([]);
+  const [selectedRashis, setSelectedRashis] = useState<Rashi[]>([]);
+  const [showAllNakshatras, setShowAllNakshatras] = useState<boolean>(false);
+  const [userSearch, setUserSearch] = useState<string>("");
 
   // Responsive font sizes
   const titleVariant = isMobile ? "h5" : "h4";
@@ -76,35 +93,61 @@ const SendNotification = () => {
   const chipSize = isMobile ? "small" : "medium";
 
   // Sample data
-  const users = [
+  const users: User[] = [
     { id: 1, name: "Rahul", email: "rahul@example.com" },
     { id: 2, name: "Priya", email: "priya@example.com" },
     { id: 3, name: "Manasa", email: "manasa@example.com" },
   ];
 
-  const nakshatras = [
-    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira",
-    "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha"
+  const nakshatras: Nakshatra[] = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
+    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni",
+    "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishaka", "Anuradha",
+    "Jyeshta", "Moola", "Purva Ashadha", "Uttara Ashadha", "Shravana",
+    "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada",
+    "Revati",
   ];
 
-  const rashis = [
+  const initialNakshatras: Nakshatra[] = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
+    "Punarvasu", "Pushya", "Ashlesha", "Magha",
+  ];
+
+  const rashis: Rashi[] = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
   ];
 
-  const toggleSection = (section) => {
+  // Update selectedUsers whenever selectedUserIds changes
+  useEffect(() => {
+    const newSelectedUsers = users.filter(user => selectedUserIds.includes(user.id));
+    setSelectedUsers(newSelectedUsers);
+  }, [selectedUserIds]);
+
+  const toggleSection = (section: string): void => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  const handleUserSelect = (user) => {
-    if (selectedUsers.some((u) => u.id === user.id)) {
-      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
+  const handleUserSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const value = event.target.value as unknown as number[];
+    setSelectedUserIds(value);
+  };
+
+  const handleSelectAll = (): void => {
+    const filteredUserIds = filteredUsers.map(user => user.id);
+    setSelectedUserIds([...new Set([...selectedUserIds, ...filteredUserIds])]);
+  };
+
+  const handleDeselectAll = (): void => {
+    if (userSearch) {
+      const filteredUserIds = filteredUsers.map(user => user.id);
+      setSelectedUserIds(selectedUserIds.filter(id => !filteredUserIds.includes(id)));
     } else {
-      setSelectedUsers([...selectedUsers, user]);
+      setSelectedUserIds([]);
     }
   };
 
-  const handleNakshatraSelect = (nakshatra) => {
+  const handleNakshatraSelect = (nakshatra: Nakshatra): void => {
     if (selectedNakshatras.includes(nakshatra)) {
       setSelectedNakshatras(selectedNakshatras.filter((n) => n !== nakshatra));
     } else {
@@ -112,7 +155,7 @@ const SendNotification = () => {
     }
   };
 
-  const handleRashiSelect = (rashi) => {
+  const handleRashiSelect = (rashi: Rashi): void => {
     if (selectedRashis.includes(rashi)) {
       setSelectedRashis(selectedRashis.filter((r) => r !== rashi));
     } else {
@@ -120,10 +163,16 @@ const SendNotification = () => {
     }
   };
 
-  const handleSendNotification = (type) => {
+  const handleSendNotification = (type: string): void => {
     console.log(`Sending ${type} notification`);
     // Add your notification sending logic here
   };
+
+  const filteredUsers: User[] = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(userSearch.toLowerCase())
+  );
 
   return (
     <Box sx={{ p: isMobile ? 2 : 3 }}>
@@ -139,7 +188,7 @@ const SendNotification = () => {
           mb: 4,
         }}
       >
-        <Send fontSize={"medium"} />
+        <Send fontSize="medium" />
         Celestial Notifications
       </Typography>
       
@@ -157,9 +206,16 @@ const SendNotification = () => {
 
             <Collapse in={expandedSection === "all"}>
               <CardContent>
+                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+                  Mass Notification
+                </Typography>
+                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                  Send announcements or updates to all registered users instantly
+                </Typography>
+
                 <TextField
                   fullWidth
-                  label="Notification Title"
+                  label="Notification Subject"
                   variant="outlined"
                   size={buttonSize}
                   sx={{ mb: 3 }}
@@ -174,7 +230,7 @@ const SendNotification = () => {
 
                 <TextField
                   fullWidth
-                  label="Your Message"
+                  label="Notification Message"
                   multiline
                   rows={isMobile ? 3 : 4}
                   variant="outlined"
@@ -224,81 +280,137 @@ const SendNotification = () => {
 
             <Collapse in={expandedSection === "specific"}>
               <CardContent>
+                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+                  Personalized Notifications
+                </Typography>
+                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                  Select individual users for tailored messages or updates
+                </Typography>
+
+                {/* User selection with checkboxes */}
+                <FormControl fullWidth sx={{ mb: 3 }}>
+                  <InputLabel id="user-checkbox-label">Select Users</InputLabel>
+                  <Select
+                    labelId="user-checkbox-label"
+                    id="user-checkbox"
+                    multiple
+                    value={selectedUserIds}
+                    onChange={handleUserSelect}
+                    renderValue={(selected) => `${selected.length} users selected`}
+                    size={buttonSize}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 400,
+                        },
+                      },
+                      anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'center', // <-- align from center of anchor
+                      },
+                      transformOrigin: {
+                        vertical: 'top',
+                        horizontal: 'center', // <-- appear centered under Select
+                      },
+                    }}                    
+                  >
+                    {/* Search field inside dropdown */}
+                    <MenuItem 
+                      sx={{ p: 1, position: "sticky", top: 0, background: "white", zIndex: 1 }}
+                      disableRipple
+                      onKeyDown={(e) => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <TextField
+                        fullWidth
+                        placeholder="Search users..."
+                        value={userSearch}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearch(e.target.value)}
+                        size={buttonSize}
+                        variant="outlined"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <PersonSearch fontSize="small" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </MenuItem>
+                    
+                    {/* Select All / Deselect All buttons */}
+                    <MenuItem 
+                      sx={{ p: 1, position: "sticky", top: isMobile ? 56 : 64, background: "white", zIndex: 1 }}
+                      disableRipple
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={handleSelectAll}
+                          sx={{ color: '#10B100', borderColor: '#10B100', flex: 1, mr: 1 }}
+                        >
+                          Select All
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={handleDeselectAll}
+                          sx={{ color: '#1B4D3E', borderColor: '#1B4D3E', flex: 1 }}
+                        >
+                          Deselect All
+                        </Button>
+                      </Box>
+                    </MenuItem>
+                    
+                    <Divider />
+                    
+                    {/* User options with checkboxes */}
+                    {filteredUsers.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        <Checkbox checked={selectedUserIds.includes(user.id)} />
+                        <ListItemText 
+                          primary={user.name} 
+                          secondary={user.email}
+                          primaryTypographyProps={{ variant: bodyVariant }}
+                          secondaryTypographyProps={{ variant: isMobile ? 'caption' : bodyVariant }} 
+                        />
+                      </MenuItem>
+                    ))}
+                    
+                    {filteredUsers.length === 0 && (
+                      <MenuItem disabled>
+                        <Typography variant={bodyVariant} sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                          No users found
+                        </Typography>
+                      </MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant={bodyVariant} gutterBottom>
+                    Selected Users ({selectedUsers.length})
+                  </Typography>
+                </Box>
+
                 <TextField
                   fullWidth
-                  label="Search Users"
+                  label="Notification Subject"
                   variant="outlined"
                   size={buttonSize}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>🔍</Typography>
+                        <Typography variant={bodyVariant}>📢</Typography>
                       </InputAdornment>
                     ),
                   }}
                 />
-
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant={bodyVariant} gutterBottom>
-                    Selected Users ({selectedUsers.length})
-                  </Typography>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-                    {selectedUsers.map((user) => (
-                      <Chip
-                        key={user.id}
-                        label={user.name}
-                        onDelete={() => handleUserSelect(user)}
-                        deleteIcon={<Close fontSize={chipSize} />}
-                        avatar={<Avatar sx={{ width: 24, height: 24 }}>{user.name.charAt(0)}</Avatar>}
-                        size={chipSize}
-                        sx={{ background: "rgba(16, 177, 0, 0.1)" }}
-                      />
-                    ))}
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Typography variant={bodyVariant} gutterBottom>
-                    Available Users
-                  </Typography>
-                  <Box sx={{ maxHeight: 200, overflowY: "auto" }}>
-                    {users.map((user) => (
-                      <Paper
-                        key={user.id}
-                        elevation={0}
-                        sx={{
-                          p: isMobile ? 1 : 2,
-                          mb: 1,
-                          display: "flex",
-                          alignItems: "center",
-                          background: selectedUsers.some((u) => u.id === user.id)
-                            ? "rgba(16, 177, 0, 0.05)"
-                            : "transparent",
-                          border: "1px solid rgba(0,0,0,0.1)",
-                          cursor: "pointer",
-                          "&:hover": {
-                            background: "rgba(16, 177, 0, 0.05)",
-                          },
-                        }}
-                        onClick={() => handleUserSelect(user)}
-                      >
-                        <Avatar sx={{ mr: 2, bgcolor: "#10B100", width: 32, height: 32 }}>
-                          {user.name.charAt(0)}
-                        </Avatar>
-                        <Box sx={{ flexGrow: 1 }}>
-                          <Typography variant={bodyVariant}>{user.name}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {user.email}
-                          </Typography>
-                        </Box>
-                        {selectedUsers.some((u) => u.id === user.id) && (
-                          <CheckCircle color="success" fontSize={chipSize} />
-                        )}
-                      </Paper>
-                    ))}
-                  </Box>
-                </Box>
 
                 <TextField
                   fullWidth
@@ -308,6 +420,13 @@ const SendNotification = () => {
                   variant="outlined"
                   size={buttonSize}
                   sx={{ mb: 3 }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Typography variant={bodyVariant}>✉️</Typography>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
 
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -346,8 +465,11 @@ const SendNotification = () => {
 
             <Collapse in={expandedSection === "nakshatra"}>
               <CardContent>
-                <Typography variant={bodyVariant} gutterBottom sx={{ mb: 2 }}>
-                  Select one or more Nakshatras to target users born under these stars
+                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+                  Star-Based Targeting
+                </Typography>
+                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                  Reach users based on their birth nakshatras for astrologically relevant messages
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
@@ -372,7 +494,7 @@ const SendNotification = () => {
                   <Divider sx={{ my: 2 }} />
 
                   <Grid container spacing={1}>
-                    {nakshatras.map((nakshatra) => (
+                    {(showAllNakshatras ? nakshatras : initialNakshatras).map((nakshatra) => (
                       <Grid item xs={6} sm={4} md={3} key={nakshatra}>
                         <Button
                           fullWidth
@@ -401,7 +523,33 @@ const SendNotification = () => {
                       </Grid>
                     ))}
                   </Grid>
+
+                  <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+                    <Button
+                      variant="text"
+                      size={buttonSize}
+                      onClick={() => setShowAllNakshatras(!showAllNakshatras)}
+                      sx={{ color: "#10B100" }}
+                    >
+                      {showAllNakshatras ? "Show Less" : "Show More"}
+                    </Button>
+                  </Box>
                 </Box>
+
+                <TextField
+                  fullWidth
+                  label="Notification Subject"
+                  variant="outlined"
+                  size={buttonSize}
+                  sx={{ mb: 3 }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Typography variant={bodyVariant}>📢</Typography>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
                 <TextField
                   fullWidth
@@ -456,8 +604,11 @@ const SendNotification = () => {
 
             <Collapse in={expandedSection === "rashi"}>
               <CardContent>
-                <Typography variant={bodyVariant} gutterBottom sx={{ mb: 2 }}>
-                  Select Rashis to target users based on their moon signs
+                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+                  Zodiac-Based Targeting
+                </Typography>
+                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                  Send messages to users based on their zodiac signs for personalized astrological content
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
@@ -511,6 +662,21 @@ const SendNotification = () => {
                     ))}
                   </Grid>
                 </Box>
+
+                <TextField
+                  fullWidth
+                  label="Notification Subject"
+                  variant="outlined"
+                  size={buttonSize}
+                  sx={{ mb: 3 }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Typography variant={bodyVariant}>📢</Typography>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
                 <TextField
                   fullWidth
