@@ -18,8 +18,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Checkbox,
-  ListItemText,
 } from "@mui/material";
 import {
   Send,
@@ -78,12 +76,12 @@ const SendNotification: React.FC = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
   const [selectedNakshatras, setSelectedNakshatras] = useState<Nakshatra[]>([]);
   const [selectedRashis, setSelectedRashis] = useState<Rashi[]>([]);
   const [showAllNakshatras, setShowAllNakshatras] = useState<boolean>(false);
   const [userSearch, setUserSearch] = useState<string>("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   // Responsive font sizes
   const titleVariant = isMobile ? "h5" : "h4";
@@ -97,6 +95,9 @@ const SendNotification: React.FC = () => {
     { id: 1, name: "Rahul", email: "rahul@example.com" },
     { id: 2, name: "Priya", email: "priya@example.com" },
     { id: 3, name: "Manasa", email: "manasa@example.com" },
+    { id: 4, name: "Arjun", email: "arjun@example.com" },
+    { id: 5, name: "Divya", email: "divya@example.com" },
+    { id: 6, name: "Sandeep", email: "sandeep@example.com" },
   ];
 
   const nakshatras: Nakshatra[] = [
@@ -118,33 +119,46 @@ const SendNotification: React.FC = () => {
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
   ];
 
-  // Update selectedUsers whenever selectedUserIds changes
-  useEffect(() => {
-    const newSelectedUsers = users.filter(user => selectedUserIds.includes(user.id));
-    setSelectedUsers(newSelectedUsers);
-  }, [selectedUserIds]);
+  const selectedUsers = users.filter((user) => selectedUserIds.includes(user.id));
+
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(userSearch.toLowerCase())
+  );
 
   const toggleSection = (section: string): void => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  const handleUserSelect = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const value = event.target.value as unknown as number[];
-    setSelectedUserIds(value);
+  const toggleDropdown = (): void => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleUserSelect = (userId: number): void => {
+    setSelectedUserIds((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
+    );
   };
 
   const handleSelectAll = (): void => {
-    const filteredUserIds = filteredUsers.map(user => user.id);
-    setSelectedUserIds([...new Set([...selectedUserIds, ...filteredUserIds])]);
+    const filteredUserIds = filteredUsers.map((user) => user.id);
+    setSelectedUserIds((prev) => [...new Set([...prev, ...filteredUserIds])]);
   };
 
   const handleDeselectAll = (): void => {
     if (userSearch) {
-      const filteredUserIds = filteredUsers.map(user => user.id);
-      setSelectedUserIds(selectedUserIds.filter(id => !filteredUserIds.includes(id)));
+      const filteredUserIds = filteredUsers.map((user) => user.id);
+      setSelectedUserIds((prev) => prev.filter((id) => !filteredUserIds.includes(id)));
     } else {
       setSelectedUserIds([]);
     }
+  };
+
+  const removeUser = (userId: number): void => {
+    setSelectedUserIds((prev) => prev.filter((id) => id !== userId));
   };
 
   const handleNakshatraSelect = (nakshatra: Nakshatra): void => {
@@ -167,12 +181,6 @@ const SendNotification: React.FC = () => {
     console.log(`Sending ${type} notification`);
     // Add your notification sending logic here
   };
-
-  const filteredUsers: User[] = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(userSearch.toLowerCase()) ||
-      user.email.toLowerCase().includes(userSearch.toLowerCase())
-  );
 
   return (
     <Box sx={{ p: isMobile ? 2 : 3 }}>
@@ -287,46 +295,106 @@ const SendNotification: React.FC = () => {
                   Select individual users for tailored messages or updates
                 </Typography>
 
-                {/* User selection with checkboxes */}
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel id="user-checkbox-label">Select Users</InputLabel>
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <InputLabel
+                    id="select-user-label"
+                    shrink={isDropdownOpen || selectedUserIds.length > 0}
+                    sx={{
+                      transform:
+                        isDropdownOpen || selectedUserIds.length > 0
+                          ? "translate(14px, -6px) scale(0.75)"
+                          : "translate(14px, 16px) scale(1)",
+                      backgroundColor: "white",
+                      padding: "0 4px",
+                    }}
+                  >
+                    Select Users
+                  </InputLabel>
                   <Select
-                    labelId="user-checkbox-label"
-                    id="user-checkbox"
-                    multiple
+                    labelId="select-user-label"
+                    open={isDropdownOpen}
+                    onOpen={toggleDropdown}
+                    onClose={toggleDropdown}
                     value={selectedUserIds}
-                    onChange={handleUserSelect}
-                    renderValue={(selected) => `${selected.length} users selected`}
-                    size={buttonSize}
+                    multiple
+                    displayEmpty
+                    renderValue={() =>
+                      selectedUserIds.length === 0 ? (
+                        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+                          <People sx={{ mr: 1, fontSize: "1rem" }} />
+                          Select users...
+                        </Box>
+                      ) : (
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
+                          {selectedUsers.slice(0, 3).map((user) => (
+                            <Chip
+                              key={user.id}
+                              label={user.name}
+                              size="small"
+                              onDelete={(e) => {
+                                e.stopPropagation();
+                                removeUser(user.id);
+                              }}
+                              deleteIcon={<Close fontSize="small" />}
+                              sx={{
+                                backgroundColor: "rgba(16, 177, 0, 0.1)",
+                                color: "#1B4D3E",
+                              }}
+                            />
+                          ))}
+                          {selectedUsers.length > 3 && (
+                            <Chip
+                              label={`+${selectedUsers.length - 3} more`}
+                              size="small"
+                              sx={{
+                                backgroundColor: "rgba(0, 0, 0, 0.08)",
+                                color: "text.primary",
+                              }}
+                            />
+                          )}
+                        </Box>
+                      )
+                    }
+                    sx={{
+                      "& .MuiSelect-select": { display: "flex", alignItems: "center", minHeight: "40px" },
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        top: 0,
+                      },
+                      "& legend": {
+                        display: "none",
+                      },
+                    }}
                     MenuProps={{
                       PaperProps: {
                         style: {
                           maxHeight: 400,
+                          width: "auto",
+                        },
+                        sx: {
+                          display: "flex",
+                          flexDirection: "column",
                         },
                       },
-                      anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'center', // <-- align from center of anchor
-                      },
-                      transformOrigin: {
-                        vertical: 'top',
-                        horizontal: 'center', // <-- appear centered under Select
-                      },
-                    }}                    
+                    }}
                   >
-                    {/* Search field inside dropdown */}
-                    <MenuItem 
-                      sx={{ p: 1, position: "sticky", top: 0, background: "white", zIndex: 1 }}
-                      disableRipple
-                      onKeyDown={(e) => e.stopPropagation()}
-                      onClick={(e) => e.stopPropagation()}
+                    <Box
+                      sx={{
+                        position: "sticky",
+                        top: 0,
+                        backgroundColor: "white",
+                        zIndex: 1,
+                        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                        p: 1,
+                      }}
                     >
                       <TextField
                         fullWidth
                         placeholder="Search users..."
                         value={userSearch}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserSearch(e.target.value)}
-                        size={buttonSize}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setUserSearch(e.target.value)
+                        }
+                        size="small"
                         variant="outlined"
                         InputProps={{
                           startAdornment: (
@@ -338,64 +406,100 @@ const SendNotification: React.FC = () => {
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={(e) => e.stopPropagation()}
                       />
-                    </MenuItem>
-                    
-                    {/* Select All / Deselect All buttons */}
-                    <MenuItem 
-                      sx={{ p: 1, position: "sticky", top: isMobile ? 56 : 64, background: "white", zIndex: 1 }}
-                      disableRipple
-                      onClick={(e) => e.stopPropagation()}
+                    </Box>
+                    <Box
+                      sx={{
+                        position: "sticky",
+                        top: 56,
+                        backgroundColor: "white",
+                        zIndex: 1,
+                        borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                        p: 1,
+                      }}
                     >
-                      <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={handleSelectAll}
-                          sx={{ color: '#10B100', borderColor: '#10B100', flex: 1, mr: 1 }}
-                        >
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectAll();
+                        }}
+                        sx={{ py: 0.5 }}
+                      >
+                        <Typography variant={bodyVariant} sx={{ color: "#10B100" }}>
                           Select All
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={handleDeselectAll}
-                          sx={{ color: '#1B4D3E', borderColor: '#1B4D3E', flex: 1 }}
-                        >
-                          Deselect All
-                        </Button>
-                      </Box>
-                    </MenuItem>
-                    
-                    <Divider />
-                    
-                    {/* User options with checkboxes */}
-                    {filteredUsers.map((user) => (
-                      <MenuItem key={user.id} value={user.id}>
-                        <Checkbox checked={selectedUserIds.includes(user.id)} />
-                        <ListItemText 
-                          primary={user.name} 
-                          secondary={user.email}
-                          primaryTypographyProps={{ variant: bodyVariant }}
-                          secondaryTypographyProps={{ variant: isMobile ? 'caption' : bodyVariant }} 
-                        />
-                      </MenuItem>
-                    ))}
-                    
-                    {filteredUsers.length === 0 && (
-                      <MenuItem disabled>
-                        <Typography variant={bodyVariant} sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-                          No users found
                         </Typography>
                       </MenuItem>
-                    )}
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeselectAll();
+                        }}
+                        sx={{ py: 0.5 }}
+                      >
+                        <Typography variant={bodyVariant} sx={{ color: "#1B4D3E" }}>
+                          Deselect All
+                        </Typography>
+                      </MenuItem>
+                    </Box>
+                    <Box sx={{ overflowY: "auto", maxHeight: 300 }}>
+                      {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user) => (
+                          <MenuItem
+                            key={user.id}
+                            value={user.id}
+                            onClick={() => handleUserSelect(user.id)}
+                            sx={{ display: "flex", alignItems: "center", py: 1 }}
+                          >
+                            <Box
+                              sx={{
+                                width: 20,
+                                height: 20,
+                                border: selectedUserIds.includes(user.id)
+                                  ? "1px solid #10B100"
+                                  : "1px solid rgba(0, 0, 0, 0.23)",
+                                borderRadius: "4px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                mr: 2,
+                                backgroundColor: selectedUserIds.includes(user.id)
+                                  ? "#10B100"
+                                  : "transparent",
+                              }}
+                            >
+                              {selectedUserIds.includes(user.id) && (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  fill="white"
+                                  viewBox="0 0 16 16"
+                                >
+                                  <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L6 9.293 4.354 7.646a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l6-6z" />
+                                </svg>
+                              )}
+                            </Box>
+                            <Box>
+                              <Typography variant={bodyVariant}>{user.name}</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {user.email}
+                              </Typography>
+                            </Box>
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>
+                          <Typography variant={bodyVariant} sx={{ fontStyle: "italic", color: "text.secondary" }}>
+                            No users found
+                          </Typography>
+                        </MenuItem>
+                      )}
+                    </Box>
                   </Select>
                 </FormControl>
 
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant={bodyVariant} gutterBottom>
-                    Selected Users ({selectedUsers.length})
-                  </Typography>
-                </Box>
+                <Typography variant={bodyVariant} sx={{ mb: 3, color: "text.secondary" }}>
+                  {selectedUsers.length} users selected
+                </Typography>
 
                 <TextField
                   fullWidth
@@ -438,7 +542,10 @@ const SendNotification: React.FC = () => {
                     onClick={() => handleSendNotification("specific")}
                     sx={{
                       background:
-                        "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)",
+                        selectedUsers.length > 0
+                          ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
+                          : "rgba(0, 0, 0, 0.12)",
+                      color: selectedUsers.length > 0 ? "white" : "text.disabled",
                       borderRadius: "50px",
                       px: isMobile ? 3 : 4,
                       py: isMobile ? 1 : 1.5,
