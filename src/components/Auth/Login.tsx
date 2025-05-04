@@ -296,9 +296,9 @@ export const Login: React.FC = () => {
           method: "post",
           data,
         });
-      } catch (error) {
+      } catch (error:any) {
         // Silently catch error from actual API call
-        console.log("Original API call failed, but continuing with bypass");
+        console.log("Original API call failed, but continuing with bypass", error);
       }
 
       // Always proceed to OTP step regardless of API response

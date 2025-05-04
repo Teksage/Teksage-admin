@@ -931,15 +931,16 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             method: "get",
           });
           const data = response.data;
+          console.log(data, "data")
           setFormData({
-            first_name: data.first_name || "",
-            last_name: data.last_name || "",
-            email: data.email || "",
-            mobile_number: data.mobile_number || "",
+            first_name: data.user.first_name || "",
+            last_name: data.user.last_name || "",
+            email: data.user.email || "",
+            mobile_number: data.user.mobile_number || "",
             status: data.status || "Active",
             astrologer_profile_info: data.astrologer_profile_info || "",
             experience: data.experience || "",
-            consulting_fee: data.consulting_fee || "",
+            consulting_fee: data.consulting_fee.toString() || "",
             picture: data.picture || null,
             languages: data.languages || [],
             expertises: data.expertises || [],
