@@ -238,9 +238,9 @@ const Consultations: React.FC = () => {
     navigate(`/dashboard/consultations/view/${row?.id}`);
   };
 
-  const handleSelectionChange = (selectedIds: number[]) => {
-    console.log("Selected:", selectedIds);
-  };
+  // const handleSelectionChange = (selectedIds: number[]) => {
+  //   console.log("Selected:", selectedIds);
+  // };
 
   return (
     <>
@@ -255,7 +255,7 @@ const Consultations: React.FC = () => {
         columns={columns}
         totalCount={totalCount}
         onView={handleView}
-        onSelectionChange={handleSelectionChange}
+        // onSelectionChange={handleSelectionChange}
         getRowId={(row) => row.id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={rowsPerPage}

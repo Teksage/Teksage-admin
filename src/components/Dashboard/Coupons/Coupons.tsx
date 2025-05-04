@@ -1,13 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-} from "@mui/material";
 import GenericTable, { TableColumn } from "../../Elements/Table";
 import { callAPI } from "../../../api/crudFactory";
 import { format } from "date-fns";
@@ -88,7 +79,6 @@ const Coupons: React.FC = () => {
   };
 
   const confirmDelete = async () => {
-    console.log(selectedRow?.coupon_id, "selectedRow?.id")
     try {
       await callAPI({
         endpoint: `/api/admin/coupons/${selectedRow?.coupon_id}`,
@@ -102,7 +92,7 @@ const Coupons: React.FC = () => {
     }
   };
 
-  const handleSelectionChange = (selectedIds: number[]) => {};
+  // const handleSelectionChange = (selectedIds: number[]) => {};
 
   return (
     <>
@@ -114,7 +104,7 @@ const Coupons: React.FC = () => {
         // onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onSelectionChange={handleSelectionChange}
+        // onSelectionChange={handleSelectionChange}
         getRowId={(row) => row.coupon_id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={10}

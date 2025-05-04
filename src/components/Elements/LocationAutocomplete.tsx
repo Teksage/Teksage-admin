@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Autocomplete, TextField } from "@mui/material";
 import debounce from "lodash.debounce";
 import { fetchPlaceSuggestions } from "../../api/crudFactory";
@@ -54,10 +54,12 @@ const PlaceAutocomplete = ({
       filterOptions={(x) => x}
       inputValue={inputValue}
       onInputChange={(e, newInputValue) => {
+        console.log(e)
         setInputValue(newInputValue);
         fetchSuggestionsDebounced(newInputValue);
       }}
       onChange={(e, newValue) => {
+        console.log(e)
         if (typeof newValue === "string") {
           setInputValue(newValue);
           onChange(newValue);

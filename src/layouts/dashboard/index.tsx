@@ -151,7 +151,7 @@ const DashboardLayout = () => {
     if (!name) return "U";
     return name
       .split(" ")
-      .map((n) => n[0])
+      .map((n:any) => n[0])
       .join("")
       .toUpperCase()
       .substring(0, 2);

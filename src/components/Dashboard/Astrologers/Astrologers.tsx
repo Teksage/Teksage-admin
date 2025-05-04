@@ -173,11 +173,11 @@ const Astrologers: React.FC = () => {
         page: currentPage + 1, // API expects 1-based indexing
         per_page: rowsPerPage,
         ...Object.fromEntries(
-          Object.entries(currentFilters).filter(([_, v]) => v !== "")
+          Object.entries(currentFilters).filter(([v]) => v !== "")
         ),
       };
 
-      console.log("fetchAstrologers params:", params); // Debug log
+      console.log("fetchAstrologers params:", params);
 
       const response = await callAPI({
         endpoint: "api/admin/astrologers",
@@ -185,7 +185,7 @@ const Astrologers: React.FC = () => {
         params,
       });
 
-      console.log("fetchAstrologers response:", response); // Debug log
+      console.log("fetchAstrologers response:", response);
 
       const astrologerData = response?.data?.astrologers || [];
       const total = response?.data?.total || 0;
@@ -216,7 +216,8 @@ const Astrologers: React.FC = () => {
       let allAstrologers: UserData[] = [];
       let currentPage = 1;
       let total = 0;
-      const perPage = 100; // Smaller per_page to avoid API limits
+      const perPage = 100;
+      let astrologerData: UserData[] = []; // Declare outside the loop
 
       // Fetch all pages until all records are retrieved
       do {
@@ -226,9 +227,9 @@ const Astrologers: React.FC = () => {
           params: { per_page: perPage, page: currentPage },
         });
 
-        console.log(`fetchFilterOptions response (page ${currentPage}):`, response); // Debug log
+        console.log(`fetchFilterOptions response (page ${currentPage}):`, response);
 
-        const astrologerData = response?.data?.astrologers || [];
+        astrologerData = response?.data?.astrologers || [];
         total = response?.data?.total || 0;
 
         if (!Array.isArray(astrologerData)) {
@@ -246,7 +247,7 @@ const Astrologers: React.FC = () => {
         ].sort(),
         experience: [
           ...new Set(allAstrologers.map((astro) => String(astro.experience)).filter(Boolean)),
-        ].sort((a, b) => Number(a) - Number(b)), // Sort numerically
+        ].sort((a, b) => Number(a) - Number(b)),
         customer_rating: [
           ...new Set(allAstrologers.map((astro) => astro.customer_rating).filter(Boolean)),
         ].sort(),
@@ -258,8 +259,7 @@ const Astrologers: React.FC = () => {
         ].sort(),
       };
 
-      console.log("Derived filterOptions:", options); // Debug log
-
+      console.log("Derived filterOptions:", options);
       setFilterOptions(options);
     } catch (error) {
       console.error("Failed to fetch filter options:", error);
@@ -331,10 +331,6 @@ const Astrologers: React.FC = () => {
     navigate("/dashboard/astrologers/new");
   };
 
-  const handleStatus = () => {
-    // Implement status toggle logic if needed
-  };
-
   const handleView = (row: UserData) => {
     navigate(`/dashboard/astrologers/view/${row?.astrologer_id}`);
   };
@@ -343,13 +339,9 @@ const Astrologers: React.FC = () => {
     navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
   };
 
-  // const handleDelete = (row: UserData) => {
-  //   // Implement delete logic
+  // const handleSelectionChange = (selectedIds: number[]) => {
+  //   console.log("Selected:", selectedIds);
   // };
-
-  const handleSelectionChange = (selectedIds: number[]) => {
-    console.log("Selected:", selectedIds);
-  };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -378,11 +370,9 @@ const Astrologers: React.FC = () => {
         columns={columns}
         totalCount={totalCount}
         onAdd={handleAdd}
-        onStatus={handleStatus}
         onView={handleView}
         onEdit={handleEdit}
-        // onDelete={handleDelete}
-        onSelectionChange={handleSelectionChange}
+        // onSelect={handleSelectionChange}
         getRowId={(row) => row.astrologer_id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={rowsPerPage}

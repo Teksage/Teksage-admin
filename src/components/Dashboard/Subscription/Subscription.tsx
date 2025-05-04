@@ -96,11 +96,11 @@ const Subscription: React.FC = () => {
     navigate(`/dashboard/subscription/edit/${row?.plan_id}`);
   };
 
-  const handleSelectionChange = (selectedIds: number[]) => {
-    // Handle selected row IDs here
-  };
+  // const handleSelectionChange = (selectedIds: number[]) => {
+  //   // Handle selected row IDs here
+  // };
 
-  const handleDelete = (row: planData) => {
+  const handleDelete = (row: PlanData) => {
     console.log(row, "row");
     setSelectedRow(row);
     setDeleteModalOpen(true);
@@ -131,7 +131,7 @@ const Subscription: React.FC = () => {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onSelectionChange={handleSelectionChange}
+        // onSelectionChange={handleSelectionChange}
         getRowId={(row) => row.plan_id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={10}

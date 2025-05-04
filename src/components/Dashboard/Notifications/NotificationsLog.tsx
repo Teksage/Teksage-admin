@@ -203,9 +203,9 @@ const NotificationLog: React.FC = () => {
     [filterOptions]
   );
 
-  const handleSelectionChange = (selectedIds: number[]) => {
-    console.log("Selected:", selectedIds);
-  };
+  // const handleSelectionChange = (selectedIds: number[]) => {
+  //   console.log("Selected:", selectedIds);
+  // };
 
   return (
     <>
@@ -219,7 +219,7 @@ const NotificationLog: React.FC = () => {
         data={notificationLogs}
         columns={columns}
         totalCount={totalCount}
-        onSelectionChange={handleSelectionChange}
+        // onSelectionChange={handleSelectionChange}
         getRowId={(row) => row.id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={rowsPerPage}

@@ -13,6 +13,7 @@ import {
   IconButton,
   FormHelperText,
   CircularProgress,
+  SelectChangeEvent,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -135,7 +136,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             user_type:
               user.user_type.charAt(0).toUpperCase() +
                 user.user_type.slice(1).toLowerCase() || "Customer",
-          })
+          });
           setFormData({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -192,14 +193,41 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     return newErrors;
   };
 
+  // Helper function to update form data
+  const updateFormData = (field: keyof UserFormData, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  // const handleChange =
+  //   (field: keyof UserFormData) =>
+  //   (event: React.ChangeEvent<{ value: unknown }>) => {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       [field]: event.target.value as string,
+  //     }));
+  //     setErrors((prev) => ({ ...prev, [field]: "" }));
+  //   };
+
+  // Updated handleChange function
   const handleChange =
     (field: keyof UserFormData) =>
-    (event: React.ChangeEvent<{ value: unknown }>) => {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: event.target.value as string,
-      }));
-      setErrors((prev) => ({ ...prev, [field]: "" }));
+    (
+      input:
+        | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        | SelectChangeEvent<string | string[]>
+        | string
+    ) => {
+      let value: string | string[];
+      if (typeof input === "string") {
+        value = input;
+      } else {
+        value = input.target.value as string | string[];
+      }
+      updateFormData(field, value);
     };
 
   const handleDateChange = (value: Date | null) => {
@@ -250,10 +278,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       });
 
       navigate(-1);
-    } catch (err) {
+    } catch (err: any) {
+      console.log(err);
       setSnackbar({
         open: true,
-        message: "Something went wrong. Please try again.",
+        message: `Something went wrong. Please try again.`,
         severity: "error",
       });
     }
@@ -269,8 +298,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   // ⏳ Auto trigger rashi & nakshatra fetch
   useEffect(() => {
-    if (mode === "edit" && !isFormInitialized.current)
-    return;
+    if (mode === "edit" && !isFormInitialized.current) return;
     const { dateOfBirth, timeOfBirth, placeOfBirth, preferredLocation } =
       formData;
 
@@ -320,7 +348,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const availableNakshatrams = nakshatramOptions[formData.rashi] || [];
 
-  console.log(formData)
+  console.log(formData);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -470,7 +498,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.mobile}
                 onChange={(e) => {
                   const numericValue = e.target.value.replace(/\D/g, "");
-                  handleChange("mobile")({ target: { value: numericValue } });
+                  handleChange("mobile")(numericValue);
                 }}
                 error={!!errors.mobile}
                 helperText={errors.mobile || ""}

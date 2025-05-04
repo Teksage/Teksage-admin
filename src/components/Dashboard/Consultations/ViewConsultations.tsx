@@ -59,7 +59,7 @@ const InfoItem = ({
   </Box>
 );
 
-const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
+const ConsultationView: React.FC<{ mode: "view" }> = () => {
   const navigate = useNavigate();
   const { consultationId } = useParams<{ consultationId: string }>();
   const [consultationData, setConsultationData] = useState<any>(null);
@@ -90,7 +90,8 @@ const ConsultationView: React.FC<{ mode: "view" }> = ({ mode }) => {
           formatTimeRange(`${res?.data.start_time} - ${res?.data.end_time}`)
         );
         setConsultationData(res?.data || null);
-      } catch (err) {
+      } catch (err:any) {
+        console.log(err)
         setConsultationData(null);
       } finally {
         setLoading(false);
@@ -746,7 +747,7 @@ const QuestionsAnswersList = ({ qaList = [] }) => {
       </Typography>
 
       <Grid container spacing={2}>
-        {itemsToShow.map((item, index) => (
+        {itemsToShow.map((item:any, index:number) => (
           <Grid item xs={12} key={index}>
             <Paper
               elevation={2}

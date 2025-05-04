@@ -45,8 +45,8 @@ interface UserData {
   email: string;
   user_type: string;
   status: string;
-  rasi: string;
-  nakshatram: string;
+  rashi: string;
+  nakshatra: string;
   plan: string;
 }
 
@@ -99,7 +99,7 @@ const InfoItem = ({
   </Box>
 );
 
-const UserView: React.FC<{ mode: "view" }> = ({ mode }) => {
+const UserView: React.FC<{ mode: "view" }> = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const [userData, setUserData] = useState<UserData | null>(null);

@@ -612,6 +612,7 @@ import {
   MenuItem,
   Select,
   useMediaQuery,
+  SelectChangeEvent,
 } from "@mui/material";
 import { callAPI } from "../../../api/crudFactory";
 
@@ -622,7 +623,7 @@ const Analytics: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [filterType, setFilterType] = useState<string>("year"); // Reintroduce filterType
+  const [filterType, setFilterType] = useState<string>("year");
   const [analyticsData, setAnalyticsData] = useState<any>({
     subscription: {},
     users_per_service: [],
@@ -707,8 +708,8 @@ const Analytics: React.FC = () => {
       const [aMonth, aYear] = a.name.split(" ");
       const [bMonth, bYear] = b.name.split(" ");
       return (
-        new Date(parseInt(aYear), monthOrder.indexOf(aMonth), 1) -
-        new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1)
+        new Date(parseInt(aYear), monthOrder.indexOf(aMonth), 1).getTime() -
+        new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1).getTime()
       );
     });
 
@@ -754,31 +755,35 @@ const Analytics: React.FC = () => {
   );
 
   // Prepare data for Compact Stats Row (Latest month's plan counts)
-  const latestMonthData = selectedYear && analyticsData.subscription[selectedYear]?.plans?.length > 0
-  ? analyticsData.subscription[selectedYear].plans.reduce((acc: any, month: any) => {
-      Object.keys(month).forEach((key) => {
-        if (key !== "name") {
-          acc[key] = (acc[key] || 0) + month[key];
-        }
-      });
-      return acc;
-    }, {})
-  : {};
+  const latestMonthData =
+    selectedYear && analyticsData.subscription[selectedYear]?.plans?.length > 0
+      ? analyticsData.subscription[selectedYear].plans.reduce(
+          (acc: any, month: any) => {
+            Object.keys(month).forEach((key) => {
+              if (key !== "name") {
+                acc[key] = (acc[key] || 0) + month[key];
+              }
+            });
+            return acc;
+          },
+          {}
+        )
+      : {};
 
-const compactStatsData = Object.keys(latestMonthData)
-  .filter((key) => key !== "name")
-  .map((plan, index) => ({
-    plan_name: plan,
-    users: latestMonthData[plan] || 0,
-    colorIndex: index % COLORS.length,
-  }));
+  const compactStatsData = Object.keys(latestMonthData)
+    .filter((key) => key !== "name")
+    .map((plan, index) => ({
+      plan_name: plan,
+      users: latestMonthData[plan] || 0,
+      colorIndex: index % COLORS.length,
+    }));
 
-  const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleYearChange = (event: SelectChangeEvent<number>) => {
     setSelectedYear(event.target.value as number);
     setFilterType("year"); // Reset to year-wise when changing year
   };
 
-  const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleFilterChange = (event: SelectChangeEvent<string>) => {
     setFilterType(event.target.value as string);
   };
 
@@ -868,7 +873,7 @@ const compactStatsData = Object.keys(latestMonthData)
         </Typography>
 
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Select
+          <Select<string>
             value={filterType}
             onChange={handleFilterChange}
             sx={{
@@ -886,8 +891,8 @@ const compactStatsData = Object.keys(latestMonthData)
             <MenuItem value="year">Year-wise</MenuItem>
           </Select>
           {filterType === "year" && (
-            <Select
-              value={selectedYear || ""}
+            <Select<number>
+              value={selectedYear ?? ""}
               onChange={handleYearChange}
               sx={{
                 minWidth: 120,
@@ -900,6 +905,7 @@ const compactStatsData = Object.keys(latestMonthData)
               }}
               disabled={availableYears.length === 0 || loading}
             >
+              <MenuItem value="">Select Year</MenuItem>
               {availableYears.map((year) => (
                 <MenuItem key={year} value={year}>
                   {year}

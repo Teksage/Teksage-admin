@@ -1317,7 +1317,7 @@ function GenericTable<T>({
 
   const hasFeeData = useMemo(() => {
     const feeValues = data
-      .map((item:any) => {
+      .map((item: any) => {
         const value =
           (item as any)["consultation_fee"] ||
           (item as any)["fee"] ||
@@ -1445,7 +1445,8 @@ function GenericTable<T>({
     onSortChange?.(columnId, newDirection);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (event: any, newPage: number) => {
+    console.log(event);
     onPageChange?.(newPage);
   };
 
@@ -1614,12 +1615,13 @@ function GenericTable<T>({
             option === "Select All" ? "Select All" : option
           }
           value={filters[column.id as string] || ""}
-          onChange={(event, newValue) =>
+          onChange={(event, newValue) => {
+            console.log(event);
             handleFilterChange(
               column.id,
               newValue === "Select All" ? "" : newValue || ""
-            )
-          }
+            );
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -1888,12 +1890,13 @@ function GenericTable<T>({
                       option === "Select All" ? "Select All" : option
                     }
                     value={filters[column.id as string] || ""}
-                    onChange={(event, newValue) =>
+                    onChange={(event, newValue) => {
+                      console.log(event);
                       handleFilterChange(
                         column.id,
                         newValue === "Select All" ? "" : newValue || ""
-                      )
-                    }
+                      );
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}

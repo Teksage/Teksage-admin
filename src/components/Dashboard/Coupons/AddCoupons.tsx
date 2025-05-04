@@ -351,7 +351,7 @@ interface CouponFormData {
   max_cap: number | "";
   start_date: Date | null;
   end_date: Date | null;
-  plan_id: number;
+  plan_id: number | null;
 }
 
 const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {

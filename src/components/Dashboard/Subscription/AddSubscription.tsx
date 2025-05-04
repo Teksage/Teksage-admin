@@ -467,17 +467,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     };
 
   // For Select
-  const handleSelectChange =
-  (field: keyof SubscriptionFormData) =>
-  (event: SelectChangeEvent<string>) => {
-    const {
-      target: { value },
-    } = event;
-
+  const handleSelectChange = <T extends string | string[]>(field: keyof SubscriptionFormData) => (
+    e: SelectChangeEvent<T>
+  ) => {
+    const value = e.target.value as T;
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const validateForm = () => {

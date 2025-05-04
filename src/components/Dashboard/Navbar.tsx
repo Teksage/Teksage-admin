@@ -110,7 +110,7 @@ const ToggleButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const NavItem = styled(ListItemButton)(({ theme, open }) => ({
+const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
   borderRadius: theme.shape.borderRadius,
   margin: theme.spacing(0.5, 1),
   padding: theme.spacing(1),
@@ -131,6 +131,7 @@ const NavItem = styled(ListItemButton)(({ theme, open }) => ({
   "& .MuiListItemIcon-root": {
     minWidth: open ? 40 : 24,
     justifyContent: open ? "flex-start" : "center",
+    marginRight: open ? theme.spacing(4) : 0, // Increased gap to 16px when open
   },
   transition: theme.transitions.create(
     ["background-color", "padding", "margin"],
@@ -161,7 +162,7 @@ const menuItems = [
 ];
 
 const Navbar = ({ open, toggleSidebar }: any) => {
-  const [expanded, setExpanded] = useState(false);
+  // const [expanded, setExpanded] = useState(false);
   const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -171,7 +172,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
   const locationPathname = location?.pathname;
   // const firstPathSegment = location.pathname.split("/")[2];
 
-  const handleNotificationsClick = (e) => {
+  const handleNotificationsClick = (e: any) => {
     e.stopPropagation();
     setNotificationsExpanded(!notificationsExpanded);
     if (!notificationsExpanded && open) {
@@ -185,13 +186,13 @@ const Navbar = ({ open, toggleSidebar }: any) => {
     } else {
       toggleSidebar();
       // Only reset expanded state when closing the sidebar
-      if (open) {
-        setExpanded(false);
-      }
+      // if (open) {
+      //   setExpanded(false);
+      // }
     }
   };
 
-  const handleMenuItemClick = (path) => {
+  const handleMenuItemClick = (path: any) => {
     navigate(path);
     if (isMobile) {
       setMobileOpen(false);
@@ -206,7 +207,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
   //   }
   // };
 
-  const isActive = (path) => locationPathname.includes(path);
+  const isActive = (path: any) => locationPathname.includes(path);
 
   const drawerContent = (
     <>
@@ -253,9 +254,16 @@ const Navbar = ({ open, toggleSidebar }: any) => {
             key={item.name}
             onClick={() => handleMenuItemClick(item.path)}
             selected={isActive(item.path)}
-            open={open}
+            sx={{ gap: "10px" }}
           >
-            <ListItemIcon sx={{ color: "inherit" }}>{item.icon}</ListItemIcon>
+            <ListItemIcon
+              sx={{
+                color: "inherit",
+                marginRight: open || isMobile ? 4 : 0, // Adds 32px gap when open or on mobile
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
             {(open || isMobile) && (
               <ListItemText
                 primary={item.name}
@@ -272,13 +280,14 @@ const Navbar = ({ open, toggleSidebar }: any) => {
 
         {/* Add Notifications section with expandable items */}
         <NavItem
-          open={open}
+          // open={open}
           onClick={
             open
               ? handleNotificationsClick
               : () => navigate("/dashboard/notifications/send")
           }
           selected={locationPathname.includes("/dashboard/notifications")}
+          sx={{ gap: "10px" }}
         >
           <ListItemIcon sx={{ color: "inherit" }}>
             <NotificationsIcon />
@@ -319,8 +328,9 @@ const Navbar = ({ open, toggleSidebar }: any) => {
                 ml: 1,
                 mr: 1,
                 borderRadius: theme.shape.borderRadius,
+                gap: "8px"
               }}
-              open={open}
+              // open={open}
               onClick={() =>
                 handleMenuItemClick("/dashboard/notifications/send")
               }
@@ -349,8 +359,9 @@ const Navbar = ({ open, toggleSidebar }: any) => {
                 ml: 1,
                 mr: 1,
                 borderRadius: theme.shape.borderRadius,
+                gap: "8px"
               }}
-              open={open}
+              // open={open}
               onClick={() =>
                 handleMenuItemClick("/dashboard/notifications/log")
               }

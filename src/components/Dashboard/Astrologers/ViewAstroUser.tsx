@@ -366,7 +366,6 @@ import {
   Button,
   Skeleton,
   Divider,
-  Chip,
   CardActions,
   Modal,
 } from "@mui/material";
@@ -437,7 +436,7 @@ const InfoItem = ({
   </Box>
 );
 
-const AstroUserView: React.FC<{ mode: "view" }> = ({ mode }) => {
+const AstroUserView: React.FC<{ mode: "view" }> = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -643,7 +642,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = ({ mode }) => {
 
       {/* Consultation Info */}
       <ConsultationDetails
-        fullName={fullName}
+        // fullName={fullName}
         loading={loading}
         consultationData={consultationData}
       />
@@ -651,7 +650,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = ({ mode }) => {
   );
 };
 
-const ConsultationDetails = ({ fullName, loading, consultationData }: any) => {
+const ConsultationDetails = ({ loading, consultationData }: any) => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedHoroscopeUrl, setSelectedHoroscopeUrl] = useState<string | null>(null);
 
