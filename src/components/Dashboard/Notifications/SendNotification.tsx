@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Avatar,
   Divider,
   InputAdornment,
   Grid,
@@ -42,7 +41,7 @@ type Nakshatra = string;
 type Rashi = string;
 
 // Styled Components
-const CelestialCard = styled(Card)(({ theme }) => ({
+const CelestialCard = styled(Card)(() => ({
   background:
     "linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(240,247,250,0.9) 100%)",
   borderRadius: "16px",
@@ -73,7 +72,7 @@ const SectionHeader = styled(Box)(({ theme }) => ({
 const SendNotification: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  // const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
