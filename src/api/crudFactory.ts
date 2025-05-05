@@ -208,7 +208,7 @@ export const fetchFilterValues = async (table: string, field: string, searchValu
           .filter(Boolean)
           .sort()
       : [];
-
+    console.log(uniqueValues, "uniqueValues")
     return uniqueValues;
   } catch (error) {
     console.error(`Error fetching filter values for ${field}:`, error);

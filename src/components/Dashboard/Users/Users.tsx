@@ -251,7 +251,7 @@ const Users: React.FC = () => {
         console.log(`Applying filter: field=${field}, value=${normalizedValue}`);
       }
 
-      console.log("fetchUsers params:", params);
+      // console.log("fetchUsers params:", params);
 
       const response = await callAPI({
         endpoint,
@@ -259,13 +259,15 @@ const Users: React.FC = () => {
         params,
       });
 
-      console.log("fetchUsers response:", response);
+      // console.log("fetchUsers response:", response);
 
       // Handle response structure for both endpoints
       const responseData = response?.data;
       if (!responseData) {
         throw new Error("No data in response");
       }
+
+      console.log(responseData, "responseData")
 
       // Ensure data is an array and total is a number
       const fetchedUsers = Array.isArray(responseData.data) ? responseData.data : [];
