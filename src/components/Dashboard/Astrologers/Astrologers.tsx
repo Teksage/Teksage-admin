@@ -23,6 +23,8 @@ const Astrologers: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  console.log(filters, "filters");
+
   const fetchAstrologers = async (currentPage: number, currentFilters: Record<string, string>) => {
     setLoading(true);
     setError(null);

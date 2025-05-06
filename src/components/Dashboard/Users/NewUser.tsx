@@ -279,22 +279,26 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
       navigate(-1);
     } catch (err: any) {
-      console.log(err);
+      console.error("API Error:", err);
+      let errorMessage = "Something went wrong. Please try again.";
+      if (err.response && err.response.data) {
+        errorMessage = err.response.data.message || JSON.stringify(err.response.data);
+      }
       setSnackbar({
         open: true,
-        message: `Something went wrong. Please try again.`,
+        message: errorMessage,
         severity: "error",
       });
     }
   };
 
-  useEffect(() => {
-    // Reset nakshatra when rashi changes
-    setFormData((prev) => ({
-      ...prev,
-      nakshatra: "",
-    }));
-  }, [formData.rashi]);
+  // useEffect(() => {
+  //   // Reset nakshatra when rashi changes
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     nakshatra: "",
+  //   }));
+  // }, [formData.rashi]);
 
   // ⏳ Auto trigger rashi & nakshatra fetch
   useEffect(() => {
@@ -321,6 +325,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               birth_location: placeOfBirth,
             },
           });
+
+          console.log(response.data, "response.data")
 
           if (response?.data?.nakshatra && response?.data?.rashi) {
             setFormData((prev) => ({
