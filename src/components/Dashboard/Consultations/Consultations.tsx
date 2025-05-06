@@ -87,7 +87,6 @@ const Consultations: React.FC = () => {
     if (!searchValue.trim()) {
       return [];
     }
-
     try {
       const uniqueValues = await fetchFilterValues("consultation", field as string, searchValue);
       // For start_time, ensure values are formatted as dates (YYYY-MM-DD)
