@@ -77,7 +77,6 @@ const LogoContainer = styled(Box)(({ theme }) => ({
 
 const ToggleButton = styled(IconButton)(({ theme }) => ({
   position: "fixed",
-  // left: open ? DRAWER_WIDTH - 12 : DRAWER_COLLAPSED_WIDTH - 12,
   top: "50%",
   transform: "translateY(-50%)",
   zIndex: theme.zIndex.drawer + 1,
@@ -110,7 +109,7 @@ const ToggleButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
+const NavItem = styled(ListItemButton)(({ theme, open }) => ({
   borderRadius: theme.shape.borderRadius,
   margin: theme.spacing(0.5, 1),
   padding: theme.spacing(1),
@@ -131,7 +130,7 @@ const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
   "& .MuiListItemIcon-root": {
     minWidth: open ? 40 : 24,
     justifyContent: open ? "flex-start" : "center",
-    marginRight: open ? theme.spacing(4) : 0, // Increased gap to 16px when open
+    marginRight: open ? theme.spacing(4) : 0,
   },
   transition: theme.transitions.create(
     ["background-color", "padding", "margin"],
@@ -141,7 +140,6 @@ const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
   ),
 }));
 
-// Update menuItems to include Notifications
 const menuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
@@ -161,8 +159,7 @@ const menuItems = [
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 ];
 
-const Navbar = ({ open, toggleSidebar }: any) => {
-  // const [expanded, setExpanded] = useState(false);
+const Navbar = ({ open, toggleSidebar }) => {
   const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -170,9 +167,8 @@ const Navbar = ({ open, toggleSidebar }: any) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
   const locationPathname = location?.pathname;
-  // const firstPathSegment = location.pathname.split("/")[2];
 
-  const handleNotificationsClick = (e: any) => {
+  const handleNotificationsClick = (e) => {
     e.stopPropagation();
     setNotificationsExpanded(!notificationsExpanded);
     if (!notificationsExpanded && open) {
@@ -185,29 +181,17 @@ const Navbar = ({ open, toggleSidebar }: any) => {
       setMobileOpen(!mobileOpen);
     } else {
       toggleSidebar();
-      // Only reset expanded state when closing the sidebar
-      // if (open) {
-      //   setExpanded(false);
-      // }
     }
   };
 
-  const handleMenuItemClick = (path: any) => {
+  const handleMenuItemClick = (path) => {
     navigate(path);
     if (isMobile) {
       setMobileOpen(false);
     }
   };
 
-  // const handleExpandClick = (e) => {
-  //   e.stopPropagation();
-  //   setExpanded(!expanded);
-  //   if (!expanded && open) {
-  //     navigate("/dashboard/plans/coupons");
-  //   }
-  // };
-
-  const isActive = (path: any) => locationPathname.includes(path);
+  const isActive = (path) => locationPathname.includes(path);
 
   const drawerContent = (
     <>
@@ -248,7 +232,6 @@ const Navbar = ({ open, toggleSidebar }: any) => {
       </LogoContainer>
 
       <List sx={{ px: 0.5, pt: 1 }}>
-        {/* Render main menu items */}
         {menuItems.map((item) => (
           <NavItem
             key={item.name}
@@ -259,7 +242,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
             <ListItemIcon
               sx={{
                 color: "inherit",
-                marginRight: open || isMobile ? 4 : 0, // Adds 32px gap when open or on mobile
+                marginRight: open || isMobile ? 4 : 0,
               }}
             >
               {item.icon}
@@ -268,7 +251,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
               <ListItemText
                 primary={item.name}
                 primaryTypographyProps={{
-                  fontSize: "0.995rem",
+                  variant: "body1", // 16px base, scalable
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -278,9 +261,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
           </NavItem>
         ))}
 
-        {/* Add Notifications section with expandable items */}
         <NavItem
-          // open={open}
           onClick={
             open
               ? handleNotificationsClick
@@ -297,7 +278,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
               <ListItemText
                 primary="Notifications"
                 primaryTypographyProps={{
-                  fontSize: "0.995rem",
+                  variant: "body1", // 16px base, scalable
                   whiteSpace: "nowrap",
                 }}
                 sx={{ flexGrow: 1 }}
@@ -321,16 +302,14 @@ const Navbar = ({ open, toggleSidebar }: any) => {
           unmountOnExit
         >
           <List component="div" disablePadding>
-            {/* Send Notifications */}
             <NavItem
               sx={{
                 pl: open ? 4 : 2,
                 ml: 1,
                 mr: 1,
                 borderRadius: theme.shape.borderRadius,
-                gap: "8px"
+                gap: "8px",
               }}
-              // open={open}
               onClick={() =>
                 handleMenuItemClick("/dashboard/notifications/send")
               }
@@ -343,7 +322,7 @@ const Navbar = ({ open, toggleSidebar }: any) => {
                 <ListItemText
                   primary="Send Notifications"
                   primaryTypographyProps={{
-                    fontSize: "0.875rem",
+                    variant: "body2", // 14px base, scalable, for sub-items
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -352,29 +331,27 @@ const Navbar = ({ open, toggleSidebar }: any) => {
               )}
             </NavItem>
 
-            {/* Notifications Log */}
             <NavItem
               sx={{
                 pl: open ? 4 : 2,
                 ml: 1,
                 mr: 1,
                 borderRadius: theme.shape.borderRadius,
-                gap: "8px"
+                gap: "8px",
               }}
-              // open={open}
               onClick={() =>
                 handleMenuItemClick("/dashboard/notifications/log")
               }
               selected={locationPathname === "/dashboard/notifications/log"}
             >
               <ListItemIcon sx={{ color: "inherit" }}>
-                <ListAltIcon fontSize="small" />
+                <SendIcon fontSize="small" />
               </ListItemIcon>
               {(open || isMobile) && (
                 <ListItemText
                   primary="Notifications Log"
                   primaryTypographyProps={{
-                    fontSize: "0.875rem",
+                    variant: "body2", // 14px base, scalable, for sub-items
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",

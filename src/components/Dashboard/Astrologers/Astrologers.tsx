@@ -1,135 +1,8 @@
-// import React, {useEffect, useState} from "react";
-// import GenericTable from "../../Elements/Table";
-// import { TableColumn } from "../../Elements/Table";
-// import { Chip, Avatar } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
-// import { callAPI } from "../../../api/crudFactory";
-
-// interface UserData {
-//   astrologer_id: number;
-//   consulting_fee: string;
-//   customer_rating: string;
-//   experience: number;
-//   first_name: string;
-//   status: string;
-// }
-
-// const Astrologers: React.FC = () => {
-//   const navigate = useNavigate();
-//   const [Astrologers, setAstrologers] = useState([]);
-
-//   useEffect(() => {
-//     const fetchUsers = async () => {
-//       try {
-//         const response = await callAPI({
-//           endpoint: "api/admin/astrologers",
-//           method: "get",
-//         });
-//         console.log(response?.data?.astrologers, "response");
-//         setAstrologers(response?.data?.astrologers); // or response if your `callAPI` returns data directly
-//       } catch (error) {
-//         console.error("Failed to fetch users:", error);
-//       }
-//     };
-
-//     fetchUsers();
-//   }, []);
-
-//   const columns: TableColumn<UserData>[] = [
-//     {
-//       id: "first_name",
-//       label: "Name",
-//       filterable: true,
-//       // width: "300px",
-//     },
-//     {
-//       id: "experience",
-//       label: "Experience",
-//       filterable: true,
-//     },
-//     {
-//       id: "customer_rating",
-//       label: "Rating",
-//       filterable: true,
-//       // width: "250px",
-//     },
-//     {
-//       id: "consulting_fee",
-//       label: "Consultation Fee",
-//       filterable: true,
-//     },
-//     { 
-//       id: 'status', 
-//       label: 'Status',
-//       render: (value) => {
-//         // Handle null/undefined cases safely
-//         if (!value) {
-//           return <Chip label="N/A" color="default" />;
-//         }
-    
-//         const formattedValue = 
-//           value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-    
-//         return (
-//           <Chip 
-//             label={formattedValue} 
-//             color={formattedValue === 'Active' ? 'success' : 'default'} 
-//           />
-//         );
-//       },
-//       filterable: true,
-//     },
-//   ];
-
-//   const handleAdd = () => {
-//     navigate("/dashboard/astrologers/new");
-//   };
-
-//   const handleStatus = () => {
-//     // Handle Status
-//   };
-
-//   const handleView = (row: UserData) => {
-//     navigate(`/dashboard/astrologers/view/${row?.astrologer_id}`);
-//   };
-
-//   const handleEdit = (row: UserData) => {
-//     navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
-//   };
-
-//   const handleDelete = (row: UserData) => {
-//     // navigate(`/dashboard/users/edit/${row?.id}`);
-//   };
-
-//   const handleSelectionChange = (selectedIds: number[]) => {
-//     // console.log('Selected:', selectedIds);
-//   };
-
-//   return (
-//     <GenericTable<UserData>
-//       title="Astrologer Management"
-//       data={Astrologers}
-//       columns={columns}
-//       onAdd={handleAdd}
-//       onStatus={handleStatus}
-//       onView={handleView}
-//       onEdit={handleEdit}
-//       onDelete={handleDelete}
-//       onSelectionChange={handleSelectionChange}
-//       getRowId={(row) => row.astrologer_id}
-//       tableHeight="calc(100vh - 250px)"
-//       initialRowsPerPage={10}
-//     />
-//   );
-// };
-
-// export default Astrologers;
-
 import React, { useEffect, useState, useMemo } from "react";
 import GenericTable, { TableColumn } from "../../Elements/Table";
 import { Chip, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { callAPI } from "../../../api/crudFactory";
+import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
 interface UserData {
   astrologer_id: number;
@@ -140,14 +13,6 @@ interface UserData {
   status: string;
 }
 
-interface FilterOptions {
-  first_name: string[];
-  experience: string[];
-  customer_rating: string[];
-  consulting_fee: string[];
-  status: string[];
-}
-
 const Astrologers: React.FC = () => {
   const navigate = useNavigate();
   const [astrologers, setAstrologers] = useState<UserData[]>([]);
@@ -155,13 +20,6 @@ const Astrologers: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    first_name: [],
-    experience: [],
-    customer_rating: [],
-    consulting_fee: [],
-    status: [],
-  });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -169,36 +27,48 @@ const Astrologers: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const params = {
-        page: currentPage + 1, // API expects 1-based indexing
+      // Default pagination params
+      const params: Record<string, any> = {
+        page: currentPage + 1,
         per_page: rowsPerPage,
-        ...Object.fromEntries(
-          Object.entries(currentFilters).filter(([v]) => v !== "")
-        ),
       };
 
-      console.log("fetchAstrologers params:", params);
+      // Add filters to params if they exist and are non-empty
+      const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v.trim() !== "");
+      filterEntries.forEach(([field, value]) => {
+        params[field] = value.trim();
+      });
+
+      const endpoint = "api/admin/astrologers";
+
+      // console.log("fetchAstrologers params:", params);
 
       const response = await callAPI({
-        endpoint: "api/admin/astrologers",
+        endpoint,
         method: "get",
         params,
       });
 
-      console.log("fetchAstrologers response:", response);
+      // console.log("fetchAstrologers response:", response);
 
-      const astrologerData = response?.data?.astrologers || [];
-      const total = response?.data?.total || 0;
-
-      if (!Array.isArray(astrologerData)) {
-        throw new Error("Invalid astrologer data format");
+      // Handle response structure
+      const responseData = response?.data;
+      if (!responseData) {
+        throw new Error("No data in response");
       }
 
-      setAstrologers(astrologerData);
-      setTotalCount(Number(total));
+      // Ensure data is an array and total is a number
+      const fetchedAstrologers = Array.isArray(responseData.data) ? responseData.data : [];
+      const fetchedTotal = typeof responseData.total === "number" ? responseData.total : 0;
+
+      console.log("Fetched astrologers:", fetchedAstrologers);
+      console.log("Fetched total:", fetchedTotal);
+
+      setAstrologers(fetchedAstrologers);
+      setTotalCount(fetchedTotal);
 
       // Reset page if out of range
-      if (currentPage * rowsPerPage >= total && total > 0) {
+      if (currentPage * rowsPerPage >= fetchedTotal && fetchedTotal > 0) {
         setPage(0);
       }
     } catch (error) {
@@ -211,59 +81,18 @@ const Astrologers: React.FC = () => {
     }
   };
 
-  const fetchFilterOptions = async () => {
+  const fetchFilterOptions = async (field: keyof UserData, searchValue: string) => {
+    // Only fetch filter options if searchValue is non-empty
+    if (!searchValue.trim()) {
+      return [];
+    }
+
     try {
-      let allAstrologers: UserData[] = [];
-      let currentPage = 1;
-      let total = 0;
-      const perPage = 100;
-      let astrologerData: UserData[] = []; // Declare outside the loop
-
-      // Fetch all pages until all records are retrieved
-      do {
-        const response = await callAPI({
-          endpoint: "api/admin/astrologers",
-          method: "get",
-          params: { per_page: perPage, page: currentPage },
-        });
-
-        console.log(`fetchFilterOptions response (page ${currentPage}):`, response);
-
-        astrologerData = response?.data?.astrologers || [];
-        total = response?.data?.total || 0;
-
-        if (!Array.isArray(astrologerData)) {
-          throw new Error("Invalid astrologer data format for filter options");
-        }
-
-        allAstrologers = [...allAstrologers, ...astrologerData];
-        currentPage++;
-      } while (allAstrologers.length < total && astrologerData.length > 0);
-
-      // Extract unique values for each filterable field
-      const options: FilterOptions = {
-        first_name: [
-          ...new Set(allAstrologers.map((astro) => astro.first_name).filter(Boolean)),
-        ].sort(),
-        experience: [
-          ...new Set(allAstrologers.map((astro) => String(astro.experience)).filter(Boolean)),
-        ].sort((a, b) => Number(a) - Number(b)),
-        customer_rating: [
-          ...new Set(allAstrologers.map((astro) => astro.customer_rating).filter(Boolean)),
-        ].sort(),
-        consulting_fee: [
-          ...new Set(allAstrologers.map((astro) => astro.consulting_fee).filter(Boolean)),
-        ].sort(),
-        status: [
-          ...new Set(allAstrologers.map((astro) => astro.status).filter(Boolean)),
-        ].sort(),
-      };
-
-      console.log("Derived filterOptions:", options);
-      setFilterOptions(options);
+      const uniqueValues = await fetchFilterValues("astrologer", field as string, searchValue);
+      return uniqueValues;
     } catch (error) {
-      console.error("Failed to fetch filter options:", error);
-      setError("Failed to load filter options. Please try again.");
+      console.error(`Failed to fetch filter options for ${field}:`, error);
+      return [];
     }
   };
 
@@ -271,44 +100,34 @@ const Astrologers: React.FC = () => {
     fetchAstrologers(page, filters);
   }, [page, rowsPerPage, filters]);
 
-  useEffect(() => {
-    fetchFilterOptions();
-  }, []);
-
-  // Use useMemo to ensure columns update with filterOptions
   const columns: TableColumn<UserData>[] = useMemo(
     () => [
       {
         id: "first_name",
         label: "Name",
         filterable: true,
-        filterOptions: filterOptions.first_name,
         width: "300px",
       },
       {
         id: "experience",
         label: "Experience",
         filterable: true,
-        filterOptions: filterOptions.experience,
       },
       {
         id: "customer_rating",
         label: "Rating",
         filterable: true,
-        filterOptions: filterOptions.customer_rating,
         width: "250px",
       },
       {
         id: "consulting_fee",
         label: "Consultation Fee",
         filterable: true,
-        filterOptions: filterOptions.consulting_fee,
       },
       {
         id: "status",
         label: "Status",
         filterable: true,
-        filterOptions: filterOptions.status,
         render: (value) => {
           if (!value) {
             return <Chip label="N/A" color="default" />;
@@ -324,7 +143,7 @@ const Astrologers: React.FC = () => {
         },
       },
     ],
-    [filterOptions]
+    []
   );
 
   const handleAdd = () => {
@@ -338,10 +157,6 @@ const Astrologers: React.FC = () => {
   const handleEdit = (row: UserData) => {
     navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
   };
-
-  // const handleSelectionChange = (selectedIds: number[]) => {
-  //   console.log("Selected:", selectedIds);
-  // };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -372,7 +187,6 @@ const Astrologers: React.FC = () => {
         onAdd={handleAdd}
         onView={handleView}
         onEdit={handleEdit}
-        // onSelect={handleSelectionChange}
         getRowId={(row) => row.astrologer_id}
         tableHeight="calc(100vh - 250px)"
         initialRowsPerPage={rowsPerPage}
@@ -381,6 +195,7 @@ const Astrologers: React.FC = () => {
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
         onFilterChange={handleFilterChange}
+        onFetchFilterOptions={fetchFilterOptions}
         loading={loading}
       />
     </>

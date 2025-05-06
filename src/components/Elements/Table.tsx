@@ -2138,13 +2138,13 @@ function GenericTable<T>({
     return (
       <StyledFormControl key={columnId} size="small" fullWidth>
         <Autocomplete
-          options={["Select All", ...options]}
+          options={[...options]}
           getOptionLabel={(option) =>
-            option === "Select All" ? "Select All" : option
+            option
           }
           value={filters[columnId] || ""}
           onChange={(event, newValue) => {
-            const selectedValue = newValue === "Select All" ? "" : newValue || "";
+            const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue);
             // Reset search input if a value is selected or cleared
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
@@ -2179,11 +2179,9 @@ function GenericTable<T>({
             <li
               {...props}
               style={{
-                fontWeight: option === "Select All" ? 600 : 400,
+                fontWeight: 400,
                 background:
-                  option === "Select All" && !filters[columnId]
-                    ? alpha(theme.palette.primary.main, 0.1)
-                    : "transparent",
+                  "transparent",
               }}
             >
               {option}
@@ -2428,13 +2426,13 @@ function GenericTable<T>({
                   return (
                     <Autocomplete
                       key={columnId}
-                      options={["Select All", ...options]}
+                      options={[...options]}
                       getOptionLabel={(option) =>
-                        option === "Select All" ? "Select All" : option
+                        option
                       }
                       value={filters[columnId] || ""}
                       onChange={(event, newValue) => {
-                        const selectedValue = newValue === "Select All" ? "" : newValue || "";
+                        const selectedValue = newValue || "";
                         handleFilterChange(column.id, selectedValue);
                         // Reset search input if a value is selected or cleared
                         setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
@@ -2469,11 +2467,9 @@ function GenericTable<T>({
                         <li
                           {...props}
                           style={{
-                            fontWeight: option === "Select All" ? 600 : 400,
+                            fontWeight: 400,
                             background:
-                              option === "Select All" && !filters[columnId]
-                                ? alpha(theme.palette.primary.main, 0.1)
-                                : "transparent",
+                              "transparent",
                           }}
                         >
                           {option}

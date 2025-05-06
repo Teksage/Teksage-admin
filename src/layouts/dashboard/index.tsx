@@ -186,7 +186,7 @@ const DashboardLayout = () => {
                 variant="h6"
                 sx={{
                   fontWeight: 600,
-                  fontSize: { xs: "1.1rem", sm: "1.2rem" },
+                  fontSize: { xs: "1.15rem", sm: "1.3rem", md: "1.4rem" },
                   color: "rgba(0, 0, 0, 0.87)",
                   marginLeft: { xs: 7, sm: 2 },
                 }}

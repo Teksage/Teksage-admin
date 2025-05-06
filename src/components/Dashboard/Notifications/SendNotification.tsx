@@ -41,7 +41,7 @@ type Nakshatra = string;
 type Rashi = string;
 
 // Styled Components
-const CelestialCard = styled(Card)(() => ({
+const CelestialCard = styled(Card)(({ theme }) => ({
   background:
     "linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(240,247,250,0.9) 100%)",
   borderRadius: "16px",
@@ -52,6 +52,9 @@ const CelestialCard = styled(Card)(() => ({
   "&:hover": {
     transform: "translateY(-5px)",
     boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+  },
+  [theme.breakpoints.down("sm")]: {
+    borderRadius: "12px",
   },
 }));
 
@@ -67,12 +70,15 @@ const SectionHeader = styled(Box)(({ theme }) => ({
     background:
       "linear-gradient(135deg, rgba(16, 177, 0, 0.15) 0%, rgba(27, 77, 62, 0.15) 100%)",
   },
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(1.5),
+  },
 }));
 
 const SendNotification: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  // const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
@@ -81,13 +87,6 @@ const SendNotification: React.FC = () => {
   const [showAllNakshatras, setShowAllNakshatras] = useState<boolean>(false);
   const [userSearch, setUserSearch] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-
-  // Responsive font sizes
-  const titleVariant = isMobile ? "h5" : "h4";
-  const subtitleVariant = isMobile ? "subtitle2" : "subtitle1";
-  const bodyVariant = isMobile ? "body2" : "body1";
-  const buttonSize = isMobile ? "small" : "medium";
-  const chipSize = isMobile ? "small" : "medium";
 
   // Sample data
   const users: User[] = [
@@ -182,41 +181,61 @@ const SendNotification: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: isMobile ? 2 : 3 }}>
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
       <Typography
-        variant={titleVariant}
-        gutterBottom
+        variant="h4"
         sx={{
           fontWeight: 600,
           color: "#1B4D3E",
           display: "flex",
           alignItems: "center",
           gap: 2,
-          mb: 4,
+          mb: { xs: 3, sm: 4 },
+          fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.6rem" },
         }}
       >
-        <Send fontSize="medium" />
+        <Send sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
         Celestial Notifications
       </Typography>
       
-      <Grid container spacing={isMobile ? 2 : 3}>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {/* All Users Section */}
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("all")}>
-              <People sx={{ mr: 2, color: "#10B100", fontSize: isMobile ? "1.25rem" : "1.5rem" }} />
-              <Typography variant={subtitleVariant} sx={{ flexGrow: 1, fontWeight: 600 }}>
+              <People sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  flexGrow: 1,
+                  fontWeight: 600,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                }}
+              >
                 Broadcast to All Users
               </Typography>
               {expandedSection === "all" ? <ExpandLess /> : <ExpandMore />}
             </SectionHeader>
 
             <Collapse in={expandedSection === "all"}>
-              <CardContent>
-                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Mass Notification
                 </Typography>
-                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    mb: 3,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Send announcements or updates to all registered users instantly
                 </Typography>
 
@@ -224,14 +243,21 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Notification Subject"
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>📢</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          📢
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -239,16 +265,23 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Notification Message"
                   multiline
-                  rows={isMobile ? 3 : 4}
+                  rows={isMobile ? 3 : isTablet ? 4 : 5}
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>✉️</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          ✉️
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -256,14 +289,15 @@ const SendNotification: React.FC = () => {
                   <Button
                     variant="contained"
                     startIcon={<Send />}
-                    size={buttonSize}
+                    size={isMobile ? "small" : "medium"}
                     onClick={() => handleSendNotification("all")}
                     sx={{
                       background:
                         "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)",
                       borderRadius: "50px",
-                      px: isMobile ? 3 : 4,
-                      py: isMobile ? 1 : 1.5,
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
                     }}
                   >
                     Send to All
@@ -278,19 +312,39 @@ const SendNotification: React.FC = () => {
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("specific")}>
-              <PersonSearch sx={{ mr: 2, color: "#10B100", fontSize: isMobile ? "1.25rem" : "1.5rem" }} />
-              <Typography variant={subtitleVariant} sx={{ flexGrow: 1, fontWeight: 600 }}>
+              <PersonSearch sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  flexGrow: 1,
+                  fontWeight: 600,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                }}
+              >
                 Target Specific Users
               </Typography>
               {expandedSection === "specific" ? <ExpandLess /> : <ExpandMore />}
             </SectionHeader>
 
             <Collapse in={expandedSection === "specific"}>
-              <CardContent>
-                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Personalized Notifications
                 </Typography>
-                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    mb: 3,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Select individual users for tailored messages or updates
                 </Typography>
 
@@ -305,6 +359,7 @@ const SendNotification: React.FC = () => {
                           : "translate(14px, 16px) scale(1)",
                       backgroundColor: "white",
                       padding: "0 4px",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
                     }}
                   >
                     Select Users
@@ -320,8 +375,12 @@ const SendNotification: React.FC = () => {
                     renderValue={() =>
                       selectedUserIds.length === 0 ? (
                         <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-                          <People sx={{ mr: 1, fontSize: "1rem" }} />
-                          Select users...
+                          {/* <People sx={{ mr: 1, fontSize: { xs: "0.875rem", sm: "1rem" } }} /> */}
+                          {/* <Typography
+                            sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                          >
+                            Select users...
+                          </Typography> */}
                         </Box>
                       ) : (
                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
@@ -329,25 +388,31 @@ const SendNotification: React.FC = () => {
                             <Chip
                               key={user.id}
                               label={user.name}
-                              size="small"
+                              size={isMobile ? "small" : "medium"}
                               onDelete={(e) => {
                                 e.stopPropagation();
                                 removeUser(user.id);
                               }}
-                              deleteIcon={<Close fontSize="small" />}
+                              deleteIcon={<Close sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }} />}
                               sx={{
                                 backgroundColor: "rgba(16, 177, 0, 0.1)",
                                 color: "#1B4D3E",
+                                "& .MuiChip-label": {
+                                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                                },
                               }}
                             />
                           ))}
                           {selectedUsers.length > 3 && (
                             <Chip
                               label={`+${selectedUsers.length - 3} more`}
-                              size="small"
+                              size={isMobile ? "small" : "medium"}
                               sx={{
                                 backgroundColor: "rgba(0, 0, 0, 0.08)",
                                 color: "text.primary",
+                                "& .MuiChip-label": {
+                                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                                },
                               }}
                             />
                           )}
@@ -355,7 +420,7 @@ const SendNotification: React.FC = () => {
                       )
                     }
                     sx={{
-                      "& .MuiSelect-select": { display: "flex", alignItems: "center", minHeight: "40px" },
+                      "& .MuiSelect-select": { display: "flex", alignItems: "center", minHeight: { xs: "36px", sm: "40px" } },
                       "& .MuiOutlinedInput-notchedOutline": {
                         top: 0,
                       },
@@ -393,14 +458,17 @@ const SendNotification: React.FC = () => {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setUserSearch(e.target.value)
                         }
-                        size="small"
+                        size={isMobile ? "small" : "medium"}
                         variant="outlined"
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
-                              <PersonSearch fontSize="small" />
+                              <PersonSearch sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }} />
                             </InputAdornment>
                           ),
+                        }}
+                        InputLabelProps={{
+                          sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                         }}
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={(e) => e.stopPropagation()}
@@ -423,7 +491,12 @@ const SendNotification: React.FC = () => {
                         }}
                         sx={{ py: 0.5 }}
                       >
-                        <Typography variant={bodyVariant} sx={{ color: "#10B100" }}>
+                        <Typography
+                          sx={{
+                            color: "#10B100",
+                            fontSize: { xs: "0.875rem", sm: "1rem" },
+                          }}
+                        >
                           Select All
                         </Typography>
                       </MenuItem>
@@ -434,7 +507,12 @@ const SendNotification: React.FC = () => {
                         }}
                         sx={{ py: 0.5 }}
                       >
-                        <Typography variant={bodyVariant} sx={{ color: "#1B4D3E" }}>
+                        <Typography
+                          sx={{
+                            color: "#1B4D3E",
+                            fontSize: { xs: "0.875rem", sm: "1rem" },
+                          }}
+                        >
                           Deselect All
                         </Typography>
                       </MenuItem>
@@ -478,8 +556,16 @@ const SendNotification: React.FC = () => {
                               )}
                             </Box>
                             <Box>
-                              <Typography variant={bodyVariant}>{user.name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography
+                                sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                              >
+                                {user.name}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                              >
                                 {user.email}
                               </Typography>
                             </Box>
@@ -487,7 +573,13 @@ const SendNotification: React.FC = () => {
                         ))
                       ) : (
                         <MenuItem disabled>
-                          <Typography variant={bodyVariant} sx={{ fontStyle: "italic", color: "text.secondary" }}>
+                          <Typography
+                            sx={{
+                              fontStyle: "italic",
+                              color: "text.secondary",
+                              fontSize: { xs: "0.875rem", sm: "1rem" },
+                            }}
+                          >
                             No users found
                           </Typography>
                         </MenuItem>
@@ -496,7 +588,14 @@ const SendNotification: React.FC = () => {
                   </Select>
                 </FormControl>
 
-                <Typography variant={bodyVariant} sx={{ mb: 3, color: "text.secondary" }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mb: 3,
+                    color: "text.secondary",
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  }}
+                >
                   {selectedUsers.length} users selected
                 </Typography>
 
@@ -504,14 +603,21 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Notification Subject"
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>📢</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          📢
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -519,16 +625,23 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Personalized Message"
                   multiline
-                  rows={isMobile ? 3 : 4}
+                  rows={isMobile ? 3 : isTablet ? 4 : 5}
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>✉️</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          ✉️
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -536,7 +649,7 @@ const SendNotification: React.FC = () => {
                   <Button
                     variant="contained"
                     startIcon={<Send />}
-                    size={buttonSize}
+                    size={isMobile ? "small" : "medium"}
                     disabled={selectedUsers.length === 0}
                     onClick={() => handleSendNotification("specific")}
                     sx={{
@@ -546,8 +659,9 @@ const SendNotification: React.FC = () => {
                           : "rgba(0, 0, 0, 0.12)",
                       color: selectedUsers.length > 0 ? "white" : "text.disabled",
                       borderRadius: "50px",
-                      px: isMobile ? 3 : 4,
-                      py: isMobile ? 1 : 1.5,
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
                     }}
                   >
                     Send to Selected
@@ -562,19 +676,39 @@ const SendNotification: React.FC = () => {
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("nakshatra")}>
-              <Star sx={{ mr: 2, color: "#10B100", fontSize: isMobile ? "1.25rem" : "1.5rem" }} />
-              <Typography variant={subtitleVariant} sx={{ flexGrow: 1, fontWeight: 600 }}>
+              <Star sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  flexGrow: 1,
+                  fontWeight: 600,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                }}
+              >
                 Nakshatra-Based Users
               </Typography>
               {expandedSection === "nakshatra" ? <ExpandLess /> : <ExpandMore />}
             </SectionHeader>
 
             <Collapse in={expandedSection === "nakshatra"}>
-              <CardContent>
-                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Star-Based Targeting
                 </Typography>
-                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    mb: 3,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Reach users based on their birth nakshatras for astrologically relevant messages
                 </Typography>
 
@@ -585,12 +719,13 @@ const SendNotification: React.FC = () => {
                         key={nakshatra}
                         label={nakshatra}
                         onDelete={() => handleNakshatraSelect(nakshatra)}
-                        deleteIcon={<Close fontSize={chipSize} />}
-                        size={chipSize}
+                        deleteIcon={<Close sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }} />}
+                        size={isMobile ? "small" : "medium"}
                         sx={{
                           background: "rgba(16, 177, 0, 0.1)",
                           "& .MuiChip-label": {
                             fontWeight: 600,
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
                           },
                         }}
                       />
@@ -610,12 +745,13 @@ const SendNotification: React.FC = () => {
                               : "outlined"
                           }
                           onClick={() => handleNakshatraSelect(nakshatra)}
-                          startIcon={<Star fontSize={chipSize} />}
-                          size={buttonSize}
+                          startIcon={<Star sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }} />}
+                          size={isMobile ? "small" : "medium"}
                           sx={{
                             justifyContent: "flex-start",
                             textTransform: "none",
                             borderRadius: "8px",
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
                             ...(selectedNakshatras.includes(nakshatra) && {
                               background: "rgba(16, 177, 0, 0.1)",
                               borderColor: "rgba(16, 177, 0, 0.3)",
@@ -633,9 +769,12 @@ const SendNotification: React.FC = () => {
                   <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
                     <Button
                       variant="text"
-                      size={buttonSize}
+                      size={isMobile ? "small" : "medium"}
                       onClick={() => setShowAllNakshatras(!showAllNakshatras)}
-                      sx={{ color: "#10B100" }}
+                      sx={{
+                        color: "#10B100",
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      }}
                     >
                       {showAllNakshatras ? "Show Less" : "Show More"}
                     </Button>
@@ -646,14 +785,21 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Notification Subject"
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>📢</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          📢
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -661,16 +807,23 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Celestial Message"
                   multiline
-                  rows={isMobile ? 3 : 4}
+                  rows={isMobile ? 3 : isTablet ? 4 : 5}
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>🌌</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          🌌
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -678,15 +831,18 @@ const SendNotification: React.FC = () => {
                   <Button
                     variant="contained"
                     startIcon={<Send />}
-                    size={buttonSize}
+                    size={isMobile ? "small" : "medium"}
                     disabled={selectedNakshatras.length === 0}
                     onClick={() => handleSendNotification("nakshatra")}
                     sx={{
                       background:
-                        "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)",
+                        selectedNakshatras.length > 0
+                          ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
+                          : "rgba(0, 0, 0, 0.12)",
                       borderRadius: "50px",
-                      px: isMobile ? 3 : 4,
-                      py: isMobile ? 1 : 1.5,
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
                     }}
                   >
                     Send to Nakshatra
@@ -701,19 +857,39 @@ const SendNotification: React.FC = () => {
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("rashi")}>
-              <Schema sx={{ mr: 2, color: "#10B100", fontSize: isMobile ? "1.25rem" : "1.5rem" }} />
-              <Typography variant={subtitleVariant} sx={{ flexGrow: 1, fontWeight: 600 }}>
+              <Schema sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  flexGrow: 1,
+                  fontWeight: 600,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                }}
+              >
                 Rashi-Based Users
               </Typography>
               {expandedSection === "rashi" ? <ExpandLess /> : <ExpandMore />}
             </SectionHeader>
 
             <Collapse in={expandedSection === "rashi"}>
-              <CardContent>
-                <Typography variant={subtitleVariant} sx={{ fontWeight: 600, mb: 1 }}>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Zodiac-Based Targeting
                 </Typography>
-                <Typography variant={bodyVariant} sx={{ mb: 3 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    mb: 3,
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                  }}
+                >
                   Send messages to users based on their zodiac signs for personalized astrological content
                 </Typography>
 
@@ -724,12 +900,13 @@ const SendNotification: React.FC = () => {
                         key={rashi}
                         label={rashi}
                         onDelete={() => handleRashiSelect(rashi)}
-                        deleteIcon={<Close fontSize={chipSize} />}
-                        size={chipSize}
+                        deleteIcon={<Close sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }} />}
+                        size={isMobile ? "small" : "medium"}
                         sx={{
                           background: "rgba(16, 177, 0, 0.1)",
                           "& .MuiChip-label": {
                             fontWeight: 600,
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
                           },
                         }}
                       />
@@ -749,11 +926,12 @@ const SendNotification: React.FC = () => {
                               : "outlined"
                           }
                           onClick={() => handleRashiSelect(rashi)}
-                          size={buttonSize}
+                          size={isMobile ? "small" : "medium"}
                           sx={{
                             justifyContent: "flex-start",
                             textTransform: "none",
                             borderRadius: "8px",
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
                             ...(selectedRashis.includes(rashi) && {
                               background: "rgba(16, 177, 0, 0.1)",
                               borderColor: "rgba(16, 177, 0, 0.3)",
@@ -773,14 +951,21 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Notification Subject"
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>📢</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          📢
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -788,16 +973,23 @@ const SendNotification: React.FC = () => {
                   fullWidth
                   label="Zodiac Message"
                   multiline
-                  rows={isMobile ? 3 : 4}
+                  rows={isMobile ? 3 : isTablet ? 4 : 5}
                   variant="outlined"
-                  size={buttonSize}
+                  size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Typography variant={bodyVariant}>♋️</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
+                          ♋️
+                        </Typography>
                       </InputAdornment>
                     ),
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -805,15 +997,18 @@ const SendNotification: React.FC = () => {
                   <Button
                     variant="contained"
                     startIcon={<Send />}
-                    size={buttonSize}
+                    size={isMobile ? "small" : "medium"}
                     disabled={selectedRashis.length === 0}
                     onClick={() => handleSendNotification("rashi")}
                     sx={{
                       background:
-                        "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)",
+                        selectedRashis.length > 0
+                          ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
+                          : "rgba(0, 0, 0, 0.12)",
                       borderRadius: "50px",
-                      px: isMobile ? 3 : 4,
-                      py: isMobile ? 1 : 1.5,
+                      px: { xs: 3, sm: 4 },
+                      py: { xs: 1, sm: 1.5 },
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
                     }}
                   >
                     Send to Rashi

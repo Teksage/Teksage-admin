@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import GenericTable, { TableColumn } from "../../Elements/Table";
 import { Chip, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { callAPI } from "../../../api/crudFactory";
+import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
 interface ConsultationData {
   id: number;
@@ -14,15 +14,6 @@ interface ConsultationData {
   consultation_fee: string | number | null;
 }
 
-interface FilterOptions {
-  astrologer_name: string[];
-  category: string[];
-  status: string[];
-  customer_name: string[];
-  consultation_fee: string[];
-  start_time: string[];
-}
-
 const Consultations: React.FC = () => {
   const navigate = useNavigate();
   const [consultations, setConsultations] = useState<ConsultationData[]>([]);
@@ -30,14 +21,6 @@ const Consultations: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    astrologer_name: [],
-    category: [],
-    status: [],
-    customer_name: [],
-    consultation_fee: [],
-    start_time: [],
-  });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -45,36 +28,48 @@ const Consultations: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const params = {
-        page: currentPage + 1, // API expects 1-based indexing
+      // Default pagination params
+      const params: Record<string, any> = {
+        page: currentPage + 1,
         per_page: rowsPerPage,
-        ...Object.fromEntries(
-          Object.entries(currentFilters).filter(([_, v]) => v !== "")
-        ),
       };
 
-      console.log("fetchConsultations params:", params); // Debug log
+      // Add filters to params if they exist and are non-empty
+      const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v.trim() !== "");
+      filterEntries.forEach(([field, value]) => {
+        params[field] = value.trim();
+      });
+
+      const endpoint = "/api/admin/consultations";
+
+      // console.log("fetchConsultations params:", params);
 
       const response = await callAPI({
-        endpoint: "/api/admin/consultations",
+        endpoint,
         method: "get",
         params,
       });
 
-      console.log("fetchConsultations response:", response); // Debug log
+      // console.log("fetchConsultations response:", response);
 
-      const consultData = response?.data?.data || [];
-      const total = response?.data?.total || 0;
-
-      if (!Array.isArray(consultData)) {
-        throw new Error("Invalid consultation data format");
+      // Handle response structure
+      const responseData = response?.data;
+      if (!responseData) {
+        throw new Error("No data in response");
       }
 
-      setConsultations(consultData);
-      setTotalCount(Number(total));
+      // Ensure data is an array and total is a number
+      const fetchedConsultations = Array.isArray(responseData.data) ? responseData.data : [];
+      const fetchedTotal = typeof responseData.total === "number" ? responseData.total : 0;
+
+      console.log("Fetched consultations:", fetchedConsultations);
+      console.log("Fetched total:", fetchedTotal);
+
+      setConsultations(fetchedConsultations);
+      setTotalCount(fetchedTotal);
 
       // Reset page if out of range
-      if (currentPage * rowsPerPage >= total && total > 0) {
+      if (currentPage * rowsPerPage >= fetchedTotal && fetchedTotal > 0) {
         setPage(0);
       }
     } catch (error) {
@@ -87,78 +82,30 @@ const Consultations: React.FC = () => {
     }
   };
 
-  const fetchFilterOptions = async () => {
+  const fetchFilterOptions = async (field: keyof ConsultationData, searchValue: string) => {
+    // Only fetch filter options if searchValue is non-empty
+    if (!searchValue.trim()) {
+      return [];
+    }
+
     try {
-      let allConsultations: ConsultationData[] = [];
-      let currentPage = 1;
-      let total = 0;
-      const perPage = 100; // Smaller per_page to avoid API limits
-
-      // Fetch all pages until all records are retrieved
-      do {
-        const response = await callAPI({
-          endpoint: "/api/admin/consultations",
-          method: "get",
-          params: { per_page: perPage, page: currentPage },
-        });
-
-        const consultData = response?.data?.data || [];
-        total = response?.data?.total || 0;
-
-        if (!Array.isArray(consultData)) {
-          throw new Error("Invalid consultation data format for filter options");
-        }
-
-        allConsultations = [...allConsultations, ...consultData];
-        currentPage++;
-      } while (allConsultations.length < total);
-
-      // Extract unique values for each filterable field, excluding null and empty values
-      const options: FilterOptions = {
-        astrologer_name: [
-          ...new Set(allConsultations.map((consult) => consult.astrologer_name).filter((val): val is string => val !== null && val !== "")),
-        ].sort(),
-        category: [
-          ...new Set(allConsultations.map((consult) => consult.category).filter((val): val is string => val !== null && val !== "")),
-        ].sort(),
-        status: [
-          ...new Set(allConsultations.map((consult) => consult.status).filter((val): val is string => val !== null && val !== "")),
-        ].sort(),
-        customer_name: [
-          ...new Set(allConsultations.map((consult) => consult.customer_name).filter((val): val is string => val !== null && val !== "")),
-        ].sort(),
-        consultation_fee: [
-          ...new Set(
-            allConsultations
-              .map((consult) => (consult.consultation_fee !== null ? consult.consultation_fee.toString() : null))
-              .filter((val): val is string => val !== null && val !== "")
-          ),
-        ].sort(),
-        start_time: [
-          ...new Set(
-            allConsultations
-              .map((consult) => new Date(consult.start_time).toISOString().split("T")[0])
-              .filter((val): val is string => val !== null && val !== "")
-          ),
-        ].sort(),
-      };
-
-      console.log("Derived filterOptions:", options); // Debug log
-
-      setFilterOptions(options);
+      const uniqueValues = await fetchFilterValues("consultation", field as string, searchValue);
+      // For start_time, ensure values are formatted as dates (YYYY-MM-DD)
+      if (field === "start_time") {
+        return uniqueValues.map((value: string) =>
+          new Date(value).toISOString().split("T")[0]
+        ).filter((value: string) => value);
+      }
+      return uniqueValues;
     } catch (error) {
-      console.error("Failed to fetch filter options:", error);
-      setError("Failed to load filter options. Please try again.");
+      console.error(`Failed to fetch filter options for ${field}:`, error);
+      return [];
     }
   };
 
   useEffect(() => {
     fetchConsultations(page, filters);
   }, [page, rowsPerPage, filters]);
-
-  useEffect(() => {
-    fetchFilterOptions();
-  }, []);
 
   const columns: TableColumn<ConsultationData>[] = useMemo(
     () => [
@@ -167,20 +114,17 @@ const Consultations: React.FC = () => {
         label: "User",
         width: "180px",
         filterable: true,
-        filterOptions: filterOptions.customer_name,
       },
       {
         id: "astrologer_name",
         label: "Astrologer",
         width: "180px",
         filterable: true,
-        filterOptions: filterOptions.astrologer_name,
       },
       {
         id: "category",
         label: "Category",
         filterable: true,
-        filterOptions: filterOptions.category,
         width: "140px",
         render: (value) => value || "N/A",
       },
@@ -188,7 +132,6 @@ const Consultations: React.FC = () => {
         id: "consultation_fee",
         label: "Consultation Fee",
         filterable: true,
-        filterOptions: filterOptions.consultation_fee,
         width: "140px",
         render: (value) => (value !== null ? value.toString() : "N/A"),
       },
@@ -197,7 +140,6 @@ const Consultations: React.FC = () => {
         label: "Consultation Date",
         filterable: true,
         filterType: "date",
-        filterOptions: filterOptions.start_time,
         width: "140px",
         render: (value) =>
           value
@@ -214,7 +156,6 @@ const Consultations: React.FC = () => {
         id: "status",
         label: "Status",
         filterable: true,
-        filterOptions: filterOptions.status,
         render: (value) => (
           <Chip
             label={value}
@@ -231,7 +172,7 @@ const Consultations: React.FC = () => {
         ),
       },
     ],
-    [filterOptions]
+    []
   );
 
   const handleView = (row: ConsultationData) => {
@@ -270,6 +211,7 @@ const Consultations: React.FC = () => {
           setFilters(newFilters);
           setPage(0);
         }}
+        onFetchFilterOptions={fetchFilterOptions}
         showActions={true}
         loading={loading}
       />

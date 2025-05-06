@@ -211,7 +211,7 @@ import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
 interface UserData {
   id: number;
-  name: string;
+  first_name: string;
   email: string;
   mobile_number: string;
   status: string;
@@ -227,6 +227,68 @@ const Users: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(false);
 
+  console.log(filters, "filters")
+
+  // const fetchUsers = async (currentPage: number, currentFilters: Record<string, string>) => {
+  //   setLoading(true);
+  //   try {
+  //     // Default pagination params
+  //     const params: Record<string, any> = {
+  //       page: currentPage + 1,
+  //       per_page: rowsPerPage,
+  //     };
+
+  //     let endpoint = "api/admin/users";
+
+  //     // If filters are applied, use api/admin/query with table, field, value
+  //     const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v !== "");
+  //     if (filterEntries.length > 0) {
+  //       const [field, value] = filterEntries[0];
+  //       // Only trim whitespace, preserve the exact case of the value
+  //       const normalizedValue = value.trim();
+  //       params.table = "user";
+  //       params.field = field;
+  //       params.value = normalizedValue;
+  //       endpoint = "api/admin/query";
+  //       console.log(`Applying filter: field=${field}, value=${normalizedValue}`);
+  //     }
+
+  //     // console.log("fetchUsers params:", params);
+
+  //     const response = await callAPI({
+  //       endpoint,
+  //       method: "get",
+  //       params,
+  //     });
+
+  //     // console.log("fetchUsers response:", response);
+
+  //     // Handle response structure for both endpoints
+  //     const responseData = response?.data;
+  //     if (!responseData) {
+  //       throw new Error("No data in response");
+  //     }
+
+  //     console.log(responseData, "responseData")
+
+  //     // Ensure data is an array and total is a number
+  //     const fetchedUsers = Array.isArray(responseData.data) ? responseData.data : [];
+  //     const fetchedTotal = typeof responseData.total === "number" ? responseData.total : 0;
+
+  //     console.log("Fetched users:", fetchedUsers);
+  //     console.log("Fetched total:", fetchedTotal);
+
+  //     setUsers(fetchedUsers);
+  //     setTotalCount(fetchedTotal);
+  //   } catch (error) {
+  //     console.error("Failed to fetch users:", error);
+  //     setUsers([]);
+  //     setTotalCount(0);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchUsers = async (currentPage: number, currentFilters: Record<string, string>) => {
     setLoading(true);
     try {
@@ -235,47 +297,40 @@ const Users: React.FC = () => {
         page: currentPage + 1,
         per_page: rowsPerPage,
       };
-
-      let endpoint = "api/admin/users";
-
-      // If filters are applied, use api/admin/query with table, field, value
-      const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v !== "");
-      if (filterEntries.length > 0) {
-        const [field, value] = filterEntries[0];
-        // Only trim whitespace, preserve the exact case of the value
-        const normalizedValue = value.trim();
-        params.table = "user";
-        params.field = field;
-        params.value = normalizedValue;
-        endpoint = "api/admin/query";
-        console.log(`Applying filter: field=${field}, value=${normalizedValue}`);
-      }
-
+  
+      // Add filters to params if they exist and are non-empty
+      const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v.trim() !== "");
+      filterEntries.forEach(([field, value]) => {
+        params[field] = value.trim();
+      });
+  
+      const endpoint = "api/admin/users";
+  
       // console.log("fetchUsers params:", params);
-
+  
       const response = await callAPI({
         endpoint,
         method: "get",
         params,
       });
-
+  
       // console.log("fetchUsers response:", response);
-
-      // Handle response structure for both endpoints
+  
+      // Handle response structure
       const responseData = response?.data;
       if (!responseData) {
         throw new Error("No data in response");
       }
-
-      console.log(responseData, "responseData")
-
+  
+      console.log(responseData, "responseData");
+  
       // Ensure data is an array and total is a number
       const fetchedUsers = Array.isArray(responseData.data) ? responseData.data : [];
       const fetchedTotal = typeof responseData.total === "number" ? responseData.total : 0;
-
+  
       console.log("Fetched users:", fetchedUsers);
       console.log("Fetched total:", fetchedTotal);
-
+  
       setUsers(fetchedUsers);
       setTotalCount(fetchedTotal);
     } catch (error) {
@@ -286,7 +341,7 @@ const Users: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
   const fetchFilterOptions = async (field: keyof UserData, searchValue: string) => {
     // Only fetch filter options if searchValue is non-empty
     if (!searchValue.trim()) {
@@ -308,7 +363,7 @@ const Users: React.FC = () => {
 
   const columns: TableColumn<UserData>[] = [
     {
-      id: "name",
+      id: "first_name",
       label: "Name",
       filterable: true,
       width: "200px",
