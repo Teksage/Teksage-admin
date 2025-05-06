@@ -8,13 +8,13 @@ interface NotificationLogData {
   recipient_type: string;
   recipient_count: number;
   sender_email: string;
-  sent_by_time: string; // ISO date string
+  sent_by_: string; // ISO date string
 }
 
 interface FilterOptions {
   recipient_type: string[];
   sender_email: string[];
-  sent_by_time: string[];
+  sent_by_date: string[];
 }
 
 const NotificationLog: React.FC = () => {
@@ -26,7 +26,7 @@ const NotificationLog: React.FC = () => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     recipient_type: [],
     sender_email: [],
-    sent_by_time: [],
+    sent_by_date: [],
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,7 +39,7 @@ const NotificationLog: React.FC = () => {
       recipient_type: "All Users",
       recipient_count: 1500,
       sender_email: "astrology@service.com",
-      sent_by_time: "2025-04-28T10:30:00Z",
+      sent_by_date: "2025-04-28T10:30:00Z",
     },
     {
       id: 2,
@@ -47,7 +47,7 @@ const NotificationLog: React.FC = () => {
       recipient_type: "Premium Users",
       recipient_count: 300,
       sender_email: "notifications@service.com",
-      sent_by_time: "2025-04-27T15:45:00Z",
+      sent_by_date: "2025-04-27T15:45:00Z",
     },
     {
       id: 3,
@@ -55,7 +55,7 @@ const NotificationLog: React.FC = () => {
       recipient_type: "All Users",
       recipient_count: 2000,
       sender_email: "astrology@service.com",
-      sent_by_time: "2025-04-26T09:00:00Z",
+      sent_by_date: "2025-04-26T09:00:00Z",
     },
     {
       id: 4,
@@ -63,7 +63,7 @@ const NotificationLog: React.FC = () => {
       recipient_type: "Free Users",
       recipient_count: 800,
       sender_email: "daily@service.com",
-      sent_by_time: "2025-04-29T08:00:00Z",
+      sent_by_date: "2025-04-29T08:00:00Z",
     },
     {
       id: 5,
@@ -71,7 +71,7 @@ const NotificationLog: React.FC = () => {
       recipient_type: "Premium Users",
       recipient_count: 250,
       sender_email: "notifications@service.com",
-      sent_by_time: "2025-04-25T14:20:00Z",
+      sent_by_date: "2025-04-25T14:20:00Z",
     },
   ];
 
@@ -93,11 +93,11 @@ const NotificationLog: React.FC = () => {
           (log) => log.sender_email === currentFilters.sender_email
         );
       }
-      if (currentFilters.sent_by_time) {
+      if (currentFilters.sent_by_date) {
         filteredData = filteredData.filter(
           (log) =>
-            new Date(log.sent_by_time).toISOString().split("T")[0] ===
-            currentFilters.sent_by_time
+            new Date(log.sent_by_date).toISOString().split("T")[0] ===
+            currentFilters.sent_by_date
         );
       }
 
@@ -131,10 +131,10 @@ const NotificationLog: React.FC = () => {
         sender_email: [
           ...new Set(sampleData.map((log) => log.sender_email).filter(Boolean)),
         ].sort(),
-        sent_by_time: [
+        sent_by_date: [
           ...new Set(
             sampleData
-              .map((log) => new Date(log.sent_by_time).toISOString().split("T")[0])
+              .map((log) => new Date(log.sent_by_date).toISOString().split("T")[0])
               .filter(Boolean)
           ),
         ].sort(),
@@ -182,12 +182,12 @@ const NotificationLog: React.FC = () => {
         filterOptions: filterOptions.sender_email,
       },
       {
-        id: "sent_by_time",
+        id: "sent_by_date",
         label: "Sent by Time",
         width: "200px",
         filterable: true,
         filterType: "date", // Specify as date type for GenericTable
-        filterOptions: filterOptions.sent_by_time,
+        filterOptions: filterOptions.sent_by_date,
         render: (value) =>
           value
             ? new Date(value).toLocaleString("en-US", {
