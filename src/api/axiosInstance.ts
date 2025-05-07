@@ -77,7 +77,7 @@ axiosInstance.interceptors.response.use(
         processQueue(err, null);
         tokenService.clearTokens();
         // Optionally redirect to login
-        window.location.href = "/auth/login";
+        // window.location.href = "/auth/login";
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
