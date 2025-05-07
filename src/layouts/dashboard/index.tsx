@@ -13,11 +13,11 @@ import {
   useMediaQuery,
   useTheme,
   Avatar,
-  Theme
+  Theme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Logout from "@mui/icons-material/Logout";
-import Profile from "@mui/icons-material/Person";
+import Brightness4Icon from "@mui/icons-material/Brightness4"; // Added missing import
 import Navbar from "../../components/Dashboard/Navbar";
 import { tokenService } from "../../utils/tokenService";
 import { callAPI } from "../../api/crudFactory";
@@ -26,7 +26,7 @@ import { callAPI } from "../../api/crudFactory";
 interface MainContentProps {
   sidebarOpen: boolean;
   isMobile: boolean;
-  theme?: Theme; // Optional theme prop (already handled by MUI)
+  theme?: Theme;
 }
 
 const GradientAppBar = styled(AppBar)(({ theme }) => ({
@@ -65,8 +65,7 @@ const ProfileButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const MainContent = styled(Box, {
-  shouldForwardProp: (prop) =>
-    prop !== "sidebarOpen" && prop !== "isMobile",
+  shouldForwardProp: (prop) => prop !== "sidebarOpen" && prop !== "isMobile",
 })<MainContentProps>(({ theme, sidebarOpen, isMobile }) => ({
   flexGrow: 1,
   overflow: "hidden",
@@ -77,7 +76,7 @@ const MainContent = styled(Box, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  marginLeft: 0, // Remove left margin to attach directly to navbar
+  marginLeft: 0,
   width: isMobile
     ? "100%"
     : sidebarOpen
@@ -97,27 +96,44 @@ const DashboardLayout = () => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
   const open = Boolean(anchorEl);
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
-  const loginUserDetails = useSelector((state:any) => state.userInfo);
+  const loginUserDetails = useSelector((state: any) => state.userInfo);
+  const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
-    // Close sidebar on mobile when location changes
+    const userName = tokenService.getUser();
+    setUser(userName);
+  }, []);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("themeMode") as "light" | "dark";
+    if (savedTheme) {
+      setThemeMode(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("themeMode", themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
     if (isMobile) {
       setSidebarOpen(false);
     }
   }, [location, isMobile]);
 
-  const handleMenu = (event:any) => {
+  const handleMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleProfile = () => {
+  const handleToggleTheme = () => {
+    setThemeMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
     setAnchorEl(null);
-    navigate("/dashboard/profile");
   };
 
   const handleClose = () => {
@@ -127,7 +143,7 @@ const DashboardLayout = () => {
   const logoutSection = async () => {
     try {
       const refreshToken = tokenService.getRefreshToken();
-  
+
       if (refreshToken) {
         await callAPI({
           endpoint: "api/auth/logout",
@@ -145,13 +161,13 @@ const DashboardLayout = () => {
       dispatch({ type: "login", payload: {} });
       navigate("/auth/login");
     }
-  };  
+  };
 
-  const getInitials = (name:any) => {
+  const getInitials = (name: any) => {
     if (!name) return "U";
     return name
       .split(" ")
-      .map((n:any) => n[0])
+      .map((n: any) => n[0])
       .join("")
       .toUpperCase()
       .substring(0, 2);
@@ -159,8 +175,8 @@ const DashboardLayout = () => {
 
   const ScrollableContent = styled(Box)({
     flexGrow: 1,
-    overflow: "auto", // This area will scroll
-    height: "calc(100vh - 64px)", // Full height minus app bar height
+    overflow: "auto",
+    height: "calc(100vh - 64px)",
   });
 
   return (
@@ -177,11 +193,11 @@ const DashboardLayout = () => {
           <Toolbar
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "end",
               minHeight: 64,
             }}
           >
-            <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+            {/* <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
               <Typography
                 variant="h6"
                 sx={{
@@ -193,44 +209,26 @@ const DashboardLayout = () => {
               >
                 Dashboard
               </Typography>
-            </Box>
+            </Box> */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  display: { xs: "none", sm: "block" },
-                  color: "rgba(0, 0, 0, 0.6)",
-                  fontWeight: 500,
-                }}
-              >
-                {loginUserDetails?.name || "User"}
-              </Typography>
               <ProfileButton
                 onClick={handleMenu}
                 color="inherit"
                 aria-label="account"
                 size="large"
               >
-                {loginUserDetails?.avatar ? (
-                  <Avatar
-                    src={loginUserDetails.avatar}
-                    alt={loginUserDetails?.name || "User"}
-                    sx={{ width: 38, height: 38 }}
-                  />
-                ) : (
-                  <Avatar
-                    sx={{
-                      width: 38,
-                      height: 38,
-                      bgcolor: "rgba(16, 177, 0, 0.7)",
-                      color: "#fff",
-                      fontSize: "0.9rem",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {getInitials(loginUserDetails?.name)}
-                  </Avatar>
-                )}
+                <Avatar
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    bgcolor: "rgba(16, 177, 0, 0.7)",
+                    color: "#fff",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  {getInitials(user)}
+                </Avatar>
               </ProfileButton>
               <Menu
                 anchorEl={anchorEl}
@@ -261,36 +259,58 @@ const DashboardLayout = () => {
                     borderBottom: "1px solid rgba(0,0,0,0.06)",
                   }}
                 >
-                  {loginUserDetails?.avatar ? (
-                    <Avatar
-                      src={loginUserDetails.avatar}
-                      alt={loginUserDetails?.name || "User"}
-                      sx={{
-                        width: 64,
-                        height: 64,
-                        mb: 1.5,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                  ) : (
-                    <Avatar
-                      sx={{
-                        width: 64,
-                        height: 64,
-                        mb: 1.5,
-                        bgcolor: "rgba(16, 177, 0, 0.7)",
-                        color: "#fff",
-                        fontSize: "1.5rem",
-                        fontWeight: 600,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      {getInitials(loginUserDetails?.name)}
-                    </Avatar>
-                  )}
-                  <Typography variant="subtitle1" fontWeight={600}>
-                    {loginUserDetails?.name || "User"}
-                  </Typography>
+                  <Avatar
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      mb: 1.5,
+                      bgcolor: "rgba(16, 177, 0, 0.7)",
+                      color: "#fff",
+                      fontSize: "1.5rem",
+                      fontWeight: 600,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    {getInitials(user)}
+                  </Avatar>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      {user || "User"}
+                    </Typography>
+                    {themeMode === "light" ? (
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 3V1M12 23V21M3 12H1M23 12H21M5.64 5.64L4.22 4.22M19.78 19.78L18.36 18.36M5.64 18.36L4.22 19.78M19.78 4.22L18.36 5.64M12 17C14.76 17 17 14.76 17 12C17 9.24 14.76 7 12 7C9.24 7 7 9.24 7 12C7 14.76 9.24 17 12 17Z"
+                          stroke="#FFB300"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M21 12.79C20.65 14.24 19.88 15.56 18.77 16.67C16.77 18.67 14.06 19.5 11.5 19.5C6.75 19.5 3 15.75 3 11C3 8.44 3.83 5.73 5.83 3.73C6.94 2.62 8.26 1.85 9.71 1.5C9.15 2.62 8.85 3.85 8.85 5.15C8.85 8.85 11.85 11.85 15.55 11.85C16.85 11.85 18.08 11.55 19.2 11C19.55 11.56 20.32 12.33 21 12.79Z"
+                          stroke="#4A90E2"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </Box>
                   <Typography
                     variant="body2"
                     color="text.secondary"
@@ -302,11 +322,11 @@ const DashboardLayout = () => {
                       mt: 0.5,
                     }}
                   >
-                    {loginUserDetails?.role || "User"}
+                    {"Administrator"}
                   </Typography>
                 </Paper>
                 <MenuItem
-                  onClick={handleProfile}
+                  onClick={handleToggleTheme}
                   sx={{
                     py: 1.5,
                     px: 2,
@@ -316,9 +336,9 @@ const DashboardLayout = () => {
                     },
                   }}
                 >
-                  <Profile sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} />
+                  <Brightness4Icon sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} />
                   <Typography variant="body2" fontWeight={500}>
-                    Profile
+                    {themeMode === "light" ? "Dark Mode" : "Light Mode"}
                   </Typography>
                 </MenuItem>
                 <MenuItem
@@ -341,7 +361,6 @@ const DashboardLayout = () => {
             </Box>
           </Toolbar>
         </GradientAppBar>
-        {/* Scrollable content area */}
         <ScrollableContent>
           <Box
             sx={{

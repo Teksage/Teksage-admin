@@ -1,47 +1,46 @@
-// import PropTypes from "prop-types";
-// import { useMemo } from "react";
-// // material
-// import { CssBaseline } from "@mui/material";
-// import {
-//   ThemeProvider as MUIThemeProvider,
-//   createTheme,
-//   StyledEngineProvider,
-// } from "@mui/material/styles";
-// //
-// import palette from "./palette";
-// import typography from "./typography";
-// import componentsOverride from "./overrides";
-// import shadows, { customShadows } from "./shadows";
+// import React, { createContext, useState, useEffect, ReactNode } from "react";
 
-// // ----------------------------------------------------------------------
+// // Define the shape of the context value
+// interface ThemeContextType {
+//   themeMode: "light" | "dark";
+//   setThemeMode: (mode: "light" | "dark") => void;
+// }
 
-// ThemeProvider.propTypes = {
-//   children: PropTypes.node,
-// };
+// // Create the Theme Context with a default value
+// const ThemeContext = createContext<ThemeContextType>({
+//   themeMode: "light",
+//   setThemeMode: () => {},
+// });
 
-// export default function ThemeProvider({ children }) {
-//   const themeOptions = useMemo(
-//     () => ({
-//       palette,
-//       shape: { borderRadius: 8 },
-//       typography,
-//       shadows,
-//       customShadows,
-//     }),
-//     []
-//   );
+// // Theme Provider Component
+// interface ThemeProviderWrapperProps {
+//   children: ReactNode;
+// }
 
-//   const theme = createTheme(themeOptions);
-//   theme.components = componentsOverride(theme);
+// export const ThemeProviderWrapper: React.FC<ThemeProviderWrapperProps> = ({ children }) => {
+//   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
+
+//   // Load theme preference from localStorage on mount
+//   useEffect(() => {
+//     const savedTheme = localStorage.getItem("themeMode") as "light" | "dark";
+//     if (savedTheme) {
+//       setThemeMode(savedTheme);
+//     }
+//   }, []);
+
+//   // Save theme preference to localStorage when themeMode changes
+//   useEffect(() => {
+//     localStorage.setItem("themeMode", themeMode);
+//   }, [themeMode]);
 
 //   return (
-//     <StyledEngineProvider injectFirst>
-//       <MUIThemeProvider theme={theme}>
-//         <CssBaseline />
-//         {children}
-//       </MUIThemeProvider>
-//     </StyledEngineProvider>
+//     <ThemeContext.Provider value={{ themeMode, setThemeMode }}>
+//       {children}
+//     </ThemeContext.Provider>
 //   );
-// }
+// };
+
+// export default ThemeContext;
+
 
 export {}

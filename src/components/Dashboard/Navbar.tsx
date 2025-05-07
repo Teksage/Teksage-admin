@@ -235,7 +235,7 @@ const Navbar = ({ open, toggleSidebar }) => {
         {menuItems.map((item) => (
           <NavItem
             key={item.name}
-            onClick={() => handleMenuItemClick(item.path)}
+            onClick={() => {handleMenuItemClick(item.path); setNotificationsExpanded(false)}}
             selected={isActive(item.path)}
             sx={{ gap: "10px" }}
           >

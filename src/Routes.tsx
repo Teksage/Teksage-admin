@@ -123,10 +123,10 @@ export const router = createBrowserRouter([
             path: "analytics",
             element: <Analytics />,
           },
-          {
-            path: "profile",
-            element: <Profile />,
-          },
+          // {
+          //   path: "profile",
+          //   element: <Profile />,
+          // },
           {
             path: "notifications",
             children: [

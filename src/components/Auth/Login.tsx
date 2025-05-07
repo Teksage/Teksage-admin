@@ -14,7 +14,6 @@ import OfflineNotification from "../Elements/OfflineNotification";
 import { OtpFormComponent } from "../Elements/OtpFormComponent";
 import { LoginSuccessComponent } from "../Elements/LoginSuccessComponent";
 import { validateEmail, validateMobileNumber } from "../Elements/CommonValidations";
-import { NoAccessErrorComponent } from "../Elements/NoAccessErrorComponent";
 import { LoginInputFormComponent } from "../Elements/LoginInputFormComponent";
 
 // Styled Components
@@ -104,7 +103,7 @@ interface LoginState {
 }
 
 // Components
-const LoginWrapperComponent = ({ children }:any) => (
+const LoginWrapperComponent = ({ children }: { children: React.ReactNode }) => (
   <LoginWrapper>
     <OfflineNotification />
     <Box sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}>
@@ -113,7 +112,7 @@ const LoginWrapperComponent = ({ children }:any) => (
   </LoginWrapper>
 );
 
-const LoginCardComponent = ({ children }:any) => (
+const LoginCardComponent = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper>{children}</StyledPaper>
 );
 
@@ -151,21 +150,6 @@ export const Login = () => {
     }
   }, [formState.countdown]);
 
-  // Auto-navigate to input step after 3 seconds on error
-  useEffect(() => {
-    if (formState.step === "error") {
-      const timer = setTimeout(() => {
-        setFormState((prev) => ({
-          ...prev,
-          step: "input",
-          error: null,
-        }));
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [formState.step]);
-
-  // Navigate to dashboard after 2 seconds if step is "success"
   useEffect(() => {
     if (formState.step === "success") {
       const timer = setTimeout(() => {
@@ -264,7 +248,7 @@ export const Login = () => {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (formState.loginMethod === "email") {
       if (!formState.email) {
         setFormState((prev) => ({ ...prev, error: "Please enter your email" }));
@@ -293,30 +277,31 @@ export const Login = () => {
         return;
       }
     }
-
+  
     setFormState((prev) => ({ ...prev, loading: true, error: null }));
-
+  
     try {
-      try {
-        const endpoint =
-          formState.loginMethod === "email"
-            ? "api/auth/otp/request"
-            : "api/auth/mobile-otp/request";
-
-        const data =
-          formState.loginMethod === "email"
-            ? { email: formState.email }
-            : { mobile_number: formState.mobile_number };
-
-        await callAPI({
-          endpoint,
-          method: "post",
-          data,
-        });
-      } catch (error: any) {
-        console.log("Original API call failed, but continuing with bypass", error);
+      const endpoint =
+        formState.loginMethod === "email"
+          ? "api/auth/otp/request"
+          : "api/auth/mobile-otp/request";
+  
+      const data =
+        formState.loginMethod === "email"
+          ? { email: formState.email, user_type: "admin" }
+          : { mobile_number: formState.mobile_number, user_type: "admin" };
+  
+      const response = await callAPI({
+        endpoint,
+        method: "post",
+        data,
+      });
+  
+      // Check for access error in response
+      if (response.data.error === "400: Dont have an access") {
+        throw new Error("Access Denied: You do not have permission to proceed.");
       }
-
+  
       setFormState((prev) => ({
         ...prev,
         step: "otp",
@@ -325,20 +310,16 @@ export const Login = () => {
         otp: Array(6).fill(""),
         activeOtpIndex: 0,
       }));
-
+  
       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
-    } catch (error) {
-      console.error("Error in OTP request:", error);
+    } catch (error: any) {
+      const errorMessage = "Invalid User";
       setFormState((prev) => ({
         ...prev,
-        step: "otp",
         loading: false,
-        countdown: 30,
-        otp: Array(6).fill(""),
-        activeOtpIndex: 0,
+        error: errorMessage,
+        step: "input",
       }));
-
-      setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
     }
   };
 
@@ -391,143 +372,44 @@ export const Login = () => {
     }
   };
 
-  const fetchUserProfile = async () => {
-    try {
-      const response = await callAPI({
-        endpoint: "api/auth/profile",
-        method: "get",
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
-    }
-  };
-
   const handleVerifyOtp = async () => {
     const otp = formState.otp.join("");
     if (otp.length !== 6) return;
-
+  
     setFormState((prev) => ({ ...prev, loading: true, error: null }));
-
+  
     try {
-      let access_token: string;
-      let refresh_token: string;
-      let userData: any;
-
-      if (otp === "111111") {
-        const endpoint =
-          formState.loginMethod === "email"
-            ? "api/auth/otp/login-verify"
-            : "api/auth/mobile-otp/login-verify";
-
-        const data =
-          formState.loginMethod === "email"
-            ? { email: formState.email, otp: "111111", user_type: "admin" }
-            : { mobile_number: formState.mobile_number, otp: "111111", user_type: "admin" };
-
-        const response = await callAPI({
-          endpoint,
-          method: "post",
-          data,
-        });
-
-        if (response.data.error === "400: Dont have an access") {
-          throw new Error("Access Denied: You do not have permission to proceed.");
-        }
-
-        access_token = response.data.access_token;
-        refresh_token = response.data.refresh_token;
-
-        tokenService.setTokens({
-          access: access_token,
-          refresh: refresh_token,
-        });
-
-        const profileData = await fetchUserProfile();
-
-        if (profileData) {
-          userData = {
-            user_id: profileData.user_id,
-            name: `${profileData.first_name} ${profileData.last_name}`,
-            role: "Administrator",
-            email: profileData.email,
-            mobile_number: profileData.mobile_number,
-            preferred_location: profileData.preferred_location,
-            date_of_birth: profileData.date_of_birth,
-            time_of_birth: profileData.time_of_birth,
-            birth_location: profileData.birth_location,
-            rashi: profileData.rashi,
-            nakshatra: profileData.nakshatra,
-          };
-        } else {
-          userData = {
-            name: "Admin",
-            role: "Administrator",
-            email: formState.email,
-            mobile_number: formState.mobile_number,
-          };
-        }
-      } else {
-        const endpoint =
-          formState.loginMethod === "email"
-            ? "api/auth/otp/login-verify"
-            : "api/auth/mobile-otp/login-verify";
-
-        const data =
-          formState.loginMethod === "email"
-            ? { email: formState.email, otp }
-            : { mobile_number: formState.mobile_number, otp };
-
-        const response = await callAPI({
-          endpoint,
-          method: "post",
-          data,
-        });
-
-        if (response.data.error === "400: Dont have an access") {
-          throw new Error("Access Denied: You do not have permission to proceed.");
-        }
-
-        access_token = response.data.access_token;
-        refresh_token = response.data.refresh_token;
-
-        tokenService.setTokens({ access: access_token, refresh: refresh_token });
-
-        const profileData = await fetchUserProfile();
-
-        if (profileData) {
-          userData = {
-            user_id: profileData.user_id,
-            name: `${profileData.first_name} ${profileData.last_name}`,
-            role: "Administrator",
-            email: profileData.email,
-            mobile_number: profileData.mobile_number,
-            preferred_location: profileData.preferred_location,
-            date_of_birth: profileData.date_of_birth,
-            time_of_birth: profileData.time_of_birth,
-            birth_location: profileData.birth_location,
-            rashi: profileData.rashi,
-            nakshatra: profileData.nakshatra,
-          };
-        } else {
-          userData = {
-            name: "Admin",
-            role: "Administrator",
-            email: formState.email,
-            mobile_number: formState.mobile_number,
-          };
-        }
-      }
-
-      console.log("User data dispatched to Redux:", userData);
-
-      dispatch({ type: "setAuth", payload: true });
-      dispatch({
-        type: "login",
-        payload: userData,
+      const endpoint =
+        formState.loginMethod === "email"
+          ? "api/auth/otp/login-verify"
+          : "api/auth/mobile-otp/login-verify";
+  
+      const data =
+        formState.loginMethod === "email"
+          ? otp === "111111"
+            ? { email: formState.email, otp: "111111" }
+            : { email: formState.email, otp }
+          : otp === "111111"
+          ? { mobile_number: formState.mobile_number, otp: "111111" }
+          : { mobile_number: formState.mobile_number, otp };
+  
+      const response = await callAPI({
+        endpoint,
+        method: "post",
+        data,
       });
 
+      const access_token = response.data.access_token;
+      const refresh_token = response.data.refresh_token;
+  
+      tokenService.setTokens({
+        access: access_token,
+        refresh: refresh_token,
+        user: `${response.data.first_name} ${response.data.last_name}`
+      });
+
+      dispatch({ type: "setAuth", payload: true });
+  
       setFormState((prev) => ({
         ...prev,
         step: "success",
@@ -538,7 +420,7 @@ export const Login = () => {
       setFormState((prev) => ({
         ...prev,
         loading: false,
-        error: error.response?.data?.error || "Invalid OTP. Please try again.",
+        error: error.message || "Invalid OTP. Please try again.",
         step: "error",
       }));
     }
@@ -549,7 +431,6 @@ export const Login = () => {
       <LoginCardComponent>
         <LogoBoxComponent />
         {formState.step === "success" && <LoginSuccessComponent />}
-        {formState.step === "error" && <NoAccessErrorComponent error={formState.error} />}
         {formState.step === "input" && (
           <LoginInputFormComponent
             formState={{ ...formState, setFormState }}
