@@ -43,6 +43,11 @@ const TableHeader = ({
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
+          fontWeight: 600, // Bolder font for emphasis
+          fontFamily: '"Poppins", sans-serif', // Modern font family
+          color: theme.palette.mode === "light" ? "#10B100" : "#4CAF50", // Green shade, adjusted for light/dark mode
+          letterSpacing: 0.5, // Slight spacing for readability
+          textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
         }}
       >
         {title}
@@ -50,18 +55,17 @@ const TableHeader = ({
       <Box
         sx={{
           display: "flex",
-          gap: isMobile ? 0.5 : 1.5, // Smaller gap on mobile (4px), larger on desktop (12px)
+          gap: isMobile ? 0.5 : 1.5,
           alignItems: "center",
-          flexWrap: isMobile ? "wrap" : "nowrap", // Allow wrapping on mobile if needed
+          flexWrap: isMobile ? "wrap" : "nowrap",
         }}
       >
         {onAdd && (
           <Button
-            // variant="contained"
+            variant="contained"
             startIcon={<AddIcon />}
             onClick={onAdd}
-            size={isMobile ? "small" : "medium"} // Smaller button on mobile
-            // sx={{ px: isMobile ? 1 : 2 }} // Adjust padding for mobile
+            size={isMobile ? "small" : "medium"}
             sx={{
                 px: isMobile ? 1 : 2,
                 background:
