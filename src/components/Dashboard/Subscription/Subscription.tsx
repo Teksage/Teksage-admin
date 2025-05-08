@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import GenericTable from "../../Elements/Table/Table";
-import { TableColumn } from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/types";
 import { Chip } from "@mui/material";
 import { callAPI } from "../../../api/crudFactory";
 import { useNavigate } from "react-router-dom";
@@ -70,7 +70,7 @@ const Subscription: React.FC = () => {
     {
       id: "status",
       label: "Status",
-      render: (value) => {
+      render: (value:any) => {
         if (!value) return <Chip label="N/A" color="default" />;
         const formatted =
           value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();

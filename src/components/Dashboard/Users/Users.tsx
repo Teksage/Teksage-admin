@@ -215,7 +215,8 @@
 // export default Users;
 
 import React, { useEffect, useState } from "react";
-import GenericTable, { TableColumn } from "../../Elements/Table/Table";
+import GenericTable from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/types";
 import { Chip, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
@@ -348,7 +349,7 @@ const Users: React.FC = () => {
       label: "Status",
       filterable: true,
       filterOptions: ["Active", "Inactive"], // Default dropdown options
-      render: (value) => {
+      render: (value:any) => {
         if (!value) {
           return <Chip label="N/A" color="default" />;
         }

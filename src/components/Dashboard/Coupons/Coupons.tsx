@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import GenericTable, { TableColumn } from "../../Elements/Table/Table";
+import GenericTable from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/types";
 import { callAPI } from "../../../api/crudFactory";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -43,25 +44,25 @@ const Coupons: React.FC = () => {
       id: "coupon_percentage",
       label: "Coupon (%)",
       width: "150px",
-      render: (value) => `${value}%`,
+      render: (value:any) => `${value}%`,
     },
     {
       id: "max_cap",
       label: "Max Limit",
       width: "150px",
-      render: (value) => `₹${value}`,
+      render: (value:any) => `₹${value}`,
     },
     {
       id: "start_date",
       label: "Valid From",
       width: "180px",
-      render: (value) => format(new Date(value), "dd MMM yyyy"),
+      render: (value:any) => format(new Date(value), "dd MMM yyyy"),
     },
     {
       id: "end_date",
       label: "Valid Till",
       width: "180px",
-      render: (value) => format(new Date(value), "dd MMM yyyy"),
+      render: (value:any) => format(new Date(value), "dd MMM yyyy"),
     },
     { id: "plan_name", label: "Linked Plan", width: "200px" },
   ];

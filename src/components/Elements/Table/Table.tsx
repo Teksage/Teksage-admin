@@ -1621,10 +1621,10 @@ function GenericTable<T>({
 
   const handleExport = () => {
     const csv = [
-      columns.map((col) => col.label).join(","),
-      ...data.map((row) =>
+      columns.map((col:any) => col.label).join(","),
+      ...data.map((row:any) =>
         columns
-          .map((col) => {
+          .map((col:any) => {
             const value = col.render
               ? col.render(row[col.id], row)
               : row[col.id]?.toString() || "";

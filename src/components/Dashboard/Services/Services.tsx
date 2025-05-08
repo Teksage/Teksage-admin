@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../Elements/Table/Table";
-import { TableColumn } from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/types";
 import { Switch } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Chip } from "@mui/material";
@@ -53,7 +53,7 @@ const Services: React.FC = () => {
     {
       id: "status",
       label: "Status",
-      render: (value) => {
+      render: (value:any) => {
         if (!value) return <Chip label="N/A" color="default" />;
         const formatted =
           value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
@@ -68,7 +68,7 @@ const Services: React.FC = () => {
     {
       id: "push_notification_status",
       label: "Push Notification",
-      render: (value) => (
+      render: (value:any) => (
         <Switch
           checked={value}
           // disabled

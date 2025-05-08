@@ -396,6 +396,7 @@ const FilterSection = <T,>({
           getOptionLabel={(option) => option}
           value={filters[columnId] || ""}
           onChange={(event, newValue) => {
+            console.log(event)
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue);
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));

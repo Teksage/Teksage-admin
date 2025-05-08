@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
-import GenericTable, { TableColumn } from "../../Elements/Table/Table";
+import GenericTable from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/types";
 import { Alert } from "@mui/material";
 
 interface NotificationLogData {
@@ -188,7 +189,7 @@ const NotificationLog: React.FC = () => {
         filterable: true,
         filterType: "date", // Specify as date type for GenericTable
         filterOptions: filterOptions.sent_by_date,
-        render: (value) =>
+        render: (value:any) =>
           value
             ? new Date(value).toLocaleString("en-US", {
                 day: "numeric",

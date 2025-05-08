@@ -20,7 +20,6 @@ const TableHeader = ({
   title,
   onAdd,
   onExport,
-  showFilters,
   setShowFilters,
   setMobileFiltersOpen,
   filters,
