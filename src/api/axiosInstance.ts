@@ -68,7 +68,7 @@ axiosInstance.interceptors.response.use(
         const newAccessToken = res.data.access_token;
         const newRefreshToken = res.data.refresh_token;
 
-        tokenService.setTokens({ access: newAccessToken, refresh: newRefreshToken });
+        tokenService.setTokens({ access: newAccessToken, refresh: newRefreshToken, user: `${res.data.first_name} ${res.data.last_name}` });
         axiosInstance.defaults.headers.common.Authorization = "Bearer " + newAccessToken;
 
         processQueue(null, newAccessToken);
@@ -77,7 +77,7 @@ axiosInstance.interceptors.response.use(
         processQueue(err, null);
         tokenService.clearTokens();
         // Optionally redirect to login
-        // window.location.href = "/auth/login";
+        window.location.href = "/auth/login";
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

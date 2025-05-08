@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   Menu,
   MenuItem,
@@ -102,7 +102,6 @@ const DashboardLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
-  const loginUserDetails = useSelector((state: any) => state.userInfo);
   const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {

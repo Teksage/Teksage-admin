@@ -293,7 +293,6 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
 
       {/* Consultation Info */}
       <ConsultationDetails
-        fullName={fullName}
         loading={loading}
         consultationData={consultationData}
       />
@@ -301,12 +300,13 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
   );
 };
 
-const ConsultationDetails = ({ fullName, loading, consultationData }: any) => {
+const ConsultationDetails = ({ loading, consultationData }: any) => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedHoroscope, setSelectedHoroscope] = useState<{
     horoscope: any;
     customerName: string;
   } | null>(null);
+  const [visibleCount, setVisibleCount] = useState(6); // Track number of visible cards
 
   const handleOpenModal = (horoscope: any, customerName: string) => {
     setSelectedHoroscope({ horoscope, customerName });
@@ -318,6 +318,14 @@ const ConsultationDetails = ({ fullName, loading, consultationData }: any) => {
     setSelectedHoroscope(null);
   };
 
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 6);
+  };
+
+  const handleShowLess = () => {
+    setVisibleCount((prev) => Math.max(6, prev - 6));
+  };
+
   return (
     <>
       <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
@@ -327,159 +335,242 @@ const ConsultationDetails = ({ fullName, loading, consultationData }: any) => {
         {loading ? (
           <Skeleton height={120} />
         ) : consultationData && consultationData.length > 0 ? (
-          <Grid container spacing={3}>
-            {consultationData.map((consultation: any, index: number) => {
-              const event = consultation.event;
-              const customerName = `${event.customer_first_name} ${event.customer_last_name}`;
-              const hasHoroscope = event.user_horoscope;
-              const languages = event.languages
-                ? event.languages.join(", ")
-                : "N/A";
-              const category = event.category
-                ? event.category.join(", ")
-                : "N/A";
-              const rating = event.rating || "Not Rated";
+          <>
+            <Grid container spacing={3}>
+              {consultationData.slice(0, visibleCount).map((consultation: any, index: number) => {
+                const event = consultation.event;
+                const customerName = `${event.customer_first_name} ${event.customer_last_name}`;
+                const hasHoroscope = event.user_horoscope;
+                const languages = event.languages
+                  ? event.languages.join(", ")
+                  : "N/A";
+                const category = event.category
+                  ? event.category.join(", ")
+                  : "N/A";
+                const rating = event.rating || "Not Rated";
 
-              return (
-                <Grid item xs={12} sm={6} md={4} key={event.id || index}>
-                  <Card
-                    elevation={2}
-                    sx={{
-                      borderRadius: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%",
-                      transition: "transform 0.2s ease-in-out",
-                      "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={600}
-                        color="primary"
-                      >
-                        Consultation{" "}
-                        <Box
-                          component="span"
-                          sx={{
-                            backgroundColor: "#e3f2fd",
-                            color: "#1976d2",
-                            px: 1,
-                            py: 0.2,
-                            borderRadius: "6px",
-                            fontWeight: 600,
-                            fontSize: "0.9rem",
-                          }}
+                return (
+                  <Grid item xs={12} sm={6} md={4} key={event.id || index}>
+                    <Card
+                      elevation={2}
+                      sx={{
+                        borderRadius: 2,
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        transition: "transform 0.2s ease-in-out, opacity 0.3s ease-in-out",
+                        "&:hover": {
+                          transform: "scale(1.02)",
+                          boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
+                        },
+                        opacity: 0, // Start hidden for animation
+                        animation: "fadeIn 0.5s forwards",
+                        animationDelay: `${index * 0.1}s`, // Staggered animation
+                      }}
+                    >
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight={600}
+                          color="#006400"
                         >
-                          {dateFormat(event?.start_time, "DD-MMM-YYYY")}
-                        </Box>
-                      </Typography>
-
-                      <Divider sx={{ my: 1 }} />
-                      <Box sx={{ mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Category:</strong> {category}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Customer:</strong> {customerName}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Booking Date:</strong>{" "}
-                          {event.booking_date || "N/A"}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Time:</strong>{" "}
-                          {event.start_time && event.end_time
-                            ? `${event.start_time.slice(
-                                11,
-                                16
-                              )} - ${event.end_time.slice(11, 16)}`
-                            : "N/A"}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Fee:</strong> ₹{event.consultation_fee || 0}
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{ mb: 1, display: "flex", alignItems: "center" }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Rating:</strong>{" "}
-                        </Typography>
-                        {typeof rating === "number" ? (
+                          Consultation{" "}
                           <Box
+                            component="span"
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              ml: 1,
+                              backgroundColor: "rgba(16, 177, 0, 0.7)",
+                              color: "white",
+                              px: 1,
+                              py: 0.2,
+                              borderRadius: "6px",
+                              fontWeight: 600,
+                              fontSize: "0.9rem",
                             }}
                           >
-                            <StarIcon
-                              sx={{ color: "#fbc02d", fontSize: 18, mr: 0.5 }}
-                            />
-                            <Typography variant="body2">{rating}</Typography>
+                            {dateFormat(event?.start_time, "DD-MMM-YYYY")}
                           </Box>
-                        ) : (
-                          <Typography variant="body2" sx={{ ml: 1 }}>
-                            {rating}
-                          </Typography>
-                        )}
-                      </Box>
-                      <Box sx={{ mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Languages:</strong> {languages}
                         </Typography>
-                      </Box>
-                      {event.feedback && (
+
+                        <Divider sx={{ my: 1 }} />
                         <Box sx={{ mb: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            <strong>Feedback:</strong> {event.feedback}
+                            <strong>Category:</strong> {category}
                           </Typography>
                         </Box>
-                      )}
-                      {event.status && (
-                        <Box sx={{ mt: 1 }}>
-                          <Chip
-                            label={event.status.toUpperCase()}
-                            color={event.status === "new" ? "info" : "default"}
-                            size="small"
-                            sx={{ fontWeight: 500 }}
-                          />
+                        <Box sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Customer:</strong> {customerName}
+                          </Typography>
                         </Box>
-                      )}
-                    </CardContent>
-                    {hasHoroscope && (
-                      <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          startIcon={<DescriptionIcon />}
-                          onClick={() =>
-                            handleOpenModal(event.user_horoscope, customerName)
-                          }
-                          sx={{ textTransform: "none", fontWeight: 500 }}
+                        <Box sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Booking Date:</strong>{" "}
+                            {event.booking_date || "N/A"}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Time:</strong>{" "}
+                            {event.start_time && event.end_time
+                              ? `${event.start_time.slice(
+                                  11,
+                                  16
+                                )} - ${event.end_time.slice(11, 16)}`
+                              : "N/A"}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Fee:</strong> ₹{event.consultation_fee || 0}
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{ mb: 1, display: "flex", alignItems: "center" }}
                         >
-                          View Horoscope
-                        </Button>
-                      </CardActions>
-                    )}
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Rating:</strong>{" "}
+                          </Typography>
+                          {typeof rating === "number" ? (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                ml: 1,
+                              }}
+                            >
+                              <StarIcon
+                                sx={{ color: "#fbc02d", fontSize: 18, mr: 0.5 }}
+                              />
+                              <Typography variant="body2">{rating}</Typography>
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" sx={{ ml: 1 }}>
+                              {rating}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Languages:</strong> {languages}
+                          </Typography>
+                        </Box>
+                        {event.feedback && (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Feedback:</strong> {event.feedback}
+                            </Typography>
+                          </Box>
+                        )}
+                        {event.status && (
+                          <Box sx={{ mt: 1 }}>
+                            <Chip
+                              label={event.status.toUpperCase()}
+                              color={event.status === "new" ? "info" : "default"}
+                              size="small"
+                              sx={{ fontWeight: 500 }}
+                            />
+                          </Box>
+                        )}
+                      </CardContent>
+                      {hasHoroscope && (
+                        <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
+                          <Button
+                            variant="outlined"
+                            startIcon={<DescriptionIcon />}
+                            onClick={() =>
+                              handleOpenModal(event.user_horoscope, customerName)
+                            }
+                            sx={{
+                              borderColor: "rgba(16, 177, 0, 1)", // Primary green color from the gradient
+                              color: "rgba(16, 177, 0, 1)", // Text color matches the border
+                              textTransform: "none",
+                              fontWeight: 500,
+                              "& .MuiButton-startIcon": {
+                                color: "rgba(16, 177, 0, 1)", // Icon color matches the text
+                              },
+                              "&:hover": {
+                                borderColor: "rgba(27, 77, 62, 1)", // Darker green from the gradient on hover
+                                color: "rgba(27, 77, 62, 1)", // Text color matches the border on hover
+                                "& .MuiButton-startIcon": {
+                                  color: "rgba(27, 77, 62, 1)", // Icon color matches on hover
+                                },
+                                transform: "scale(1.05)", // Subtle scale effect on hover
+                              },
+                              transition: "all 0.3s ease-in-out",
+                            }}
+                          >
+                            View Horoscope
+                          </Button>
+                        </CardActions>
+                      )}
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+
+            {/* Show More/Show Less Buttons */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 2,
+                mt: 4,
+              }}
+            >
+              {visibleCount < consultationData.length && (
+                <Button
+                  variant="contained"
+                  onClick={handleShowMore}
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
+                    color: "#fff",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    borderRadius: 50,
+                    px: 4,
+                    py: 1.5,
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
+                      boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+                      transform: "scale(1.05)",
+                    },
+                    transition: "all 0.3s ease-in-out",
+                  }}
+                  startIcon={<StarsIcon />}
+                >
+                  Show More
+                </Button>
+              )}
+              {visibleCount > 6 && (
+                <Button
+                  variant="outlined"
+                  onClick={handleShowLess}
+                  sx={{
+                    borderColor: "rgba(16, 177, 0, 0.5)",
+                    color: "rgba(16, 177, 0, 0.9)",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    borderRadius: 50,
+                    px: 4,
+                    py: 1.5,
+                    "&:hover": {
+                      borderColor: "rgba(16, 177, 0, 1)",
+                      background: "rgba(16, 177, 0, 0.05)",
+                      transform: "scale(1.05)",
+                    },
+                    transition: "all 0.3s ease-in-out",
+                  }}
+                  startIcon={<CloseIcon />}
+                >
+                  Show Less
+                </Button>
+              )}
+            </Box>
+          </>
         ) : (
           <Typography color="text.disabled">
             No consultation data available.
@@ -968,3 +1059,23 @@ const ConsultationDetails = ({ fullName, loading, consultationData }: any) => {
 };
 
 export default AstroUserView;
+
+// Add CSS keyframes for the fade-in animation
+const styles = `
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+// Inject the styles into the document head
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);

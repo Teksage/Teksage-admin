@@ -216,12 +216,28 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                   <CardActions sx={{ justifyContent: "flex-start", p: 2 }}>
                     <Button
                       variant="outlined"
-                      color="primary"
                       startIcon={<DescriptionIcon />}
                       onClick={() =>
                         handleOpenModal(consultationData.user_horoscope)
                       }
-                      sx={{ textTransform: "none", fontWeight: 500 }}
+                      sx={{
+                        borderColor: "rgba(16, 177, 0, 1)", // Primary green color from the gradient
+                        color: "rgba(16, 177, 0, 1)", // Text color matches the border
+                        textTransform: "none",
+                        fontWeight: 500,
+                        "& .MuiButton-startIcon": {
+                          color: "rgba(16, 177, 0, 1)", // Icon color matches the text
+                        },
+                        "&:hover": {
+                          borderColor: "rgba(27, 77, 62, 1)", // Darker green from the gradient on hover
+                          color: "rgba(27, 77, 62, 1)", // Text color matches the border on hover
+                          "& .MuiButton-startIcon": {
+                            color: "rgba(27, 77, 62, 1)", // Icon color matches on hover
+                          },
+                          transform: "scale(1.05)", // Subtle scale effect on hover
+                        },
+                        transition: "all 0.3s ease-in-out",
+                      }}
                     >
                       View Horoscope
                     </Button>

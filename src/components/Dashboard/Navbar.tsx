@@ -30,7 +30,6 @@ import astro_prompt_logo from "../../assets/astro_prompt_logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SendIcon from "@mui/icons-material/Send";
-import ListAltIcon from "@mui/icons-material/ListAlt";
 
 const DRAWER_WIDTH = 240;
 const DRAWER_COLLAPSED_WIDTH = 72;
@@ -109,7 +108,7 @@ const ToggleButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const NavItem = styled(ListItemButton)(({ theme, open }) => ({
+const NavItem = styled(ListItemButton)(({ theme, open }:any) => ({
   borderRadius: theme.shape.borderRadius,
   margin: theme.spacing(0.5, 1),
   padding: theme.spacing(1),
@@ -159,7 +158,7 @@ const menuItems = [
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 ];
 
-const Navbar = ({ open, toggleSidebar }) => {
+const Navbar = ({ open, toggleSidebar }:any) => {
   const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -168,7 +167,7 @@ const Navbar = ({ open, toggleSidebar }) => {
   const location = useLocation();
   const locationPathname = location?.pathname;
 
-  const handleNotificationsClick = (e) => {
+  const handleNotificationsClick = (e:any) => {
     e.stopPropagation();
     setNotificationsExpanded(!notificationsExpanded);
     if (!notificationsExpanded && open) {
@@ -184,14 +183,14 @@ const Navbar = ({ open, toggleSidebar }) => {
     }
   };
 
-  const handleMenuItemClick = (path) => {
+  const handleMenuItemClick = (path:any) => {
     navigate(path);
     if (isMobile) {
       setMobileOpen(false);
     }
   };
 
-  const isActive = (path) => locationPathname.includes(path);
+  const isActive = (path:any) => locationPathname.includes(path);
 
   const drawerContent = (
     <>

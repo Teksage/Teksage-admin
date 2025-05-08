@@ -2859,6 +2859,7 @@ import {
   TableSortLabel,
   Stack,
   Popper,
+  Theme
 } from "@mui/material";
 import {
   Visibility as ViewIcon,
@@ -2982,12 +2983,12 @@ const TableToolbar = styled(Box)(({ theme }) => ({
   },
 }));
 
-const PrimaryButton = styled(Button)(({ theme }) => ({
+const PrimaryButton = styled(Button)(({ theme }: { theme: Theme }) => ({
   borderRadius: "8px",
   textTransform: "none",
   fontWeight: 600,
-  padding: { xs: theme.spacing(0.5, 1), sm: theme.spacing(1, 2) },
-  fontSize: { xs: "0.8rem", sm: "0.875rem" },
+  padding: theme.spacing(1, 2), // Default padding for larger screens
+  fontSize: "0.875rem", // Default fontSize for larger screens
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   boxShadow: "none",
   background:
@@ -2996,6 +2997,11 @@ const PrimaryButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-1px)",
     boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+  },
+  // Responsive styles using theme.breakpoints
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(0.5, 1), // Smaller padding for xs screens
+    fontSize: "0.8rem", // Smaller fontSize for xs screens
   },
 }));
 
@@ -3030,11 +3036,11 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
-const CustomPaper = styled(Paper)(({ theme, width }) => ({
-  width: width,
-  borderRadius: "8px",
-  boxShadow: `0 2px 8px ${alpha(theme.palette.grey[500], 0.2)}`,
-}));
+// const CustomPaper = styled(Paper)(({ theme, width }:any) => ({
+//   width: width,
+//   borderRadius: "8px",
+//   boxShadow: `0 2px 8px ${alpha(theme.palette.grey[500], 0.2)}`,
+// }));
 
 export interface TableColumn<T> {
   id: keyof T;
@@ -3165,8 +3171,8 @@ function GenericTable<T>({
     try {
       const options = await onFetchFilterOptions(columnId, searchValue);
       setFilterOptions((prev) => ({ ...prev, [columnIdStr]: options }));
-    } catch (error) {
-      console.error(`Failed to fetch filter options for ${columnId}:`, error);
+    } catch (error:any) {
+      console.error(`Failed to fetch filter`, error);
       setFilterOptions((prev) => ({ ...prev, [columnIdStr]: [] }));
     } finally {
       setFilterLoading((prev) => ({ ...prev, [columnIdStr]: false }));
@@ -3250,6 +3256,7 @@ function GenericTable<T>({
   };
 
   const handleChangePage = (event: any, newPage: number) => {
+    console.log(event)
     onPageChange?.(newPage);
   };
 
@@ -3616,7 +3623,7 @@ function GenericTable<T>({
     const optionsListWidth = Math.min(Math.max(estimatedWidth, 200), 450); // Clamp between 200px and 450px
 
     // Custom Popper to left-align the dropdown menu
-    const CustomPopper = (props) => (
+    const CustomPopper = (props:any) => (
       <Popper
         {...props}
         placement="bottom-start"
@@ -3650,6 +3657,7 @@ function GenericTable<T>({
           getOptionLabel={(option) => option}
           value={filters[columnId] || ""}
           onChange={(event, newValue) => {
+            console.log(event, "event")
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue);
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
@@ -3698,7 +3706,7 @@ function GenericTable<T>({
           disableClearable={false}
           freeSolo={false}
           PopperComponent={CustomPopper}
-          PaperComponent={(props) => <CustomPaper {...props} width={optionsListWidth} />}
+          // PaperComponent={(props) => <CustomPaper {...props} width={optionsListWidth} />}
           ListboxProps={{
             style: {
               width: optionsListWidth,

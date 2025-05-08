@@ -8,7 +8,7 @@ interface NotificationLogData {
   recipient_type: string;
   recipient_count: number;
   sender_email: string;
-  sent_by_: string; // ISO date string
+  sent_by_date: string; // ISO date string
 }
 
 interface FilterOptions {
