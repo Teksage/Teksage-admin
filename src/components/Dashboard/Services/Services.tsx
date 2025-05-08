@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import GenericTable from "../../Elements/Table";
-import { TableColumn } from "../../Elements/Table";
+import GenericTable from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/Table";
 import { Switch } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Chip } from "@mui/material";

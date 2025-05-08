@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import GenericTable, { TableColumn } from "../../Elements/Table";
+import GenericTable, { TableColumn } from "../../Elements/Table/Table";
 import { callAPI } from "../../../api/crudFactory";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import GenericTable, { TableColumn } from "../../Elements/Table";
+import GenericTable, { TableColumn } from "../../Elements/Table/Table";
 import { Chip, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
@@ -25,7 +25,10 @@ const Astrologers: React.FC = () => {
 
   console.log(filters, "filters");
 
-  const fetchAstrologers = async (currentPage: number, currentFilters: Record<string, string>) => {
+  const fetchAstrologers = async (
+    currentPage: number,
+    currentFilters: Record<string, string>
+  ) => {
     setLoading(true);
     setError(null);
     try {
@@ -36,7 +39,9 @@ const Astrologers: React.FC = () => {
       };
 
       // Add filters to params if they exist and are non-empty
-      const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v.trim() !== "");
+      const filterEntries = Object.entries(currentFilters).filter(
+        ([_, v]) => v.trim() !== ""
+      );
       filterEntries.forEach(([field, value]) => {
         params[field] = value.trim();
       });
@@ -60,8 +65,11 @@ const Astrologers: React.FC = () => {
       }
 
       // Ensure data is an array and total is a number
-      const fetchedAstrologers = Array.isArray(responseData.data) ? responseData.data : [];
-      const fetchedTotal = typeof responseData.total === "number" ? responseData.total : 0;
+      const fetchedAstrologers = Array.isArray(responseData.data)
+        ? responseData.data
+        : [];
+      const fetchedTotal =
+        typeof responseData.total === "number" ? responseData.total : 0;
 
       console.log("Fetched astrologers:", fetchedAstrologers);
       console.log("Fetched total:", fetchedTotal);
@@ -83,14 +91,21 @@ const Astrologers: React.FC = () => {
     }
   };
 
-  const fetchFilterOptions = async (field: keyof UserData, searchValue: string) => {
+  const fetchFilterOptions = async (
+    field: keyof UserData,
+    searchValue: string
+  ) => {
     // Only fetch filter options if searchValue is non-empty
     if (!searchValue.trim()) {
       return [];
     }
 
     try {
-      const uniqueValues = await fetchFilterValues("astrologer", field as string, searchValue);
+      const uniqueValues = await fetchFilterValues(
+        "astrologer",
+        field as string,
+        searchValue
+      );
       return uniqueValues;
     } catch (error) {
       console.error(`Failed to fetch filter options for ${field}:`, error);
@@ -114,12 +129,19 @@ const Astrologers: React.FC = () => {
         id: "experience",
         label: "Experience",
         filterable: true,
+        filterOptions: [
+          "< 3 Years",
+          "3 - 5 Years",
+          "5 - 10 Years",
+          "> 10 Years",
+        ], // Default dropdown options
       },
       {
         id: "customer_rating",
         label: "Rating",
         filterable: true,
         width: "250px",
+        filterOptions: ["1", "2", "3", "4", "5"],
       },
       {
         id: "consulting_fee",
@@ -130,6 +152,7 @@ const Astrologers: React.FC = () => {
         id: "status",
         label: "Status",
         filterable: true,
+        filterOptions: ["Active", "Inactive"], // Default dropdown options
         render: (value) => {
           if (!value) {
             return <Chip label="N/A" color="default" />;

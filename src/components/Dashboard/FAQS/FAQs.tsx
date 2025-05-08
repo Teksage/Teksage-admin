@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import GenericTable from "../../Elements/Table";
-import { TableColumn } from "../../Elements/Table";
+import GenericTable from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/Table";
 import { callAPI } from "../../../api/crudFactory";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../Elements/ConfirmModal";

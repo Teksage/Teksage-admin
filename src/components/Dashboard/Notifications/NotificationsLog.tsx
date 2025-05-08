@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import GenericTable, { TableColumn } from "../../Elements/Table";
+import GenericTable, { TableColumn } from "../../Elements/Table/Table";
 import { Alert } from "@mui/material";
 
 interface NotificationLogData {
