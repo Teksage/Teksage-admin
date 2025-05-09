@@ -533,7 +533,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               data?.coupon_percentage != null
                 ? Number(data.coupon_percentage)
                 : "",
-            max_cap: data?.max_cap != null ? Number(data.max_cap) : "", // Ensure it's a number
+            max_cap: data?.max_cap != null ? Number(data.max_cap) : "",
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             plan_id: data?.plan_id || null,
@@ -558,11 +558,11 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           field === "coupon_percentage"
             ? value === ""
               ? ""
-              : Number(value) // Keep coupon_percentage as a number input
+              : Number(value)
             : field === "max_cap"
             ? value === ""
               ? ""
-              : Number(value.replace(/,/g, "")) // Remove commas for max_cap
+              : Number(value.replace(/,/g, ""))
             : field === "plan_id"
             ? value === ""
               ? null
@@ -610,13 +610,64 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const isViewMode = mode === "view";
 
+  // Define textField props for DatePickers to reduce nesting
+  const startDateTextFieldProps = {
+    fullWidth: true,
+    size: "small",
+    error: !!errors.start_date,
+    helperText: errors.start_date || "",
+    InputLabelProps: {
+      sx: {
+        fontSize: "0.95rem",
+        fontWeight: 500,
+        color: "#455a64",
+      },
+    },
+    InputProps: {
+      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+    },
+    sx: {
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": { borderColor: "#cfd8dc" },
+        "&:hover fieldset": { borderColor: "#3f51b5" },
+        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+      },
+      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+    },
+  };
+
+  const endDateTextFieldProps = {
+    fullWidth: true,
+    size: "small",
+    error: !!errors.end_date,
+    helperText: errors.end_date || "",
+    InputLabelProps: {
+      sx: {
+        fontSize: "0.95rem",
+        fontWeight: 500,
+        color: "#455a64",
+      },
+    },
+    InputProps: {
+      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+    },
+    sx: {
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": { borderColor: "#cfd8dc" },
+        "&:hover fieldset": { borderColor: "#3f51b5" },
+        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+      },
+      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+    },
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-          <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
+          <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
-        <Typography variant="body1" fontWeight={600} color="#3f51b5">
+        <Typography variant="body1" fontWeight={600} color="#06402B">
           Back
         </Typography>
       </Box>
@@ -637,8 +688,17 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           variant="h5"
           fontWeight={600}
           mb={3}
-          color="#1a237e"
-          sx={{ letterSpacing: "0.3px", textAlign: "start" }}
+          // color="#1a237e"
+          sx={{
+            maxWidth: "50%", // Prevent title from pushing buttons too far
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 600, // Bolder font for emphasis
+            fontFamily: '"Poppins", sans-serif', // Modern font family
+            letterSpacing: 0.5, // Slight spacing for readability
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+          }}
         >
           {mode === "new"
             ? "Create Coupon"
@@ -725,7 +785,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <TextField
-                type="text" // Use text to handle formatted display
+                type="text"
                 label="Max Cap *"
                 fullWidth
                 size="small"
@@ -779,32 +839,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   setErrors((prev) => ({ ...prev, start_date: "" }));
                 }}
                 disabled={isViewMode}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                    error: !!errors.start_date,
-                    helperText: errors.start_date || "",
-                    InputLabelProps: {
-                      sx: {
-                        fontSize: "0.95rem",
-                        fontWeight: 500,
-                        color: "#455a64",
-                      },
-                    },
-                    InputProps: {
-                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
-                    },
-                    sx: {
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#cfd8dc" },
-                        "&:hover fieldset": { borderColor: "#3f51b5" },
-                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                      },
-                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                    },
-                  },
-                }}
+                slotProps={{ textField: startDateTextFieldProps }}
               />
             </Grid>
 
@@ -817,32 +852,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   setErrors((prev) => ({ ...prev, end_date: "" }));
                 }}
                 disabled={isViewMode}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size="small",
-                    error: !!errors.end_date,
-                    helperText: errors.end_date || "",
-                    InputLabelProps: {
-                      sx: {
-                        fontSize: "0.95rem",
-                        fontWeight: 500,
-                        color: "#455a64",
-                      },
-                    },
-                    InputProps: {
-                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
-                    },
-                    sx: {
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#cfd8dc" },
-                        "&:hover fieldset": { borderColor: "#3f51b5" },
-                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                      },
-                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                    },
-                  },
-                }}
+                slotProps={{ textField: endDateTextFieldProps }}
               />
             </Grid>
 
