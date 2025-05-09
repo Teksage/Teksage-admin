@@ -26,7 +26,6 @@ const FiltersContainer = styled(Box)(({ theme }) => ({
   flexWrap: "wrap",
   gap: theme.spacing(2),
   justifyContent: "flex-start",
-  // borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
   background: alpha(theme.palette.grey[50], 0.5),
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
@@ -43,6 +42,12 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
   "& .MuiOutlinedInput-notchedOutline": {
     borderColor: alpha(theme.palette.divider, 0.3),
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#3f51b5",
+  },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#3f51b5",
   },
   [theme.breakpoints.down("sm")]: {
     "& .MuiInputBase-root": { fontSize: "0.8rem" },
@@ -66,7 +71,6 @@ interface FilterSectionProps<T> {
   onFilterChange?: (filters: Record<string, string>) => void;
   onFetchFilterOptions?: (field: keyof T, searchValue: string) => Promise<string[]>;
   hasDateData: boolean;
-  hasFeeData: boolean;
 }
 
 const FilterSection = <T,>({
@@ -86,7 +90,6 @@ const FilterSection = <T,>({
   onFilterChange,
   onFetchFilterOptions,
   hasDateData,
-  hasFeeData,
 }: FilterSectionProps<T>) => {
   const theme = useTheme();
 
@@ -190,17 +193,15 @@ const FilterSection = <T,>({
     return (
       <Box sx={{ minWidth: { xs: "100%", sm: 200 }, maxWidth: { xs: "100%", sm: 450 } }}>
         <StyledFormControl size="small" sx={{ width: "100%", maxWidth: { xs: "100%", sm: 450 } }}>
-          <InputLabel>Date Range</InputLabel>
+          <InputLabel sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>Date Range</InputLabel>
           <Select
             value={selectedPreset}
             onChange={(e) => handleDatePresetChange(e.target.value as string)}
             label="Date Range"
             sx={{
               "& .MuiSelect-select": { padding: "6px 10px", fontSize: { xs: "0.8rem", sm: "0.9rem" } },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: selectedPreset ? "#4caf50" : "#e0e0e0" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              borderRadius: 1,
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: selectedPreset ? "#4caf50" : alpha(theme.palette.divider, 0.3) },
+              borderRadius: "8px",
             }}
           >
             {datePresets.map((preset) => (
@@ -236,7 +237,20 @@ const FilterSection = <T,>({
                     textField: {
                       size: "small",
                       sx: {
-                        "& .MuiInputBase-root": { borderRadius: "8px", background: alpha(theme.palette.background.paper, 0.9) },
+                        "& .MuiInputBase-root": {
+                          borderRadius: "8px",
+                          background: alpha(theme.palette.background.paper, 0.9),
+                          fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: alpha(theme.palette.divider, 0.3),
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
                         width: { xs: "100%", sm: 200 },
                       },
                     },
@@ -251,7 +265,20 @@ const FilterSection = <T,>({
                     textField: {
                       size: "small",
                       sx: {
-                        "& .MuiInputBase-root": { borderRadius: "8px", background: alpha(theme.palette.background.paper, 0.9) },
+                        "& .MuiInputBase-root": {
+                          borderRadius: "8px",
+                          background: alpha(theme.palette.background.paper, 0.9),
+                          fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: alpha(theme.palette.divider, 0.3),
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
                         width: { xs: "100%", sm: 200 },
                       },
                     },
@@ -265,117 +292,11 @@ const FilterSection = <T,>({
     );
   };
 
-  const renderFeeFilter = () => {
-    if (!hasFeeData) return null;
-    const feeRanges = ["< 500", "500 - 1000", "> 1000"];
-    const currencyCodes = ["INR", "USD"];
-
-    const handleFeeRangeChange = (value: string) => {
-      const currency = filters["consultation_fee"]?.split(" ")[1] || "INR";
-      const newValue = value ? `${value} ${currency}` : currency;
-      handleFilterChange("consultation_fee" as keyof T, newValue);
-    };
-
-    const handleCurrencyChange = (value: string) => {
-      const feeRange = filters["consultation_fee"]?.split(" ")[0] || "";
-      const newValue = feeRange ? `${feeRange} ${value}` : value;
-      handleFilterChange("consultation_fee" as keyof T, newValue);
-    };
-
-    return (
-      <Box sx={{ minWidth: { xs: "100%", sm: 300 }, maxWidth: { xs: "100%", sm: 500 }, display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 1, sm: 0.5 } }}>
-        <StyledFormControl size="small" sx={{ width: { xs: "100%", sm: 100 } }}>
-          <Box sx={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "2px" }}>
-            <Typography variant="caption" sx={{ fontSize: "0.75rem", fontWeight: 700, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.grey[100], 0.5), padding: "0 4px" }}>
-              Currency
-            </Typography>
-          </Box>
-          <Select
-            value={filters["consultation_fee"]?.split(" ")[1] || "INR"}
-            onChange={(e) => handleCurrencyChange(e.target.value as string)}
-            label="Currency"
-            sx={{
-              "& .MuiSelect-select": { padding: "6px 8px", fontSize: { xs: "0.8rem", sm: "0.9rem" }, height: "38px", textAlign: "center" },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: filters["consultation_fee"] ? "#4caf50" : "#e0e0e0" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              borderRadius: "8px",
-            }}
-          >
-            {currencyCodes.map((code) => (
-              <MenuItem key={code} value={code} sx={{ justifyContent: "center", textAlign: "center" }}>
-                {code}
-              </MenuItem>
-            ))}
-          </Select>
-        </StyledFormControl>
-        <StyledFormControl size="small" sx={{ flex: { xs: "none", sm: 1 }, width: { xs: "100%", sm: "auto" } }}>
-          <Box sx={{ display: "flex", justifyContent: { xs: "center", sm: "flex-start" }, width: "100%", marginBottom: "2px" }}>
-            <Typography variant="caption" sx={{ fontSize: "0.75rem", fontWeight: 700, color: theme.palette.text.primary, backgroundColor: alpha(theme.palette.grey[100], 0.5), padding: "0 4px" }}>
-              Fee Range
-            </Typography>
-          </Box>
-          <Select
-            value={filters["consultation_fee"]?.split(" ")[0] || ""}
-            onChange={(e) => handleFeeRangeChange(e.target.value as string)}
-            label="Fee Range"
-            sx={{
-              "& .MuiSelect-select": { padding: "6px 12px", fontSize: { xs: "0.8rem", sm: "0.9rem" }, height: "38px", textAlign: "left" },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: filters["consultation_fee"] ? "#4caf50" : "#e0e0e0" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              borderRadius: "8px",
-            }}
-          >
-            <MenuItem value="" sx={{ textAlign: "left" }}>
-              <span>All</span>
-            </MenuItem>
-            {feeRanges.map((range) => (
-              <MenuItem key={range} value={range} sx={{ textAlign: "left" }}>
-                {range}
-              </MenuItem>
-            ))}
-          </Select>
-        </StyledFormControl>
-      </Box>
-    );
-  };
-
-  const renderSelectFilter = (column: TableColumn<T>) => {
+  const renderFilter = (column: TableColumn<T>) => {
     const columnId = column.id as string;
-    if (column.filterOptions && column.filterOptions.length > 0) {
-      return (
-        <StyledFormControl key={columnId} size="small" sx={{ minWidth: { xs: "100%", sm: 200 }, maxWidth: { xs: "100%", sm: 450 } }}>
-          <InputLabel>{column.label}</InputLabel>
-          <Select
-            value={filters[columnId] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value as string)}
-            label={column.label}
-            sx={{
-              "& .MuiSelect-select": { padding: "6px 12px", fontSize: { xs: "0.8rem", sm: "0.9rem" } },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: filters[columnId] ? "#4caf50" : "#e0e0e0" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#3f51b5" },
-              borderRadius: "8px",
-            }}
-          >
-            <MenuItem value="">
-              <span>All</span>
-            </MenuItem>
-            {column.filterOptions.map((option) => ( 
-              // console.log(option?.toLowerCase()),
-              <MenuItem key={option} value={option?.toLowerCase()}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </StyledFormControl>
-      );
-    }
-
-    const options = filterOptions[columnId] || [];
+    const options = column.filterOptions || filterOptions[columnId] || [];
     const isLoading = filterLoading[columnId] || false;
-    const longestOptionLength = options.length > 0 ? Math.max(...options.map(opt => opt.length)) : 0;
+    const longestOptionLength = options.length > 0 ? Math.max(...options.map((opt) => opt.length)) : 0;
     const estimatedWidth = longestOptionLength * 8;
     const optionsListWidth = Math.min(Math.max(estimatedWidth, 200), 450);
 
@@ -393,25 +314,24 @@ const FilterSection = <T,>({
     return (
       <StyledFormControl key={columnId} size="small" sx={{ minWidth: { xs: "100%", sm: 200 }, maxWidth: { xs: "100%", sm: 450 } }}>
         <Autocomplete
-          options={[...options]}
-          getOptionLabel={(option) => option}
+          options={["", ...options]} // Add empty option for "All"
+          getOptionLabel={(option) => (option === "" ? "All" : option)}
           value={filters[columnId] || ""}
           onChange={(event, newValue) => {
-            console.log(event)
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue);
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
             setFilterOptions((prev) => ({ ...prev, [columnId]: selectedValue ? [selectedValue] : [] }));
           }}
           onInputChange={(event, newInputValue, reason) => {
-            if (event && reason === "input") {
+            if (event && reason === "input" && !column.filterOptions) {
               handleSearchChange(column.id, newInputValue);
             }
           }}
           renderInput={(params) => (
             <TextField
               {...params}
-              label={`${column.label}`}
+              label={column.label}
               size="small"
               variant="outlined"
               value={searchValues[columnId] || ""}
@@ -424,11 +344,19 @@ const FilterSection = <T,>({
                   </>
                 ),
               }}
+              sx={{
+                "& .MuiInputBase-root": {
+                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: filters[columnId] ? "#4caf50" : alpha(theme.palette.divider, 0.3),
+                },
+              }}
             />
           )}
           renderOption={(props, option) => (
             <li {...props} style={{ fontWeight: 400, background: "transparent", padding: "8px 12px" }}>
-              {option}
+              {option === "" ? "All" : option}
             </li>
           )}
           disableClearable={false}
@@ -442,17 +370,8 @@ const FilterSection = <T,>({
 
   return (
     <FiltersContainer>
-      {columns
-        .filter(
-          (col) =>
-            col.filterable &&
-            !col.id.toString().includes("date") &&
-            !col.id.toString().includes("start_time") &&
-            !col.id.toString().includes("fee")
-        )
-        .map((column) => renderSelectFilter(column))}
+      {columns.filter((col) => col.filterable).map((column) => renderFilter(column))}
       {hasDateData && renderDateFilter()}
-      {hasFeeData && renderFeeFilter()}
     </FiltersContainer>
   );
 };
