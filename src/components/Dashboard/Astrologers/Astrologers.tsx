@@ -24,7 +24,7 @@ const Astrologers: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(filters, "filters");
+  console.log(filters, "filters")
 
   const fetchAstrologers = async (
     currentPage: number,
@@ -69,11 +69,8 @@ const Astrologers: React.FC = () => {
       const fetchedAstrologers = Array.isArray(responseData.data)
         ? responseData.data
         : [];
-      const fetchedTotal =
+        const fetchedTotal =
         typeof responseData.total === "number" ? responseData.total : 0;
-
-      console.log("Fetched astrologers:", fetchedAstrologers);
-      console.log("Fetched total:", fetchedTotal);
 
       setAstrologers(fetchedAstrologers);
       setTotalCount(fetchedTotal);
@@ -103,6 +100,7 @@ const Astrologers: React.FC = () => {
 
     try {
       const uniqueValues = await fetchFilterValues(
+        // field === "first_name" ? "user" : "astrologer",
         "astrologer",
         field as string,
         searchValue
@@ -148,6 +146,10 @@ const Astrologers: React.FC = () => {
         id: "consulting_fee",
         label: "Consultation Fee",
         filterable: true,
+        render: (value: number) => {
+          if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+          return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)
+        },
       },
       {
         id: "status",

@@ -162,7 +162,7 @@ export const AstroChart: React.FC<AstroChartProps> = ({
           textAlign: "center",
           mb: 2,
           fontWeight: 600,
-          color: isRasi ? "#1B4D3E" : "#6A1B9A",
+          color: "#1B4D3E",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

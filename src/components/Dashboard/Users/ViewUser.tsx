@@ -13,7 +13,26 @@ import {
   Chip,
   CardActions,
   Modal,
+  Avatar
 } from "@mui/material";
+import {
+  Email,
+  Phone,
+  CheckCircle,
+  Star,
+  Brightness3,
+  Person,
+  LocationCity,
+  CalendarToday,
+  AccessTime,
+  LocationOn,
+} from "@mui/icons-material";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -48,6 +67,11 @@ interface UserData {
   rashi: string;
   nakshatra: string;
   plan: string;
+  mobile_number: number;
+  place_of_birth: string;
+  date_of_birth: string;
+  time_of_birth: string;
+  preferred_location: string;
 }
 
 interface SubscriptionData {
@@ -80,20 +104,25 @@ interface ConsultationData {
 const InfoItem = ({
   label,
   value,
+  icon,
 }: {
   label: string;
-  value: string | undefined;
+  value: string | React.ReactNode | undefined;
+  icon?: React.ReactNode; // Add icon prop
 }) => (
   <Box sx={{ py: 1.5 }}>
-    <Typography
-      variant="subtitle2"
-      color="text.secondary"
-      sx={{ fontSize: "0.85rem" }}
-    >
-      {label}
-    </Typography>
-    <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 500 }}>
-      {value || <Typography color="text.disabled">—</Typography>}
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {icon && <Box sx={{ display: "flex", alignItems: "center", color: "#90EE90" }}>{icon}</Box>}
+      <Typography
+        variant="subtitle2"
+        color="text.secondary"
+        sx={{ fontSize: "0.85rem" }}
+      >
+        {label}
+      </Typography>
+    </Box>
+    <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 500, pl: icon ? 4 : 0 }}>
+      {value || <Typography component="span" color="text.disabled">—</Typography>}
     </Typography>
     <Divider sx={{ mt: 1.5 }} />
   </Box>
@@ -152,11 +181,37 @@ const UserView: React.FC<{ mode: "view" }> = () => {
       </Box>
 
       {/* Main Info */}
-      <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          backgroundColor: "#f9f9fb",
+          border: "1px solid #e0e0e0",
+          "&:hover": {
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            transition: "box-shadow 0.3s ease",
+          },
+        }}
+      >
         <Grid container spacing={3}>
-          {/* Left Profile */}
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: "100%", textAlign: "center", py: 4, px: 2 }}>
+          {/* Profile Section (Header) */}
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                textAlign: "center",
+                py: 3,
+                px: 2,
+                borderRadius: 3,
+                background: "linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%)",
+                boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+                transition: "transform 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+                },
+              }}
+            >
               {loading ? (
                 <>
                   <Skeleton
@@ -173,11 +228,32 @@ const UserView: React.FC<{ mode: "view" }> = () => {
                   />
                 </>
               ) : (
-                <>
-                  <AccountCircleIcon
-                    sx={{ fontSize: 100, color: "grey.500", mb: 2 }}
-                  />
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      bgcolor: "grey.500",
+                      color: "#fff",
+                      border: "3px solid #e0e0e0",
+                      transition: "border-color 0.3s ease",
+                      "&:hover": { borderColor: "#3f51b5" },
+                    }}
+                  >
+                    <AccountCircleIcon sx={{ fontSize: 80 }} />
+                  </Avatar>
+                  <Typography
+                    variant="h5"
+                    fontWeight={600}
+                    sx={{ color: "#1a237e" }}
+                  >
                     {fullName || "N/A"}
                   </Typography>
                   <Button
@@ -212,50 +288,218 @@ const UserView: React.FC<{ mode: "view" }> = () => {
                   >
                     Edit Profile
                   </Button>
-                </>
+                </Box>
               )}
             </Card>
           </Grid>
 
-          {/* Right Info */}
-          <Grid item xs={12} md={8}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+          {/* Account Information Section */}
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                backgroundColor: "#fff",
+                boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+                transition: "box-shadow 0.3s ease",
+                "&:hover": {
+                  boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                },
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 3,
+                    maxWidth: "50%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    fontWeight: 600,
+                    fontFamily: '"Poppins", sans-serif',
+                    letterSpacing: 0.5,
+                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+                    color: "#1a237e",
+                  }}
+                >
                   Account Information
                 </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
-                    {loading ? (
-                      <>
-                        <Skeleton height={30} />
-                        <Skeleton height={30} />
-                        <Skeleton height={30} />
-                      </>
-                    ) : (
-                      <>
-                        <InfoItem label="Email" value={userData?.email} />
-                        <InfoItem label="Status" value={userData?.status} />
-                      </>
-                    )}
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    {loading ? (
-                      <>
-                        <Skeleton height={30} />
-                        <Skeleton height={30} />
-                      </>
-                    ) : (
-                      <>
-                        <InfoItem label="Rasi" value={userData?.rashi} />
-                        <InfoItem
-                          label="Nakshatram"
-                          value={userData?.nakshatra}
-                        />
-                      </>
-                    )}
-                  </Grid>
-                </Grid>
+
+                {/* Personal Information Accordion */}
+                <Accordion
+                  defaultExpanded
+                  sx={{
+                    mb: 2,
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    sx={{
+                      backgroundColor: "#f5f5f5",
+                      borderRadius: 2,
+                      "&:hover": { backgroundColor: "#90EE90" },
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={500}
+                      color="#06402B"
+                    >
+                      Personal Information
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="Email"
+                              value={userData?.email}
+                              icon={<Email sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Mobile Number"
+                              value={userData?.mobile_number}
+                              icon={<Phone sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Status"
+                              value={userData?.status}
+                              icon={
+                                <CheckCircle sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                            <InfoItem
+                              label="Place of Birth"
+                              value={userData?.place_of_birth}
+                              icon={
+                                <LocationCity
+                                  sx={{ color: "#90EE90", mr: 1 }}
+                                />
+                              }
+                            />
+                          </>
+                        )}
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="Rasi"
+                              value={userData?.rashi}
+                              icon={<Star sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Nakshatram"
+                              value={userData?.nakshatra}
+                              icon={
+                                <Brightness3 sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                            <InfoItem
+                              label="Date of Birth"
+                              value={userData?.date_of_birth}
+                              icon={
+                                <CalendarToday
+                                  sx={{ color: "#90EE90", mr: 1 }}
+                                />
+                              }
+                            />
+                            <InfoItem
+                              label="Time of Birth"
+                              value={userData?.time_of_birth}
+                              icon={
+                                <AccessTime sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                          </>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+
+                {/* Professional Information Accordion */}
+                <Accordion
+                  defaultExpanded
+                  sx={{
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    sx={{
+                      backgroundColor: "#eceff1",
+                      borderRadius: 2,
+                      "&:hover": { backgroundColor: "#90EE90" },
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={500}
+                      color="#06402B"
+                    >
+                      Professional Information
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="User Type"
+                              value={userData?.user_type
+                                ? userData.user_type.charAt(0).toUpperCase() + userData.user_type.slice(1)
+                                : ''
+                              }
+                              icon={<Person sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Preferred Location"
+                              value={userData?.preferred_location}
+                              icon={
+                                <LocationOn sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                          </>
+                        )}
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
               </CardContent>
             </Card>
           </Grid>

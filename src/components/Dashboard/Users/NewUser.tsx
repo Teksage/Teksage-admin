@@ -167,30 +167,55 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     })();
   }, [mode, userId]);
 
+  // Field-specific validation function
+  const validateField = (field: keyof UserFormData, value: string) => {
+    let error = "";
+
+    switch (field) {
+      case "first_name":
+        if (!value.trim()) {
+          error = "First name is required";
+        }
+        break;
+      case "last_name":
+        if (!value.trim()) {
+          error = "Last name is required";
+        }
+        break;
+      case "email":
+        if (!value.trim()) {
+          error = "Email is required";
+        } else if (!/^\S+@\S+\.\S+$/.test(value)) {
+          error = "Please enter a valid email address";
+        }
+        break;
+      case "mobile":
+        if (!value.trim()) {
+          error = "Mobile number is required";
+        } else if (!/^\d{10}$/.test(value)) {
+          error = "Mobile number must be exactly 10 digits";
+        }
+        break;
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  // Validate all mandatory fields on form submission
   const validate = () => {
     const newErrors: typeof errors = {};
 
-    if (!formData.first_name.trim()) {
-      newErrors.first_name = "First name is required";
-    }
+    newErrors.first_name = validateField("first_name", formData.first_name);
+    newErrors.last_name = validateField("last_name", formData.last_name);
+    newErrors.email = validateField("email", formData.email);
+    newErrors.mobile = validateField("mobile", formData.mobile);
 
-    if (!formData.last_name.trim()) {
-      newErrors.last_name = "Last name is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!formData.mobile.trim()) {
-      newErrors.mobile = "Mobile number is required";
-    } else if (!/^\d{10}$/.test(formData.mobile)) {
-      newErrors.mobile = "Mobile number must be exactly 10 digits";
-    }
-
-    return newErrors;
+    // Filter out empty errors to only include fields with validation issues
+    return Object.fromEntries(
+      Object.entries(newErrors).filter(([_, value]) => value)
+    );
   };
 
   // Helper function to update form data
@@ -199,18 +224,9 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       ...prev,
       [field]: value,
     }));
+    // Clear error for the field when the user starts typing
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
-
-  // const handleChange =
-  //   (field: keyof UserFormData) =>
-  //   (event: React.ChangeEvent<{ value: unknown }>) => {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       [field]: event.target.value as string,
-  //     }));
-  //     setErrors((prev) => ({ ...prev, [field]: "" }));
-  //   };
 
   // Updated handleChange function
   const handleChange =
@@ -228,6 +244,17 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         value = input.target.value as string | string[];
       }
       updateFormData(field, value);
+    };
+
+  // Handle blur to validate mandatory fields
+  const handleBlur =
+    (field: keyof UserFormData) =>
+    (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value = event.target.value;
+      const error = validateField(field, value);
+      if (error) {
+        setErrors((prev) => ({ ...prev, [field]: error }));
+      }
     };
 
   const handleDateChange = (value: Date | null) => {
@@ -248,36 +275,50 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       return;
     }
     try {
-      const response = await callAPI({
-        endpoint:
-          mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
-        method: mode === "edit" ? "put" : "post",
-        data: {
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          preferred_location: formData.preferredLocation,
-          email: formData.email,
-          mobile_number: formData.mobile,
-          birth_location: formData.placeOfBirth,
-          date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
-          time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
-          rashi: formData.rashi,
-          nakshatra: formData.nakshatra,
-          status: formData.status.toLowerCase(),
-          user_type: formData.user_type.toLowerCase(),
-        },
-      });
-      console.log(response, "response");
-      setSnackbar({
-        open: true,
-        message:
-          mode === "edit"
-            ? "User updated successfully!"
-            : "User created successfully!",
-        severity: "success",
-      });
+      console.log({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        preferred_location: formData.preferredLocation,
+        email: formData.email,
+        mobile_number: formData.mobile,
+        birth_location: formData.placeOfBirth,
+        date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+        time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+        rashi: formData.rashi,
+        nakshatra: formData.nakshatra,
+        status: formData.status.toLowerCase(),
+        user_type: formData.user_type.toLowerCase(),
+      })
+      // const response = await callAPI({
+      //   endpoint:
+      //     mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
+      //   method: mode === "edit" ? "put" : "post",
+      //   data: {
+      //     first_name: formData.first_name,
+      //     last_name: formData.last_name,
+      //     preferred_location: formData.preferredLocation,
+      //     email: formData.email,
+      //     mobile_number: formData.mobile,
+      //     birth_location: formData.placeOfBirth,
+      //     date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+      //     time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+      //     rashi: formData.rashi,
+      //     nakshatra: formData.nakshatra,
+      //     status: formData.status.toLowerCase(),
+      //     user_type: formData.user_type.toLowerCase(),
+      //   },
+      // });
+      // console.log(response, "response");
+      // setSnackbar({
+      //   open: true,
+      //   message:
+      //     mode === "edit"
+      //       ? "User updated successfully!"
+      //       : "User created successfully!",
+      //   severity: "success",
+      // });
 
-      navigate(-1);
+      // navigate(-1);
     } catch (err: any) {
       console.error("API Error:", err);
       let errorMessage = "Something went wrong. Please try again.";
@@ -291,14 +332,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       });
     }
   };
-
-  // useEffect(() => {
-  //   // Reset nakshatra when rashi changes
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     nakshatra: "",
-  //   }));
-  // }, [formData.rashi]);
 
   // ⏳ Auto trigger rashi & nakshatra fetch
   useEffect(() => {
@@ -326,7 +359,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             },
           });
 
-          console.log(response.data, "response.data")
+          console.log(response.data, "response.data");
 
           if (response?.data?.nakshatra && response?.data?.rashi) {
             setFormData((prev) => ({
@@ -354,16 +387,14 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const availableNakshatrams = nakshatramOptions[formData.rashi] || [];
 
-  console.log(formData);
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       {/* Header with back button - compact and aligned */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-          <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
+          <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
-        <Typography variant="body1" fontWeight={600} color="#3f51b5">
+        <Typography variant="body1" fontWeight={600} color="#06402B">
           Back
         </Typography>
       </Box>
@@ -385,8 +416,17 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           variant="h5"
           fontWeight={600}
           mb={3}
-          color="#1a237e"
-          sx={{ letterSpacing: "0.3px", textAlign: "start" }}
+          // color="#1a237e"
+          sx={{
+            maxWidth: "50%", // Prevent title from pushing buttons too far
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 600, // Bolder font for emphasis
+            fontFamily: '"Poppins", sans-serif', // Modern font family
+            letterSpacing: 0.5, // Slight spacing for readability
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+          }}
         >
           {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} User
         </Typography>
@@ -407,11 +447,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6}>
               <TextField
-                label="First Name"
+                label="First Name *"
                 fullWidth
                 size="small"
                 value={formData.first_name}
                 onChange={handleChange("first_name")}
+                onBlur={handleBlur("first_name")} // Add onBlur for validation
                 error={!!errors.first_name}
                 helperText={errors.first_name || ""}
                 disabled={isViewMode}
@@ -437,11 +478,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Last Name"
+                label="Last Name *"
                 fullWidth
                 size="small"
                 value={formData.last_name}
                 onChange={handleChange("last_name")}
+                onBlur={handleBlur("last_name")} // Add onBlur for validation
                 error={!!errors.last_name}
                 helperText={errors.last_name || ""}
                 disabled={isViewMode}
@@ -468,11 +510,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Email"
+                label="Email *"
                 fullWidth
                 size="small"
                 value={formData.email}
                 onChange={handleChange("email")}
+                onBlur={handleBlur("email")} // Add onBlur for validation
                 error={!!errors.email}
                 helperText={errors.email || ""}
                 disabled={isViewMode}
@@ -498,7 +541,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Mobile Number"
+                label="Mobile Number *"
                 fullWidth
                 size="small"
                 value={formData.mobile}
@@ -506,6 +549,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   const numericValue = e.target.value.replace(/\D/g, "");
                   handleChange("mobile")(numericValue);
                 }}
+                onBlur={handleBlur("mobile")} // Add onBlur for validation
                 error={!!errors.mobile}
                 helperText={errors.mobile || ""}
                 disabled={isViewMode}

@@ -13,10 +13,27 @@ import {
   Chip,
   CardActions,
   Modal,
+  Avatar,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
+import {
+  Email,
+  Phone,
+  Info,
+  CheckCircle,
+  Star,
+  Brightness3,
+  AttachMoney,
+  Work,
+  Lightbulb,
+  Language,
+} from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { callAPI } from "../../../api/crudFactory";
 import DescriptionIcon from "@mui/icons-material/Description";
 import StarIcon from "@mui/icons-material/Star";
@@ -40,6 +57,12 @@ import BadgeIcon from "@mui/icons-material/Badge";
 
 interface UserData {
   astrologer_id: number;
+  picture: any;
+  astrologer_profile_info: string;
+  consulting_fee: number;
+  experience: number;
+  expertises: any;
+  languages: any;
   user: {
     first_name: string;
     last_name: string;
@@ -48,6 +71,7 @@ interface UserData {
     rashi: string;
     nakshatra: string;
     plan: string;
+    mobile_number: number;
   };
 }
 
@@ -81,20 +105,25 @@ interface ConsultationData {
 const InfoItem = ({
   label,
   value,
+  icon,
 }: {
   label: string;
   value: string | React.ReactNode | undefined;
+  icon?: React.ReactNode; // Add icon prop
 }) => (
   <Box sx={{ py: 1.5 }}>
-    <Typography
-      variant="subtitle2"
-      color="text.secondary"
-      sx={{ fontSize: "0.85rem" }}
-    >
-      {label}
-    </Typography>
-    <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 500 }}>
-      {value || <Typography color="text.disabled">—</Typography>}
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {icon && <Box sx={{ display: "flex", alignItems: "center", color: "#90EE90" }}>{icon}</Box>}
+      <Typography
+        variant="subtitle2"
+        color="text.secondary"
+        sx={{ fontSize: "0.85rem" }}
+      >
+        {label}
+      </Typography>
+    </Box>
+    <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 500, pl: icon ? 4 : 0 }}>
+      {value || <Typography component="span" color="text.disabled">—</Typography>}
     </Typography>
     <Divider sx={{ mt: 1.5 }} />
   </Box>
@@ -104,7 +133,8 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
+  const [subscriptionData, setSubscriptionData] =
+    useState<SubscriptionData | null>(null);
   const [consultationData, setConsultationData] = useState<
     ConsultationData[] | null
   >(null);
@@ -117,11 +147,11 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
           endpoint: `api/admin/astrologers/${userId}`,
           method: "get",
         });
-        console.log(res?.data, "res")
+        console.log(res?.data, "res");
         setUserData(res?.data || null);
         setSubscriptionData(res?.data?.subscription || null);
         setConsultationData(res?.data?.events || null);
-      } catch (err:any) {
+      } catch (err: any) {
         setUserData(null);
         setSubscriptionData(null);
         setConsultationData(null);
@@ -152,11 +182,37 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
       </Box>
 
       {/* Main Info */}
-      <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          backgroundColor: "#f9f9fb",
+          border: "1px solid #e0e0e0",
+          "&:hover": {
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            transition: "box-shadow 0.3s ease",
+          },
+        }}
+      >
         <Grid container spacing={3}>
-          {/* Left Profile */}
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: "100%", textAlign: "center", py: 4, px: 2 }}>
+          {/* Profile Section (Header) */}
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                textAlign: "center",
+                py: 3,
+                px: 2,
+                borderRadius: 3,
+                background: "linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%)",
+                boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+                transition: "transform 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+                },
+              }}
+            >
               {loading ? (
                 <>
                   <Skeleton
@@ -173,18 +229,47 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                   />
                 </>
               ) : (
-                <>
-                  <AccountCircleIcon
-                    sx={{ fontSize: 100, color: "grey.500", mb: 2 }}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Avatar
+                    src={
+                      userData?.picture
+                        ? userData.picture
+                        : "https://img.freepik.com/free-photo/3d-cartoon-portrait-person-practicing-law-related-profession_23-2151419548.jpg?semt=ais_hybrid&w=740"
+                    }
+                    alt="Astrologer"
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      bgcolor: "grey.500",
+                      color: "#fff",
+                      border: "3px solid #e0e0e0",
+                      transition: "border-color 0.3s ease",
+                      "&:hover": { borderColor: "#3f51b5" },
+                    }}
                   />
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
+                  {/* <AccountCircleIcon sx={{ fontSize: 80 }} /> */}
+                  {/* </Avatar> */}
+                  <Typography
+                    variant="h5"
+                    fontWeight={600}
+                    sx={{ color: "#1a237e" }}
+                  >
                     {fullName}
                   </Typography>
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={() =>
-                      navigate(`/dashboard/astrologers/edit/${userData?.astrologer_id}`)
+                      navigate(
+                        `/dashboard/astrologers/edit/${userData?.astrologer_id}`
+                      )
                     }
                     size="large"
                     disabled={!userData}
@@ -212,47 +297,211 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                   >
                     Edit Profile
                   </Button>
-                </>
+                </Box>
               )}
             </Card>
           </Grid>
 
-          {/* Right Info */}
-          <Grid item xs={12} md={8}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+          {/* Account Information Section */}
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                backgroundColor: "#fff",
+                boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+                transition: "box-shadow 0.3s ease",
+                "&:hover": {
+                  boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                },
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 3,
+                    maxWidth: "50%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    fontWeight: 600,
+                    fontFamily: '"Poppins", sans-serif', // Modern font family
+                    letterSpacing: 0.5, // Slight spacing for readability
+                    textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+                  }}
+                >
                   Account Information
                 </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
-                    {loading ? (
-                      <>
-                        <Skeleton height={30} />
-                        <Skeleton height={30} />
-                        <Skeleton height={30} />
-                      </>
-                    ) : (
-                      <>
-                        <InfoItem label="Email" value={userData?.user?.email} />
-                        <InfoItem label="Status" value={userData?.user?.status} />
-                      </>
-                    )}
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    {loading ? (
-                      <>
-                        <Skeleton height={30} />
-                        <Skeleton height={30} />
-                      </>
-                    ) : (
-                      <>
-                        <InfoItem label="Rasi" value={userData?.user?.rashi} />
-                        <InfoItem label="Nakshatram" value={userData?.user?.nakshatra} />
-                      </>
-                    )}
-                  </Grid>
-                </Grid>
+
+                {/* Personal Information Accordion */}
+                <Accordion
+                  defaultExpanded
+                  sx={{
+                    mb: 2,
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    sx={{
+                      backgroundColor: "#f5f5f5",
+                      borderRadius: 2,
+                      "&:hover": { backgroundColor: "#90EE90" },
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={500}
+                      color="#06402B"
+                    >
+                      Personal Information
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="Email"
+                              value={userData?.user?.email}
+                              icon={<Email sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Mobile Number"
+                              value={userData?.user?.mobile_number}
+                              icon={<Phone sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Status"
+                              value={userData?.user?.status}
+                              icon={
+                                <CheckCircle sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                          </>
+                        )}
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="Rasi"
+                              value={userData?.user?.rashi}
+                              icon={<Star sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Nakshatram"
+                              value={userData?.user?.nakshatra}
+                              icon={
+                                <Brightness3 sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                          </>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+
+                {/* Professional Information Accordion */}
+                <Accordion
+                  defaultExpanded
+                  sx={{
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    sx={{
+                      backgroundColor: "#eceff1",
+                      // color: "",
+                      borderRadius: 2,
+                      "&:hover": { backgroundColor: "#90EE90" },
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={500}
+                      color="#06402B"
+                    >
+                      Professional Information
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: 3 }}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="Profile Info"
+                              value={userData?.astrologer_profile_info}
+                              icon={<Info sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                            <InfoItem
+                              label="Consulting Fee"
+                              value={userData?.consulting_fee?.toLocaleString(
+                                "en-IN"
+                              )}
+                              icon={
+                                <AttachMoney sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                            <InfoItem
+                              label="Experience"
+                              value={userData?.experience}
+                              icon={<Work sx={{ color: "#90EE90", mr: 1 }} />}
+                            />
+                          </>
+                        )}
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {loading ? (
+                          <>
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                            <Skeleton height={40} sx={{ mb: 1 }} />
+                          </>
+                        ) : (
+                          <>
+                            <InfoItem
+                              label="Expertise Areas"
+                              value={(userData?.expertises || []).join(", ")}
+                              icon={
+                                <Lightbulb sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                            <InfoItem
+                              label="Languages"
+                              value={(userData?.languages || []).join(", ")}
+                              icon={
+                                <Language sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                          </>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
               </CardContent>
             </Card>
           </Grid>
@@ -274,13 +523,19 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
             <Grid item xs={12} md={4}>
               <InfoItem
                 label="Subscribed On"
-                value={dateFormat(subscriptionData.date_of_subscription, "DD MMM YYYY")}
+                value={dateFormat(
+                  subscriptionData.date_of_subscription,
+                  "DD MMM YYYY"
+                )}
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <InfoItem
                 label="Ends On"
-                value={dateFormat(subscriptionData.subscription_end_date, "DD MMM YYYY")}
+                value={dateFormat(
+                  subscriptionData.subscription_end_date,
+                  "DD MMM YYYY"
+                )}
               />
             </Grid>
           </Grid>
@@ -337,176 +592,200 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
         ) : consultationData && consultationData.length > 0 ? (
           <>
             <Grid container spacing={3}>
-              {consultationData.slice(0, visibleCount).map((consultation: any, index: number) => {
-                const event = consultation.event;
-                const customerName = `${event.customer_first_name} ${event.customer_last_name}`;
-                const hasHoroscope = event.user_horoscope;
-                const languages = event.languages
-                  ? event.languages.join(", ")
-                  : "N/A";
-                const category = event.category
-                  ? event.category.join(", ")
-                  : "N/A";
-                const rating = event.rating || "Not Rated";
+              {consultationData
+                .slice(0, visibleCount)
+                .map((consultation: any, index: number) => {
+                  const event = consultation.event;
+                  const customerName = `${event.customer_first_name} ${event.customer_last_name}`;
+                  const hasHoroscope = event.user_horoscope;
+                  const languages = event.languages
+                    ? event.languages.join(", ")
+                    : "N/A";
+                  const category = event.category
+                    ? event.category.join(", ")
+                    : "N/A";
+                  const rating = event.rating || "Not Rated";
 
-                return (
-                  <Grid item xs={12} sm={6} md={4} key={event.id || index}>
-                    <Card
-                      elevation={2}
-                      sx={{
-                        borderRadius: 2,
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
-                        transition: "transform 0.2s ease-in-out, opacity 0.3s ease-in-out",
-                        "&:hover": {
-                          transform: "scale(1.02)",
-                          boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
-                        },
-                        opacity: 0, // Start hidden for animation
-                        animation: "fadeIn 0.5s forwards",
-                        animationDelay: `${index * 0.1}s`, // Staggered animation
-                      }}
-                    >
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography
-                          variant="subtitle1"
-                          fontWeight={600}
-                          color="#006400"
-                        >
-                          Consultation{" "}
-                          <Box
-                            component="span"
-                            sx={{
-                              backgroundColor: "rgba(16, 177, 0, 0.7)",
-                              color: "white",
-                              px: 1,
-                              py: 0.2,
-                              borderRadius: "6px",
-                              fontWeight: 600,
-                              fontSize: "0.9rem",
-                            }}
+                  return (
+                    <Grid item xs={12} sm={6} md={4} key={event.id || index}>
+                      <Card
+                        elevation={2}
+                        sx={{
+                          borderRadius: 2,
+                          display: "flex",
+                          flexDirection: "column",
+                          height: "100%",
+                          transition:
+                            "transform 0.2s ease-in-out, opacity 0.3s ease-in-out",
+                          "&:hover": {
+                            transform: "scale(1.02)",
+                            boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
+                          },
+                          opacity: 0, // Start hidden for animation
+                          animation: "fadeIn 0.5s forwards",
+                          animationDelay: `${index * 0.1}s`, // Staggered animation
+                        }}
+                      >
+                        <CardContent sx={{ flexGrow: 1 }}>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={600}
+                            color="#006400"
                           >
-                            {dateFormat(event?.start_time, "DD-MMM-YYYY")}
-                          </Box>
-                        </Typography>
-
-                        <Divider sx={{ my: 1 }} />
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Category:</strong> {category}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Customer:</strong> {customerName}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Booking Date:</strong>{" "}
-                            {event.booking_date || "N/A"}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Time:</strong>{" "}
-                            {event.start_time && event.end_time
-                              ? `${event.start_time.slice(
-                                  11,
-                                  16
-                                )} - ${event.end_time.slice(11, 16)}`
-                              : "N/A"}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Fee:</strong> ₹{event.consultation_fee || 0}
-                          </Typography>
-                        </Box>
-                        <Box
-                          sx={{ mb: 1, display: "flex", alignItems: "center" }}
-                        >
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Rating:</strong>{" "}
-                          </Typography>
-                          {typeof rating === "number" ? (
+                            Consultation{" "}
                             <Box
+                              component="span"
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                ml: 1,
+                                backgroundColor: "rgba(16, 177, 0, 0.7)",
+                                color: "white",
+                                px: 1,
+                                py: 0.2,
+                                borderRadius: "6px",
+                                fontWeight: 600,
+                                fontSize: "0.9rem",
                               }}
                             >
-                              <StarIcon
-                                sx={{ color: "#fbc02d", fontSize: 18, mr: 0.5 }}
-                              />
-                              <Typography variant="body2">{rating}</Typography>
+                              {dateFormat(event?.start_time, "DD-MMM-YYYY")}
                             </Box>
-                          ) : (
-                            <Typography variant="body2" sx={{ ml: 1 }}>
-                              {rating}
-                            </Typography>
-                          )}
-                        </Box>
-                        <Box sx={{ mb: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>Languages:</strong> {languages}
                           </Typography>
-                        </Box>
-                        {event.feedback && (
+
+                          <Divider sx={{ my: 1 }} />
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="text.secondary">
-                              <strong>Feedback:</strong> {event.feedback}
+                              <strong>Category:</strong> {category}
                             </Typography>
                           </Box>
-                        )}
-                        {event.status && (
-                          <Box sx={{ mt: 1 }}>
-                            <Chip
-                              label={event.status.toUpperCase()}
-                              color={event.status === "new" ? "info" : "default"}
-                              size="small"
-                              sx={{ fontWeight: 500 }}
-                            />
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Customer:</strong> {customerName}
+                            </Typography>
                           </Box>
-                        )}
-                      </CardContent>
-                      {hasHoroscope && (
-                        <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
-                          <Button
-                            variant="outlined"
-                            startIcon={<DescriptionIcon />}
-                            onClick={() =>
-                              handleOpenModal(event.user_horoscope, customerName)
-                            }
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Booking Date:</strong>{" "}
+                              {event.booking_date || "N/A"}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Time:</strong>{" "}
+                              {event.start_time && event.end_time
+                                ? `${event.start_time.slice(
+                                    11,
+                                    16
+                                  )} - ${event.end_time.slice(11, 16)}`
+                                : "N/A"}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Fee:</strong> ₹
+                              {event.consultation_fee || 0}
+                            </Typography>
+                          </Box>
+                          <Box
                             sx={{
-                              borderColor: "rgba(16, 177, 0, 1)", // Primary green color from the gradient
-                              color: "rgba(16, 177, 0, 1)", // Text color matches the border
-                              textTransform: "none",
-                              fontWeight: 500,
-                              "& .MuiButton-startIcon": {
-                                color: "rgba(16, 177, 0, 1)", // Icon color matches the text
-                              },
-                              "&:hover": {
-                                borderColor: "rgba(27, 77, 62, 1)", // Darker green from the gradient on hover
-                                color: "rgba(27, 77, 62, 1)", // Text color matches the border on hover
-                                "& .MuiButton-startIcon": {
-                                  color: "rgba(27, 77, 62, 1)", // Icon color matches on hover
-                                },
-                                transform: "scale(1.05)", // Subtle scale effect on hover
-                              },
-                              transition: "all 0.3s ease-in-out",
+                              mb: 1,
+                              display: "flex",
+                              alignItems: "center",
                             }}
                           >
-                            View Horoscope
-                          </Button>
-                        </CardActions>
-                      )}
-                    </Card>
-                  </Grid>
-                );
-              })}
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Rating:</strong>{" "}
+                            </Typography>
+                            {typeof rating === "number" ? (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  ml: 1,
+                                }}
+                              >
+                                <StarIcon
+                                  sx={{
+                                    color: "#fbc02d",
+                                    fontSize: 18,
+                                    mr: 0.5,
+                                  }}
+                                />
+                                <Typography variant="body2">
+                                  {rating}
+                                </Typography>
+                              </Box>
+                            ) : (
+                              <Typography variant="body2" sx={{ ml: 1 }}>
+                                {rating}
+                              </Typography>
+                            )}
+                          </Box>
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>Languages:</strong> {languages}
+                            </Typography>
+                          </Box>
+                          {event.feedback && (
+                            <Box sx={{ mb: 1 }}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                <strong>Feedback:</strong> {event.feedback}
+                              </Typography>
+                            </Box>
+                          )}
+                          {event.status && (
+                            <Box sx={{ mt: 1 }}>
+                              <Chip
+                                label={event.status.toUpperCase()}
+                                color={
+                                  event.status === "new" ? "info" : "default"
+                                }
+                                size="small"
+                                sx={{ fontWeight: 500 }}
+                              />
+                            </Box>
+                          )}
+                        </CardContent>
+                        {hasHoroscope && (
+                          <CardActions
+                            sx={{ justifyContent: "flex-end", p: 2 }}
+                          >
+                            <Button
+                              variant="outlined"
+                              startIcon={<DescriptionIcon />}
+                              onClick={() =>
+                                handleOpenModal(
+                                  event.user_horoscope,
+                                  customerName
+                                )
+                              }
+                              sx={{
+                                borderColor: "rgba(16, 177, 0, 1)", // Primary green color from the gradient
+                                color: "rgba(16, 177, 0, 1)", // Text color matches the border
+                                textTransform: "none",
+                                fontWeight: 500,
+                                "& .MuiButton-startIcon": {
+                                  color: "rgba(16, 177, 0, 1)", // Icon color matches the text
+                                },
+                                "&:hover": {
+                                  borderColor: "rgba(27, 77, 62, 1)", // Darker green from the gradient on hover
+                                  color: "rgba(27, 77, 62, 1)", // Text color matches the border on hover
+                                  "& .MuiButton-startIcon": {
+                                    color: "rgba(27, 77, 62, 1)", // Icon color matches on hover
+                                  },
+                                  transform: "scale(1.05)", // Subtle scale effect on hover
+                                },
+                                transition: "all 0.3s ease-in-out",
+                              }}
+                            >
+                              View Horoscope
+                            </Button>
+                          </CardActions>
+                        )}
+                      </Card>
+                    </Grid>
+                  );
+                })}
             </Grid>
 
             {/* Show More/Show Less Buttons */}
@@ -997,7 +1276,9 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                           }}
                         >
                           <AstroChart
-                            chartHtml={selectedHoroscope.horoscope.navamsa_chart}
+                            chartHtml={
+                              selectedHoroscope.horoscope.navamsa_chart
+                            }
                             chartType="Navamsa"
                           />
                         </Box>

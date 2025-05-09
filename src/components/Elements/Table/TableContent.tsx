@@ -18,7 +18,7 @@ import {
   Tooltip,
   Typography,
   TableHead,
-  TableSortLabel
+  TableSortLabel,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 import { Visibility as ViewIcon, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
@@ -58,23 +58,35 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   "& .MuiTable-root": { minWidth: "800px" },
   "& .MuiTableCell-head": {
     background: `linear-gradient(180deg, ${alpha("#2e7d32", 0.9)} 0%, ${alpha("#1b4d3e", 0.9)} 100%)`,
-    color: theme.palette.common.white,
+    color: theme.palette.common.white + " !important",
     fontWeight: 700,
     fontSize: "1rem",
     fontFamily: "Poppins, sans-serif",
     whiteSpace: "nowrap",
     borderBottom: "none",
     padding: theme.spacing(2, 3),
-    textAlign: "left", // Header alignment set to left
-    "&:first-of-type": { borderTopLeftRadius: "8px", textAlign: "center" }, // Center-align S.No. header
-    "&:last-of-type": { borderTopRightRadius: "8px", textAlign: "right" }, // Right-align Actions header
+    textAlign: "center",
+    "&:first-of-type": { borderTopLeftRadius: "8px" },
+    "&:last-of-type": { borderTopRightRadius: "8px" },
+    "& .MuiTableSortLabel-root": {
+      color: theme.palette.common.white + " !important",
+      "&.Mui-active": {
+        color: theme.palette.common.white + " !important",
+      },
+      "&:hover": {
+        color: theme.palette.common.white + " !important",
+      },
+      "& .MuiTableSortLabel-icon": {
+        color: theme.palette.common.white + " !important",
+      },
+    },
   },
   "& .MuiTableRow-root": {
     transition: "all 0.3s ease",
     "&:hover": {
-      border: `2px solid ${theme.palette.primary.main}`, // Green border on hover
-      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`, // Subtle shadow on hover
-      background: alpha(theme.palette.primary.light, 0.05), // Very subtle background tint
+      border: `2px solid ${theme.palette.primary.main}`,
+      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+      background: alpha(theme.palette.primary.light, 0.05),
     },
     animation: `${fadeIn} 0.5s ease-in-out`,
   },
@@ -87,7 +99,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
     fontFamily: "Roboto, sans-serif",
     fontSize: "0.95rem",
     color: theme.palette.text.primary,
-    textAlign: "left", // Uniform left-alignment for all cell data
+    textAlign: "left", // Default alignment for cells
     "&:first-of-type": { textAlign: "center" }, // Center-align S.No. column
     "&:last-of-type": { textAlign: "right" }, // Right-align Actions column
   },
@@ -95,7 +107,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
 
 const SerialNumberCell = styled(TableCell)(({ theme }) => ({
   width: "60px",
-  textAlign: "center", // Ensure serial number is center-aligned
+  textAlign: "center",
   fontWeight: 600,
   color: theme.palette.text.secondary,
   fontFamily: "Roboto, sans-serif",
@@ -138,17 +150,13 @@ const TableContent = <T,>({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Utility function to safely render a value, handling nested objects and null/undefined
   const safeRenderValue = (value: any, row: T, render?: (value: any, row: T) => React.ReactNode) => {
     if (render) {
-      // If a render function is provided, pass the value and row to it
       return render(value, row) || "N/A";
     }
-    // Handle nested objects (e.g., { first_name: "John" })
     if (value && typeof value === "object" && "first_name" in value) {
       return `${value.first_name || ""} ${value.last_name || ""}`.trim() || "N/A";
     }
-    // Handle direct values (e.g., strings, numbers)
     return value?.toString() || "N/A";
   };
 
@@ -179,9 +187,9 @@ const TableContent = <T,>({
                       py: 1.5,
                       transition: "all 0.3s ease",
                       "&:hover": {
-                        border: `2px solid ${theme.palette.primary.main}`, // Green border on hover
-                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`, // Subtle shadow on hover
-                        background: alpha(theme.palette.primary.light, 0.05), // Very subtle background tint
+                        border: `2px solid ${theme.palette.primary.main}`,
+                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+                        background: alpha(theme.palette.primary.light, 0.05),
                       },
                       animation: `${fadeIn} 0.5s ease-in-out`,
                     }}
@@ -197,8 +205,17 @@ const TableContent = <T,>({
                       secondary={
                         columns[1] ? safeRenderValue(row[columns[1].id], row, columns[1].render) : undefined
                       }
-                      primaryTypographyProps={{ fontWeight: 600, fontFamily: "Roboto, sans-serif", fontSize: "1rem", textAlign: "left" }}
-                      secondaryTypographyProps={{ fontFamily: "Roboto, sans-serif", fontSize: "0.85rem", textAlign: "left" }}
+                      primaryTypographyProps={{
+                        fontWeight: 600,
+                        fontFamily: "Roboto, sans-serif",
+                        fontSize: "1rem",
+                        textAlign: columns[0].align ?? "left", // Use column alignment or default to "left"
+                      }}
+                      secondaryTypographyProps={{
+                        fontFamily: "Roboto, sans-serif",
+                        fontSize: "0.85rem",
+                        textAlign: columns[1]?.align ?? "left", // Use column alignment or default to "left"
+                      }}
                     />
                     {showActions && onView && (
                       <Tooltip title="View Details">
@@ -243,11 +260,12 @@ const TableContent = <T,>({
           <Table stickyHeader aria-label="data table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: "60px", textAlign: "center" }}>S.No.</TableCell>
+                <TableCell sx={{ width: "60px", textAlign: "center" }}>S.No</TableCell>
                 {columns.map((column) => (
                   <TableCell
                     key={column.id as string}
                     sortDirection={sortConfig.key === column.id ? sortConfig.direction : false}
+                    sx={{ width: column.width, textAlign: column.align }}
                   >
                     {column.sortable ? (
                       <TableSortLabel
@@ -262,7 +280,7 @@ const TableContent = <T,>({
                     )}
                   </TableCell>
                 ))}
-                {showActions && <TableCell sx={{ width: "150px" }}>Actions</TableCell>}
+                {showActions && <TableCell sx={{ width: "150px", textAlign: "center" }}>Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -273,8 +291,11 @@ const TableContent = <T,>({
                   <TableRow hover key={id}>
                     <SerialNumberCell>{serialNumber}</SerialNumberCell>
                     {columns.map((column) => (
-                      <TableCell key={column.id as string}>
-                        {column.render ? column.render(row[column.id], row) : row[column.id]?.toString() || "N/A"}
+                      <TableCell
+                        key={column.id as string}
+                        sx={{ textAlign: column.align ?? "left" }} // Use column alignment or default to "left"
+                      >
+                        {safeRenderValue(row[column.id], row, column.render)}
                       </TableCell>
                     ))}
                     {showActions && (

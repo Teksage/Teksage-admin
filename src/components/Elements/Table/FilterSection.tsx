@@ -26,7 +26,7 @@ const FiltersContainer = styled(Box)(({ theme }) => ({
   flexWrap: "wrap",
   gap: theme.spacing(2),
   justifyContent: "flex-start",
-  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+  // borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
   background: alpha(theme.palette.grey[50], 0.5),
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
@@ -328,7 +328,7 @@ const FilterSection = <T,>({
             }}
           >
             <MenuItem value="" sx={{ textAlign: "left" }}>
-              <em>All</em>
+              <span>All</span>
             </MenuItem>
             {feeRanges.map((range) => (
               <MenuItem key={range} value={range} sx={{ textAlign: "left" }}>
@@ -360,9 +360,10 @@ const FilterSection = <T,>({
             }}
           >
             <MenuItem value="">
-              <em>All</em>
+              <span>All</span>
             </MenuItem>
-            {column.filterOptions.map((option) => (
+            {column.filterOptions.map((option) => ( 
+              // console.log(option?.toLowerCase()),
               <MenuItem key={option} value={option?.toLowerCase()}>
                 {option}
               </MenuItem>

@@ -26,7 +26,6 @@ const PlaceAutocomplete = ({
   const [options, setOptions] = useState<SuggestionOption[]>([]);
   const [inputValue, setInputValue] = useState(value);
 
-  // ✅ Sync internal inputValue with prop value when it changes
   useEffect(() => {
     setInputValue(value);
   }, [value]);
@@ -44,6 +43,21 @@ const PlaceAutocomplete = ({
     []
   );
 
+  // Handle blur to clear input if no suggestion is selected
+  const handleBlur = () => {
+    // Check if the current inputValue matches any option's label or mainText
+    const isValidOption = options.some(
+      (option) =>
+        option.label === inputValue || option.mainText === inputValue
+    );
+
+    // If the inputValue doesn't match any suggestion, clear it
+    if (!isValidOption && inputValue) {
+      setInputValue("");
+      onChange("");
+    }
+  };
+
   return (
     <Autocomplete
       freeSolo
@@ -54,17 +68,17 @@ const PlaceAutocomplete = ({
       filterOptions={(x) => x}
       inputValue={inputValue}
       onInputChange={(e, newInputValue) => {
-        console.log(e)
+        console.log(e);
         setInputValue(newInputValue);
         fetchSuggestionsDebounced(newInputValue);
       }}
       onChange={(e, newValue) => {
-        console.log(e)
+        console.log(e);
         if (typeof newValue === "string") {
           setInputValue(newValue);
           onChange(newValue);
         } else if (newValue) {
-          setInputValue(newValue.label);
+          setInputValue(newValue.mainText);
           onChange(newValue.mainText);
         } else {
           setInputValue("");
@@ -79,6 +93,7 @@ const PlaceAutocomplete = ({
           helperText={helperText}
           disabled={disabled}
           size="small"
+          onBlur={handleBlur} // Add onBlur handler
           InputLabelProps={{
             sx: {
               fontSize: "0.95rem",

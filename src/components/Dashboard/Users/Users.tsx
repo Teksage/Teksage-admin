@@ -325,31 +325,35 @@ const Users: React.FC = () => {
       label: "Name",
       filterable: true,
       width: "200px",
+      align: "left", // Left-align name
     },
     {
       id: "email",
       label: "Email",
       filterable: true,
       width: "250px",
+      align: "left", // Left-align email
     },
     {
       id: "mobile_number",
       label: "Mobile Number",
       filterable: true,
       width: "250px",
+      align: "left", // Center-align mobile number
     },
     {
       id: "plan_name",
       label: "Subscription",
       filterable: true,
-      filterOptions: ["Free", "Premium"], // Default dropdown options
+      filterOptions: ["Free", "Premium"],
+      align: "center", // Center-align subscription
     },
     {
       id: "status",
       label: "Status",
       filterable: true,
-      filterOptions: ["Active", "Inactive"], // Default dropdown options
-      render: (value:any) => {
+      filterOptions: ["Active", "Inactive"],
+      render: (value: any) => {
         if (!value) {
           return <Chip label="N/A" color="default" />;
         }
@@ -362,6 +366,7 @@ const Users: React.FC = () => {
           />
         );
       },
+      align: "center", // Center-align status chip
     },
   ];
 

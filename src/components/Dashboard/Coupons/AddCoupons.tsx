@@ -22,7 +22,7 @@
 //   max_cap: number | "";
 //   start_date: Date | null;
 //   end_date: Date | null;
-//   plan_id: number;
+//   plan_id: number | null;
 // }
 
 // const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
@@ -90,7 +90,7 @@
 //           field === "coupon_percentage" || field === "max_cap" ? +value : value,
 //       }));
 
-//       // ✅ Clear the error for this field when user starts typing
+//       // Clear the error for this field when user starts typing
 //       setErrors((prev: any) => ({
 //         ...prev,
 //         [field]: "",
@@ -98,15 +98,15 @@
 //     };
 
 //   const validateForm = () => {
-//     const newErrors: Record<string, boolean> = {};
-//     if (!formData.coupon_name.trim()) newErrors.coupon_name = true;
+//     const newErrors: Record<string, string> = {};
+//     if (!formData.coupon_name.trim()) newErrors.coupon_name = "Coupon name is required.";
 //     if (formData.coupon_percentage === "" || formData.coupon_percentage < 0)
-//       newErrors.coupon_percentage = true;
+//       newErrors.coupon_percentage = "Enter a valid percentage (0 or more).";
 //     if (formData.max_cap === "" || formData.max_cap < 0)
-//       newErrors.max_cap = true;
-//     if (!formData.start_date) newErrors.start_date = true;
-//     if (!formData.end_date) newErrors.end_date = true;
-//     if (!formData.plan_id) newErrors.plan_id = true;
+//       newErrors.max_cap = "Enter a valid max cap (0 or more).";
+//     if (!formData.start_date) newErrors.start_date = "Start date is required.";
+//     if (!formData.end_date) newErrors.end_date = "End date is required.";
+//     if (!formData.plan_id) newErrors.plan_id = "Plan name is required.";
 //     setErrors(newErrors);
 //     return Object.keys(newErrors).length === 0;
 //   };
@@ -134,11 +134,12 @@
 
 //   return (
 //     <LocalizationProvider dateAdapter={AdapterDateFns}>
+//       {/* Header with back button - compact and aligned */}
 //       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-//         <IconButton onClick={() => navigate(-1)} size="small" sx={{ mr: 1 }}>
-//           <ArrowBackIcon fontSize="small" />
+//         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+//           <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
 //         </IconButton>
-//         <Typography variant="subtitle1" fontWeight={500}>
+//         <Typography variant="body1" fontWeight={600} color="#3f51b5">
 //           Back
 //         </Typography>
 //       </Box>
@@ -147,14 +148,24 @@
 //         elevation={2}
 //         sx={{
 //           p: { xs: 2, sm: 3 },
+//           maxWidth: "800px", // Constrain width for better alignment
 //           mx: "auto",
-//           backgroundColor: "#fafafa",
+//           backgroundColor: "#f9f9fb",
 //           borderRadius: "12px",
+//           boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+//           border: "1px solid #e0e0e0",
 //         }}
 //       >
-//         <Typography variant="h6" fontWeight={500} mb={2}>
+//         {/* Form title - balanced size and styling */}
+//         <Typography
+//           variant="h5"
+//           fontWeight={600}
+//           mb={3}
+//           color="#1a237e"
+//           sx={{ letterSpacing: "0.3px", textAlign: "start" }}
+//         >
 //           {mode === "new"
-//             ? "Create New Coupon"
+//             ? "Create Coupon"
 //             : mode === "edit"
 //             ? "Edit Coupon"
 //             : "View Coupon"}
@@ -162,8 +173,14 @@
 
 //         <Box component="form" onSubmit={handleSubmit}>
 //           <Grid container spacing={2}>
+//             {/* Coupon Details */}
 //             <Grid item xs={12}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
+//               <Typography
+//                 variant="subtitle1"
+//                 fontWeight={500}
+//                 color="#546e7a"
+//                 mb={1.5}
+//               >
 //                 Coupon Details
 //               </Typography>
 //             </Grid>
@@ -176,12 +193,30 @@
 //                 value={formData.coupon_name}
 //                 onChange={handleChange("coupon_name")}
 //                 disabled={isViewMode}
-//                 error={errors.coupon_name}
-//                 helperText={errors.coupon_name && "Coupon name is required."}
+//                 error={!!errors.coupon_name}
+//                 helperText={errors.coupon_name || ""}
+//                 InputLabelProps={{
+//                   sx: {
+//                     fontSize: "0.95rem",
+//                     fontWeight: 500,
+//                     color: "#455a64",
+//                   },
+//                 }}
+//                 InputProps={{
+//                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//                 }}
+//                 sx={{
+//                   "& .MuiOutlinedInput-root": {
+//                     "& fieldset": { borderColor: "#cfd8dc" },
+//                     "&:hover fieldset": { borderColor: "#3f51b5" },
+//                     "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//                   },
+//                   "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//                 }}
 //               />
 //             </Grid>
 
-//             <Grid item xs={6} sm={3}>
+//             <Grid item xs={12} sm={6} md={3}>
 //               <TextField
 //                 type="number"
 //                 label="Coupon %"
@@ -190,15 +225,30 @@
 //                 value={formData.coupon_percentage}
 //                 onChange={handleChange("coupon_percentage")}
 //                 disabled={isViewMode}
-//                 error={errors.coupon_percentage}
-//                 helperText={
-//                   errors.coupon_percentage &&
-//                   "Enter a valid percentage (0 or more)."
-//                 }
+//                 error={!!errors.coupon_percentage}
+//                 helperText={errors.coupon_percentage || ""}
+//                 InputLabelProps={{
+//                   sx: {
+//                     fontSize: "0.95rem",
+//                     fontWeight: 500,
+//                     color: "#455a64",
+//                   },
+//                 }}
+//                 InputProps={{
+//                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//                 }}
+//                 sx={{
+//                   "& .MuiOutlinedInput-root": {
+//                     "& fieldset": { borderColor: "#cfd8dc" },
+//                     "&:hover fieldset": { borderColor: "#3f51b5" },
+//                     "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//                   },
+//                   "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//                 }}
 //               />
 //             </Grid>
 
-//             <Grid item xs={6} sm={3}>
+//             <Grid item xs={12} sm={6} md={3}>
 //               <TextField
 //                 type="number"
 //                 label="Max Cap"
@@ -207,15 +257,37 @@
 //                 value={formData.max_cap}
 //                 onChange={handleChange("max_cap")}
 //                 disabled={isViewMode}
-//                 error={errors.max_cap}
-//                 helperText={
-//                   errors.max_cap && "Enter a valid max cap (0 or more)."
-//                 }
+//                 error={!!errors.max_cap}
+//                 helperText={errors.max_cap || ""}
+//                 InputLabelProps={{
+//                   sx: {
+//                     fontSize: "0.95rem",
+//                     fontWeight: 500,
+//                     color: "#455a64",
+//                   },
+//                 }}
+//                 InputProps={{
+//                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//                 }}
+//                 sx={{
+//                   "& .MuiOutlinedInput-root": {
+//                     "& fieldset": { borderColor: "#cfd8dc" },
+//                     "&:hover fieldset": { borderColor: "#3f51b5" },
+//                     "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//                   },
+//                   "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//                 }}
 //               />
 //             </Grid>
 
+//             {/* Validity Period */}
 //             <Grid item xs={12} mt={1}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
+//               <Typography
+//                 variant="subtitle1"
+//                 fontWeight={500}
+//                 color="#546e7a"
+//                 mb={1.5}
+//               >
 //                 Validity Period
 //               </Typography>
 //             </Grid>
@@ -232,10 +304,27 @@
 //                 slotProps={{
 //                   textField: {
 //                     fullWidth: true,
-//                     // required: true,
 //                     size: "small",
-//                     error: errors.start_date,
-//                     helperText: errors.start_date && "Start date is required.",
+//                     error: !!errors.start_date,
+//                     helperText: errors.start_date || "",
+//                     InputLabelProps: {
+//                       sx: {
+//                         fontSize: "0.95rem",
+//                         fontWeight: 500,
+//                         color: "#455a64",
+//                       },
+//                     },
+//                     InputProps: {
+//                       sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//                     },
+//                     sx: {
+//                       "& .MuiOutlinedInput-root": {
+//                         "& fieldset": { borderColor: "#cfd8dc" },
+//                         "&:hover fieldset": { borderColor: "#3f51b5" },
+//                         "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//                       },
+//                       "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//                     },
 //                   },
 //                 }}
 //               />
@@ -253,17 +342,40 @@
 //                 slotProps={{
 //                   textField: {
 //                     fullWidth: true,
-//                     // required: true,
 //                     size: "small",
-//                     error: errors.end_date,
-//                     helperText: errors.end_date && "End date is required.",
+//                     error: !!errors.end_date,
+//                     helperText: errors.end_date || "",
+//                     InputLabelProps: {
+//                       sx: {
+//                         fontSize: "0.95rem",
+//                         fontWeight: 500,
+//                         color: "#455a64",
+//                       },
+//                     },
+//                     InputProps: {
+//                       sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//                     },
+//                     sx: {
+//                       "& .MuiOutlinedInput-root": {
+//                         "& fieldset": { borderColor: "#cfd8dc" },
+//                         "&:hover fieldset": { borderColor: "#3f51b5" },
+//                         "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//                       },
+//                       "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//                     },
 //                   },
 //                 }}
 //               />
 //             </Grid>
 
+//             {/* Applicable Plan */}
 //             <Grid item xs={12} mt={1}>
-//               <Typography variant="subtitle2" color="text.secondary" mb={1}>
+//               <Typography
+//                 variant="subtitle1"
+//                 fontWeight={500}
+//                 color="#546e7a"
+//                 mb={1.5}
+//               >
 //                 Applicable Plan
 //               </Typography>
 //             </Grid>
@@ -278,7 +390,32 @@
 //                 onChange={handleChange("plan_id")}
 //                 disabled={isViewMode}
 //                 error={!!errors.plan_id}
-//                 helperText={errors.plan_id && "Plan name is required."}
+//                 helperText={errors.plan_id || ""}
+//                 InputLabelProps={{
+//                   sx: {
+//                     fontSize: "0.95rem",
+//                     fontWeight: 500,
+//                     color: "#455a64",
+//                   },
+//                 }}
+//                 SelectProps={{
+//                   sx: {
+//                     fontSize: "0.9rem",
+//                     borderRadius: "6px",
+//                     "& .MuiOutlinedInput-notchedOutline": {
+//                       borderColor: "#cfd8dc",
+//                     },
+//                     "&:hover .MuiOutlinedInput-notchedOutline": {
+//                       borderColor: "#3f51b5",
+//                     },
+//                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+//                       borderColor: "#3f51b5",
+//                     },
+//                   },
+//                 }}
+//                 sx={{
+//                   "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//                 }}
 //               >
 //                 {planData.map((plan: any) => (
 //                   <MenuItem key={plan.id} value={plan.id}>
@@ -288,28 +425,29 @@
 //               </TextField>
 //             </Grid>
 
+//             {/* Submit Button - Centered and styled */}
 //             {!isViewMode && (
 //               <Grid item xs={12} mt={2}>
-//                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+//                 <Box sx={{ display: "flex", justifyContent: "end" }}>
 //                   <Button
 //                     type="submit"
 //                     variant="contained"
 //                     sx={{
 //                       background:
-//                         "linear-gradient(135deg, rgba(16, 177, 0, 0.9) 0%, rgba(27, 77, 62, 0.9) 100%)",
+//                         "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
 //                       color: "#fff",
 //                       borderRadius: "8px",
-//                       padding: "8px 22px",
-//                       fontWeight: 500,
+//                       padding: "8px 24px",
+//                       fontWeight: 600,
+//                       fontSize: "0.95rem",
 //                       textTransform: "none",
-//                       fontSize: "0.875rem",
-//                       boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-//                       transition: "all 0.2s ease",
+//                       boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+//                       transition: "all 0.3s ease",
 //                       "&:hover": {
 //                         background:
-//                           "linear-gradient(135deg, rgba(16, 177, 0, 1) 0%, rgba(27, 77, 62, 1) 100%)",
-//                         boxShadow: "0 3px 8px rgba(27, 77, 62, 0.25)",
-//                         transform: "translateY(-1px)",
+//                           "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+//                         boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+//                         transform: "scale(1.02)",
 //                       },
 //                     }}
 //                   >
@@ -371,7 +509,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // Fetch all service catalogs
         const serviceResponse = await callAPI({
           endpoint: "/api/admin/service-catalogs",
           method: "get",
@@ -384,7 +521,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
         setPlanData(transformedPlans);
 
-        // If edit mode, fetch coupon details
         if (mode === "edit" && userId) {
           const couponResponse = await callAPI({
             endpoint: `/api/admin/coupons/${userId}`,
@@ -393,8 +529,11 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           const data = couponResponse?.data;
           setFormData({
             coupon_name: data?.coupon_name || "",
-            coupon_percentage: data?.coupon_percentage || "",
-            max_cap: data?.max_cap || "",
+            coupon_percentage:
+              data?.coupon_percentage != null
+                ? Number(data.coupon_percentage)
+                : "",
+            max_cap: data?.max_cap != null ? Number(data.max_cap) : "", // Ensure it's a number
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             plan_id: data?.plan_id || null,
@@ -416,10 +555,21 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setFormData((prev) => ({
         ...prev,
         [field]:
-          field === "coupon_percentage" || field === "max_cap" ? +value : value,
+          field === "coupon_percentage"
+            ? value === ""
+              ? ""
+              : Number(value) // Keep coupon_percentage as a number input
+            : field === "max_cap"
+            ? value === ""
+              ? ""
+              : Number(value.replace(/,/g, "")) // Remove commas for max_cap
+            : field === "plan_id"
+            ? value === ""
+              ? null
+              : Number(value)
+            : value,
       }));
 
-      // Clear the error for this field when user starts typing
       setErrors((prev: any) => ({
         ...prev,
         [field]: "",
@@ -428,7 +578,8 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.coupon_name.trim()) newErrors.coupon_name = "Coupon name is required.";
+    if (!formData.coupon_name.trim())
+      newErrors.coupon_name = "Coupon name is required.";
     if (formData.coupon_percentage === "" || formData.coupon_percentage < 0)
       newErrors.coupon_percentage = "Enter a valid percentage (0 or more).";
     if (formData.max_cap === "" || formData.max_cap < 0)
@@ -447,9 +598,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       console.log(formData, "formData");
       await callAPI({
         endpoint:
-          mode === "edit"
-            ? `/api/admin/coupons/${userId}`
-            : "/api/admin/coupons",
+          mode === "edit" ? `/api/admin/coupons/${userId}` : "/api/admin/coupons",
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
@@ -463,7 +612,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      {/* Header with back button - compact and aligned */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
@@ -477,7 +625,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         elevation={2}
         sx={{
           p: { xs: 2, sm: 3 },
-          maxWidth: "800px", // Constrain width for better alignment
+          maxWidth: "800px",
           mx: "auto",
           backgroundColor: "#f9f9fb",
           borderRadius: "12px",
@@ -485,7 +633,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           border: "1px solid #e0e0e0",
         }}
       >
-        {/* Form title - balanced size and styling */}
         <Typography
           variant="h5"
           fontWeight={600}
@@ -502,7 +649,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            {/* Coupon Details */}
             <Grid item xs={12}>
               <Typography
                 variant="subtitle1"
@@ -516,7 +662,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Coupon Name"
+                label="Coupon Name *"
                 fullWidth
                 size="small"
                 value={formData.coupon_name}
@@ -548,7 +694,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             <Grid item xs={12} sm={6} md={3}>
               <TextField
                 type="number"
-                label="Coupon %"
+                label="Coupon % *"
                 fullWidth
                 size="small"
                 value={formData.coupon_percentage}
@@ -579,11 +725,15 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <TextField
-                type="number"
-                label="Max Cap"
+                type="text" // Use text to handle formatted display
+                label="Max Cap *"
                 fullWidth
                 size="small"
-                value={formData.max_cap}
+                value={
+                  formData.max_cap === ""
+                    ? ""
+                    : Number(formData.max_cap).toLocaleString("en-US")
+                }
                 onChange={handleChange("max_cap")}
                 disabled={isViewMode}
                 error={!!errors.max_cap}
@@ -609,7 +759,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Validity Period */}
             <Grid item xs={12} mt={1}>
               <Typography
                 variant="subtitle1"
@@ -623,7 +772,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6}>
               <DatePicker
-                label="Start Date"
+                label="Start Date *"
                 value={formData.start_date}
                 onChange={(newValue) => {
                   setFormData((prev) => ({ ...prev, start_date: newValue }));
@@ -661,7 +810,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6}>
               <DatePicker
-                label="End Date"
+                label="End Date *"
                 value={formData.end_date}
                 onChange={(newValue) => {
                   setFormData((prev) => ({ ...prev, end_date: newValue }));
@@ -671,7 +820,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    size: "small",
+                    size="small",
                     error: !!errors.end_date,
                     helperText: errors.end_date || "",
                     InputLabelProps: {
@@ -697,7 +846,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid>
 
-            {/* Applicable Plan */}
             <Grid item xs={12} mt={1}>
               <Typography
                 variant="subtitle1"
@@ -712,7 +860,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 select
-                label="Plan Name"
+                label="Plan Name *"
                 fullWidth
                 size="small"
                 value={formData.plan_id ?? ""}
@@ -754,7 +902,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </TextField>
             </Grid>
 
-            {/* Submit Button - Centered and styled */}
             {!isViewMode && (
               <Grid item xs={12} mt={2}>
                 <Box sx={{ display: "flex", justifyContent: "end" }}>
