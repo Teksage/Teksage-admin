@@ -8,6 +8,7 @@ import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 interface UserData {
   astrologer_id: number;
   consulting_fee: string;
+  consulting_fee_code: string;
   customer_rating: string;
   experience: number;
   first_name: string;
@@ -130,7 +131,7 @@ const Astrologers: React.FC = () => {
         filterable: true,
         filterOptions: [
           "< 3 Years",
-          "3 - 5 Years",
+          "3 - 5 Years",    
           "5 - 10 Years",
           "> 10 Years",
         ], // Default dropdown options
@@ -143,9 +144,20 @@ const Astrologers: React.FC = () => {
         filterOptions: ["1", "2", "3", "4", "5"],
       },
       {
-        id: "consulting_fee",
-        label: "Consultation Fee",
+        id: "consulting_fee_code",
+        label: "Fee Code",
         filterable: true,
+        filterOptions: ["INR", "USD"],
+        render: (value: number) => {
+          if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+          return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)
+        },
+      },
+      {
+        id: "consulting_fee",
+        label: "Fee",
+        filterable: true,
+        filterOptions: ["Less than 500", "500 - 1000", "Greater than 1000 "],
         render: (value: number) => {
           if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
           return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)

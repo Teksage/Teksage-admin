@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   FormControl,
@@ -94,7 +94,10 @@ const FilterSection = <T,>({
   const theme = useTheme();
 
   const handleFilterChange = (columnId: keyof T, value: string) => {
-    const newFilters = { ...filters, [columnId as string]: value };
+    const isNumber = !isNaN(parseFloat(value)) && isFinite(parseFloat(value));
+    const processedValue = value && !isNumber ? value.toLowerCase() : value;
+
+    const newFilters = { ...filters, [columnId as string]: processedValue };
     setFilters(newFilters);
     onFilterChange?.(newFilters);
   };
@@ -191,8 +194,8 @@ const FilterSection = <T,>({
     ];
 
     return (
-      <Box sx={{ minWidth: { xs: "100%", sm: 200 }, maxWidth: { xs: "100%", sm: 450 } }}>
-        <StyledFormControl size="small" sx={{ width: "100%", maxWidth: { xs: "100%", sm: 450 } }}>
+      <Box sx={{ minWidth: { xs: "100%", sm: 150 }, maxWidth: { xs: "100%", sm: 200 } }}>
+        <StyledFormControl size="small" sx={{ width: "100%", maxWidth: { xs: "100%", sm: 200 } }}>
           <InputLabel sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>Date Range</InputLabel>
           <Select
             value={selectedPreset}
@@ -220,7 +223,7 @@ const FilterSection = <T,>({
               border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
               borderRadius: "8px",
               width: "100%",
-              maxWidth: { xs: "100%", sm: 450 },
+              maxWidth: { xs: "100%", sm: 200 },
             }}
           >
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, color: theme.palette.text.primary }}>
@@ -251,7 +254,7 @@ const FilterSection = <T,>({
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                           borderColor: "#3f51b5",
                         },
-                        width: { xs: "100%", sm: 200 },
+                        width: { xs: "100%", sm: 150 },
                       },
                     },
                   }}
@@ -279,7 +282,7 @@ const FilterSection = <T,>({
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                           borderColor: "#3f51b5",
                         },
-                        width: { xs: "100%", sm: 200 },
+                        width: { xs: "100%", sm: 150 },
                       },
                     },
                   }}
@@ -296,9 +299,33 @@ const FilterSection = <T,>({
     const columnId = column.id as string;
     const options = column.filterOptions || filterOptions[columnId] || [];
     const isLoading = filterLoading[columnId] || false;
-    const longestOptionLength = options.length > 0 ? Math.max(...options.map((opt) => opt.length)) : 0;
-    const estimatedWidth = longestOptionLength * 8;
-    const optionsListWidth = Math.min(Math.max(estimatedWidth, 200), 450);
+
+    // State to store the exact width of the longest option
+    const [optionsListWidth, setOptionsListWidth] = useState(250); // Default minimum width
+
+    // Ref for the hidden div used to measure text width
+    const textMeasureRef = useRef<HTMLDivElement>(null);
+
+    // Measure the exact width of the longest option
+    useEffect(() => {
+      if (options.length > 0 && textMeasureRef.current) {
+        const allOptions = ["", ...options]; // Include "All" option
+        const optionTexts = allOptions.map((option) => (option === "" ? "All" : option));
+        
+        let maxWidth = 0;
+        optionTexts.forEach((text) => {
+          if (textMeasureRef.current) {
+            textMeasureRef.current.textContent = text;
+            const width = textMeasureRef.current.offsetWidth;
+            maxWidth = Math.max(maxWidth, width);
+          }
+        });
+
+        // Set the width with a small buffer, minimum 250px
+        const finalWidth = Math.max(maxWidth + 24, 250); // 24px for padding (8px left + 12px right + 4px buffer)
+        setOptionsListWidth(finalWidth);
+      }
+    }, [options]);
 
     const CustomPopper = (props: any) => (
       <Popper
@@ -306,65 +333,102 @@ const FilterSection = <T,>({
         placement="bottom-start"
         modifiers={[
           { name: "flip", enabled: true },
-          { name: "preventOverflow", enabled: true, options: { boundariesElement: "viewport" } },
+          { name: "preventOverflow", enabled: false },
+          { name: "offset", options: { offset: [0, 8] } },
         ]}
+        style={{ width: optionsListWidth }}
       />
     );
 
     return (
-      <StyledFormControl key={columnId} size="small" sx={{ minWidth: { xs: "100%", sm: 200 }, maxWidth: { xs: "100%", sm: 450 } }}>
-        <Autocomplete
-          options={["", ...options]} // Add empty option for "All"
-          getOptionLabel={(option) => (option === "" ? "All" : option)}
-          value={filters[columnId] || ""}
-          onChange={(event, newValue) => {
-            const selectedValue = newValue || "";
-            handleFilterChange(column.id, selectedValue);
-            setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
-            setFilterOptions((prev) => ({ ...prev, [columnId]: selectedValue ? [selectedValue] : [] }));
+      <>
+        {/* Hidden div to measure text width */}
+        <div
+          ref={textMeasureRef}
+          style={{
+            position: "absolute",
+            visibility: "hidden",
+            whiteSpace: "nowrap",
+            fontSize: "0.9rem",
+            fontWeight: 400,
+            fontFamily: theme.typography.fontFamily,
+            padding: "8px 12px", // Match the padding from renderOption
           }}
-          onInputChange={(event, newInputValue, reason) => {
-            if (event && reason === "input" && !column.filterOptions) {
-              handleSearchChange(column.id, newInputValue);
-            }
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={column.label}
-              size="small"
-              variant="outlined"
-              value={searchValues[columnId] || ""}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
-              }}
-              sx={{
-                "& .MuiInputBase-root": {
-                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: filters[columnId] ? "#4caf50" : alpha(theme.palette.divider, 0.3),
-                },
-              }}
-            />
-          )}
-          renderOption={(props, option) => (
-            <li {...props} style={{ fontWeight: 400, background: "transparent", padding: "8px 12px" }}>
-              {option === "" ? "All" : option}
-            </li>
-          )}
-          disableClearable={false}
-          freeSolo={false}
-          PopperComponent={CustomPopper}
-          ListboxProps={{ style: { width: optionsListWidth } }}
         />
-      </StyledFormControl>
+        <StyledFormControl key={columnId} size="small" sx={{ minWidth: { xs: "100%", sm: 150 }, maxWidth: { xs: "100%", sm: 200 } }}>
+          <Autocomplete
+            options={["", ...options]}
+            getOptionLabel={(option) => option}
+            value={filters[columnId] || ""}
+            onChange={(event, newValue) => {
+              const selectedValue = newValue || "";
+              handleFilterChange(column.id, selectedValue);
+              setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
+              setFilterOptions((prev) => ({ ...prev, [columnId]: selectedValue ? [selectedValue] : [] }));
+            }}
+            onInputChange={(event, newInputValue, reason) => {
+              if (event && reason === "input" && !column.filterOptions) {
+                handleSearchChange(column.id, newInputValue);
+              }
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={column.label}
+                size="small"
+                variant="outlined"
+                value={filters[columnId] || ""}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                  sx: {
+                    "& .MuiInputBase-input": {
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    },
+                  },
+                }}
+                sx={{
+                  "& .MuiInputBase-root": {
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: filters[columnId] ? "#4caf50" : alpha(theme.palette.divider, 0.3),
+                  },
+                }}
+              />
+            )}
+            renderOption={(props, option) => (
+              <li
+                {...props}
+                style={{
+                  fontWeight: 400,
+                  background: "transparent",
+                  padding: "8px 12px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {option === "" ? "All" : option}
+              </li>
+            )}
+            disableClearable={false}
+            freeSolo={false}
+            PopperComponent={CustomPopper}
+            ListboxProps={{
+              style: {
+                width: optionsListWidth,
+                overflowX: "visible",
+              },
+            }}
+          />
+        </StyledFormControl>
+      </>
     );
   };
 

@@ -1675,7 +1675,7 @@ function GenericTable<T>({
           onFilterChange={onFilterChange}
           onFetchFilterOptions={onFetchFilterOptions}
           hasDateData={hasDateData}
-          hasFeeData={hasFeeData}
+          // hasFeeData={hasFeeData}
         />
       )}
       <TableContent

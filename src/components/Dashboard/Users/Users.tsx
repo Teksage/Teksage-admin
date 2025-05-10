@@ -336,7 +336,7 @@ const Users: React.FC = () => {
     },
     {
       id: "mobile_number",
-      label: "Mobile Number",
+      label: "Mobile",
       filterable: true,
       width: "250px",
       align: "left", // Center-align mobile number
