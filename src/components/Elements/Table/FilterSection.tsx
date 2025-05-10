@@ -12,13 +12,56 @@ import {
   useTheme,
   Popper,
   CircularProgress,
+  Popover,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { format, subDays, startOfDay, endOfDay, subWeeks, subMonths } from "date-fns";
+import {
+  format,
+  subDays,
+  startOfDay,
+  endOfDay,
+  subWeeks,
+  subMonths,
+} from "date-fns";
 import { TableColumn } from "./types";
+
+// Custom hook to calculate options list width
+const useOptionsListWidth = (options: string[], theme: any) => {
+  const [optionsListWidth, setOptionsListWidth] = useState(250);
+  const textMeasureRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (options.length > 0 && textMeasureRef.current) {
+      const allOptions = ["", ...options];
+      const optionTexts = allOptions.map((option) =>
+        option === "" ? "All" : capitalizeFirstLetter(option)
+      );
+
+      let maxWidth = 0;
+      optionTexts.forEach((text) => {
+        if (textMeasureRef.current) {
+          textMeasureRef.current.textContent = text;
+          const width = textMeasureRef.current.offsetWidth;
+          maxWidth = Math.max(maxWidth, width);
+        }
+      });
+
+      const finalWidth = Math.max(maxWidth + 30, 250);
+      setOptionsListWidth(finalWidth);
+    }
+  }, [options]);
+
+  return { optionsListWidth, textMeasureRef };
+};
+
+// Helper function to capitalize the first letter
+const capitalizeFirstLetter = (str: string) => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 const FiltersContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -54,24 +97,187 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   },
 }));
 
+type DateRange = {
+  start: Date | null;
+  end: Date | null;
+};
+
 interface FilterSectionProps<T> {
   columns: TableColumn<T>[];
   filters: Record<string, string>;
   setFilters: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   filterOptions: Record<string, string[]>;
-  setFilterOptions: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
+  setFilterOptions: React.Dispatch<
+    React.SetStateAction<Record<string, string[]>>
+  >;
   filterLoading: Record<string, boolean>;
-  setFilterLoading: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  setFilterLoading: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
   searchValues: Record<string, string>;
   setSearchValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  tempDateRange: { start: Date | null; end: Date | null };
-  setTempDateRange: React.Dispatch<React.SetStateAction<{ start: Date | null; end: Date | null }>>;
+  tempDateRange: DateRange;
+  setTempDateRange: React.Dispatch<React.SetStateAction<DateRange>>;
   selectedPreset: string;
   setSelectedPreset: React.Dispatch<React.SetStateAction<string>>;
   onFilterChange?: (filters: Record<string, string>) => void;
-  onFetchFilterOptions?: (field: keyof T, searchValue: string) => Promise<string[]>;
-  hasDateData: boolean;
+  onFetchFilterOptions?: (
+    field: keyof T,
+    searchValue: string
+  ) => Promise<string[]>;
 }
+
+interface FilterItemProps<T> {
+  column: TableColumn<T>;
+  filters: Record<string, string>;
+  filterOptions: Record<string, string[]>;
+  filterLoading: Record<string, boolean>;
+  setSearchValues: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setFilterOptions: React.Dispatch<
+    React.SetStateAction<Record<string, string[]>>
+  >;
+  handleFilterChange: (columnId: keyof T, value: string) => void;
+  handleSearchChange: (columnId: keyof T, searchValue: string) => Promise<void>;
+}
+
+const FilterItem = <T,>({
+  column,
+  filters,
+  filterOptions,
+  filterLoading,
+  setSearchValues,
+  setFilterOptions,
+  handleFilterChange,
+  handleSearchChange,
+}: FilterItemProps<T>) => {
+  const theme = useTheme();
+  const columnId = column.id as string;
+  const options = column.filterOptions || filterOptions[columnId] || [];
+  const isLoading = filterLoading[columnId] || false;
+
+  const { optionsListWidth, textMeasureRef } = useOptionsListWidth(
+    options,
+    theme
+  );
+
+  const CustomPopper = (props: any) => (
+    <Popper
+      {...props}
+      placement="bottom-start"
+      modifiers={[
+        { name: "flip", enabled: true },
+        { name: "preventOverflow", enabled: false },
+        { name: "offset", options: { offset: [0, 8] } },
+      ]}
+      style={{ width: optionsListWidth }}
+    />
+  );
+
+  return (
+    <>
+      <div
+        ref={textMeasureRef}
+        style={{
+          position: "absolute",
+          visibility: "hidden",
+          whiteSpace: "nowrap",
+          fontSize: "0.9rem",
+          fontWeight: 400,
+          fontFamily: theme.typography.fontFamily,
+          padding: "8px 12px",
+          lineHeight: "normal",
+        }}
+      />
+      <StyledFormControl
+        key={columnId}
+        size="small"
+        sx={{
+          minWidth: { xs: "100%", sm: 150 },
+          maxWidth: { xs: "100%", sm: 200 },
+        }}
+      >
+        <Autocomplete
+          options={["", ...options]}
+          getOptionLabel={(option) => option}
+          value={filters[columnId] || ""}
+          onChange={(event, newValue) => {
+            const selectedValue = newValue || "";
+            handleFilterChange(column.id, selectedValue);
+            setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
+            setFilterOptions((prev) => ({
+              ...prev,
+              [columnId]: selectedValue ? [selectedValue] : [],
+            }));
+          }}
+          onInputChange={(event, newInputValue, reason) => {
+            if (event && reason === "input" && !column.filterOptions) {
+              handleSearchChange(column.id, newInputValue);
+            }
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={column.label}
+              size="small"
+              variant="outlined"
+              value={filters[columnId] || ""}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {isLoading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+                sx: {
+                  "& .MuiInputBase-input": {
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  },
+                },
+              }}
+              sx={{
+                "& .MuiInputBase-root": {
+                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: filters[columnId]
+                    ? "#4caf50"
+                    : alpha(theme.palette.divider, 0.3),
+                },
+              }}
+            />
+          )}
+          renderOption={(props, option) => (
+            <li
+              {...props}
+              style={{
+                fontWeight: 400,
+                background: "transparent",
+                padding: "8px 12px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {option === "" ? "All" : capitalizeFirstLetter(option)}
+            </li>
+          )}
+          disableClearable={false}
+          freeSolo={false}
+          PopperComponent={CustomPopper}
+          ListboxProps={{
+            style: {
+              width: optionsListWidth,
+              overflowX: "visible",
+            },
+          }}
+        />
+      </StyledFormControl>
+    </>
+  );
+};
 
 const FilterSection = <T,>({
   columns,
@@ -89,15 +295,10 @@ const FilterSection = <T,>({
   setSelectedPreset,
   onFilterChange,
   onFetchFilterOptions,
-  hasDateData,
 }: FilterSectionProps<T>) => {
   const theme = useTheme();
-
-  // Helper function to capitalize the first letter
-  const capitalizeFirstLetter = (str: string) => {
-    if (!str) return str;
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const selectRef = useRef<HTMLElement | null>(null);
 
   const handleFilterChange = (columnId: keyof T, value: string) => {
     const isNumber = !isNaN(parseFloat(value)) && isFinite(parseFloat(value));
@@ -167,16 +368,27 @@ const FilterSection = <T,>({
         break;
     }
     setSelectedPreset(preset);
-    setTempDateRange({ start, end });
-    handleDateRangeChange(start, end);
+    if (preset !== "Custom") {
+      setAnchorEl(null); // Close Popover if not Custom
+      setTempDateRange({ start, end });
+      handleDateRangeChange(start, end);
+    }
+  };
+
+  const handleCustomClick = (event: React.MouseEvent<HTMLElement>) => {
+    setSelectedPreset("Custom");
+    setAnchorEl(selectRef.current); // Reopen Popover
   };
 
   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
-    const dateFilterValue =
-      start && end
-        ? `${format(start, "yyyy-MM-dd")}-${format(end, "yyyy-MM-dd")}`
-        : "";
-    const newFilters = { ...filters, booking_date: dateFilterValue };
+    const newFilters = { ...filters };
+    if (start && end) {
+      newFilters.start_time = format(start, "yyyy-MM-dd");
+      newFilters.end_time = format(end, "yyyy-MM-dd");
+    } else {
+      delete newFilters.start_time;
+      delete newFilters.end_time;
+    }
     setFilters(newFilters);
     onFilterChange?.(newFilters);
   };
@@ -186,8 +398,12 @@ const FilterSection = <T,>({
     handleDateRangeChange(start, end);
   };
 
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    // Do not reset selectedPreset or tempDateRange to preserve the UI state
+  };
+
   const renderDateFilter = () => {
-    if (!hasDateData) return null;
     const datePresets = [
       { value: "", label: "All Dates" },
       { value: "Today", label: "Today" },
@@ -200,55 +416,123 @@ const FilterSection = <T,>({
     ];
 
     return (
-      <Box sx={{ minWidth: { xs: "100%", sm: 150 }, maxWidth: { xs: "100%", sm: 200 } }}>
-        <StyledFormControl size="small" sx={{ width: "100%", maxWidth: { xs: "100%", sm: 200 } }}>
-          <InputLabel sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>Date Range</InputLabel>
+      <Box
+        sx={{
+          minWidth: { xs: "100%", sm: 150 },
+          maxWidth: { xs: "100%", sm: 200 },
+        }}
+      >
+        <StyledFormControl
+          size="small"
+          sx={{ width: "100%", maxWidth: { xs: "100%", sm: 200 } }}
+          ref={(el: HTMLElement | null) => (selectRef.current = el)}
+        >
+          <InputLabel sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>
+            Date Range
+          </InputLabel>
           <Select
             value={selectedPreset}
             onChange={(e) => handleDatePresetChange(e.target.value as string)}
             label="Date Range"
             sx={{
-              "& .MuiSelect-select": { padding: "6px 10px", fontSize: { xs: "0.8rem", sm: "0.9rem" } },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: selectedPreset ? "#4caf50" : alpha(theme.palette.divider, 0.3) },
+              "& .MuiSelect-select": {
+                padding: "6px 10px",
+                fontSize: { xs: "0.8rem", sm: "0.9rem" },
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: selectedPreset
+                  ? "#4caf50"
+                  : alpha(theme.palette.divider, 0.3),
+              },
               borderRadius: "8px",
             }}
           >
             {datePresets.map((preset) => (
-              <MenuItem key={preset.value} value={preset.value}>
+              <MenuItem
+                key={preset.value}
+                value={preset.value}
+                onClick={
+                  preset.value === "Custom" ? handleCustomClick : undefined
+                }
+              >
                 {preset.label}
               </MenuItem>
             ))}
           </Select>
         </StyledFormControl>
-        {selectedPreset === "Custom" && (
+        <Popover
+          open={Boolean(anchorEl)}
+          anchorEl={anchorEl}
+          onClose={handlePopoverClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+        >
           <Box
             sx={{
-              p: 2,
-              mt: 1,
-              background: alpha(theme.palette.background.paper, 0.5),
-              border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+              p: 3,
+              background: alpha(theme.palette.background.paper, 0.98),
+              border: `2px solid ${theme.palette.success.main}`,
               borderRadius: "8px",
-              width: "100%",
-              maxWidth: { xs: "100%", sm: 200 },
+              width: { xs: "100%", sm: 400 },
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, color: theme.palette.text.primary }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 2,
+                fontWeight: 600,
+                color: theme.palette.success.main,
+              }}
+            >
               Custom Date Range
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: 3,
+                  alignItems: "center",
+                }}
+              >
                 <DatePicker
                   label="Start Date"
                   value={tempDateRange.start}
-                  onChange={(newValue) => handleCustomDateChange(newValue, tempDateRange.end)}
+                  onChange={(newValue) =>
+                    handleCustomDateChange(newValue, tempDateRange.end)
+                  }
                   slots={{ textField: TextField }}
                   slotProps={{
                     textField: {
                       size: "small",
+                      InputLabelProps: {
+                        shrink: true,
+                        sx: {
+                          fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                          color: theme.palette.text.secondary,
+                        },
+                      },
+                      InputProps: {
+                        sx: {
+                          "& .MuiInputBase-root": {
+                            minHeight: "40px",
+                          },
+                        },
+                      },
                       sx: {
                         "& .MuiInputBase-root": {
                           borderRadius: "8px",
-                          background: alpha(theme.palette.background.paper, 0.9),
+                          background: alpha(
+                            theme.palette.background.paper,
+                            0.9
+                          ),
                           fontSize: { xs: "0.8rem", sm: "0.9rem" },
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
@@ -260,7 +544,7 @@ const FilterSection = <T,>({
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                           borderColor: "#3f51b5",
                         },
-                        width: { xs: "100%", sm: 150 },
+                        width: { xs: "100%", sm: 180 },
                       },
                     },
                   }}
@@ -268,15 +552,34 @@ const FilterSection = <T,>({
                 <DatePicker
                   label="End Date"
                   value={tempDateRange.end}
-                  onChange={(newValue) => handleCustomDateChange(tempDateRange.start, newValue)}
+                  onChange={(newValue) =>
+                    handleCustomDateChange(tempDateRange.start, newValue)
+                  }
                   slots={{ textField: TextField }}
                   slotProps={{
                     textField: {
                       size: "small",
+                      InputLabelProps: {
+                        shrink: true,
+                        sx: {
+                          fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                          color: theme.palette.text.secondary,
+                        },
+                      },
+                      InputProps: {
+                        sx: {
+                          "& .MuiInputBase-root": {
+                            minHeight: "40px",
+                          },
+                        },
+                      },
                       sx: {
                         "& .MuiInputBase-root": {
                           borderRadius: "8px",
-                          background: alpha(theme.palette.background.paper, 0.9),
+                          background: alpha(
+                            theme.palette.background.paper,
+                            0.9
+                          ),
                           fontSize: { xs: "0.8rem", sm: "0.9rem" },
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
@@ -288,161 +591,50 @@ const FilterSection = <T,>({
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                           borderColor: "#3f51b5",
                         },
-                        width: { xs: "100%", sm: 150 },
+                        width: { xs: "100%", sm: 180 },
                       },
                     },
                   }}
                 />
               </Box>
+              {tempDateRange.start && tempDateRange.end && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mt: 2,
+                    color: theme.palette.text.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  Selected Range: {format(tempDateRange.start, "MMM d, yyyy")} -{" "}
+                  {format(tempDateRange.end, "MMM d, yyyy")}
+                </Typography>
+              )}
             </LocalizationProvider>
           </Box>
-        )}
+        </Popover>
       </Box>
-    );
-  };
-
-  const renderFilter = (column: TableColumn<T>) => {
-    const columnId = column.id as string;
-    const options = column.filterOptions || filterOptions[columnId] || [];
-    const isLoading = filterLoading[columnId] || false;
-
-    // State to store the exact width of the longest option
-    const [optionsListWidth, setOptionsListWidth] = useState(250); // Default minimum width
-
-    // Ref for the hidden div used to measure text width
-    const textMeasureRef = useRef<HTMLDivElement>(null);
-
-    // Measure the exact width of the longest option (with capitalized text)
-    useEffect(() => {
-      if (options.length > 0 && textMeasureRef.current) {
-        const allOptions = ["", ...options];
-        const optionTexts = allOptions.map((option) => (option === "" ? "All" : capitalizeFirstLetter(option)));
-        
-        let maxWidth = 0;
-        optionTexts.forEach((text) => {
-          if (textMeasureRef.current) {
-            textMeasureRef.current.textContent = text;
-            const width = textMeasureRef.current.offsetWidth;
-            maxWidth = Math.max(maxWidth, width);
-          }
-        });
-
-        // Set the width with a small buffer, minimum 250px
-        const finalWidth = Math.max(maxWidth + 30, 250); // Increased buffer to 30px for Material-UI padding
-        setOptionsListWidth(finalWidth);
-      }
-    }, [options]);
-
-    const CustomPopper = (props: any) => (
-      <Popper
-        {...props}
-        placement="bottom-start"
-        modifiers={[
-          { name: "flip", enabled: true },
-          { name: "preventOverflow", enabled: false },
-          { name: "offset", options: { offset: [0, 8] } },
-        ]}
-        style={{ width: optionsListWidth }}
-      />
-    );
-
-    return (
-      <>
-        {/* Hidden div to measure text width */}
-        <div
-          ref={textMeasureRef}
-          style={{
-            position: "absolute",
-            visibility: "hidden",
-            whiteSpace: "nowrap",
-            fontSize: "0.9rem",
-            fontWeight: 400,
-            fontFamily: theme.typography.fontFamily,
-            padding: "8px 12px", // Match the padding from renderOption
-            lineHeight: "normal", // Match Material-UI's default line height
-          }}
-        />
-        <StyledFormControl key={columnId} size="small" sx={{ minWidth: { xs: "100%", sm: 150 }, maxWidth: { xs: "100%", sm: 200 } }}>
-          <Autocomplete
-            options={["", ...options]}
-            getOptionLabel={(option) => option} // Value remains unchanged for internal logic
-            value={filters[columnId] || ""}
-            onChange={(event, newValue) => {
-              const selectedValue = newValue || "";
-              handleFilterChange(column.id, selectedValue);
-              setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
-              setFilterOptions((prev) => ({ ...prev, [columnId]: selectedValue ? [selectedValue] : [] }));
-            }}
-            onInputChange={(event, newInputValue, reason) => {
-              if (event && reason === "input" && !column.filterOptions) {
-                handleSearchChange(column.id, newInputValue);
-              }
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={column.label}
-                size="small"
-                variant="outlined"
-                value={filters[columnId] || ""}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                  sx: {
-                    "& .MuiInputBase-input": {
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    },
-                  },
-                }}
-                sx={{
-                  "& .MuiInputBase-root": {
-                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: filters[columnId] ? "#4caf50" : alpha(theme.palette.divider, 0.3),
-                  },
-                }}
-              />
-            )}
-            renderOption={(props, option) => (
-              <li
-                {...props}
-                style={{
-                  fontWeight: 400,
-                  background: "transparent",
-                  padding: "8px 12px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {option === "" ? "All" : capitalizeFirstLetter(option)}
-              </li>
-            )}
-            disableClearable={false}
-            freeSolo={false}
-            PopperComponent={CustomPopper}
-            ListboxProps={{
-              style: {
-                width: optionsListWidth,
-                overflowX: "visible",
-              },
-            }}
-          />
-        </StyledFormControl>
-      </>
     );
   };
 
   return (
     <FiltersContainer>
-      {columns.filter((col) => col.filterable).map((column) => renderFilter(column))}
-      {hasDateData && renderDateFilter()}
+      {columns
+        .filter((col) => col.filterable)
+        .map((column) => (
+          <FilterItem
+            key={column.id as string}
+            column={column}
+            filters={filters}
+            filterOptions={filterOptions}
+            filterLoading={filterLoading}
+            setSearchValues={setSearchValues}
+            setFilterOptions={setFilterOptions}
+            handleFilterChange={handleFilterChange}
+            handleSearchChange={handleSearchChange}
+          />
+        ))}
+      {renderDateFilter()}
     </FiltersContainer>
   );
 };

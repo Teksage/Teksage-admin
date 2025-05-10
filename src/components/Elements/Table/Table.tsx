@@ -1581,18 +1581,6 @@ function GenericTable<T>({
     [columns]
   );
 
-  const hasDateData = useMemo(
-    () =>
-      data.some(
-        (item) =>
-          item["booking_date" as keyof T] ||
-          item["date" as keyof T] ||
-          item["sent_by_date" as keyof T] ||
-          item["start_time" as keyof T]
-      ),
-    [data]
-  );
-
   const hasFeeData = useMemo(() => {
     const feeValues = data
       .map((item: any) =>
@@ -1654,11 +1642,10 @@ function GenericTable<T>({
         filters={filters}
         clearAllFilters={clearAllFilters}
         hasFilterableColumns={hasFilterableColumns}
-        hasDateData={hasDateData}
         hasFeeData={hasFeeData}
         mobileFiltersOpen={mobileFiltersOpen}
       />
-      {showFilters && (hasFilterableColumns || hasDateData || hasFeeData) && (
+      {showFilters && (hasFilterableColumns || hasFeeData) && (
         <FilterSection
           columns={columns}
           filters={filters}
@@ -1675,8 +1662,6 @@ function GenericTable<T>({
           setSelectedPreset={setSelectedPreset}
           onFilterChange={onFilterChange}
           onFetchFilterOptions={onFetchFilterOptions}
-          hasDateData={hasDateData}
-          // hasFeeData={hasFeeData}
         />
       )}
       <TableContent
@@ -1729,7 +1714,6 @@ function GenericTable<T>({
             setSelectedPreset={setSelectedPreset}
             onFilterChange={onFilterChange}
             onFetchFilterOptions={onFetchFilterOptions}
-            hasDateData={hasDateData}
             hasFeeData={hasFeeData}
             clearAllFilters={clearAllFilters}
           />

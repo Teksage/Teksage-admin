@@ -31,7 +31,6 @@ interface MobileFiltersDialogProps<T> {
   setSelectedPreset: React.Dispatch<React.SetStateAction<string>>;
   onFilterChange?: (filters: Record<string, string>) => void;
   onFetchFilterOptions?: (field: keyof T, searchValue: string) => Promise<string[]>;
-  hasDateData: boolean;
   hasFeeData: boolean;
   clearAllFilters: () => void;
 }
@@ -54,7 +53,6 @@ const MobileFiltersDialog = <T,>({
   setSelectedPreset,
   onFilterChange,
   onFetchFilterOptions,
-  hasDateData,
   hasFeeData,
   clearAllFilters,
 }: MobileFiltersDialogProps<T>) => {
@@ -86,7 +84,6 @@ const MobileFiltersDialog = <T,>({
             setSelectedPreset={setSelectedPreset}
             onFilterChange={onFilterChange}
             onFetchFilterOptions={onFetchFilterOptions}
-            hasDateData={hasDateData}
             hasFeeData={hasFeeData}
           />
         </Box>
