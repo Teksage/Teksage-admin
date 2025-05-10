@@ -1,6 +1,17 @@
 import React from "react";
-import { Box, Typography, Button, IconButton, useMediaQuery, useTheme } from "@mui/material";
-import { Add as AddIcon, FilterList as FilterListIcon, CloudDownload as ExportIcon } from "@mui/icons-material";
+import {
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import {
+  Add as AddIcon,
+  FilterList as FilterListIcon,
+  CloudDownload as ExportIcon,
+} from "@mui/icons-material";
 
 interface TableHeaderProps {
   title: string;
@@ -14,12 +25,14 @@ interface TableHeaderProps {
   hasFilterableColumns: boolean;
   hasDateData: boolean;
   hasFeeData: boolean;
+  mobileFiltersOpen: boolean;
 }
 
 const TableHeader = ({
   title,
   onAdd,
   onExport,
+  showFilters,
   setShowFilters,
   setMobileFiltersOpen,
   filters,
@@ -27,14 +40,24 @@ const TableHeader = ({
   hasFilterableColumns,
   hasDateData,
   hasFeeData,
+  mobileFiltersOpen
 }: TableHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const hasActiveFilters = Object.values(filters).some((value) => value.trim() !== "");
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value.trim() !== ""
+  );
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2 }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        p: 2,
+      }}
+    >
       <Typography
         variant="h5"
         sx={{
@@ -66,24 +89,22 @@ const TableHeader = ({
             onClick={onAdd}
             size={isMobile ? "small" : "medium"}
             sx={{
-                px: isMobile ? 1 : 2,
-                background:
-                  "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
-                color: "#fff",
-                borderRadius: "8px",
-                padding: "8px 24px",
-                fontWeight: 600,
-                fontSize: "0.95rem",
-                textTransform: "none",
-                boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
-                  boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
-                  transform: "scale(1.02)",
-                },
-              }}
+              px: isMobile ? 1 : 2,
+              background: "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+              color: "#fff",
+              borderRadius: "8px",
+              padding: "8px 24px",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              textTransform: "none",
+              boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                transform: "scale(1.02)",
+              },
+            }}
           >
             Add
           </Button>
@@ -94,7 +115,13 @@ const TableHeader = ({
           </IconButton>
         )}
         {(hasFilterableColumns || hasDateData || hasFeeData) && (
-          <Box sx={{ display: "flex", gap: isMobile ? 0.5 : 1, alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: isMobile ? 0.5 : 1,
+              alignItems: "center",
+            }}
+          >
             {hasActiveFilters && (
               <Button
                 onClick={clearAllFilters}
@@ -114,8 +141,28 @@ const TableHeader = ({
                 }
               }}
               size={isMobile ? "small" : "medium"}
+              sx={{
+                backgroundColor: (isMobile ? mobileFiltersOpen : showFilters)
+                  ? "rgba(76, 175, 80, 0.2)" // light green background
+                  : "transparent",
+                border: (isMobile ? mobileFiltersOpen : showFilters)
+                  ? "2px solid #4CAF50" // green border
+                  : "none",
+                borderRadius: "8px",
+                padding: "6px",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(76, 175, 80, 0.3)",
+                },
+              }}
             >
-              <FilterListIcon />
+              <FilterListIcon
+                sx={{
+                  color: (isMobile ? mobileFiltersOpen : showFilters)
+                    ? "#4CAF50"
+                    : "inherit",
+                }}
+              />
             </IconButton>
           </Box>
         )}

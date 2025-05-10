@@ -93,6 +93,12 @@ const FilterSection = <T,>({
 }: FilterSectionProps<T>) => {
   const theme = useTheme();
 
+  // Helper function to capitalize the first letter
+  const capitalizeFirstLetter = (str: string) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   const handleFilterChange = (columnId: keyof T, value: string) => {
     const isNumber = !isNaN(parseFloat(value)) && isFinite(parseFloat(value));
     const processedValue = value && !isNumber ? value.toLowerCase() : value;
@@ -306,11 +312,11 @@ const FilterSection = <T,>({
     // Ref for the hidden div used to measure text width
     const textMeasureRef = useRef<HTMLDivElement>(null);
 
-    // Measure the exact width of the longest option
+    // Measure the exact width of the longest option (with capitalized text)
     useEffect(() => {
       if (options.length > 0 && textMeasureRef.current) {
-        const allOptions = ["", ...options]; // Include "All" option
-        const optionTexts = allOptions.map((option) => (option === "" ? "All" : option));
+        const allOptions = ["", ...options];
+        const optionTexts = allOptions.map((option) => (option === "" ? "All" : capitalizeFirstLetter(option)));
         
         let maxWidth = 0;
         optionTexts.forEach((text) => {
@@ -322,7 +328,7 @@ const FilterSection = <T,>({
         });
 
         // Set the width with a small buffer, minimum 250px
-        const finalWidth = Math.max(maxWidth + 24, 250); // 24px for padding (8px left + 12px right + 4px buffer)
+        const finalWidth = Math.max(maxWidth + 30, 250); // Increased buffer to 30px for Material-UI padding
         setOptionsListWidth(finalWidth);
       }
     }, [options]);
@@ -353,12 +359,13 @@ const FilterSection = <T,>({
             fontWeight: 400,
             fontFamily: theme.typography.fontFamily,
             padding: "8px 12px", // Match the padding from renderOption
+            lineHeight: "normal", // Match Material-UI's default line height
           }}
         />
         <StyledFormControl key={columnId} size="small" sx={{ minWidth: { xs: "100%", sm: 150 }, maxWidth: { xs: "100%", sm: 200 } }}>
           <Autocomplete
             options={["", ...options]}
-            getOptionLabel={(option) => option}
+            getOptionLabel={(option) => option} // Value remains unchanged for internal logic
             value={filters[columnId] || ""}
             onChange={(event, newValue) => {
               const selectedValue = newValue || "";
@@ -414,7 +421,7 @@ const FilterSection = <T,>({
                   whiteSpace: "nowrap",
                 }}
               >
-                {option === "" ? "All" : option}
+                {option === "" ? "All" : capitalizeFirstLetter(option)}
               </li>
             )}
             disableClearable={false}

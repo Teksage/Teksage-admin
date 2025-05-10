@@ -55,7 +55,10 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   flex: 1,
   overflow: "auto",
   width: "100%",
-  "& .MuiTable-root": { minWidth: "800px" },
+  "& .MuiTable-root": {
+    minWidth: "800px",
+    tableLayout: "fixed", // Ensure consistent column widths
+  },
   "& .MuiTableCell-head": {
     background: `linear-gradient(180deg, ${alpha("#2e7d32", 0.9)} 0%, ${alpha("#1b4d3e", 0.9)} 100%)`,
     color: theme.palette.common.white + " !important",
@@ -65,8 +68,16 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
     whiteSpace: "nowrap",
     borderBottom: "none",
     padding: theme.spacing(2, 3),
-    textAlign: "center",
-    "&:first-of-type": { borderTopLeftRadius: "8px" },
+    textAlign: "center", // Center-align headers
+    "&:first-of-type": { 
+      borderTopLeftRadius: "8px",
+      // padding: theme.spacing(2, 0.5), // Minimal padding for S.No header
+      // fontSize: "0.85rem", // Reduced font size for S.No header
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      boxSizing: "border-box",
+    },
     "&:last-of-type": { borderTopRightRadius: "8px" },
     "& .MuiTableSortLabel-root": {
       color: theme.palette.common.white + " !important",
@@ -99,19 +110,22 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
     fontFamily: "Roboto, sans-serif",
     fontSize: "0.95rem",
     color: theme.palette.text.primary,
-    textAlign: "left", // Default alignment for cells
-    "&:first-of-type": { textAlign: "center" }, // Center-align S.No. column
-    "&:last-of-type": { textAlign: "right" }, // Right-align Actions column
+    textAlign: "center", // Center-align all cells
+    boxSizing: "border-box",
   },
 }));
 
 const SerialNumberCell = styled(TableCell)(({ theme }) => ({
-  width: "60px",
+  width: "20px", // Strictly enforce width
+  minWidth: "20px", // Minimal width for S.No
+  maxWidth: "20px", // Prevent expansion
+  padding: theme.spacing(2, 0.5), // Minimal padding for S.No data cells
   textAlign: "center",
   fontWeight: 600,
   color: theme.palette.text.secondary,
   fontFamily: "Roboto, sans-serif",
-  fontSize: "0.95rem",
+  fontSize: "0.85rem", // Reduced font size for S.No data
+  boxSizing: "border-box",
 }));
 
 interface TableContentProps<T> {
@@ -150,12 +164,49 @@ const TableContent = <T,>({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  // Helper function to capitalize the first letter
+  const capitalizeFirstLetter = (str: string) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  // Helper function to detect and format date-time strings
+  const formatDateTime = (value: string) => {
+    const dateTimeRegex = /^([A-Za-z]+\s\d{1,2},\s\d{4}),\s(\d{2}:\d{2}\s[A|P]M)$/;
+    const match = value.match(dateTimeRegex);
+    if (match) {
+      const date = match[1]; // e.g., "May 15, 2025"
+      const time = match[2]; // e.g., "09:00 AM"
+      return (
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography variant="body2">{date}</Typography>
+          <Typography variant="body2">{time}</Typography>
+        </Box>
+      );
+    }
+    return null;
+  };
+
   const safeRenderValue = (value: any, row: T, render?: (value: any, row: T) => React.ReactNode) => {
     if (render) {
-      return render(value, row) || "N/A";
+      const renderedValue = render(value, row);
+      if (typeof renderedValue === "string") {
+        // Check if the rendered value is a date-time string
+        const formattedDateTime = formatDateTime(renderedValue);
+        if (formattedDateTime) return formattedDateTime;
+        return capitalizeFirstLetter(renderedValue) || "N/A";
+      }
+      return renderedValue || "N/A";
     }
     if (value && typeof value === "object" && "first_name" in value) {
-      return `${value.first_name || ""} ${value.last_name || ""}`.trim() || "N/A";
+      const fullName = `${value.first_name || ""} ${value.last_name || ""}`.trim();
+      return fullName ? capitalizeFirstLetter(fullName) : "N/A";
+    }
+    if (typeof value === "string") {
+      // Check if the value is a date-time string
+      const formattedDateTime = formatDateTime(value);
+      if (formattedDateTime) return formattedDateTime;
+      return capitalizeFirstLetter(value) || "N/A";
     }
     return value?.toString() || "N/A";
   };
@@ -209,12 +260,12 @@ const TableContent = <T,>({
                         fontWeight: 600,
                         fontFamily: "Roboto, sans-serif",
                         fontSize: "1rem",
-                        textAlign: columns[0].align ?? "left", // Use column alignment or default to "left"
+                        textAlign: "center", // Center-align mobile view
                       }}
                       secondaryTypographyProps={{
                         fontFamily: "Roboto, sans-serif",
                         fontSize: "0.85rem",
-                        textAlign: columns[1]?.align ?? "left", // Use column alignment or default to "left"
+                        textAlign: "center", // Center-align mobile view
                       }}
                     />
                     {showActions && onView && (
@@ -249,7 +300,7 @@ const TableContent = <T,>({
           <Box sx={{ p: 3 }}>
             {[...Array(rowsPerPage)].map((_, index) => (
               <Box key={index} sx={{ display: "flex", gap: 2, py: 1 }}>
-                <Skeleton variant="text" width="40px" height={30} />
+                <Skeleton variant="text" width="20px" height={30} />
                 {columns.map((_, colIndex) => (
                   <Skeleton key={colIndex} variant="text" width="100px" height={30} />
                 ))}
@@ -260,12 +311,15 @@ const TableContent = <T,>({
           <Table stickyHeader aria-label="data table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: "60px", textAlign: "center" }}>S.No</TableCell>
+                <TableCell sx={{ width: "20px", minWidth: "20px", maxWidth: "20px", textAlign: "center" }}>No.</TableCell>
                 {columns.map((column) => (
                   <TableCell
                     key={column.id as string}
                     sortDirection={sortConfig.key === column.id ? sortConfig.direction : false}
-                    sx={{ width: column.width, textAlign: column.align }}
+                    sx={{
+                      minWidth: column.minWidth || "150px", // Use minWidth or default to 150px
+                      textAlign: "center",
+                    }}
                   >
                     {column.sortable ? (
                       <TableSortLabel
@@ -280,7 +334,7 @@ const TableContent = <T,>({
                     )}
                   </TableCell>
                 ))}
-                {showActions && <TableCell sx={{ width: "150px", textAlign: "center" }}>Actions</TableCell>}
+                {showActions && <TableCell sx={{ minWidth: "150px", textAlign: "center" }}>Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -290,17 +344,36 @@ const TableContent = <T,>({
                 return (
                   <TableRow hover key={id}>
                     <SerialNumberCell>{serialNumber}</SerialNumberCell>
-                    {columns.map((column) => (
-                      <TableCell
-                        key={column.id as string}
-                        sx={{ textAlign: column.align ?? "left" }} // Use column alignment or default to "left"
-                      >
-                        {safeRenderValue(row[column.id], row, column.render)}
-                      </TableCell>
-                    ))}
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      const displayValue = safeRenderValue(value, row, column.render);
+                      const isLongText = typeof value === "string" && value.length > 30; // Example threshold for truncation
+                      return (
+                        <TableCell
+                          key={column.id as string}
+                          sx={{
+                            textAlign: "center",
+                            minWidth: column.minWidth || "150px",
+                            ...(isLongText && {
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }),
+                          }}
+                        >
+                          {isLongText ? (
+                            <Tooltip title={value}>
+                              <span>{displayValue}</span>
+                            </Tooltip>
+                          ) : (
+                            displayValue
+                          )}
+                        </TableCell>
+                      );
+                    })}
                     {showActions && (
-                      <TableCell>
-                        <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                      <TableCell sx={{ minWidth: "150px" }}>
+                        <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                           {onView && (
                             <Tooltip title="View">
                               <IconButton

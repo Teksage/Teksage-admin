@@ -136,7 +136,7 @@ const Consultations: React.FC = () => {
       {
         id: "start_time",
         label: "Consultation Date",
-        filterable: true,
+        filterable: false,
         filterType: "date",
         width: "140px",
         render: (value) =>

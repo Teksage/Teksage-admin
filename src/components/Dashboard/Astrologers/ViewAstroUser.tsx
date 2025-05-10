@@ -623,7 +623,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                           },
                           opacity: 0, // Start hidden for animation
                           animation: "fadeIn 0.5s forwards",
-                          animationDelay: `${index * 0.1}s`, // Staggered animation
+                          animationDelay: `${0.2}s`, // Staggered animation
                         }}
                       >
                         <CardContent sx={{ flexGrow: 1 }}>

@@ -263,7 +263,7 @@ const DashboardLayout = () => {
                     <Typography variant="subtitle1" fontWeight={600}>
                       {user || "User"}
                     </Typography>
-                    {themeMode === "light" ? (
+                    {/* {themeMode === "light" ? (
                       <svg
                         width="16"
                         height="16"
@@ -295,7 +295,7 @@ const DashboardLayout = () => {
                           strokeLinejoin="round"
                         />
                       </svg>
-                    )}
+                    )} */}
                   </Box>
                   <Typography
                     variant="body2"
@@ -311,7 +311,7 @@ const DashboardLayout = () => {
                     {"Administrator"}
                   </Typography>
                 </Paper>
-                <MenuItem
+                {/* <MenuItem
                   onClick={handleToggleTheme}
                   sx={{
                     py: 1.5,
@@ -326,7 +326,7 @@ const DashboardLayout = () => {
                   <Typography variant="body2" fontWeight={500}>
                     {themeMode === "light" ? "Dark Mode" : "Light Mode"}
                   </Typography>
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem
                   onClick={logoutSection}
                   sx={{

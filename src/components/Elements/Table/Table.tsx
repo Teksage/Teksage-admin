@@ -1656,6 +1656,7 @@ function GenericTable<T>({
         hasFilterableColumns={hasFilterableColumns}
         hasDateData={hasDateData}
         hasFeeData={hasFeeData}
+        mobileFiltersOpen={mobileFiltersOpen}
       />
       {showFilters && (hasFilterableColumns || hasDateData || hasFeeData) && (
         <FilterSection
