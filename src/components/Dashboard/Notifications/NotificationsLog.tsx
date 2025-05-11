@@ -186,7 +186,7 @@ const NotificationLog: React.FC = () => {
         id: "sent_by_date",
         label: "Sent by Time",
         width: "200px",
-        filterable: true,
+        filterable: false,
         filterType: "date", // Specify as date type for GenericTable
         filterOptions: filterOptions.sent_by_date,
         render: (value:any) =>

@@ -125,6 +125,7 @@ interface FilterSectionProps<T> {
     field: keyof T,
     searchValue: string
   ) => Promise<string[]>;
+  title: string;
 }
 
 interface FilterItemProps<T> {
@@ -295,6 +296,7 @@ const FilterSection = <T,>({
   setSelectedPreset,
   onFilterChange,
   onFetchFilterOptions,
+  title
 }: FilterSectionProps<T>) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -634,7 +636,7 @@ const FilterSection = <T,>({
             handleSearchChange={handleSearchChange}
           />
         ))}
-      {renderDateFilter()}
+      {title!=="User Management" && title!=="Astrologer Management" && renderDateFilter()}
     </FiltersContainer>
   );
 };

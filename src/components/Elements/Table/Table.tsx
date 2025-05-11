@@ -481,10 +481,10 @@
 
 //     return (
 //       <Box sx={{ minWidth: { xs: "100%", sm: 200 }, maxWidth: { xs: "100%", sm: 450 } }}>
-//         <StyledFormControl 
-//           size="small" 
-//           sx={{ 
-//             width: "100%", 
+//         <StyledFormControl
+//           size="small"
+//           sx={{
+//             width: "100%",
 //             maxWidth: { xs: "100%", sm: 450 },
 //             boxSizing: "border-box",
 //           }}
@@ -819,11 +819,11 @@
 //     );
 
 //     return (
-//       <StyledFormControl 
-//         key={columnId} 
-//         size="small" 
-//         sx={{ 
-//           minWidth: { xs: "100%", sm: 200 }, 
+//       <StyledFormControl
+//         key={columnId}
+//         size="small"
+//         sx={{
+//           minWidth: { xs: "100%", sm: 200 },
 //           maxWidth: { xs: "100%", sm: 450 },
 //         }}
 //       >
@@ -1566,8 +1566,12 @@ function GenericTable<T>({
     key: keyof T | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
-  const [filterOptions, setFilterOptions] = useState<Record<string, string[]>>({});
-  const [filterLoading, setFilterLoading] = useState<Record<string, boolean>>({});
+  const [filterOptions, setFilterOptions] = useState<Record<string, string[]>>(
+    {}
+  );
+  const [filterLoading, setFilterLoading] = useState<Record<string, boolean>>(
+    {}
+  );
   const [searchValues, setSearchValues] = useState<Record<string, string>>({});
   const [tempDateRange, setTempDateRange] = useState<{
     start: Date | null;
@@ -1583,8 +1587,9 @@ function GenericTable<T>({
 
   const hasFeeData = useMemo(() => {
     const feeValues = data
-      .map((item: any) =>
-        (item["consultation_fee"] || item["fee"] || item["consulting_fee"])
+      .map(
+        (item: any) =>
+          item["consultation_fee"] || item["fee"] || item["consulting_fee"]
       )
       .filter((value) => value !== null && value !== 0 && !isNaN(value));
     return feeValues.length > 0;
@@ -1609,10 +1614,10 @@ function GenericTable<T>({
 
   const handleExport = () => {
     const csv = [
-      columns.map((col:any) => col.label).join(","),
-      ...data.map((row:any) =>
+      columns.map((col: any) => col.label).join(","),
+      ...data.map((row: any) =>
         columns
-          .map((col:any) => {
+          .map((col: any) => {
             const value = col.render
               ? col.render(row[col.id], row)
               : row[col.id]?.toString() || "";
@@ -1647,6 +1652,7 @@ function GenericTable<T>({
       />
       {showFilters && (hasFilterableColumns || hasFeeData) && (
         <FilterSection
+          title={title}
           columns={columns}
           filters={filters}
           setFilters={setFilters}
