@@ -58,7 +58,7 @@ const Subscription: React.FC = () => {
       width: "150px",
       render: (value: number) => {
         if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
-        return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)
+        return `₹ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
       },
     },
     {
@@ -114,7 +114,7 @@ const Subscription: React.FC = () => {
     console.log(selectedRow?.plan_id, "selectedRow?.plan_id");
     try {
       await callAPI({
-        endpoint: `/api/admin/subscription/${selectedRow?.plan_id}`,
+        endpoint: `/api/admin/service-catalogs/${selectedRow?.plan_id}`,
         method: "delete",
       });
       setDeleteModalOpen(false);

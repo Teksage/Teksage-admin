@@ -48,7 +48,9 @@
 //     width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
 //     boxSizing: "border-box",
 //     overflowX: "hidden",
-//     position: "relative",
+//     position: "fixed", // Make the Drawer sticky on desktop
+//     top: 0,
+//     bottom: 0,
 //     background:
 //       "linear-gradient(180deg, rgba(16, 177, 0, 0.5) -202.06%, rgba(255, 255, 255, 0.5) 100%)",
 //     backdropFilter: "blur(10px)",
@@ -108,7 +110,7 @@
 //   },
 // }));
 
-// const NavItem = styled(ListItemButton)(({ theme, open }:any) => ({
+// const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
 //   borderRadius: theme.shape.borderRadius,
 //   margin: theme.spacing(0.5, 1),
 //   padding: theme.spacing(1),
@@ -158,7 +160,7 @@
 //   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 // ];
 
-// const Navbar = ({ open, toggleSidebar }:any) => {
+// const Navbar = ({ open, toggleSidebar }: any) => {
 //   const [notificationsExpanded, setNotificationsExpanded] = useState(false);
 //   const [mobileOpen, setMobileOpen] = useState(false);
 //   const navigate = useNavigate();
@@ -167,7 +169,7 @@
 //   const location = useLocation();
 //   const locationPathname = location?.pathname;
 
-//   const handleNotificationsClick = (e:any) => {
+//   const handleNotificationsClick = (e: any) => {
 //     e.stopPropagation();
 //     setNotificationsExpanded(!notificationsExpanded);
 //     if (!notificationsExpanded && open) {
@@ -183,14 +185,14 @@
 //     }
 //   };
 
-//   const handleMenuItemClick = (path:any) => {
+//   const handleMenuItemClick = (path: any) => {
 //     navigate(path);
 //     if (isMobile) {
 //       setMobileOpen(false);
 //     }
 //   };
 
-//   const isActive = (path:any) => locationPathname.includes(path);
+//   const isActive = (path: any) => locationPathname.includes(path);
 
 //   const drawerContent = (
 //     <>
@@ -234,7 +236,10 @@
 //         {menuItems.map((item) => (
 //           <NavItem
 //             key={item.name}
-//             onClick={() => {handleMenuItemClick(item.path); setNotificationsExpanded(false)}}
+//             onClick={() => {
+//               handleMenuItemClick(item.path);
+//               setNotificationsExpanded(false);
+//             }}
 //             selected={isActive(item.path)}
 //             sx={{ gap: "10px" }}
 //           >
@@ -418,7 +423,7 @@
 
 // export default Navbar;
 
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import {
   Drawer,
@@ -457,6 +462,7 @@ const DRAWER_COLLAPSED_WIDTH = 72;
 const GradientDrawer = styled(Drawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
+  backgroundColor: theme.palette.background.default,
   width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
   flexShrink: 0,
   whiteSpace: "nowrap",
@@ -468,7 +474,7 @@ const GradientDrawer = styled(Drawer, {
     width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
     boxSizing: "border-box",
     overflowX: "hidden",
-    position: "fixed", // Make the Drawer sticky on desktop
+    position: "fixed",
     top: 0,
     bottom: 0,
     background:
@@ -491,7 +497,7 @@ const LogoContainer = styled(Box)(({ theme }) => ({
   position: "relative",
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-start",
+  justifyContent: "space-between",
   padding: theme.spacing(2),
   minHeight: 64,
 }));
@@ -530,16 +536,18 @@ const ToggleButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
+const NavItem = styled(ListItemButton, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<{ open?: boolean }>(({ theme, open }) => ({
   borderRadius: theme.shape.borderRadius,
   margin: theme.spacing(0.5, 1),
   padding: theme.spacing(1),
   width: "auto",
   "&:hover": {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: alpha(theme.palette.common.white, 0.2),
   },
   "&.Mui-selected": {
-    backgroundColor: "rgba(16, 177, 0, 0.3)",
+    backgroundColor: alpha(theme.palette.success.main, 0.3),
     borderLeft: `3px solid ${theme.palette.success.main}`,
     "& .MuiListItemIcon-root": {
       color: theme.palette.success.main,
@@ -551,7 +559,7 @@ const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
   "& .MuiListItemIcon-root": {
     minWidth: open ? 40 : 24,
     justifyContent: open ? "flex-start" : "center",
-    marginRight: open ? theme.spacing(4) : 0,
+    // marginRight: open ? theme.spacing(4) : 0,
   },
   transition: theme.transitions.create(
     ["background-color", "padding", "margin"],
@@ -564,281 +572,282 @@ const NavItem = styled(ListItemButton)(({ theme, open }: any) => ({
 const menuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
-  {
-    name: "Consultations",
-    path: "/dashboard/consultations",
-    icon: <ChatIcon />,
-  },
-  {
-    name: "Subscription Plans",
-    path: "/dashboard/subscription",
-    icon: <BarChartIcon />,
-  },
+  { name: "Consultations", path: "/dashboard/consultations", icon: <ChatIcon /> },
+  { name: "Subscription Plans", path: "/dashboard/subscription", icon: <BarChartIcon /> },
   { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
 ];
 
-const Navbar = ({ open, toggleSidebar }: any) => {
-  const [notificationsExpanded, setNotificationsExpanded] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const location = useLocation();
-  const locationPathname = location?.pathname;
+const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
+  ({ open, toggleSidebar }) => {
+    const [notificationsExpanded, setNotificationsExpanded] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const location = useLocation();
+    const locationPathname = location?.pathname;
 
-  const handleNotificationsClick = (e: any) => {
-    e.stopPropagation();
-    setNotificationsExpanded(!notificationsExpanded);
-    if (!notificationsExpanded && open) {
-      navigate("/dashboard/notifications/send");
-    }
-  };
+    const handleNotificationsClick = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      setNotificationsExpanded((prev) => !prev);
+      if (!notificationsExpanded && open) {
+        navigate("/dashboard/notifications/send");
+      }
+    }, [notificationsExpanded, open, navigate]);
 
-  const handleToggleSidebar = () => {
-    if (isMobile) {
-      setMobileOpen(!mobileOpen);
-    } else {
-      toggleSidebar();
-    }
-  };
+    const handleToggleSidebar = useCallback(() => {
+      if (isMobile) {
+        setMobileOpen((prev) => !prev);
+      } else {
+        toggleSidebar();
+      }
+    }, [isMobile, toggleSidebar]);
 
-  const handleMenuItemClick = (path: any) => {
-    navigate(path);
-    if (isMobile) {
-      setMobileOpen(false);
-    }
-  };
+    const handleMenuItemClick = useCallback(
+      (path: string) => {
+        navigate(path);
+        if (isMobile) {
+          setMobileOpen(false);
+        }
+      },
+      [isMobile, navigate]
+    );
 
-  const isActive = (path: any) => locationPathname.includes(path);
+    const isActive = useCallback(
+      (path: string) => locationPathname.includes(path),
+      [locationPathname]
+    );
 
-  const drawerContent = (
-    <>
-      <LogoContainer>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: open ? "flex-start" : "center",
-            alignItems: "center",
-            paddingLeft: open ? 2 : 0,
-            "& img": {
-              width: open ? "100px" : "28px",
-              height: "auto",
-              transition: "all 0.3s ease",
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
-            },
-          }}
-        >
-          <img
-            src={astro_prompt_logo}
-            alt="Logo"
-            style={{ borderRadius: "8px" }}
-          />
-        </Box>
-        {!isMobile && (
-          <ToggleButton
-            onClick={handleToggleSidebar}
+    const drawerContent = (
+      <>
+        <LogoContainer>
+          <Box
             sx={{
-              left: `calc(${
-                open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH
-              }px - 22px)`,
+              width: "100%",
+              display: "flex",
+              justifyContent: open ? "space-between" : "center",
+              alignItems: "center",
+              paddingLeft: open ? 2 : 0,
+              "& img": {
+                width: open ? "100px" : "28px",
+                height: "auto",
+                transition: "all 0.3s ease",
+                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
+              },
             }}
           >
-            {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </ToggleButton>
-        )}
-      </LogoContainer>
-
-      <List sx={{ px: 0.5, pt: 1 }}>
-        {menuItems.map((item) => (
-          <NavItem
-            key={item.name}
-            onClick={() => {
-              handleMenuItemClick(item.path);
-              setNotificationsExpanded(false);
-            }}
-            selected={isActive(item.path)}
-            sx={{ gap: "10px" }}
-          >
-            <ListItemIcon
+            <img
+              src={astro_prompt_logo}
+              alt="Logo"
+              style={{ borderRadius: "8px" }}
+              loading="lazy"
+            />
+          </Box>
+          {!isMobile && (
+            <ToggleButton
+              onClick={handleToggleSidebar}
               sx={{
-                color: "inherit",
-                marginRight: open || isMobile ? 4 : 0,
+                left: `calc(${
+                  open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH
+                }px - 22px)`,
               }}
             >
-              {item.icon}
+              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </ToggleButton>
+          )}
+        </LogoContainer>
+
+        <List sx={{ px: 0.5, pt: 1 }}>
+          {menuItems.map((item) => (
+            <NavItem
+              key={item.name}
+              onClick={() => {
+                handleMenuItemClick(item.path);
+                setNotificationsExpanded(false);
+              }}
+              selected={isActive(item.path)}
+              open={open}
+            >
+              <ListItemIcon
+                sx={{
+                  color: "inherit",
+                  marginRight: isMobile ? 1 : 0,
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              {(open || isMobile) && (
+                <ListItemText
+                  primary={item.name}
+                  primaryTypographyProps={{
+                    variant: "body1",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                />
+              )}
+            </NavItem>
+          ))}
+
+          <NavItem
+            onClick={
+              open
+                ? handleNotificationsClick
+                : () => navigate("/dashboard/notifications/send")
+            }
+            selected={isActive("/dashboard/notifications")}
+            open={open}
+          >
+            <ListItemIcon sx={{ color: "inherit" }}>
+              <NotificationsIcon />
             </ListItemIcon>
             {(open || isMobile) && (
-              <ListItemText
-                primary={item.name}
-                primaryTypographyProps={{
-                  variant: "body1", // 16px base, scalable
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              />
+              <>
+                <ListItemText
+                  primary="Notifications"
+                  primaryTypographyProps={{
+                    variant: "body1",
+                    whiteSpace: "nowrap",
+                  }}
+                  sx={{ flexGrow: 1 }}
+                />
+                {open && (
+                  <IconButton
+                    size="small"
+                    onClick={handleNotificationsClick}
+                    sx={{ padding: 0.5, ml: -1 }}
+                  >
+                    {notificationsExpanded ? <ExpandLess /> : <ExpandMore />}
+                  </IconButton>
+                )}
+              </>
             )}
           </NavItem>
-        ))}
 
-        <NavItem
-          onClick={
-            open
-              ? handleNotificationsClick
-              : () => navigate("/dashboard/notifications/send")
-          }
-          selected={locationPathname.includes("/dashboard/notifications")}
-          sx={{ gap: "10px" }}
-        >
-          <ListItemIcon sx={{ color: "inherit" }}>
-            <NotificationsIcon />
-          </ListItemIcon>
-          {(open || isMobile) && (
-            <>
-              <ListItemText
-                primary="Notifications"
-                primaryTypographyProps={{
-                  variant: "body1", // 16px base, scalable
-                  whiteSpace: "nowrap",
+          <Collapse
+            in={notificationsExpanded && (open || isMobile)}
+            timeout="auto"
+            unmountOnExit
+          >
+            <List component="div" disablePadding>
+              <NavItem
+                sx={{
+                  pl: open ? 4 : 2,
+                  ml: 1,
+                  mr: 1,
+                  borderRadius: theme.shape.borderRadius,
                 }}
-                sx={{ flexGrow: 1 }}
-              />
-              {open && (
-                <IconButton
-                  size="small"
-                  onClick={handleNotificationsClick}
-                  sx={{ padding: 0.5, ml: -1 }}
-                >
-                  {notificationsExpanded ? <ExpandLess /> : <ExpandMore />}
-                </IconButton>
-              )}
-            </>
-          )}
-        </NavItem>
+                onClick={() =>
+                  handleMenuItemClick("/dashboard/notifications/send")
+                }
+                selected={locationPathname === "/dashboard/notifications/send"}
+                open={open}
+              >
+                <ListItemIcon sx={{ color: "inherit" }}>
+                  <SendIcon fontSize="small" />
+                </ListItemIcon>
+                {(open || isMobile) && (
+                  <ListItemText
+                    primary="Send Notifications"
+                    primaryTypographyProps={{
+                      variant: "body2",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  />
+                )}
+              </NavItem>
 
-        <Collapse
-          in={notificationsExpanded && (open || isMobile)}
-          timeout="auto"
-          unmountOnExit
-        >
-          <List component="div" disablePadding>
-            <NavItem
-              sx={{
-                pl: open ? 4 : 2,
-                ml: 1,
-                mr: 1,
-                borderRadius: theme.shape.borderRadius,
-                gap: "8px",
-              }}
-              onClick={() =>
-                handleMenuItemClick("/dashboard/notifications/send")
-              }
-              selected={locationPathname === "/dashboard/notifications/send"}
-            >
-              <ListItemIcon sx={{ color: "inherit" }}>
-                <SendIcon fontSize="small" />
-              </ListItemIcon>
-              {(open || isMobile) && (
-                <ListItemText
-                  primary="Send Notifications"
-                  primaryTypographyProps={{
-                    variant: "body2", // 14px base, scalable, for sub-items
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                />
-              )}
-            </NavItem>
-
-            <NavItem
-              sx={{
-                pl: open ? 4 : 2,
-                ml: 1,
-                mr: 1,
-                borderRadius: theme.shape.borderRadius,
-                gap: "8px",
-              }}
-              onClick={() =>
-                handleMenuItemClick("/dashboard/notifications/log")
-              }
-              selected={locationPathname === "/dashboard/notifications/log"}
-            >
-              <ListItemIcon sx={{ color: "inherit" }}>
-                <SendIcon fontSize="small" />
-              </ListItemIcon>
-              {(open || isMobile) && (
-                <ListItemText
-                  primary="Notifications Log"
-                  primaryTypographyProps={{
-                    variant: "body2", // 14px base, scalable, for sub-items
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                />
-              )}
-            </NavItem>
-          </List>
-        </Collapse>
-      </List>
-    </>
-  );
-
-  if (isMobile) {
-    return (
-      <>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="start"
-          onClick={handleToggleSidebar}
-          sx={{
-            mr: 2,
-            position: "fixed",
-            left: 16,
-            top: 16,
-            zIndex: 1201,
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            backdropFilter: "blur(4px)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <SwipeableDrawer
-          variant="temporary"
-          anchor="left"
-          open={mobileOpen}
-          onClose={() => setMobileOpen(false)}
-          onOpen={() => setMobileOpen(true)}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              background:
-                "linear-gradient(180deg, rgba(16, 177, 0, 0.5) -202.06%, rgba(255, 255, 255, 0.5) 100%)",
-              backdropFilter: "blur(10px)",
-              width: DRAWER_WIDTH,
-            },
-          }}
-        >
-          <Box sx={{ py: 2 }}>{drawerContent}</Box>
-        </SwipeableDrawer>
+              <NavItem
+                sx={{
+                  pl: open ? 4 : 2,
+                  ml: 1,
+                  mr: 1,
+                  borderRadius: theme.shape.borderRadius,
+                }}
+                onClick={() =>
+                  handleMenuItemClick("/dashboard/notifications/log")
+                }
+                selected={locationPathname === "/dashboard/notifications/log"}
+                open={open}
+              >
+                <ListItemIcon sx={{ color: "inherit" }}>
+                  <SendIcon fontSize="small" />
+                </ListItemIcon>
+                {(open || isMobile) && (
+                  <ListItemText
+                    primary="Notifications Log"
+                    primaryTypographyProps={{
+                      variant: "body2",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  />
+                )}
+              </NavItem>
+            </List>
+          </Collapse>
+        </List>
       </>
     );
-  }
 
-  return (
-    <GradientDrawer variant="permanent" open={open}>
-      {drawerContent}
-    </GradientDrawer>
-  );
-};
+    if (isMobile) {
+      return (
+        <>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleToggleSidebar}
+            sx={{
+              mr: 2,
+              position: "fixed",
+              left: 16,
+              top: 16,
+              zIndex: 1201,
+              backgroundColor: alpha(theme.palette.background.paper, 0.8),
+              backdropFilter: "blur(4px)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <SwipeableDrawer
+            variant="temporary"
+            anchor="left"
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            onOpen={() => setMobileOpen(true)}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            sx={{
+              "& .MuiDrawer-paper": {
+                background:
+                  "linear-gradient(180deg, rgba(16, 177, 0, 0.5) -202.06%, rgba(255, 255, 255, 0.5) 100%)",
+                backdropFilter: "blur(10px)",
+                width: DRAWER_WIDTH,
+              },
+            }}
+          >
+            <Box sx={{ py: 2 }}>{drawerContent}</Box>
+          </SwipeableDrawer>
+        </>
+      );
+    }
+
+    return (
+      <GradientDrawer variant="permanent" open={open}>
+        {drawerContent}
+      </GradientDrawer>
+    );
+  }
+);
 
 export default Navbar;

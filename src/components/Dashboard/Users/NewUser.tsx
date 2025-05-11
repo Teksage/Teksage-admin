@@ -289,41 +289,41 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         status: formData.status.toLowerCase(),
         user_type: formData.user_type.toLowerCase(),
       })
-      // const response = await callAPI({
-      //   endpoint:
-      //     mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
-      //   method: mode === "edit" ? "put" : "post",
-      //   data: {
-      //     first_name: formData.first_name,
-      //     last_name: formData.last_name,
-      //     preferred_location: formData.preferredLocation,
-      //     email: formData.email,
-      //     mobile_number: formData.mobile,
-      //     birth_location: formData.placeOfBirth,
-      //     date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
-      //     time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
-      //     rashi: formData.rashi,
-      //     nakshatra: formData.nakshatra,
-      //     status: formData.status.toLowerCase(),
-      //     user_type: formData.user_type.toLowerCase(),
-      //   },
-      // });
-      // console.log(response, "response");
-      // setSnackbar({
-      //   open: true,
-      //   message:
-      //     mode === "edit"
-      //       ? "User updated successfully!"
-      //       : "User created successfully!",
-      //   severity: "success",
-      // });
+      const response = await callAPI({
+        endpoint:
+          mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
+        method: mode === "edit" ? "put" : "post",
+        data: {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          preferred_location: formData.preferredLocation,
+          email: formData.email,
+          mobile_number: formData.mobile,
+          birth_location: formData.placeOfBirth,
+          date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+          time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+          rashi: formData.rashi,
+          nakshatra: formData.nakshatra,
+          status: formData.status.toLowerCase(),
+          user_type: formData.user_type.toLowerCase(),
+        },
+      });
+      console.log(response, "response");
+      setSnackbar({
+        open: true,
+        message:
+          mode === "edit"
+            ? "User updated successfully!"
+            : "User created successfully!",
+        severity: "success",
+      });
 
-      // navigate(-1);
+      navigate(-1);
     } catch (err: any) {
       console.error("API Error:", err);
       let errorMessage = "Something went wrong. Please try again.";
       if (err.response && err.response.data) {
-        errorMessage = err.response.data.message || JSON.stringify(err.response.data);
+        errorMessage = err.response.data.detail || JSON.stringify(err.response.data.detail);
       }
       setSnackbar({
         open: true,

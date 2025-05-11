@@ -135,7 +135,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             last_name: data.user.last_name || "",
             email: data.user.email || "",
             mobile_number: data.user.mobile_number || "",
-            status: data.status || "Active",
+            status: data.status === "inactive" ? "Inactive" : "Active",
             astrologer_profile_info: data.astrologer_profile_info || "",
             experience: data.experience || "",
             consulting_fee: data.consulting_fee.toString() || "",
@@ -425,7 +425,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       let errorMessage = "Something went wrong. Please try again.";
       if (err.response && err.response.data) {
         errorMessage =
-          err.response.data.message || JSON.stringify(err.response.data);
+          err.response.data.detail || JSON.stringify(err.response.data?.detail);
       }
       setSnackbar({
         open: true,

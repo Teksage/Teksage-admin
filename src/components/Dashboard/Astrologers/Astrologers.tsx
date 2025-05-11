@@ -160,7 +160,7 @@ const Astrologers: React.FC = () => {
         filterOptions: ["Less than 500", "500 - 1000", "Greater than 1000 "],
         render: (value: number) => {
           if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
-          return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)
+          return `₹ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
         },
       },
       {

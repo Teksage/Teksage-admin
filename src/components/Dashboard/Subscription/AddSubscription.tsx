@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   TextField,
@@ -20,13 +20,14 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory";
+import CustomSnackbar from "../../Elements/CustomSnackbar";
 
 interface SubscriptionFormData {
   plan_name: string;
   plan_price: number | "";
   services: string[];
   status: "Active" | "Inactive";
-  service_type: "Free" | "Premium";
+  service_type: "free" | "premium";
   duration_value: number | "";
   duration_unit: "days" | "months" | "years";
 }
@@ -41,15 +42,30 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     plan_price: "",
     services: [],
     status: "Active",
-    service_type: "Free",
+    service_type: "free",
     duration_value: "",
     duration_unit: "months",
+  });
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
   });
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof SubscriptionFormData, string>>
   >({});
   const [services, setServices] = useState([]);
+  // State to hold raw input string for plan_price
+  const [inputValues, setInputValues] = useState({
+    plan_price: "",
+  });
+  // Ref to track cursor position for plan_price
+  const planPriceRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -69,11 +85,17 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
           });
           const data = subscriptionResponse?.data;
           console.log(data, "data");
+          const price = data?.plan_price != null ? Number(data.plan_price) : "";
           setFormData({
             ...data,
             status:
               data?.status.charAt(0).toUpperCase() +
               data?.status.slice(1).toLowerCase(),
+            plan_price: price,
+          });
+          // Set initial input value for plan_price
+          setInputValues({
+            plan_price: price === "" ? "" : String(price),
           });
         }
       } catch (error) {
@@ -91,16 +113,61 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       setFormData((prev) => ({
         ...prev,
         [field]:
-          field === "plan_price" || field === "duration_value"
+          field === "duration_value"
             ? value === ""
               ? ""
-              : +value.replace(/,/g, "") // Remove commas for plan_price
+              : Number(value) // Convert to number for duration_value
             : value,
       }));
       setErrors((prev: any) => ({
         ...prev,
         [field]: "",
       }));
+    };
+
+  const handleNumberChange =
+    (field: "plan_price", inputRef: React.RefObject<HTMLInputElement>) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const input = event.target;
+      const cursorPosition = input.selectionStart || 0;
+      let value = event.target.value.replace(/,/g, ""); // Remove commas for processing
+
+      // Allow empty input
+      if (value === "") {
+        setFormData((prev) => ({ ...prev, [field]: "" }));
+        setInputValues((prev) => ({ ...prev, [field]: "" }));
+        setErrors((prev: any) => ({ ...prev, [field]: "" }));
+        return;
+      }
+
+      // Validate input: numbers and one decimal point, up to 2 decimal places
+      if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+
+      const numValue = Number(value);
+      if (isNaN(numValue)) return;
+
+      // Update formData with raw number
+      setFormData((prev) => ({ ...prev, [field]: numValue }));
+      // Update inputValues with raw string (without commas)
+      setInputValues((prev) => ({ ...prev, [field]: value }));
+      setErrors((prev: any) => ({ ...prev, [field]: "" }));
+
+      // Calculate new cursor position after formatting
+      const formattedValue = numValue.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+      const commasBeforeCursor = (value.substring(0, cursorPosition).match(/,/g) || []).length;
+      const newCommasBeforeCursor = (formattedValue.substring(0, cursorPosition).match(/,/g) || []).length;
+      const cursorAdjustment = newCommasBeforeCursor - commasBeforeCursor;
+
+      // Set cursor position after formatting
+      setTimeout(() => {
+        if (inputRef.current) {
+          const newCursorPosition = cursorPosition + cursorAdjustment;
+          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+      }, 0);
     };
 
   const handleSelectChange =
@@ -120,14 +187,24 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     if (!formData.plan_name.trim()) {
       newErrors.plan_name = "Plan name is required.";
     }
-    if (!formData.plan_price || formData.plan_price <= 0) {
-      newErrors.plan_price = "Plan price must be greater than 0.";
+    if (
+      formData.plan_price === "" ||
+      isNaN(formData.plan_price as number) ||
+      (formData.plan_price as number) <= 0
+    ) {
+      newErrors.plan_price =
+        "Plan price must be a valid number greater than 0.";
     }
     if (!formData.services.length) {
       newErrors.services = "Services field is required.";
     }
-    if (!formData.duration_value || formData.duration_value <= 0) {
-      newErrors.duration_value = "Duration value must be greater than 0.";
+    if (
+      formData.duration_value === "" ||
+      isNaN(formData.duration_value as number) ||
+      (formData.duration_value as number) <= 0
+    ) {
+      newErrors.duration_value =
+        "Duration value must be a valid number greater than 0.";
     }
     if (!formData.duration_unit) {
       newErrors.duration_unit = "Duration unit is required.";
@@ -149,9 +226,30 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
+
+      setSnackbar({
+        open: true,
+        message:
+          mode === "edit"
+            ? "Subscription updated successfully!"
+            : "Subscription created successfully!",
+        severity: "success",
+      });
+
       navigate(-1);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting subscription:", error);
+      let errorMessage = "Something went wrong. Please try again.";
+      if (error.response && error.response.data) {
+        errorMessage =
+          error.response.data.detail ||
+          JSON.stringify(error.response.data?.detail);
+      }
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: "error",
+      });
     }
   };
 
@@ -184,16 +282,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
           variant="h5"
           fontWeight={600}
           mb={3}
-          // color="#1a237e"
           sx={{
-            maxWidth: "50%", // Prevent title from pushing buttons too far
+            maxWidth: "50%",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            fontWeight: 600, // Bolder font for emphasis
-            fontFamily: '"Poppins", sans-serif', // Modern font family
-            letterSpacing: 0.5, // Slight spacing for readability
-            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+            fontWeight: 600,
+            fontFamily: '"Poppins", sans-serif',
+            letterSpacing: 0.5,
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
           }}
         >
           {mode === "new"
@@ -249,16 +346,39 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
 
             <Grid item xs={12} sm={6}>
               <TextField
-                type="text" // Change type to text to handle formatted display
+                type="text"
                 label="Plan Price *"
                 fullWidth
                 size="small"
+                inputRef={planPriceRef}
                 value={
-                  formData.plan_price === ""
+                  isViewMode
+                    ? formData.plan_price === ""
+                      ? ""
+                      : Number(formData.plan_price).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                    : inputValues.plan_price === ""
                     ? ""
-                    : Number(formData.plan_price).toLocaleString("en-US")
+                    : Number(inputValues.plan_price).toLocaleString("en-US", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      })
                 }
-                onChange={handleTextChange("plan_price")}
+                onChange={handleNumberChange("plan_price", planPriceRef)}
+                onKeyDown={(e) => {
+                  if (
+                    !/[0-9.]/.test(e.key) &&
+                    e.key !== "Backspace" &&
+                    e.key !== "Delete" &&
+                    e.key !== "ArrowLeft" &&
+                    e.key !== "ArrowRight" &&
+                    e.key !== "Tab"
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
                 disabled={isViewMode}
                 error={!!errors.plan_price}
                 helperText={errors.plan_price || ""}
@@ -555,6 +675,12 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
           </Grid>
         </Box>
       </Paper>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </Box>
   );
 };

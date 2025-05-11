@@ -42,7 +42,6 @@
 //   useEffect(() => {
 //     const fetchInitialData = async () => {
 //       try {
-//         // Fetch all service catalogs
 //         const serviceResponse = await callAPI({
 //           endpoint: "/api/admin/service-catalogs",
 //           method: "get",
@@ -55,7 +54,6 @@
 
 //         setPlanData(transformedPlans);
 
-//         // If edit mode, fetch coupon details
 //         if (mode === "edit" && userId) {
 //           const couponResponse = await callAPI({
 //             endpoint: `/api/admin/coupons/${userId}`,
@@ -64,8 +62,11 @@
 //           const data = couponResponse?.data;
 //           setFormData({
 //             coupon_name: data?.coupon_name || "",
-//             coupon_percentage: data?.coupon_percentage || "",
-//             max_cap: data?.max_cap || "",
+//             coupon_percentage:
+//               data?.coupon_percentage != null
+//                 ? Number(data.coupon_percentage)
+//                 : "",
+//             max_cap: data?.max_cap != null ? Number(data.max_cap) : "",
 //             start_date: data?.start_date ? new Date(data.start_date) : null,
 //             end_date: data?.end_date ? new Date(data.end_date) : null,
 //             plan_id: data?.plan_id || null,
@@ -87,10 +88,21 @@
 //       setFormData((prev) => ({
 //         ...prev,
 //         [field]:
-//           field === "coupon_percentage" || field === "max_cap" ? +value : value,
+//           field === "coupon_percentage"
+//             ? value === ""
+//               ? ""
+//               : Number(value)
+//             : field === "max_cap"
+//             ? value === ""
+//               ? ""
+//               : Number(value.replace(/,/g, ""))
+//             : field === "plan_id"
+//             ? value === ""
+//               ? null
+//               : Number(value)
+//             : value,
 //       }));
 
-//       // Clear the error for this field when user starts typing
 //       setErrors((prev: any) => ({
 //         ...prev,
 //         [field]: "",
@@ -99,7 +111,8 @@
 
 //   const validateForm = () => {
 //     const newErrors: Record<string, string> = {};
-//     if (!formData.coupon_name.trim()) newErrors.coupon_name = "Coupon name is required.";
+//     if (!formData.coupon_name.trim())
+//       newErrors.coupon_name = "Coupon name is required.";
 //     if (formData.coupon_percentage === "" || formData.coupon_percentage < 0)
 //       newErrors.coupon_percentage = "Enter a valid percentage (0 or more).";
 //     if (formData.max_cap === "" || formData.max_cap < 0)
@@ -118,9 +131,7 @@
 //       console.log(formData, "formData");
 //       await callAPI({
 //         endpoint:
-//           mode === "edit"
-//             ? `/api/admin/coupons/${userId}`
-//             : "/api/admin/coupons",
+//           mode === "edit" ? `/api/admin/coupons/${userId}` : "/api/admin/coupons",
 //         method: mode === "edit" ? "put" : "post",
 //         data: formData,
 //       });
@@ -132,14 +143,64 @@
 
 //   const isViewMode = mode === "view";
 
+//   // Define textField props for DatePickers to reduce nesting
+//   const startDateTextFieldProps = {
+//     fullWidth: true,
+//     size: "small",
+//     error: !!errors.start_date,
+//     helperText: errors.start_date || "",
+//     InputLabelProps: {
+//       sx: {
+//         fontSize: "0.95rem",
+//         fontWeight: 500,
+//         color: "#455a64",
+//       },
+//     },
+//     InputProps: {
+//       sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//     },
+//     sx: {
+//       "& .MuiOutlinedInput-root": {
+//         "& fieldset": { borderColor: "#cfd8dc" },
+//         "&:hover fieldset": { borderColor: "#3f51b5" },
+//         "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//       },
+//       "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//     },
+//   };
+
+//   const endDateTextFieldProps = {
+//     fullWidth: true,
+//     size: "small",
+//     error: !!errors.end_date,
+//     helperText: errors.end_date || "",
+//     InputLabelProps: {
+//       sx: {
+//         fontSize: "0.95rem",
+//         fontWeight: 500,
+//         color: "#455a64",
+//       },
+//     },
+//     InputProps: {
+//       sx: { fontSize: "0.9rem", borderRadius: "6px" },
+//     },
+//     sx: {
+//       "& .MuiOutlinedInput-root": {
+//         "& fieldset": { borderColor: "#cfd8dc" },
+//         "&:hover fieldset": { borderColor: "#3f51b5" },
+//         "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+//       },
+//       "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+//     },
+//   };
+
 //   return (
 //     <LocalizationProvider dateAdapter={AdapterDateFns}>
-//       {/* Header with back button - compact and aligned */}
 //       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
 //         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-//           <ArrowBackIcon sx={{ fontSize: 24, color: "#3f51b5" }} />
+//           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
 //         </IconButton>
-//         <Typography variant="body1" fontWeight={600} color="#3f51b5">
+//         <Typography variant="body1" fontWeight={600} color="#06402B">
 //           Back
 //         </Typography>
 //       </Box>
@@ -148,7 +209,7 @@
 //         elevation={2}
 //         sx={{
 //           p: { xs: 2, sm: 3 },
-//           maxWidth: "800px", // Constrain width for better alignment
+//           maxWidth: "800px",
 //           mx: "auto",
 //           backgroundColor: "#f9f9fb",
 //           borderRadius: "12px",
@@ -156,13 +217,21 @@
 //           border: "1px solid #e0e0e0",
 //         }}
 //       >
-//         {/* Form title - balanced size and styling */}
 //         <Typography
 //           variant="h5"
 //           fontWeight={600}
 //           mb={3}
-//           color="#1a237e"
-//           sx={{ letterSpacing: "0.3px", textAlign: "start" }}
+//           // color="#1a237e"
+//           sx={{
+//             maxWidth: "50%", // Prevent title from pushing buttons too far
+//             overflow: "hidden",
+//             textOverflow: "ellipsis",
+//             whiteSpace: "nowrap",
+//             fontWeight: 600, // Bolder font for emphasis
+//             fontFamily: '"Poppins", sans-serif', // Modern font family
+//             letterSpacing: 0.5, // Slight spacing for readability
+//             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+//           }}
 //         >
 //           {mode === "new"
 //             ? "Create Coupon"
@@ -173,7 +242,6 @@
 
 //         <Box component="form" onSubmit={handleSubmit}>
 //           <Grid container spacing={2}>
-//             {/* Coupon Details */}
 //             <Grid item xs={12}>
 //               <Typography
 //                 variant="subtitle1"
@@ -187,7 +255,7 @@
 
 //             <Grid item xs={12} sm={6}>
 //               <TextField
-//                 label="Coupon Name"
+//                 label="Coupon Name *"
 //                 fullWidth
 //                 size="small"
 //                 value={formData.coupon_name}
@@ -219,7 +287,7 @@
 //             <Grid item xs={12} sm={6} md={3}>
 //               <TextField
 //                 type="number"
-//                 label="Coupon %"
+//                 label="Coupon % *"
 //                 fullWidth
 //                 size="small"
 //                 value={formData.coupon_percentage}
@@ -250,11 +318,15 @@
 
 //             <Grid item xs={12} sm={6} md={3}>
 //               <TextField
-//                 type="number"
-//                 label="Max Cap"
+//                 type="text"
+//                 label="Max Cap *"
 //                 fullWidth
 //                 size="small"
-//                 value={formData.max_cap}
+//                 value={
+//                   formData.max_cap === ""
+//                     ? ""
+//                     : Number(formData.max_cap).toLocaleString("en-US")
+//                 }
 //                 onChange={handleChange("max_cap")}
 //                 disabled={isViewMode}
 //                 error={!!errors.max_cap}
@@ -280,7 +352,6 @@
 //               />
 //             </Grid>
 
-//             {/* Validity Period */}
 //             <Grid item xs={12} mt={1}>
 //               <Typography
 //                 variant="subtitle1"
@@ -294,81 +365,30 @@
 
 //             <Grid item xs={12} sm={6}>
 //               <DatePicker
-//                 label="Start Date"
+//                 label="Start Date *"
 //                 value={formData.start_date}
 //                 onChange={(newValue) => {
 //                   setFormData((prev) => ({ ...prev, start_date: newValue }));
 //                   setErrors((prev) => ({ ...prev, start_date: "" }));
 //                 }}
 //                 disabled={isViewMode}
-//                 slotProps={{
-//                   textField: {
-//                     fullWidth: true,
-//                     size: "small",
-//                     error: !!errors.start_date,
-//                     helperText: errors.start_date || "",
-//                     InputLabelProps: {
-//                       sx: {
-//                         fontSize: "0.95rem",
-//                         fontWeight: 500,
-//                         color: "#455a64",
-//                       },
-//                     },
-//                     InputProps: {
-//                       sx: { fontSize: "0.9rem", borderRadius: "6px" },
-//                     },
-//                     sx: {
-//                       "& .MuiOutlinedInput-root": {
-//                         "& fieldset": { borderColor: "#cfd8dc" },
-//                         "&:hover fieldset": { borderColor: "#3f51b5" },
-//                         "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-//                       },
-//                       "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-//                     },
-//                   },
-//                 }}
+//                 slotProps={{ textField: startDateTextFieldProps }}
 //               />
 //             </Grid>
 
 //             <Grid item xs={12} sm={6}>
 //               <DatePicker
-//                 label="End Date"
+//                 label="End Date *"
 //                 value={formData.end_date}
 //                 onChange={(newValue) => {
 //                   setFormData((prev) => ({ ...prev, end_date: newValue }));
 //                   setErrors((prev) => ({ ...prev, end_date: "" }));
 //                 }}
 //                 disabled={isViewMode}
-//                 slotProps={{
-//                   textField: {
-//                     fullWidth: true,
-//                     size: "small",
-//                     error: !!errors.end_date,
-//                     helperText: errors.end_date || "",
-//                     InputLabelProps: {
-//                       sx: {
-//                         fontSize: "0.95rem",
-//                         fontWeight: 500,
-//                         color: "#455a64",
-//                       },
-//                     },
-//                     InputProps: {
-//                       sx: { fontSize: "0.9rem", borderRadius: "6px" },
-//                     },
-//                     sx: {
-//                       "& .MuiOutlinedInput-root": {
-//                         "& fieldset": { borderColor: "#cfd8dc" },
-//                         "&:hover fieldset": { borderColor: "#3f51b5" },
-//                         "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-//                       },
-//                       "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-//                     },
-//                   },
-//                 }}
+//                 slotProps={{ textField: endDateTextFieldProps }}
 //               />
 //             </Grid>
 
-//             {/* Applicable Plan */}
 //             <Grid item xs={12} mt={1}>
 //               <Typography
 //                 variant="subtitle1"
@@ -383,7 +403,7 @@
 //             <Grid item xs={12} sm={6}>
 //               <TextField
 //                 select
-//                 label="Plan Name"
+//                 label="Plan Name *"
 //                 fullWidth
 //                 size="small"
 //                 value={formData.plan_id ?? ""}
@@ -425,7 +445,6 @@
 //               </TextField>
 //             </Grid>
 
-//             {/* Submit Button - Centered and styled */}
 //             {!isViewMode && (
 //               <Grid item xs={12} mt={2}>
 //                 <Box sx={{ display: "flex", justifyContent: "end" }}>
@@ -465,7 +484,7 @@
 
 // export default NewCoupon;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   TextField,
@@ -475,6 +494,7 @@ import {
   Paper,
   IconButton,
   MenuItem,
+  TextFieldProps,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -492,6 +512,11 @@ interface CouponFormData {
   plan_id: number | null;
 }
 
+// Define type for textField props to fix TypeScript error
+interface DatePickerTextFieldProps extends Omit<TextFieldProps, "variant"> {
+  size?: "small" | "medium";
+}
+
 const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const navigate = useNavigate();
   const { userId } = useParams();
@@ -505,6 +530,14 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [planData, setPlanData] = useState([]);
+  // State to hold raw input strings for typing
+  const [inputValues, setInputValues] = useState({
+    coupon_percentage: "",
+    max_cap: "",
+  });
+  // Refs to track cursor position
+  const couponPercentageRef = useRef<HTMLInputElement>(null);
+  const maxCapRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -527,16 +560,23 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             method: "get",
           });
           const data = couponResponse?.data;
+          const percentage =
+            data?.coupon_percentage != null
+              ? Number(data.coupon_percentage)
+              : "";
+          const maxCap = data?.max_cap != null ? Number(data.max_cap) : "";
           setFormData({
             coupon_name: data?.coupon_name || "",
-            coupon_percentage:
-              data?.coupon_percentage != null
-                ? Number(data.coupon_percentage)
-                : "",
-            max_cap: data?.max_cap != null ? Number(data.max_cap) : "",
+            coupon_percentage: percentage,
+            max_cap: maxCap,
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             plan_id: data?.plan_id || null,
+          });
+          // Set initial input values without commas
+          setInputValues({
+            coupon_percentage: percentage === "" ? "" : String(percentage),
+            max_cap: maxCap === "" ? "" : String(maxCap),
           });
         }
       } catch (error) {
@@ -555,15 +595,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setFormData((prev) => ({
         ...prev,
         [field]:
-          field === "coupon_percentage"
-            ? value === ""
-              ? ""
-              : Number(value)
-            : field === "max_cap"
-            ? value === ""
-              ? ""
-              : Number(value.replace(/,/g, ""))
-            : field === "plan_id"
+          field === "plan_id"
             ? value === ""
               ? null
               : Number(value)
@@ -576,13 +608,66 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       }));
     };
 
+  const handleNumberChange =
+    (field: "coupon_percentage" | "max_cap", inputRef: React.RefObject<HTMLInputElement>) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const input = event.target;
+      const cursorPosition = input.selectionStart || 0;
+      let value = event.target.value.replace(/,/g, ""); // Remove commas for processing
+
+      // Allow empty input
+      if (value === "") {
+        setFormData((prev) => ({ ...prev, [field]: "" }));
+        setInputValues((prev) => ({ ...prev, [field]: "" }));
+        setErrors((prev: any) => ({ ...prev, [field]: "" }));
+        return;
+      }
+
+      // Validate input: numbers and one decimal point, up to 2 decimal places
+      if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+
+      const numValue = Number(value);
+      if (isNaN(numValue)) return;
+
+      // Update formData with raw number
+      setFormData((prev) => ({ ...prev, [field]: numValue }));
+      // Update inputValues with raw string (without commas)
+      setInputValues((prev) => ({ ...prev, [field]: value }));
+      setErrors((prev: any) => ({ ...prev, [field]: "" }));
+
+      // Calculate new cursor position after formatting
+      const formattedValue = numValue.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+      const commasBeforeCursor = (value.substring(0, cursorPosition).match(/,/g) || []).length;
+      const newCommasBeforeCursor = (formattedValue.substring(0, cursorPosition).match(/,/g) || []).length;
+      const cursorAdjustment = newCommasBeforeCursor - commasBeforeCursor;
+
+      // Set cursor position after formatting
+      setTimeout(() => {
+        if (inputRef.current) {
+          const newCursorPosition = cursorPosition + cursorAdjustment;
+          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+      }, 0);
+    };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.coupon_name.trim())
       newErrors.coupon_name = "Coupon name is required.";
-    if (formData.coupon_percentage === "" || formData.coupon_percentage < 0)
+    if (
+      formData.coupon_percentage === "" ||
+      isNaN(formData.coupon_percentage as number) ||
+      formData.coupon_percentage < 0
+    )
       newErrors.coupon_percentage = "Enter a valid percentage (0 or more).";
-    if (formData.max_cap === "" || formData.max_cap < 0)
+    if (
+      formData.max_cap === "" ||
+      isNaN(formData.max_cap as number) ||
+      formData.max_cap < 0
+    )
       newErrors.max_cap = "Enter a valid max cap (0 or more).";
     if (!formData.start_date) newErrors.start_date = "Start date is required.";
     if (!formData.end_date) newErrors.end_date = "End date is required.";
@@ -610,8 +695,8 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const isViewMode = mode === "view";
 
-  // Define textField props for DatePickers to reduce nesting
-  const startDateTextFieldProps = {
+  // Define textField props for DatePickers with correct typing
+  const startDateTextFieldProps: DatePickerTextFieldProps = {
     fullWidth: true,
     size: "small",
     error: !!errors.start_date,
@@ -636,7 +721,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     },
   };
 
-  const endDateTextFieldProps = {
+  const endDateTextFieldProps: DatePickerTextFieldProps = {
     fullWidth: true,
     size: "small",
     error: !!errors.end_date,
@@ -688,16 +773,15 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           variant="h5"
           fontWeight={600}
           mb={3}
-          // color="#1a237e"
           sx={{
-            maxWidth: "50%", // Prevent title from pushing buttons too far
+            maxWidth: "50%",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            fontWeight: 600, // Bolder font for emphasis
-            fontFamily: '"Poppins", sans-serif', // Modern font family
-            letterSpacing: 0.5, // Slight spacing for readability
-            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+            fontWeight: 600,
+            fontFamily: '"Poppins", sans-serif',
+            letterSpacing: 0.5,
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
           }}
         >
           {mode === "new"
@@ -753,12 +837,39 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6} md={3}>
               <TextField
-                type="number"
+                type="text"
                 label="Coupon % *"
                 fullWidth
                 size="small"
-                value={formData.coupon_percentage}
-                onChange={handleChange("coupon_percentage")}
+                inputRef={couponPercentageRef}
+                value={
+                  isViewMode
+                    ? formData.coupon_percentage === ""
+                      ? ""
+                      : Number(formData.coupon_percentage).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                    : inputValues.coupon_percentage === ""
+                    ? ""
+                    : Number(inputValues.coupon_percentage).toLocaleString("en-US", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      })
+                }
+                onChange={handleNumberChange("coupon_percentage", couponPercentageRef)}
+                onKeyDown={(e) => {
+                  if (
+                    !/[0-9.]/.test(e.key) &&
+                    e.key !== "Backspace" &&
+                    e.key !== "Delete" &&
+                    e.key !== "ArrowLeft" &&
+                    e.key !== "ArrowRight" &&
+                    e.key !== "Tab"
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
                 disabled={isViewMode}
                 error={!!errors.coupon_percentage}
                 helperText={errors.coupon_percentage || ""}
@@ -789,12 +900,35 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 label="Max Cap *"
                 fullWidth
                 size="small"
+                inputRef={maxCapRef}
                 value={
-                  formData.max_cap === ""
+                  isViewMode
+                    ? formData.max_cap === ""
+                      ? ""
+                      : Number(formData.max_cap).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                    : inputValues.max_cap === ""
                     ? ""
-                    : Number(formData.max_cap).toLocaleString("en-US")
+                    : Number(inputValues.max_cap).toLocaleString("en-US", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      })
                 }
-                onChange={handleChange("max_cap")}
+                onChange={handleNumberChange("max_cap", maxCapRef)}
+                onKeyDown={(e) => {
+                  if (
+                    !/[0-9.]/.test(e.key) &&
+                    e.key !== "Backspace" &&
+                    e.key !== "Delete" &&
+                    e.key !== "ArrowLeft" &&
+                    e.key !== "ArrowRight" &&
+                    e.key !== "Tab"
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
                 disabled={isViewMode}
                 error={!!errors.max_cap}
                 helperText={errors.max_cap || ""}

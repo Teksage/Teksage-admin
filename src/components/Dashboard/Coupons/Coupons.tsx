@@ -50,7 +50,10 @@ const Coupons: React.FC = () => {
       id: "max_cap",
       label: "Max Limit",
       width: "150px",
-      render: (value:any) => `₹${value}`,
+      render: (value: number) => {
+        if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+        return `₹ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
+      },
     },
     {
       id: "start_date",
