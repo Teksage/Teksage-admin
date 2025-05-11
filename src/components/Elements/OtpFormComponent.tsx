@@ -157,9 +157,9 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
               key={index}
               inputRef={(el) => (otpInputRefs.current[index] = el)}
               value={digit}
-              onChange={(e) => handleOtpChange(e, index)}
+              onChange={(e:any) => handleOtpChange(e, index)}
               onPaste={handleOtpPaste}
-              onKeyDown={(e) => handleKeyDown(e, index)}
+              onKeyDown={(e:any) => handleKeyDown(e, index)}
               inputProps={{
                 maxLength: 1,
                 inputMode: "numeric",
