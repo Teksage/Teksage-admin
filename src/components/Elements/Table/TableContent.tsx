@@ -187,27 +187,76 @@ const TableContent = <T,>({
     return null;
   };
 
-  const safeRenderValue = (value: any, row: T, render?: (value: any, row: T) => React.ReactNode) => {
+  // const safeRenderValue = (value: any, row: T, render?: (value: any, row: T) => React.ReactNode) => {
+  //   console.log(row, "row")
+  //   if (render) {
+  //     const renderedValue = render(value, row);
+  //     if (typeof renderedValue === "string") {
+  //       // Check if the rendered value is a date-time string
+  //       const formattedDateTime = formatDateTime(renderedValue);
+  //       if (formattedDateTime) return formattedDateTime;
+  //       return capitalizeFirstLetter(renderedValue) || "N/A";
+  //     }
+  //     return renderedValue || "N/A";
+  //   }
+  //   if (value && typeof value === "object" && "first_name" in value) {
+  //     const fullName = `${value.first_name || ""} ${value.last_name || ""}`.trim();
+  //     return fullName ? capitalizeFirstLetter(fullName) : "N/A";
+  //   }
+  //   if (typeof value === "string") {
+  //     // Check if the value is a date-time string
+  //     const formattedDateTime = formatDateTime(value);
+  //     if (formattedDateTime) return formattedDateTime;
+  //     return capitalizeFirstLetter(value) || "N/A";
+  //   }
+  //   return value?.toString() || "N/A";
+  // };
+
+  const safeRenderValue = (
+    value: any,
+    row: any,
+    render?: (value: any, row: any) => React.ReactNode
+  ) => {
+    console.log(row, "row");
+  
+    // Helper to determine if the current value corresponds to the 'email' key
+    const isEmailKey = (val: any, r: any) => {
+      // Find the key in row that matches the value
+      const key = Object.keys(r).find((k) => r[k] === val);
+      return key === "email";
+    };
+  
     if (render) {
       const renderedValue = render(value, row);
       if (typeof renderedValue === "string") {
         // Check if the rendered value is a date-time string
         const formattedDateTime = formatDateTime(renderedValue);
         if (formattedDateTime) return formattedDateTime;
+        // Skip capitalizeFirstLetter for email
+        if (isEmailKey(renderedValue, row)) {
+          return renderedValue || "N/A";
+        }
         return capitalizeFirstLetter(renderedValue) || "N/A";
       }
       return renderedValue || "N/A";
     }
+  
     if (value && typeof value === "object" && "first_name" in value) {
       const fullName = `${value.first_name || ""} ${value.last_name || ""}`.trim();
       return fullName ? capitalizeFirstLetter(fullName) : "N/A";
     }
+  
     if (typeof value === "string") {
       // Check if the value is a date-time string
       const formattedDateTime = formatDateTime(value);
       if (formattedDateTime) return formattedDateTime;
+      // Skip capitalizeFirstLetter for email
+      if (isEmailKey(value, row)) {
+        return value || "N/A";
+      }
       return capitalizeFirstLetter(value) || "N/A";
     }
+  
     return value?.toString() || "N/A";
   };
 
