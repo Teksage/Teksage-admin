@@ -316,7 +316,7 @@
 //         const value =
 //           (item as any)["consultation_fee"] ||
 //           (item as any)["fee"] ||
-//           (item as any)["consulting_local_fee"];
+//           (item as any)["local_consulting_fee"];
 //         return typeof value === "string"
 //           ? parseInt(value.replace(/[^0-9]/g, "")) || null
 //           : value;
@@ -1589,7 +1589,7 @@ function GenericTable<T>({
   //   const feeValues = data
   //     .map(
   //       (item: any) =>
-  //         item["consultation_fee"] || item["fee"] || item["consulting_local_fee"]
+  //         item["consultation_fee"] || item["fee"] || item["local_consulting_fee"]
   //     )
   //     .filter((value) => value !== null && value !== 0 && !isNaN(value));
   //   return feeValues.length > 0;

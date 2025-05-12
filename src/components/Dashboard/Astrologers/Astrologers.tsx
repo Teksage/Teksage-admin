@@ -7,7 +7,7 @@ import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
 interface UserData {
   astrologer_id: number;
-  consulting_local_fee: string;
+  local_consulting_fee: string;
   consulting_fee_code: string;
   customer_rating: string;
   experience: number;
@@ -154,7 +154,7 @@ const Astrologers: React.FC = () => {
         },
       },
       {
-        id: "consulting_local_fee",
+        id: "local_consulting_fee",
         label: "Fee",
         filterable: true,
         filterOptions: ["Less than 500", "500 - 1000", "Greater than 1000 "],

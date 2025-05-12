@@ -44,7 +44,7 @@ interface AstroFormData {
   status: string;
   astrologer_profile_info: string;
   experience: string;
-  consulting_local_fee: string;
+  local_consulting_fee: string;
   picture: File | string | null;
   languages: string[];
   expertises: string[];
@@ -76,7 +76,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     status: "Active",
     astrologer_profile_info: "",
     experience: "",
-    consulting_local_fee: "",
+    local_consulting_fee: "",
     picture: null,
     languages: [],
     expertises: [],
@@ -138,7 +138,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             status: data.status === "inactive" ? "Inactive" : "Active",
             astrologer_profile_info: data.astrologer_profile_info || "",
             experience: data.experience || "",
-            consulting_local_fee: data.consulting_local_fee.toString() || "",
+            local_consulting_fee: data.local_consulting_fee.toString() || "",
             picture: data.picture || null,
             languages: data.languages || [],
             expertises: data.expertises || [],
@@ -157,7 +157,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     }
   }, [mode, userId]);
 
-  // Format consulting_local_fee for display with commas
+  // Format local_consulting_fee for display with commas
   const formatNumberWithCommas = (value: string): string => {
     if (!value) return "";
     const number = value.replace(/[^0-9]/g, "");
@@ -185,7 +185,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       case "first_name":
       case "last_name":
       case "experience":
-      case "consulting_local_fee":
+      case "local_consulting_fee":
       case "status":
       case "astrologer_profile_info":
         if (!value) {
@@ -241,7 +241,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             // "email",
             // "mobile_number",
             "experience",
-            "consulting_local_fee",
+            "local_consulting_fee",
             "status",
             // "astrologer_profile_info",
             "languages",
@@ -269,7 +269,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     ) => {
       const value = e.target.value;
 
-      if (field === "consulting_local_fee") {
+      if (field === "local_consulting_fee") {
         const rawValue = value.toString().replace(/[^0-9]/g, "");
         setFormData((prev) => ({
           ...prev,
@@ -387,7 +387,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         formData.astrologer_profile_info
       );
       payload.append("experience", formData.experience);
-      payload.append("consulting_local_fee", removeCommas(formData.consulting_local_fee));
+      payload.append("local_consulting_fee", removeCommas(formData.local_consulting_fee));
 
       // Append array fields (languages and expertises)
       formData.languages.forEach((lang) => payload.append("languages[]", lang));
@@ -691,7 +691,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               [
                 "astrologer_profile_info",
                 "experience",
-                "consulting_local_fee",
+                "local_consulting_fee",
               ] as (keyof AstroFormData)[]
             ).map((key) => (
               <Grid
@@ -707,8 +707,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   fullWidth
                   size="small"
                   value={
-                    key === "consulting_local_fee"
-                      ? formatNumberWithCommas(formData.consulting_local_fee)
+                    key === "local_consulting_fee"
+                      ? formatNumberWithCommas(formData.local_consulting_fee)
                       : formData[key]
                   }
                   onChange={handleChange(key)}

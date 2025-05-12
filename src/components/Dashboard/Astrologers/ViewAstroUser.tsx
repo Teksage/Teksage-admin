@@ -59,7 +59,7 @@ interface UserData {
   astrologer_id: number;
   picture: any;
   astrologer_profile_info: string;
-  consulting_local_fee: number;
+  local_consulting_fee: number;
   experience: number;
   expertises: any;
   languages: any;
@@ -459,7 +459,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                             />
                             <InfoItem
                               label="Consulting Fee"
-                              value={userData?.consulting_local_fee?.toLocaleString(
+                              value={userData?.local_consulting_fee?.toLocaleString(
                                 "en-IN"
                               )}
                               icon={
