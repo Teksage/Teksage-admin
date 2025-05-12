@@ -141,7 +141,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             local_consulting_fee: data.local_consulting_fee.toString() || "",
             picture: data.picture || null,
             languages: data.languages || [],
-            expertises: data.expertises || [],
+            expertises: data.expertises.map((item:any) => item.toLowerCase()) || [],
             user_id: data.user_id || null,
           });
         } catch (err) {
@@ -775,9 +775,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 >
                   {["Career", "Health", "Wealth", "Relationship"].map(
                     (option) => (
-                      <MenuItem key={option} value={option}>
+                      <MenuItem key={option} value={option.toLowerCase()}>
                         <Checkbox
-                          checked={formData.expertises.includes(option)}
+                          checked={formData.expertises.includes(option.toLowerCase())}
                         />
                         <ListItemText
                           primary={option}
