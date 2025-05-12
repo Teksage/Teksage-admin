@@ -1202,17 +1202,32 @@ import {
 } from "@mui/material";
 import { callAPI } from "../../../api/crudFactory";
 
+// Colors for Line Chart
 const COLORS = [
+  "#1B5E20", // dark green
+  "#4CAF50", // medium green
+  "#81C784", // light green
+  "#A5D6A7", // pale green
   "#00C49F", // teal
   "#FFBB28", // amber
   "#FF8042", // orange
   "#8884D8", // purple
   "#0088FE", // blue
   "#FF6699", // pink
-  "#00C8C8", // aqua
-  "#A28FD0", // lavender
-  "#FF6F61", // coral
-  "#6EBE44", // green
+];
+
+// Green variants for Donut Chart
+const DONUT_COLORS = [
+  "#1B5E20", // forest green
+  "#2E7D32", // emerald green
+  "#4CAF50", // lime green
+  "#66BB6A", // mint green
+  "#81C784", // seafoam green
+  "#A5D6A7", // pale green
+  "#388E3C", // deep green
+  "#689F38", // olive green
+  "#AED581", // spring green
+  "#C8E6C9", // very light green
 ];
 
 const Analytics: React.FC = () => {
@@ -1243,7 +1258,7 @@ const Analytics: React.FC = () => {
         .map((year) => parseInt(year))
         .sort((a, b) => a - b);
       if (availableYears.length > 0) {
-        setSelectedYear(availableYears[availableYears.length - 1]);
+        setSelectedYear(availableYears[availableYears.length - 1]); // Default to latest year
       }
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
@@ -1286,8 +1301,6 @@ const Analytics: React.FC = () => {
   // Prepare Plans data for "Previous 12 Months" filter
   const getPrevious12MonthsData = () => {
     let allData: any[] = [];
-
-    // Collect all plans data from all years
     for (const year in analyticsData.subscription) {
       if (analyticsData.subscription[year].plans) {
         const yearPlans = analyticsData.subscription[year].plans.map(
@@ -1299,8 +1312,6 @@ const Analytics: React.FC = () => {
         allData = allData.concat(yearPlans);
       }
     }
-
-    // Sort allData chronologically
     allData.sort((a, b) => {
       const [aMonth, aYear] = a.name.split(" ");
       const [bMonth, bYear] = b.name.split(" ");
@@ -1309,8 +1320,6 @@ const Analytics: React.FC = () => {
         new Date(parseInt(bYear), monthOrder.indexOf(bMonth), 1).getTime()
       );
     });
-
-    // Return only the months with actual data, skipping gaps
     return allData;
   };
 
@@ -1342,16 +1351,22 @@ const Analytics: React.FC = () => {
     analyticsData.users_per_service?.length > 0
       ? analyticsData.users_per_service.map((service: any) => ({
           name: service.name,
-          value: service.user_count > 0 ? service.user_count : 0.01, // Use a small value for rendering
+          value: service.user_count > 0 ? service.user_count : 0.01, // Small value for rendering
         }))
       : [];
 
-  // Check if all values in donutData are effectively 0 (excluding the small value we added)
+  // Check if all values in donutData are effectively 0
   const allValuesZero = analyticsData.users_per_service?.every(
     (service: any) => service.user_count === 0
   );
 
-  // Prepare data for Compact Stats Row (Latest month's plan counts)
+  // Calculate total users for donut chart center label
+  const totalUsers = donutData.reduce(
+    (sum, entry) => sum + (entry.value === 0.01 ? 0 : entry.value),
+    0
+  );
+
+  // Prepare data for Compact Stats Row
   const latestMonthData =
     selectedYear && analyticsData.subscription[selectedYear]?.plans?.length > 0
       ? analyticsData.subscription[selectedYear].plans.reduce(
@@ -1377,7 +1392,7 @@ const Analytics: React.FC = () => {
 
   const handleYearChange = (event: SelectChangeEvent<number>) => {
     setSelectedYear(event.target.value as number);
-    setFilterType("year"); // Reset to year-wise when changing year
+    setFilterType("year");
   };
 
   const handleFilterChange = (event: SelectChangeEvent<string>) => {
@@ -1394,15 +1409,15 @@ const Analytics: React.FC = () => {
       return (
         <Box
           sx={{
-            background: "rgba(255, 255, 252, 0.95)",
-            border: "none",
-            borderRadius: "6px",
-            padding: "10px",
-            fontSize: "12px",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            background: "rgba(255, 255, 255, 0.95)",
+            border: "1px solid #1B5E20",
+            borderRadius: "8px",
+            padding: "12px",
+            fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           }}
         >
-          <Typography variant="caption" sx={{ fontWeight: 600 }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: "#1B5E20" }}>
             {label}
           </Typography>
           {payload.map((entry, index) => (
@@ -1418,7 +1433,7 @@ const Analytics: React.FC = () => {
     return null;
   };
 
-  // Custom Label for Donut Chart to handle zero values
+  // Custom Label for Donut Chart
   const renderCustomLabel = ({
     name,
     value,
@@ -1426,17 +1441,21 @@ const Analytics: React.FC = () => {
     name: string;
     value: number;
   }) => {
-    return `${name}: ${Math.round(value * 100) / 100}`; // Round to 2 decimal places
+    return `${name}: ${Math.round(value * 100) / 100}`;
   };
 
   return (
     <Box
       sx={{
         p: { xs: 2, md: 3 },
-        background: "linear-gradient(135deg, #f5f7fa 0%, #e4f0f9 100%)",
+        background: "linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)",
         minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       }}
     >
+      {/* Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -1444,7 +1463,7 @@ const Analytics: React.FC = () => {
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
           maxWidth: "1200px",
-          mx: "auto",
+          width: "100%",
           mb: 3,
           gap: 2,
         }}
@@ -1453,34 +1472,31 @@ const Analytics: React.FC = () => {
           variant="h5"
           sx={{
             fontWeight: 700,
-            color: "#1b4d3e",
-            position: "relative",
+            color: "#1B5E20",
             "&:after": {
               content: '""',
               display: "block",
               width: "60px",
-              height: "3px",
-              background: "linear-gradient(90deg, #1b4d3e, #4caf50)",
-              margin: "8px 0 0",
+              height: "4px",
+              background: "linear-gradient(90deg, #1B5E20, # pods: ['node_modules/.bin/eslint src --ext .js,.jsx,.ts,.tsx']4CAF50)",
+              mt: 1,
               borderRadius: "2px",
             },
           }}
         >
           Analytics Dashboard
         </Typography>
-
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Select<string>
             value={filterType}
             onChange={handleFilterChange}
             sx={{
-              minWidth: 120,
-              background: "rgba(255, 255, 255, 0.9)",
-              border: "1px solid rgba(0, 0, 0, 0.1)",
+              minWidth: 140,
+              background: "#FFFFFF",
               borderRadius: "8px",
-              "& .MuiSelect-select": {
-                py: 1,
-              },
+              "& .MuiSelect-select": { py: 1.5 },
+              "&:hover": { background: "#E8F5E9" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#4CAF50" },
             }}
             disabled={loading}
           >
@@ -1489,20 +1505,18 @@ const Analytics: React.FC = () => {
           </Select>
           {filterType === "year" && (
             <Select<number>
-              value={selectedYear ?? ""}
+              value={selectedYear ?? availableYears[0] ?? ""}
               onChange={handleYearChange}
               sx={{
-                minWidth: 120,
-                background: "rgba(255, 255, 255, 0.9)",
-                border: "1px solid rgba(0, 0, 0, 0.1)",
+                minWidth: 140,
+                background: "#FFFFFF",
                 borderRadius: "8px",
-                "& .MuiSelect-select": {
-                  py: 1,
-                },
+                "& .MuiSelect-select": { py: 1.5 },
+                "&:hover": { background: "#E8F5E9" },
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "#4CAF50" },
               }}
               disabled={availableYears.length === 0 || loading}
             >
-              <MenuItem value="">Select Year</MenuItem>
               {availableYears.map((year) => (
                 <MenuItem key={year} value={year}>
                   {year}
@@ -1513,43 +1527,42 @@ const Analytics: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Column layout for charts */}
+      {/* Main Content */}
       <Box
         sx={{
+          maxWidth: "1200px",
+          width: "100%",
           display: "flex",
           flexDirection: "column",
           gap: 3,
-          maxWidth: "1200px",
-          mx: "auto",
         }}
       >
-        {/* Plan-wise User Count (LineChart) */}
+        {/* Line Chart: Users by Plan */}
         <Paper
-          elevation={0}
+          elevation={2}
           sx={{
-            p: 2,
+            p: { xs: 2, md: 3 },
             borderRadius: "12px",
-            background: "rgba(255, 255, 255, 0.9)",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
+            background: "linear-gradient(145deg, #FFFFFF, #F1F8E9)",
+            border: "1px solid #E8F5E9",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
           }}
         >
           <Typography
             variant="subtitle1"
             sx={{
               fontWeight: 600,
-              color: "#1b4d3e",
-              mb: 1,
+              color: "#1B5E20",
+              mb: 2,
               display: "flex",
               alignItems: "center",
-              fontSize: "1rem",
               "&:before": {
                 content: '""',
-                display: "inline-block",
-                width: "8px",
-                height: "8px",
+                width: "10px",
+                height: "10px",
                 borderRadius: "50%",
-                background: COLORS[0],
-                marginRight: "8px",
+                background: "#4CAF50",
+                mr: 1,
               },
             }}
           >
@@ -1560,47 +1573,43 @@ const Analytics: React.FC = () => {
               ? "(Previous 12 Months)"
               : ""}
           </Typography>
-          <Box sx={{ height: isMobile ? "250px" : "350px" }}>
+          <Box sx={{ height: isMobile ? 250 : 350 }}>
             {loading ? (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ textAlign: "center", mt: 2 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
                 Loading...
               </Typography>
             ) : planData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={planData}
-                  margin={{ top: 20, right: 15, left: 0, bottom: 0 }}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                   <XAxis
                     dataKey="name"
-                    tick={{ fill: "#1b4d3e", fontSize: "12px" }}
-                    axisLine={{ stroke: "#1b4d3e", opacity: 0.2 }}
+                    tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12 }}
+                    axisLine={{ stroke: "#1B5E20", opacity: 0.3 }}
                   />
                   <YAxis
-                    tick={{ fill: "#1b4d3e", fontSize: "12px" }}
-                    axisLine={{ stroke: "#1b4d3e", opacity: 0.2 }}
+                    tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12 }}
+                    axisLine={{ stroke: "#1B5E20", opacity: 0.3 }}
                     label={{
                       value: "User Count",
                       angle: -90,
                       position: "insideLeft",
-                      fill: "#1b4d3e",
-                      fontSize: "12px",
+                      fill: "#1B5E20",
+                      fontSize: isMobile ? 10 : 12,
                     }}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend
-                    wrapperStyle={{ paddingTop: isMobile ? "10px" : "0" }}
+                    wrapperStyle={{
+                      paddingTop: isMobile ? 10 : 20,
+                      fontSize: isMobile ? 10 : 12,
+                    }}
                   />
                   {selectedYear &&
-                    (filterType === "year"
-                      ? getPlanNames(selectedYear)
-                      : getPlanNames(selectedYear)
-                    ).map((plan, index) => (
+                    getPlanNames(selectedYear).map((plan, index) => (
                       <Line
                         key={plan}
                         type="monotone"
@@ -1615,11 +1624,7 @@ const Analytics: React.FC = () => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ textAlign: "center", mt: 2 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
                 No plan data available.
               </Typography>
             )}
@@ -1628,30 +1633,24 @@ const Analytics: React.FC = () => {
 
         {/* Compact Stats Row */}
         <Grid container spacing={2}>
-          {compactStatsData.map((plan: any, index: number) => (
+          {compactStatsData.map((plan, index) => (
             <Grid item xs={6} sm={3} key={index}>
               <Box
                 sx={{
                   p: 1.5,
                   borderRadius: "8px",
-                  background: `linear-gradient(135deg, ${
-                    COLORS[plan.colorIndex]
-                  }, ${COLORS[(plan.colorIndex + 1) % COLORS.length]})`,
-                  color: "white",
+                  background: `linear-gradient(135deg, ${COLORS[plan.colorIndex]}, ${COLORS[(plan.colorIndex + 1) % COLORS.length]})`,
+                  color: "#FFFFFF",
                   textAlign: "center",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                  transition: "transform 0.2s",
+                  "&:hover": { transform: "scale(1.05)" },
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 700, fontSize: "1.25rem" }}
-                >
+                <Typography variant="h6" sx={{ fontWeight: 700, fontSize: isMobile ? "1rem" : "1.25rem" }}>
                   {plan.users}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ opacity: 0.9, fontSize: "0.75rem" }}
-                >
+                <Typography variant="caption" sx={{ opacity: 0.9, fontSize: isMobile ? "0.65rem" : "0.75rem" }}>
                   {plan.plan_name} Users
                 </Typography>
               </Box>
@@ -1659,102 +1658,113 @@ const Analytics: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Service Usage (Donut Chart) */}
+        {/* Donut Chart: Service Usage */}
         <Paper
-          elevation={0}
+          elevation={2}
           sx={{
-            p: 2,
+            p: { xs: 2, md: 3 },
             borderRadius: "12px",
-            background: "rgba(255, 255, 255, 0.9)",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
+            background: "linear-gradient(145deg, #FFFFFF, #F1F8E9)",
+            border: "1px solid #E8F5E9",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            position: "relative",
           }}
         >
           <Typography
             variant="subtitle1"
             sx={{
               fontWeight: 600,
-              color: "#1b4d3e",
-              mb: 1,
+              color: "#1B5E20",
+              mb: 2,
               display: "flex",
               alignItems: "center",
-              fontSize: "1rem",
               "&:before": {
                 content: '""',
-                display: "inline-block",
-                width: "8px",
-                height: "8px",
+                width: "10px",
+                height: "10px",
                 borderRadius: "50%",
-                background: COLORS[3],
-                marginRight: "8px",
+                background: "#4CAF50",
+                mr: 1,
               },
             }}
           >
             Service Usage
           </Typography>
-          <Box sx={{ height: isMobile ? "250px" : "350px" }}>
+          <Box sx={{ height: isMobile ? 250 : 350, position: "relative" }}>
             {loading ? (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ textAlign: "center", mt: 2 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
                 Loading...
               </Typography>
             ) : donutData.length > 0 ? (
               allValuesZero ? (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: "center", mt: 2 }}
-                >
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
                   No usage recorded for any service.
                 </Typography>
               ) : (
-<Box sx={{ height: isMobile ? 250 : 350 }}>
-  <ResponsiveContainer width="100%" height="100%">
-    <PieChart>
-      <Pie
-        data={donutData}
-        cx="50%"
-        cy="50%"
-        innerRadius={isMobile ? 40 : 60}
-        outerRadius={isMobile ? 70 : 100}
-        labelLine={false}
-        label={isMobile ? false : renderCustomLabel}
-        fill="#8884d8"
-        dataKey="value"
-      >
-        {donutData.map((entry: any, index: number) => (
-          <Cell
-            key={`cell-${index}`}
-            fill={COLORS[index % COLORS.length]}
-            opacity={entry.value === 0.01 ? 0.3 : 1}
-          />
-        ))}
-      </Pie>
-      <Tooltip
-        formatter={(value: number, name: string) => [
-          value === 0.01 ? 0 : value,
-          name,
-        ]}
-      />
-      <Legend
-        layout="horizontal"
-        verticalAlign="bottom"
-        align="center"
-        wrapperStyle={{ paddingTop: isMobile ? "8px" : "16px" }}
-      />
-    </PieChart>
-  </ResponsiveContainer>
-</Box>
-
+                <>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={donutData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={isMobile ? 50 : 70}
+                        outerRadius={isMobile ? 80 : 110}
+                        labelLine={false}
+                        label={isMobile ? false : renderCustomLabel}
+                        dataKey="value"
+                      >
+                        {donutData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={DONUT_COLORS[index % DONUT_COLORS.length]}
+                            opacity={entry.value === 0.01 ? 0.3 : 1}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value: number, name: string) => [
+                          value === 0.01 ? 0 : value,
+                          name,
+                        ]}
+                      />
+                      <Legend
+                        layout="horizontal"
+                        verticalAlign="bottom"
+                        align="center"
+                        wrapperStyle={{
+                          paddingTop: isMobile ? 8 : 16,
+                          fontSize: isMobile ? 10 : 12,
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "45%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: 600, color: "#1B5E20", fontSize: isMobile ? "0.75rem" : "0.875rem" }}
+                    >
+                      Total Users
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, color: "#4CAF50", fontSize: isMobile ? "1rem" : "1.25rem" }}
+                    >
+                      {Math.round(totalUsers)}
+                    </Typography>
+                  </Box>
+                </>
               )
             ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ textAlign: "center", mt: 2 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
                 No service usage data available.
               </Typography>
             )}

@@ -1,4 +1,4 @@
-// import React, { useState, useEffect, useRef } from "react";
+// import React, { useState, useEffect } from "react";
 // import {
 //   Box,
 //   TextField,
@@ -64,8 +64,6 @@
 //   const [inputValues, setInputValues] = useState({
 //     local_plan_price: "",
 //   });
-//   // Ref to track cursor position for local_plan_price
-//   const planPriceRef = useRef<HTMLInputElement>(null);
 
 //   useEffect(() => {
 //     const fetchInitialData = async () => {
@@ -126,11 +124,10 @@
 //     };
 
 //   const handleNumberChange =
-//     (field: "local_plan_price", inputRef: React.RefObject<HTMLInputElement>) =>
+//     (field: "local_plan_price") =>
 //     (event: React.ChangeEvent<HTMLInputElement>) => {
-//       const input = event.target;
-//       const cursorPosition = input.selectionStart || 0;
-//       let value = event.target.value.replace(/,/g, ""); // Remove commas for processing
+//       let value = event.target.value;
+//       console.log("Raw input for local_plan_price:", value);
 
 //       // Allow empty input
 //       if (value === "") {
@@ -140,34 +137,48 @@
 //         return;
 //       }
 
-//       // Validate input: numbers and one decimal point, up to 2 decimal places
-//       if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+//       // Remove any non-numeric characters except for a single decimal point
+//       value = value.replace(/[^0-9.]/g, "");
+//       const parts = value.split(".");
+//       if (parts.length > 2) {
+//         value = `${parts[0]}.${parts.slice(1).join("")}`; // Merge extra dots
+//       }
+//       if (parts[1] && parts[1].length > 2) {
+//         value = `${parts[0]}.${parts[1].slice(0, 2)}`; // Limit to 2 decimal places
+//       }
+
+//       console.log("Cleaned input for local_plan_price:", value);
 
 //       const numValue = Number(value);
-//       if (isNaN(numValue)) return;
+//       if (isNaN(numValue)) {
+//         console.log("Input is not a valid number, ignoring update");
+//         return;
+//       }
 
-//       // Update formData with raw number
+//       // Update formData with the numeric value
 //       setFormData((prev) => ({ ...prev, [field]: numValue }));
-//       // Update inputValues with raw string (without commas)
+//       // Store the raw input for display while typing
 //       setInputValues((prev) => ({ ...prev, [field]: value }));
 //       setErrors((prev: any) => ({ ...prev, [field]: "" }));
+//     };
 
-//       // Calculate new cursor position after formatting
+//   const handleNumberBlur =
+//     (field: "local_plan_price") =>
+//     (event: React.FocusEvent<HTMLInputElement>) => {
+//       const value = event.target.value;
+//       if (value === "") return;
+
+//       const numValue = Number(value.replace(/[^0-9.]/g, ""));
+//       if (isNaN(numValue)) return;
+
+//       // Format the value for display after blur
 //       const formattedValue = numValue.toLocaleString("en-US", {
-//         minimumFractionDigits: 0,
+//         minimumFractionDigits: value.includes(".") ? 2 : 0,
 //         maximumFractionDigits: 2,
 //       });
-//       const commasBeforeCursor = (value.substring(0, cursorPosition).match(/,/g) || []).length;
-//       const newCommasBeforeCursor = (formattedValue.substring(0, cursorPosition).match(/,/g) || []).length;
-//       const cursorAdjustment = newCommasBeforeCursor - commasBeforeCursor;
 
-//       // Set cursor position after formatting
-//       setTimeout(() => {
-//         if (inputRef.current) {
-//           const newCursorPosition = cursorPosition + cursorAdjustment;
-//           inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
-//         }
-//       }, 0);
+//       console.log("Formatted value on blur:", formattedValue);
+//       setInputValues((prev) => ({ ...prev, [field]: formattedValue }));
 //     };
 
 //   const handleSelectChange =
@@ -218,6 +229,7 @@
 //     event.preventDefault();
 //     if (!validateForm()) return;
 //     try {
+//       console.log("Submitting formData:", formData);
 //       await callAPI({
 //         endpoint:
 //           mode === "edit"
@@ -350,7 +362,6 @@
 //                 label="Plan Price *"
 //                 fullWidth
 //                 size="small"
-//                 inputRef={planPriceRef}
 //                 value={
 //                   isViewMode
 //                     ? formData.local_plan_price === ""
@@ -359,14 +370,10 @@
 //                           minimumFractionDigits: 2,
 //                           maximumFractionDigits: 2,
 //                         })
-//                     : inputValues.local_plan_price === ""
-//                     ? ""
-//                     : Number(inputValues.local_plan_price).toLocaleString("en-US", {
-//                         minimumFractionDigits: 0,
-//                         maximumFractionDigits: 2,
-//                       })
+//                     : inputValues.local_plan_price
 //                 }
-//                 onChange={handleNumberChange("local_plan_price", planPriceRef)}
+//                 onChange={handleNumberChange("local_plan_price")}
+//                 onBlur={handleNumberBlur("local_plan_price")}
 //                 onKeyDown={(e) => {
 //                   if (
 //                     !/[0-9.]/.test(e.key) &&
@@ -714,6 +721,7 @@ import CustomSnackbar from "../../Elements/CustomSnackbar";
 interface SubscriptionFormData {
   plan_name: string;
   local_plan_price: number | "";
+  foreign_plan_price: number | ""; // Added foreign_plan_price
   services: string[];
   status: "Active" | "Inactive";
   service_type: "free" | "premium";
@@ -729,6 +737,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   const [formData, setFormData] = useState<SubscriptionFormData>({
     plan_name: "",
     local_plan_price: "",
+    foreign_plan_price: "", // Added to state
     services: [],
     status: "Active",
     service_type: "free",
@@ -749,9 +758,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     Partial<Record<keyof SubscriptionFormData, string>>
   >({});
   const [services, setServices] = useState([]);
-  // State to hold raw input string for local_plan_price
+  // State to hold raw input strings for price fields
   const [inputValues, setInputValues] = useState({
     local_plan_price: "",
+    foreign_plan_price: "", // Added for foreign_plan_price
   });
 
   useEffect(() => {
@@ -772,17 +782,20 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
           });
           const data = subscriptionResponse?.data;
           console.log(data, "data");
-          const price = data?.local_plan_price != null ? Number(data.local_plan_price) : "";
+          const localPrice = data?.local_plan_price != null ? Number(data.local_plan_price) : "";
+          const foreignPrice = data?.foreign_plan_price != null ? Number(data.foreign_plan_price) : ""; // Added for foreign_plan_price
           setFormData({
             ...data,
             status:
               data?.status.charAt(0).toUpperCase() +
               data?.status.slice(1).toLowerCase(),
-            local_plan_price: price,
+            local_plan_price: localPrice,
+            foreign_plan_price: foreignPrice, // Added for foreign_plan_price
           });
-          // Set initial input value for local_plan_price
+          // Set initial input values for price fields
           setInputValues({
-            local_plan_price: price === "" ? "" : String(price),
+            local_plan_price: localPrice === "" ? "" : String(localPrice),
+            foreign_plan_price: foreignPrice === "" ? "" : String(foreignPrice), // Added for foreign_plan_price
           });
         }
       } catch (error) {
@@ -792,6 +805,21 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
 
     fetchInitialData();
   }, [mode, userId]);
+
+  // Format number with commas and decimals for display
+  const formatNumberWithCommas = (value: string | number): string => {
+    if (value === "" || value == null) return "";
+    const stringValue = String(value);
+    // Remove any existing commas to avoid duplication
+    const cleanValue = stringValue.replace(/,/g, "");
+    const [integerPart, decimalPart] = cleanValue.split(".");
+    // Add commas to integer part
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // Include decimal part if present, up to two places
+    return decimalPart !== undefined
+      ? `${formattedInteger}.${decimalPart.slice(0, 2)}`
+      : formattedInteger;
+  };
 
   const handleTextChange =
     (field: keyof SubscriptionFormData) =>
@@ -813,10 +841,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     };
 
   const handleNumberChange =
-    (field: "local_plan_price") =>
+    (field: "local_plan_price" | "foreign_plan_price") =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       let value = event.target.value;
-      console.log("Raw input for local_plan_price:", value);
+      console.log(`Raw input for ${field}:`, value);
 
       // Allow empty input
       if (value === "") {
@@ -826,17 +854,18 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         return;
       }
 
-      // Remove any non-numeric characters except for a single decimal point
+      // Remove existing commas and allow only digits and one decimal point
+      value = value.replace(/,/g, "");
       value = value.replace(/[^0-9.]/g, "");
       const parts = value.split(".");
       if (parts.length > 2) {
-        value = `${parts[0]}.${parts.slice(1).join("")}`; // Merge extra dots
+        value = `${parts[0]}.${parts[1]}`; // Ensure only one decimal point
       }
       if (parts[1] && parts[1].length > 2) {
         value = `${parts[0]}.${parts[1].slice(0, 2)}`; // Limit to 2 decimal places
       }
 
-      console.log("Cleaned input for local_plan_price:", value);
+      console.log(`Cleaned input for ${field}:`, value);
 
       const numValue = Number(value);
       if (isNaN(numValue)) {
@@ -852,21 +881,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     };
 
   const handleNumberBlur =
-    (field: "local_plan_price") =>
+    (field: "local_plan_price" | "foreign_plan_price") =>
     (event: React.FocusEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      if (value === "") return;
-
-      const numValue = Number(value.replace(/[^0-9.]/g, ""));
-      if (isNaN(numValue)) return;
+      const value = formData[field];
+      if (value === "" || value == null) return;
 
       // Format the value for display after blur
-      const formattedValue = numValue.toLocaleString("en-US", {
-        minimumFractionDigits: value.includes(".") ? 2 : 0,
-        maximumFractionDigits: 2,
-      });
+      const formattedValue = formatNumberWithCommas(value);
 
-      console.log("Formatted value on blur:", formattedValue);
+      console.log(`Formatted value on blur for ${field}:`, formattedValue);
       setInputValues((prev) => ({ ...prev, [field]: formattedValue }));
     };
 
@@ -893,19 +916,27 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       (formData.local_plan_price as number) <= 0
     ) {
       newErrors.local_plan_price =
-        "Plan price must be a valid number greater than 0.";
+        "Enter a positive number like 100, 1000.23 or 1,000.23 (up to 2 decimal places).";
+    }
+    if (
+      formData.foreign_plan_price === "" ||
+      isNaN(formData.foreign_plan_price as number) ||
+      (formData.foreign_plan_price as number) <= 0
+    ) {
+      newErrors.foreign_plan_price =
+        "Enter a positive number like 100, 1000.23 or 1,000.23 (up to 2 decimal places).";
     }
     if (!formData.services.length) {
       newErrors.services = "Services field is required.";
     }
-    if (
-      formData.duration_value === "" ||
-      isNaN(formData.duration_value as number) ||
-      (formData.duration_value as number) <= 0
-    ) {
-      newErrors.duration_value =
-        "Duration value must be a valid number greater than 0.";
-    }
+    // if (
+    //   formData.duration_value === "" ||
+    //   isNaN(formData.duration_value as number) ||
+    //   (formData.duration_value as number) <= 0
+    // ) {
+    //   newErrors.duration_value =
+    //     "Duration value must be a valid number greater than 0.";
+    // }
     if (!formData.duration_unit) {
       newErrors.duration_unit = "Duration unit is required.";
     }
@@ -1045,36 +1076,23 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
               />
             </Grid>
 
+            {/* <Grid item xs={12} sm={6} /> Empty grid item for spacing */}
+
             <Grid item xs={12} sm={6}>
               <TextField
                 type="text"
-                label="Plan Price *"
+                label="Local Plan Price *"
                 fullWidth
                 size="small"
                 value={
                   isViewMode
                     ? formData.local_plan_price === ""
                       ? ""
-                      : Number(formData.local_plan_price).toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })
+                      : formatNumberWithCommas(formData.local_plan_price)
                     : inputValues.local_plan_price
                 }
                 onChange={handleNumberChange("local_plan_price")}
                 onBlur={handleNumberBlur("local_plan_price")}
-                onKeyDown={(e) => {
-                  if (
-                    !/[0-9.]/.test(e.key) &&
-                    e.key !== "Backspace" &&
-                    e.key !== "Delete" &&
-                    e.key !== "ArrowLeft" &&
-                    e.key !== "ArrowRight" &&
-                    e.key !== "Tab"
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
                 disabled={isViewMode}
                 error={!!errors.local_plan_price}
                 helperText={errors.local_plan_price || ""}
@@ -1087,6 +1105,10 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 }}
                 InputProps={{
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  inputProps: {
+                    pattern: "[0-9,.]*",
+                    type: "text",
+                  },
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -1099,7 +1121,50 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                type="text"
+                label="Foreign Plan Price *"
+                fullWidth
+                size="small"
+                value={
+                  isViewMode
+                    ? formData.foreign_plan_price === ""
+                      ? ""
+                      : formatNumberWithCommas(formData.foreign_plan_price)
+                    : inputValues.foreign_plan_price
+                }
+                onChange={handleNumberChange("foreign_plan_price")}
+                onBlur={handleNumberBlur("foreign_plan_price")}
+                disabled={isViewMode}
+                error={!!errors.foreign_plan_price}
+                helperText={errors.foreign_plan_price || ""}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                  },
+                }}
+                InputProps={{
+                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  inputProps: {
+                    pattern: "[0-9,.]*",
+                    type: "text",
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
               <FormControl
                 fullWidth
                 size="small"
