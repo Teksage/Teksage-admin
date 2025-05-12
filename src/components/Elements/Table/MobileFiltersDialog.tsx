@@ -12,6 +12,7 @@ import {
 import { Close as CloseIcon } from "@mui/icons-material";
 import FilterSection from "./FilterSection";
 import { TableColumn } from "./types";
+import { title } from "framer-motion/client";
 
 interface MobileFiltersDialogProps<T> {
   mobileFiltersOpen: boolean;
@@ -31,7 +32,6 @@ interface MobileFiltersDialogProps<T> {
   setSelectedPreset: React.Dispatch<React.SetStateAction<string>>;
   onFilterChange?: (filters: Record<string, string>) => void;
   onFetchFilterOptions?: (field: keyof T, searchValue: string) => Promise<string[]>;
-  hasFeeData: boolean;
   clearAllFilters: () => void;
 }
 
@@ -53,7 +53,6 @@ const MobileFiltersDialog = <T,>({
   setSelectedPreset,
   onFilterChange,
   onFetchFilterOptions,
-  hasFeeData,
   clearAllFilters,
 }: MobileFiltersDialogProps<T>) => {
   return (
@@ -84,7 +83,7 @@ const MobileFiltersDialog = <T,>({
             setSelectedPreset={setSelectedPreset}
             onFilterChange={onFilterChange}
             onFetchFilterOptions={onFetchFilterOptions}
-            hasFeeData={hasFeeData}
+            title={title}
           />
         </Box>
       </DialogContent>

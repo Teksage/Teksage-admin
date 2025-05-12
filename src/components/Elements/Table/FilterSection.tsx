@@ -29,7 +29,7 @@ import {
 import { TableColumn } from "./types";
 
 // Custom hook to calculate options list width
-const useOptionsListWidth = (options: string[], theme: any) => {
+const useOptionsListWidth = (options: string[]) => {
   const [optionsListWidth, setOptionsListWidth] = useState(250);
   const textMeasureRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +103,7 @@ type DateRange = {
 };
 
 interface FilterSectionProps<T> {
-  columns: TableColumn<T>[];
+  columns: any;
   filters: Record<string, string>;
   setFilters: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   filterOptions: Record<string, string[]>;
@@ -125,7 +125,7 @@ interface FilterSectionProps<T> {
     field: keyof T,
     searchValue: string
   ) => Promise<string[]>;
-  title: string;
+  title: any;
 }
 
 interface FilterItemProps<T> {
@@ -158,7 +158,7 @@ const FilterItem = <T,>({
 
   const { optionsListWidth, textMeasureRef } = useOptionsListWidth(
     options,
-    theme
+    // theme
   );
 
   const CustomPopper = (props: any) => (
@@ -202,6 +202,7 @@ const FilterItem = <T,>({
           getOptionLabel={(option) => option}
           value={filters[columnId] || ""}
           onChange={(event, newValue) => {
+            console.log(event)
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue);
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
@@ -288,7 +289,6 @@ const FilterSection = <T,>({
   setFilterOptions,
   filterLoading,
   setFilterLoading,
-  searchValues,
   setSearchValues,
   tempDateRange,
   setTempDateRange,
@@ -302,14 +302,25 @@ const FilterSection = <T,>({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const selectRef = useRef<HTMLElement | null>(null);
 
-  const handleFilterChange = (columnId: keyof T, value: string) => {
-    const isNumber = !isNaN(parseFloat(value)) && isFinite(parseFloat(value));
-    const processedValue = value && !isNumber ? value.toLowerCase() : value;
+  // const handleFilterChange = (columnId: keyof T, value: string) => {
+  //   const isNumber = !isNaN(parseFloat(value)) && isFinite(parseFloat(value));
+  //   const processedValue = value && !isNumber ? value.toLowerCase() : value;
+  //   console.log(value, "value", processedValue)
 
+  //   const newFilters = { ...filters, [columnId as string]: processedValue };
+  //   setFilters(newFilters);
+  //   onFilterChange?.(newFilters);
+  // };
+
+  const handleFilterChange = (columnId: keyof T, value: string) => {
+    const isPureNumber = /^\d+(\.\d+)?$/.test(value.trim());
+    const processedValue = value && !isPureNumber ? value.toLowerCase() : value;
+    // console.log(value, "value", processedValue);
+  
     const newFilters = { ...filters, [columnId as string]: processedValue };
     setFilters(newFilters);
     onFilterChange?.(newFilters);
-  };
+  };  
 
   const handleSearchChange = async (columnId: keyof T, searchValue: string) => {
     const columnIdStr = columnId as string;
@@ -378,6 +389,7 @@ const FilterSection = <T,>({
   };
 
   const handleCustomClick = (event: React.MouseEvent<HTMLElement>) => {
+    console.log(event)
     setSelectedPreset("Custom");
     setAnchorEl(selectRef.current); // Reopen Popover
   };
@@ -622,8 +634,8 @@ const FilterSection = <T,>({
   return (
     <FiltersContainer>
       {columns
-        .filter((col) => col.filterable)
-        .map((column) => (
+        .filter((col:any) => col.filterable)
+        .map((column:any) => (
           <FilterItem
             key={column.id as string}
             column={column}

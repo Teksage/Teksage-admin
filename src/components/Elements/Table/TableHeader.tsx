@@ -23,7 +23,7 @@ interface TableHeaderProps {
   filters: Record<string, string>;
   clearAllFilters: () => void;
   hasFilterableColumns: boolean;
-  hasFeeData: boolean;
+  // hasFeeData: boolean;
   mobileFiltersOpen: boolean;
 }
 
@@ -37,7 +37,7 @@ const TableHeader = ({
   filters,
   clearAllFilters,
   hasFilterableColumns,
-  hasFeeData,
+  // hasFeeData,
   mobileFiltersOpen
 }: TableHeaderProps) => {
   const theme = useTheme();
@@ -112,7 +112,7 @@ const TableHeader = ({
             <ExportIcon />
           </IconButton>
         )}
-        {(hasFilterableColumns || hasFeeData) && (
+        {(hasFilterableColumns) && (
           <Box
             sx={{
               display: "flex",

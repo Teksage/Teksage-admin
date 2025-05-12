@@ -10,7 +10,7 @@ interface CouponData {
   coupon_id: number;
   coupon_name: string;
   coupon_percentage: number;
-  max_cap: number;
+  local_max_cap: number;
   start_date: string;
   end_date: string;
   plan_name: string;
@@ -47,7 +47,7 @@ const Coupons: React.FC = () => {
       render: (value:any) => `${value}%`,
     },
     {
-      id: "max_cap",
+      id: "local_max_cap",
       label: "Max Limit",
       width: "150px",
       render: (value: number) => {

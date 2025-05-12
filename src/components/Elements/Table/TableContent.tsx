@@ -317,7 +317,7 @@ const TableContent = <T,>({
                     key={column.id as string}
                     sortDirection={sortConfig.key === column.id ? sortConfig.direction : false}
                     sx={{
-                      minWidth: column.minWidth || "150px", // Use minWidth or default to 150px
+                      minWidth: "150px", // Use minWidth or default to 150px
                       textAlign: "center",
                     }}
                   >
@@ -353,7 +353,7 @@ const TableContent = <T,>({
                           key={column.id as string}
                           sx={{
                             textAlign: "center",
-                            minWidth: column.minWidth || "150px",
+                            minWidth: "150px",
                             ...(isLongText && {
                               whiteSpace: "nowrap",
                               overflow: "hidden",

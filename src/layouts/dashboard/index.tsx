@@ -520,7 +520,7 @@ const DashboardLayout = () => {
       .substring(0, 2);
   }, []);
 
-  const ScrollableContent = styled(Box)(({ theme }) => ({
+  const ScrollableContent = styled(Box)(() => ({
     flexGrow: 1,
     overflowY: "auto",
     height: isMobile ? "calc(100vh - 64px - 56px)" : "calc(100vh - 64px)",

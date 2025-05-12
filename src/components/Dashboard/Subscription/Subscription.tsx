@@ -9,7 +9,7 @@ import ConfirmModal from "../../Elements/ConfirmModal";
 interface PlanData {
   plan_id: number;
   plan_name: string;
-  plan_price: string;
+  local_plan_price: string;
   services: string;
   status: string;
   service_type: string;
@@ -53,7 +53,7 @@ const Subscription: React.FC = () => {
       width: "200px",
     },
     {
-      id: "plan_price",
+      id: "local_plan_price",
       label: "Price",
       width: "150px",
       render: (value: number) => {

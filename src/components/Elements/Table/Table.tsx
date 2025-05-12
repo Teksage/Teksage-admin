@@ -316,7 +316,7 @@
 //         const value =
 //           (item as any)["consultation_fee"] ||
 //           (item as any)["fee"] ||
-//           (item as any)["consulting_fee"];
+//           (item as any)["consulting_local_fee"];
 //         return typeof value === "string"
 //           ? parseInt(value.replace(/[^0-9]/g, "")) || null
 //           : value;
@@ -1585,15 +1585,15 @@ function GenericTable<T>({
     [columns]
   );
 
-  const hasFeeData = useMemo(() => {
-    const feeValues = data
-      .map(
-        (item: any) =>
-          item["consultation_fee"] || item["fee"] || item["consulting_fee"]
-      )
-      .filter((value) => value !== null && value !== 0 && !isNaN(value));
-    return feeValues.length > 0;
-  }, [data]);
+  // const hasFeeData = useMemo(() => {
+  //   const feeValues = data
+  //     .map(
+  //       (item: any) =>
+  //         item["consultation_fee"] || item["fee"] || item["consulting_local_fee"]
+  //     )
+  //     .filter((value) => value !== null && value !== 0 && !isNaN(value));
+  //   return feeValues.length > 0;
+  // }, [data]);
 
   // Handlers for filter, sort, and pagination
   const handleSort = (columnId: keyof T) => {
@@ -1647,10 +1647,10 @@ function GenericTable<T>({
         filters={filters}
         clearAllFilters={clearAllFilters}
         hasFilterableColumns={hasFilterableColumns}
-        hasFeeData={hasFeeData}
+        // hasFeeData={hasFeeData}
         mobileFiltersOpen={mobileFiltersOpen}
       />
-      {showFilters && (hasFilterableColumns || hasFeeData) && (
+      {showFilters && (hasFilterableColumns) && (
         <FilterSection
           title={title}
           columns={columns}
@@ -1720,7 +1720,7 @@ function GenericTable<T>({
             setSelectedPreset={setSelectedPreset}
             onFilterChange={onFilterChange}
             onFetchFilterOptions={onFetchFilterOptions}
-            hasFeeData={hasFeeData}
+            // hasFeeData={hasFeeData}
             clearAllFilters={clearAllFilters}
           />
         </>

@@ -1,4 +1,4 @@
-// import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect, useRef } from "react";
 // import {
 //   Box,
 //   TextField,
@@ -8,6 +8,7 @@
 //   Paper,
 //   IconButton,
 //   MenuItem,
+//   TextFieldProps,
 // } from "@mui/material";
 // import { useNavigate, useParams } from "react-router-dom";
 // import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -19,10 +20,15 @@
 // interface CouponFormData {
 //   coupon_name: string;
 //   coupon_percentage: number | "";
-//   max_cap: number | "";
+//   local_max_cap: number | "";
 //   start_date: Date | null;
 //   end_date: Date | null;
 //   plan_id: number | null;
+// }
+
+// // Define type for textField props to fix TypeScript error
+// interface DatePickerTextFieldProps extends Omit<TextFieldProps, "variant"> {
+//   size?: "small" | "medium";
 // }
 
 // const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
@@ -31,13 +37,21 @@
 //   const [formData, setFormData] = useState<CouponFormData>({
 //     coupon_name: "",
 //     coupon_percentage: "",
-//     max_cap: "",
+//     local_max_cap: "",
 //     start_date: null,
 //     end_date: null,
 //     plan_id: null,
 //   });
 //   const [errors, setErrors] = useState<Record<string, string>>({});
 //   const [planData, setPlanData] = useState([]);
+//   // State to hold raw input strings for typing
+//   const [inputValues, setInputValues] = useState({
+//     coupon_percentage: "",
+//     local_max_cap: "",
+//   });
+//   // Refs to track cursor position
+//   const couponPercentageRef = useRef<HTMLInputElement>(null);
+//   const maxCapRef = useRef<HTMLInputElement>(null);
 
 //   useEffect(() => {
 //     const fetchInitialData = async () => {
@@ -60,16 +74,23 @@
 //             method: "get",
 //           });
 //           const data = couponResponse?.data;
+//           const percentage =
+//             data?.coupon_percentage != null
+//               ? Number(data.coupon_percentage)
+//               : "";
+//           const maxCap = data?.local_max_cap != null ? Number(data.local_max_cap) : "";
 //           setFormData({
 //             coupon_name: data?.coupon_name || "",
-//             coupon_percentage:
-//               data?.coupon_percentage != null
-//                 ? Number(data.coupon_percentage)
-//                 : "",
-//             max_cap: data?.max_cap != null ? Number(data.max_cap) : "",
+//             coupon_percentage: percentage,
+//             local_max_cap: maxCap,
 //             start_date: data?.start_date ? new Date(data.start_date) : null,
 //             end_date: data?.end_date ? new Date(data.end_date) : null,
 //             plan_id: data?.plan_id || null,
+//           });
+//           // Set initial input values without commas
+//           setInputValues({
+//             coupon_percentage: percentage === "" ? "" : String(percentage),
+//             local_max_cap: maxCap === "" ? "" : String(maxCap),
 //           });
 //         }
 //       } catch (error) {
@@ -88,15 +109,7 @@
 //       setFormData((prev) => ({
 //         ...prev,
 //         [field]:
-//           field === "coupon_percentage"
-//             ? value === ""
-//               ? ""
-//               : Number(value)
-//             : field === "max_cap"
-//             ? value === ""
-//               ? ""
-//               : Number(value.replace(/,/g, ""))
-//             : field === "plan_id"
+//           field === "plan_id"
 //             ? value === ""
 //               ? null
 //               : Number(value)
@@ -109,14 +122,67 @@
 //       }));
 //     };
 
+//   const handleNumberChange =
+//     (field: "coupon_percentage" | "local_max_cap", inputRef: React.RefObject<HTMLInputElement>) =>
+//     (event: React.ChangeEvent<HTMLInputElement>) => {
+//       const input = event.target;
+//       const cursorPosition = input.selectionStart || 0;
+//       let value = event.target.value.replace(/,/g, ""); // Remove commas for processing
+
+//       // Allow empty input
+//       if (value === "") {
+//         setFormData((prev) => ({ ...prev, [field]: "" }));
+//         setInputValues((prev) => ({ ...prev, [field]: "" }));
+//         setErrors((prev: any) => ({ ...prev, [field]: "" }));
+//         return;
+//       }
+
+//       // Validate input: numbers and one decimal point, up to 2 decimal places
+//       if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+
+//       const numValue = Number(value);
+//       if (isNaN(numValue)) return;
+
+//       // Update formData with raw number
+//       setFormData((prev) => ({ ...prev, [field]: numValue }));
+//       // Update inputValues with raw string (without commas)
+//       setInputValues((prev) => ({ ...prev, [field]: value }));
+//       setErrors((prev: any) => ({ ...prev, [field]: "" }));
+
+//       // Calculate new cursor position after formatting
+//       const formattedValue = numValue.toLocaleString("en-US", {
+//         minimumFractionDigits: 0,
+//         maximumFractionDigits: 2,
+//       });
+//       const commasBeforeCursor = (value.substring(0, cursorPosition).match(/,/g) || []).length;
+//       const newCommasBeforeCursor = (formattedValue.substring(0, cursorPosition).match(/,/g) || []).length;
+//       const cursorAdjustment = newCommasBeforeCursor - commasBeforeCursor;
+
+//       // Set cursor position after formatting
+//       setTimeout(() => {
+//         if (inputRef.current) {
+//           const newCursorPosition = cursorPosition + cursorAdjustment;
+//           inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+//         }
+//       }, 0);
+//     };
+
 //   const validateForm = () => {
 //     const newErrors: Record<string, string> = {};
 //     if (!formData.coupon_name.trim())
 //       newErrors.coupon_name = "Coupon name is required.";
-//     if (formData.coupon_percentage === "" || formData.coupon_percentage < 0)
+//     if (
+//       formData.coupon_percentage === "" ||
+//       isNaN(formData.coupon_percentage as number) ||
+//       formData.coupon_percentage < 0
+//     )
 //       newErrors.coupon_percentage = "Enter a valid percentage (0 or more).";
-//     if (formData.max_cap === "" || formData.max_cap < 0)
-//       newErrors.max_cap = "Enter a valid max cap (0 or more).";
+//     if (
+//       formData.local_max_cap === "" ||
+//       isNaN(formData.local_max_cap as number) ||
+//       formData.local_max_cap < 0
+//     )
+//       newErrors.local_max_cap = "Enter a valid max cap (0 or more).";
 //     if (!formData.start_date) newErrors.start_date = "Start date is required.";
 //     if (!formData.end_date) newErrors.end_date = "End date is required.";
 //     if (!formData.plan_id) newErrors.plan_id = "Plan name is required.";
@@ -143,8 +209,8 @@
 
 //   const isViewMode = mode === "view";
 
-//   // Define textField props for DatePickers to reduce nesting
-//   const startDateTextFieldProps = {
+//   // Define textField props for DatePickers with correct typing
+//   const startDateTextFieldProps: DatePickerTextFieldProps = {
 //     fullWidth: true,
 //     size: "small",
 //     error: !!errors.start_date,
@@ -169,7 +235,7 @@
 //     },
 //   };
 
-//   const endDateTextFieldProps = {
+//   const endDateTextFieldProps: DatePickerTextFieldProps = {
 //     fullWidth: true,
 //     size: "small",
 //     error: !!errors.end_date,
@@ -221,16 +287,15 @@
 //           variant="h5"
 //           fontWeight={600}
 //           mb={3}
-//           // color="#1a237e"
 //           sx={{
-//             maxWidth: "50%", // Prevent title from pushing buttons too far
+//             maxWidth: "50%",
 //             overflow: "hidden",
 //             textOverflow: "ellipsis",
 //             whiteSpace: "nowrap",
-//             fontWeight: 600, // Bolder font for emphasis
-//             fontFamily: '"Poppins", sans-serif', // Modern font family
-//             letterSpacing: 0.5, // Slight spacing for readability
-//             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+//             fontWeight: 600,
+//             fontFamily: '"Poppins", sans-serif',
+//             letterSpacing: 0.5,
+//             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
 //           }}
 //         >
 //           {mode === "new"
@@ -286,12 +351,39 @@
 
 //             <Grid item xs={12} sm={6} md={3}>
 //               <TextField
-//                 type="number"
+//                 type="text"
 //                 label="Coupon % *"
 //                 fullWidth
 //                 size="small"
-//                 value={formData.coupon_percentage}
-//                 onChange={handleChange("coupon_percentage")}
+//                 inputRef={couponPercentageRef}
+//                 value={
+//                   isViewMode
+//                     ? formData.coupon_percentage === ""
+//                       ? ""
+//                       : Number(formData.coupon_percentage).toLocaleString("en-US", {
+//                           minimumFractionDigits: 2,
+//                           maximumFractionDigits: 2,
+//                         })
+//                     : inputValues.coupon_percentage === ""
+//                     ? ""
+//                     : Number(inputValues.coupon_percentage).toLocaleString("en-US", {
+//                         minimumFractionDigits: 0,
+//                         maximumFractionDigits: 2,
+//                       })
+//                 }
+//                 onChange={handleNumberChange("coupon_percentage", couponPercentageRef)}
+//                 onKeyDown={(e) => {
+//                   if (
+//                     !/[0-9.]/.test(e.key) &&
+//                     e.key !== "Backspace" &&
+//                     e.key !== "Delete" &&
+//                     e.key !== "ArrowLeft" &&
+//                     e.key !== "ArrowRight" &&
+//                     e.key !== "Tab"
+//                   ) {
+//                     e.preventDefault();
+//                   }
+//                 }}
 //                 disabled={isViewMode}
 //                 error={!!errors.coupon_percentage}
 //                 helperText={errors.coupon_percentage || ""}
@@ -322,15 +414,38 @@
 //                 label="Max Cap *"
 //                 fullWidth
 //                 size="small"
+//                 inputRef={maxCapRef}
 //                 value={
-//                   formData.max_cap === ""
+//                   isViewMode
+//                     ? formData.local_max_cap === ""
+//                       ? ""
+//                       : Number(formData.local_max_cap).toLocaleString("en-US", {
+//                           minimumFractionDigits: 2,
+//                           maximumFractionDigits: 2,
+//                         })
+//                     : inputValues.local_max_cap === ""
 //                     ? ""
-//                     : Number(formData.max_cap).toLocaleString("en-US")
+//                     : Number(inputValues.local_max_cap).toLocaleString("en-US", {
+//                         minimumFractionDigits: 0,
+//                         maximumFractionDigits: 2,
+//                       })
 //                 }
-//                 onChange={handleChange("max_cap")}
+//                 onChange={handleNumberChange("local_max_cap", maxCapRef)}
+//                 onKeyDown={(e) => {
+//                   if (
+//                     !/[0-9.]/.test(e.key) &&
+//                     e.key !== "Backspace" &&
+//                     e.key !== "Delete" &&
+//                     e.key !== "ArrowLeft" &&
+//                     e.key !== "ArrowRight" &&
+//                     e.key !== "Tab"
+//                   ) {
+//                     e.preventDefault();
+//                   }
+//                 }}
 //                 disabled={isViewMode}
-//                 error={!!errors.max_cap}
-//                 helperText={errors.max_cap || ""}
+//                 error={!!errors.local_max_cap}
+//                 helperText={errors.local_max_cap || ""}
 //                 InputLabelProps={{
 //                   sx: {
 //                     fontSize: "0.95rem",
@@ -484,7 +599,7 @@
 
 // export default NewCoupon;
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -506,7 +621,7 @@ import { callAPI } from "../../../api/crudFactory";
 interface CouponFormData {
   coupon_name: string;
   coupon_percentage: number | "";
-  max_cap: number | "";
+  local_max_cap: number | "";
   start_date: Date | null;
   end_date: Date | null;
   plan_id: number | null;
@@ -523,7 +638,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const [formData, setFormData] = useState<CouponFormData>({
     coupon_name: "",
     coupon_percentage: "",
-    max_cap: "",
+    local_max_cap: "",
     start_date: null,
     end_date: null,
     plan_id: null,
@@ -533,11 +648,8 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   // State to hold raw input strings for typing
   const [inputValues, setInputValues] = useState({
     coupon_percentage: "",
-    max_cap: "",
+    local_max_cap: "",
   });
-  // Refs to track cursor position
-  const couponPercentageRef = useRef<HTMLInputElement>(null);
-  const maxCapRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -564,11 +676,11 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             data?.coupon_percentage != null
               ? Number(data.coupon_percentage)
               : "";
-          const maxCap = data?.max_cap != null ? Number(data.max_cap) : "";
+          const maxCap = data?.local_max_cap != null ? Number(data.local_max_cap) : "";
           setFormData({
             coupon_name: data?.coupon_name || "",
             coupon_percentage: percentage,
-            max_cap: maxCap,
+            local_max_cap: maxCap,
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             plan_id: data?.plan_id || null,
@@ -576,7 +688,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           // Set initial input values without commas
           setInputValues({
             coupon_percentage: percentage === "" ? "" : String(percentage),
-            max_cap: maxCap === "" ? "" : String(maxCap),
+            local_max_cap: maxCap === "" ? "" : String(maxCap),
           });
         }
       } catch (error) {
@@ -609,11 +721,10 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     };
 
   const handleNumberChange =
-    (field: "coupon_percentage" | "max_cap", inputRef: React.RefObject<HTMLInputElement>) =>
+    (field: "coupon_percentage" | "local_max_cap") =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const input = event.target;
-      const cursorPosition = input.selectionStart || 0;
-      let value = event.target.value.replace(/,/g, ""); // Remove commas for processing
+      let value = event.target.value;
+      console.log(`Raw input for ${field}:`, value);
 
       // Allow empty input
       if (value === "") {
@@ -623,34 +734,48 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         return;
       }
 
-      // Validate input: numbers and one decimal point, up to 2 decimal places
-      if (!/^\d*\.?\d{0,2}$/.test(value)) return;
+      // Remove any non-numeric characters except for a single decimal point
+      value = value.replace(/[^0-9.]/g, "");
+      const parts = value.split(".");
+      if (parts.length > 2) {
+        value = `${parts[0]}.${parts.slice(1).join("")}`; // Merge extra dots
+      }
+      if (parts[1] && parts[1].length > 2) {
+        value = `${parts[0]}.${parts[1].slice(0, 2)}`; // Limit to 2 decimal places
+      }
+
+      console.log(`Cleaned input for ${field}:`, value);
 
       const numValue = Number(value);
-      if (isNaN(numValue)) return;
+      if (isNaN(numValue)) {
+        console.log(`Input for ${field} is not a valid number, ignoring update`);
+        return;
+      }
 
-      // Update formData with raw number
+      // Update formData with the numeric value
       setFormData((prev) => ({ ...prev, [field]: numValue }));
-      // Update inputValues with raw string (without commas)
+      // Store the raw input for display while typing
       setInputValues((prev) => ({ ...prev, [field]: value }));
       setErrors((prev: any) => ({ ...prev, [field]: "" }));
+    };
 
-      // Calculate new cursor position after formatting
+  const handleNumberBlur =
+    (field: "coupon_percentage" | "local_max_cap") =>
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      if (value === "") return;
+
+      const numValue = Number(value.replace(/[^0-9.]/g, ""));
+      if (isNaN(numValue)) return;
+
+      // Format the value for display after blur
       const formattedValue = numValue.toLocaleString("en-US", {
-        minimumFractionDigits: 0,
+        minimumFractionDigits: value.includes(".") ? 2 : 0,
         maximumFractionDigits: 2,
       });
-      const commasBeforeCursor = (value.substring(0, cursorPosition).match(/,/g) || []).length;
-      const newCommasBeforeCursor = (formattedValue.substring(0, cursorPosition).match(/,/g) || []).length;
-      const cursorAdjustment = newCommasBeforeCursor - commasBeforeCursor;
 
-      // Set cursor position after formatting
-      setTimeout(() => {
-        if (inputRef.current) {
-          const newCursorPosition = cursorPosition + cursorAdjustment;
-          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
-        }
-      }, 0);
+      console.log(`Formatted value on blur for ${field}:`, formattedValue);
+      setInputValues((prev) => ({ ...prev, [field]: formattedValue }));
     };
 
   const validateForm = () => {
@@ -664,11 +789,11 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     )
       newErrors.coupon_percentage = "Enter a valid percentage (0 or more).";
     if (
-      formData.max_cap === "" ||
-      isNaN(formData.max_cap as number) ||
-      formData.max_cap < 0
+      formData.local_max_cap === "" ||
+      isNaN(formData.local_max_cap as number) ||
+      formData.local_max_cap < 0
     )
-      newErrors.max_cap = "Enter a valid max cap (0 or more).";
+      newErrors.local_max_cap = "Enter a valid max cap (0 or more).";
     if (!formData.start_date) newErrors.start_date = "Start date is required.";
     if (!formData.end_date) newErrors.end_date = "End date is required.";
     if (!formData.plan_id) newErrors.plan_id = "Plan name is required.";
@@ -680,7 +805,7 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     event.preventDefault();
     if (!validateForm()) return;
     try {
-      console.log(formData, "formData");
+      console.log("Submitting formData:", formData);
       await callAPI({
         endpoint:
           mode === "edit" ? `/api/admin/coupons/${userId}` : "/api/admin/coupons",
@@ -841,7 +966,6 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 label="Coupon % *"
                 fullWidth
                 size="small"
-                inputRef={couponPercentageRef}
                 value={
                   isViewMode
                     ? formData.coupon_percentage === ""
@@ -850,14 +974,10 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })
-                    : inputValues.coupon_percentage === ""
-                    ? ""
-                    : Number(inputValues.coupon_percentage).toLocaleString("en-US", {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2,
-                      })
+                    : inputValues.coupon_percentage
                 }
-                onChange={handleNumberChange("coupon_percentage", couponPercentageRef)}
+                onChange={handleNumberChange("coupon_percentage")}
+                onBlur={handleNumberBlur("coupon_percentage")}
                 onKeyDown={(e) => {
                   if (
                     !/[0-9.]/.test(e.key) &&
@@ -900,23 +1020,18 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 label="Max Cap *"
                 fullWidth
                 size="small"
-                inputRef={maxCapRef}
                 value={
                   isViewMode
-                    ? formData.max_cap === ""
+                    ? formData.local_max_cap === ""
                       ? ""
-                      : Number(formData.max_cap).toLocaleString("en-US", {
+                      : Number(formData.local_max_cap).toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })
-                    : inputValues.max_cap === ""
-                    ? ""
-                    : Number(inputValues.max_cap).toLocaleString("en-US", {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2,
-                      })
+                    : inputValues.local_max_cap
                 }
-                onChange={handleNumberChange("max_cap", maxCapRef)}
+                onChange={handleNumberChange("local_max_cap")}
+                onBlur={handleNumberBlur("local_max_cap")}
                 onKeyDown={(e) => {
                   if (
                     !/[0-9.]/.test(e.key) &&
@@ -930,8 +1045,8 @@ const NewCoupon: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }
                 }}
                 disabled={isViewMode}
-                error={!!errors.max_cap}
-                helperText={errors.max_cap || ""}
+                error={!!errors.local_max_cap}
+                helperText={errors.local_max_cap || ""}
                 InputLabelProps={{
                   sx: {
                     fontSize: "0.95rem",

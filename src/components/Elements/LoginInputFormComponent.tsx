@@ -249,7 +249,7 @@ const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
 );
 
 export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
-  ({ formState, dispatchState, handleInputChange, handleSendOtp, handleSwitchMethod }) => {
+  ({ formState, handleInputChange, handleSendOtp, handleSwitchMethod }) => {
     const handleLoginMethodChange = useCallback(
       (newMethod: "email" | "mobile") => {
         handleSwitchMethod(newMethod);
