@@ -11,7 +11,7 @@ interface UserData {
   email: string;
   mobile_number: string;
   status: string;
-  plan_name: string;
+  plan_type: string;
 }
 
 const Users: React.FC = () => {
@@ -23,6 +23,8 @@ const Users: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  console.log(filters, "filters")
 
   const fetchUsers = async (
     currentPage: number,
@@ -126,7 +128,7 @@ const Users: React.FC = () => {
       align: "left", // Center-align mobile number
     },
     {
-      id: "plan_name",
+      id: "plan_type",
       label: "Subscription",
       filterable: true,
       filterOptions: ["Free", "Premium"],

@@ -616,7 +616,19 @@ import {
 } from "@mui/material";
 import { callAPI } from "../../../api/crudFactory";
 
-const COLORS = ["#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+// const COLORS = ["#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+const COLORS = [
+  "#00C49F", // teal
+  "#FFBB28", // amber
+  "#FF8042", // orange
+  "#8884D8", // purple
+  "#0088FE", // blue
+  "#FF6699", // pink
+  "#00C8C8", // aqua
+  "#A28FD0", // lavender
+  "#FF6F61", // coral
+  "#6EBE44", // green
+];
 
 const Analytics: React.FC = () => {
   const theme = useTheme();
