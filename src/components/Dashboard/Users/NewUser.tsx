@@ -405,10 +405,22 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           p: { xs: 2, sm: 3 },
           maxWidth: "800px", // Constrain width for better alignment
           mx: "auto",
-          backgroundColor: "#f9f9fb",
+          height: "100%",
+          backgroundColor: "#fff",
           borderRadius: "12px",
-          boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+          boxShadow: "0 3px 15px rgba(0,0,0,0.08)",
           border: "1px solid #e0e0e0",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "4px",
+            background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
+          }
         }}
       >
         {/* Form title - balanced size and styling */}
@@ -920,3 +932,671 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 };
 
 export default NewUser;
+
+// import React, { useState, useEffect, useRef } from "react";
+// import { useNavigate, useParams } from "react-router-dom";
+// import { UserCircle, Calendar, Clock, MapPin, Info, CheckCircle } from "lucide-react";
+// import {
+//   Box,
+//   Button,
+//   Card,
+//   CardContent,
+//   CircularProgress,
+//   IconButton,
+//   InputAdornment,
+//   MenuItem,
+//   Snackbar,
+//   TextField,
+//   Typography,
+//   Select,
+//   FormControl,
+//   InputLabel,
+//   Alert,
+// } from "@mui/material";
+// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+// // Interfaces - TypeScript Types
+// interface UserFormData {
+//   first_name: string;
+//   last_name: string;
+//   email: string;
+//   mobile: string;
+//   dateOfBirth: Date | null;
+//   timeOfBirth: Date | null;
+//   placeOfBirth: string;
+//   preferredLocation: string;
+//   rashi: string;
+//   nakshatra: string;
+//   status: string;
+//   user_type: string;
+// }
+
+// interface FormErrors {
+//   first_name?: string;
+//   last_name?: string;
+//   email?: string;
+//   mobile?: string;
+//   dateOfBirth?: string;
+//   timeOfBirth?: string;
+//   placeOfBirth?: string;
+//   preferredLocation?: string;
+//   rashi?: string;
+//   nakshatra?: string;
+// }
+
+// const rasiOptions = [
+//   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+//   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+// ];
+
+// const nakshatramOptions: Record<string, string[]> = {
+//   Aries: ["Ashwini", "Bharani", "Krittika"],
+//   Taurus: ["Krittika", "Rohini", "Mrigashira"],
+//   Gemini: ["Mrigashira", "Ardra", "Punarvasu"],
+//   Cancer: ["Punarvasu", "Pushya", "Ashlesha"],
+//   Leo: ["Magha", "Purva Phalguni", "Uttara Phalguni"],
+//   Virgo: ["Uttara Phalguni", "Hasta", "Chitra"],
+//   Libra: ["Chitra", "Swati", "Vishaka"],
+//   Scorpio: ["Vishaka", "Anuradha", "Jyeshta"],
+//   Sagittarius: ["Moola", "Purva Ashadha", "Uttara Ashadha"],
+//   Capricorn: ["Uttara Ashadha", "Shravana", "Dhanishta"],
+//   Aquarius: ["Dhanishta", "Shatabhisha", "Purva Bhadrapada"],
+//   Pisces: ["Purva Bhadrapada", "Uttara Bhadrapada", "Revati"]
+// };
+
+// const userTypeOptions = ["Customer", "Astrologer", "Admin"];
+
+// // Mock functions for the demo
+// const callAPI = async ({ endpoint, method, data }: any) => {
+//   console.log("API Call:", { endpoint, method, data });
+//   return { data: { status: "success" } };
+// };
+
+// const NewUser = ({ mode = "new" }: { mode: "new" | "edit" | "view" }) => {
+//   const navigate = useNavigate();
+//   const { userId } = useParams<{ userId: string }>();
+//   const isViewMode = mode === "view";
+//   const isFormInitialized = useRef(true);
+
+//   const [formData, setFormData] = useState<UserFormData>({
+//     first_name: "",
+//     last_name: "",
+//     email: "",
+//     mobile: "",
+//     dateOfBirth: null,
+//     timeOfBirth: null,
+//     placeOfBirth: "",
+//     preferredLocation: "",
+//     rashi: "",
+//     nakshatra: "",
+//     status: "Active",
+//     user_type: "Customer"
+//   });
+
+//   const [errors, setErrors] = useState<FormErrors>({});
+//   const [loading, setLoading] = useState<boolean>(false);
+//   const [loadingRasiNakshatram, setLoadingRasiNakshatram] = useState<boolean>(false);
+//   const [snackbar, setSnackbar] = useState({
+//     open: false,
+//     message: "",
+//     severity: "success" as "success" | "error" | "info" | "warning"
+//   });
+
+//   // Fetch user data for edit/view mode
+//   useEffect(() => {
+//     if (mode === "edit" && userId) {
+//       setLoading(true);
+//       callAPI({
+//         endpoint: `api/admin/users/${userId}`,
+//         method: "get"
+//       }).then(res => {
+//         if (res?.data) {
+//           const user = res.data;
+//           setFormData({
+//             first_name: user.first_name || "",
+//             last_name: user.last_name || "",
+//             email: user.email || "",
+//             mobile: user.mobile_number || "",
+//             dateOfBirth: user.date_of_birth ? new Date(user.date_of_birth) : null,
+//             timeOfBirth: user.time_of_birth ? new Date(`1970-01-01T${user.time_of_birth}`) : null,
+//             placeOfBirth: user.place_of_birth || "",
+//             preferredLocation: user.preferred_location || "",
+//             rashi: user.rashi || "",
+//             nakshatra: user.nakshatra || "",
+//             status: user.status === "inactive" ? "Inactive" : "Active",
+//             user_type: user.user_type ? user.user_type.charAt(0).toUpperCase() + user.user_type.slice(1).toLowerCase() : "Customer"
+//           });
+//         }
+//         setLoading(false);
+//       }).catch(err => {
+//         console.error("Error fetching user data:", err);
+//         setSnackbar({
+//           open: true,
+//           message: "Failed to fetch user data",
+//           severity: "error"
+//         });
+//         setLoading(false);
+//       });
+//     }
+//   }, [mode, userId]);
+
+//   // Field validation function
+//   const validateField = (field: keyof UserFormData, value: string): string => {
+//     let error = "";
+//     switch (field) {
+//       case "first_name":
+//         if (!value.trim()) error = "First name is required";
+//         break;
+//       case "last_name":
+//         if (!value.trim()) error = "Last name is required";
+//         break;
+//       case "email":
+//         if (!value.trim()) {
+//           error = "Email is required";
+//         } else if (!/^\S+@\S+\.\S+$/.test(value)) {
+//           error = "Please enter a valid email address";
+//         }
+//         break;
+//       case "mobile":
+//         if (!value.trim()) {
+//           error = "Mobile number is required";
+//         } else if (!/^\d{10}$/.test(value)) {
+//           error = "Mobile number must be exactly 10 digits";
+//         }
+//         break;
+//     }
+//     return error;
+//   };
+
+//   // Validate all fields on form submission
+//   const validate = (): FormErrors => {
+//     const newErrors: FormErrors = {};
+//     newErrors.first_name = validateField("first_name", formData.first_name);
+//     newErrors.last_name = validateField("last_name", formData.last_name);
+//     newErrors.email = validateField("email", formData.email);
+//     newErrors.mobile = validateField("mobile", formData.mobile);
+    
+//     // Filter out empty errors
+//     return Object.fromEntries(
+//       Object.entries(newErrors).filter(([_, value]) => value !== undefined)
+//     ) as FormErrors;    
+//   };
+
+//   // Handle input changes
+//   const handleChange = (field: keyof UserFormData, value: any) => {
+//     setFormData(prev => ({ ...prev, [field]: value }));
+//     if (errors[field]) {
+//       setErrors(prev => ({ ...prev, [field]: "" }));
+//     }
+//   };
+
+//   // Handle form submission
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     const validationErrors = validate();
+    
+//     if (Object.keys(validationErrors).length > 0) {
+//       setErrors(validationErrors);
+//       return;
+//     }
+    
+//     setLoading(true);
+    
+//     try {
+//       const endpoint = mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users";
+//       const method = mode === "edit" ? "put" : "post";
+      
+//       const response = await callAPI({
+//         endpoint,
+//         method,
+//         data: {
+//           first_name: formData.first_name,
+//           last_name: formData.last_name,
+//           preferred_location: formData.preferredLocation,
+//           email: formData.email,
+//           mobile_number: formData.mobile,
+//           birth_location: formData.placeOfBirth,
+//           date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+//           time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+//           rashi: formData.rashi,
+//           nakshatra: formData.nakshatra,
+//           status: formData.status.toLowerCase(),
+//           user_type: formData.user_type.toLowerCase()
+//         }
+//       });
+      
+//       setSnackbar({
+//         open: true,
+//         message: mode === "edit" ? "User updated successfully!" : "User created successfully!",
+//         severity: "success"
+//       });
+      
+//       // Navigate back after successful submission
+//       navigate(-1);
+//     } catch (err: any) {
+//       console.error("API Error:", err);
+//       let errorMessage = "Something went wrong. Please try again.";
+//       if (err.response && err.response.data) {
+//         errorMessage = err.response.data.detail || JSON.stringify(err.response.data.detail);
+//       }
+      
+//       setSnackbar({
+//         open: true,
+//         message: errorMessage,
+//         severity: "error"
+//       });
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Auto fetch rashi & nakshatra when birth details are complete
+//   useEffect(() => {
+//     if (mode === "edit" && !isFormInitialized.current) return;
+    
+//     const { dateOfBirth, timeOfBirth, placeOfBirth, preferredLocation } = formData;
+    
+//     if (dateOfBirth && timeOfBirth && placeOfBirth.trim() && preferredLocation.trim()) {
+//       const fetchRasiNakshatra = async () => {
+//         try {
+//           setLoadingRasiNakshatram(true);
+//           const response = await callAPI({
+//             endpoint: "api/auth/rashi-nakshatra",
+//             method: "post",
+//             data: {
+//               preferred_location: preferredLocation,
+//               date_of_birth: dateOfBirth.toISOString().split("T")[0],
+//               time_of_birth: timeOfBirth.toTimeString().slice(0, 5),
+//               birth_location: placeOfBirth
+//             }
+//           });
+          
+//           if (response?.data?.nakshatra && response?.data?.rashi) {
+//             setFormData(prev => ({
+//               ...prev,
+//               rashi: response.data.rashi,
+//               nakshatra: response.data.nakshatra
+//             }));
+//           }
+//         } catch (err) {
+//           console.error("Failed to fetch rashi and nakshatra:", err);
+//         } finally {
+//           setLoadingRasiNakshatram(false);
+//         }
+//       };
+      
+//       fetchRasiNakshatra();
+//     }
+//   }, [formData.dateOfBirth, formData.timeOfBirth, formData.placeOfBirth, formData.preferredLocation, mode]);
+
+//   // Get available nakshatrams based on selected rashi
+//   const availableNakshatrams = formData.rashi ? nakshatramOptions[formData.rashi] || [] : [];
+
+//   const handleCloseSnackbar = () => {
+//     setSnackbar({ ...snackbar, open: false });
+//   };
+
+//   return (
+//     <Box sx={{ backgroundColor: "#f0fdf4", minHeight: "100vh" }}>
+//       {/* Header */}
+//       <Box sx={{ 
+//           display: "flex", 
+//           alignItems: "center", 
+//           mb: 3,
+//           background: "rgba(6, 64, 43, 0.03)",
+//           borderRadius: "8px",
+//           p: 1
+//         }}>
+//           <IconButton 
+//             onClick={() => navigate(-1)} 
+//             sx={{ 
+//               mr: 1,
+//               color: "#06402B",
+//               "&:hover": {
+//                 background: "rgba(6, 64, 43, 0.1)",
+//               }
+//             }}
+//           >
+//             <ArrowBackIcon />
+//           </IconButton>
+//           <Typography 
+//             variant="body1" 
+//             fontWeight={600} 
+//             color="#06402B"
+//             sx={{ 
+//               display: "flex", 
+//               alignItems: "center" 
+//             }}
+//           >
+//             Back to Users
+//           </Typography>
+//         </Box>
+
+//       <Box sx={{ px: { xs: 2, sm: 3, lg: 4 }, py: 3, maxWidth: "screen-xl", mx: "auto" }}>
+//         {/* Page title */}
+//         <Box sx={{ mb: 3 }}>
+//           <Typography variant="h4" sx={{ fontWeight: "bold", color: "#166534" }}>
+//             {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} User
+//           </Typography>
+//           <Typography variant="body1" sx={{ color: "text.secondary", mt: 1 }}>
+//             {mode === "new" 
+//               ? "Add a new user to the system" 
+//               : mode === "edit" 
+//                 ? "Update existing user information" 
+//                 : "View user details"}
+//           </Typography>
+//         </Box>
+
+//         {loading ? (
+//           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "400px" }}>
+//             <CircularProgress size={60} sx={{ color: "#16a34a" }} />
+//           </Box>
+//         ) : (
+//           <Box component="form" onSubmit={handleSubmit} sx={{ display: "grid", gridTemplateColumns: { lg: "repeat(3, 1fr)" }, gap: 3 }}>
+//             {/* Left Column - Personal Information */}
+//             <Card variant="outlined">
+//               <CardContent>
+//                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+//                   <UserCircle size={24} color="#166534" />
+//                   <Typography variant="h6" sx={{ ml: 1, color: "#166534", fontWeight: "semibold" }}>
+//                     Personal Information
+//                   </Typography>
+//                 </Box>
+//                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+//                   <TextField
+//                     label="First Name *"
+//                     value={formData.first_name}
+//                     onChange={(e) => handleChange("first_name", e.target.value)}
+//                     disabled={isViewMode}
+//                     error={!!errors.first_name}
+//                     helperText={errors.first_name}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                   />
+                  
+//                   <TextField
+//                     label="Last Name *"
+//                     value={formData.last_name}
+//                     onChange={(e) => handleChange("last_name", e.target.value)}
+//                     disabled={isViewMode}
+//                     error={!!errors.last_name}
+//                     helperText={errors.last_name}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                   />
+                  
+//                   <TextField
+//                     label="Email *"
+//                     type="email"
+//                     value={formData.email}
+//                     onChange={(e) => handleChange("email", e.target.value)}
+//                     disabled={isViewMode}
+//                     error={!!errors.email}
+//                     helperText={errors.email}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                   />
+                  
+//                   <TextField
+//                     label="Mobile Number *"
+//                     value={formData.mobile}
+//                     onChange={(e) => {
+//                       const numericValue = e.target.value.replace(/\D/g, "");
+//                       handleChange("mobile", numericValue);
+//                     }}
+//                     disabled={isViewMode}
+//                     error={!!errors.mobile}
+//                     helperText={errors.mobile}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                     inputProps={{ maxLength: 10 }}
+//                   />
+//                 </Box>
+//               </CardContent>
+//             </Card>
+            
+//             {/* Middle Column - Birth Details */}
+//             <Card variant="outlined">
+//               <CardContent>
+//                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+//                   <Calendar size={24} color="#166534" />
+//                   <Typography variant="h6" sx={{ ml: 1, color: "#166534", fontWeight: "semibold" }}>
+//                     Birth Details
+//                   </Typography>
+//                 </Box>
+//                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+//                   <TextField
+//                     label="Date of Birth"
+//                     type="date"
+//                     value={formData.dateOfBirth ? formData.dateOfBirth.toISOString().split('T')[0] : ''}
+//                     onChange={(e) => handleChange("dateOfBirth", e.target.value ? new Date(e.target.value) : null)}
+//                     disabled={isViewMode}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                     InputLabelProps={{ shrink: true }}
+//                     InputProps={{
+//                       endAdornment: (
+//                         <InputAdornment position="end">
+//                           <Calendar size={18} color="action" />
+//                         </InputAdornment>
+//                       ),
+//                     }}
+//                   />
+                  
+//                   <TextField
+//                     label="Time of Birth"
+//                     type="time"
+//                     value={formData.timeOfBirth ? formData.timeOfBirth.toTimeString().slice(0, 5) : ''}
+//                     onChange={(e) => {
+//                       const timeValue = e.target.value;
+//                       if (timeValue) {
+//                         const timeDate = new Date();
+//                         const [hours, minutes] = timeValue.split(':');
+//                         timeDate.setHours(parseInt(hours), parseInt(minutes), 0);
+//                         handleChange("timeOfBirth", timeDate);
+//                       } else {
+//                         handleChange("timeOfBirth", null);
+//                       }
+//                     }}
+//                     disabled={isViewMode}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                     InputLabelProps={{ shrink: true }}
+//                     InputProps={{
+//                       endAdornment: (
+//                         <InputAdornment position="end">
+//                           <Clock size={18} color="action" />
+//                         </InputAdornment>
+//                       ),
+//                     }}
+//                   />
+                  
+//                   <TextField
+//                     label="Place of Birth"
+//                     value={formData.placeOfBirth}
+//                     onChange={(e) => handleChange("placeOfBirth", e.target.value)}
+//                     disabled={isViewMode}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                     InputProps={{
+//                       endAdornment: (
+//                         <InputAdornment position="end">
+//                           <MapPin size={18} color="action" />
+//                         </InputAdornment>
+//                       ),
+//                     }}
+//                   />
+                  
+//                   <TextField
+//                     label="Preferred Location"
+//                     value={formData.preferredLocation}
+//                     onChange={(e) => handleChange("preferredLocation", e.target.value)}
+//                     disabled={isViewMode}
+//                     fullWidth
+//                     variant="outlined"
+//                     size="small"
+//                     InputProps={{
+//                       endAdornment: (
+//                         <InputAdornment position="end">
+//                           <MapPin size={18} color="action" />
+//                         </InputAdornment>
+//                       ),
+//                     }}
+//                   />
+                  
+//                   {loadingRasiNakshatram && (
+//                     <Box sx={{ display: "flex", alignItems: "center", color: "#16a34a", fontSize: "0.875rem" }}>
+//                       <CircularProgress size={16} sx={{ color: "#16a34a", mr: 1 }} />
+//                       Calculating birth chart details...
+//                     </Box>
+//                   )}
+//                 </Box>
+//               </CardContent>
+//             </Card>
+            
+//             {/* Right Column - Additional Details */}
+//             <Card variant="outlined">
+//               <CardContent>
+//                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+//                   <Info size={24} color="#166534" />
+//                   <Typography variant="h6" sx={{ ml: 1, color: "#166534", fontWeight: "semibold" }}>
+//                     Additional Details
+//                   </Typography>
+//                 </Box>
+//                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+//                   <FormControl fullWidth size="small">
+//                     <InputLabel id="rashi-label">Rashi</InputLabel>
+//                     <Select
+//                       labelId="rashi-label"
+//                       id="rashi"
+//                       value={formData.rashi}
+//                       onChange={(e) => handleChange("rashi", e.target.value)}
+//                       disabled={isViewMode}
+//                       label="Rashi"
+//                     >
+//                       <MenuItem value="" disabled>
+//                         Select Rashi
+//                       </MenuItem>
+//                       {rasiOptions.map((option) => (
+//                         <MenuItem key={option} value={option}>
+//                           {option}
+//                         </MenuItem>
+//                       ))}
+//                     </Select>
+//                   </FormControl>
+                  
+//                   <FormControl fullWidth size="small">
+//                     <InputLabel id="nakshatra-label">Nakshatra</InputLabel>
+//                     <Select
+//                       labelId="nakshatra-label"
+//                       id="nakshatra"
+//                       value={formData.nakshatra}
+//                       onChange={(e) => handleChange("nakshatra", e.target.value)}
+//                       disabled={isViewMode || !formData.rashi}
+//                       label="Nakshatra"
+//                     >
+//                       <MenuItem value="" disabled>
+//                         {!formData.rashi ? "Select Rashi first" : "Select Nakshatra"}
+//                       </MenuItem>
+//                       {availableNakshatrams.map((option) => (
+//                         <MenuItem key={option} value={option}>
+//                           {option}
+//                         </MenuItem>
+//                       ))}
+//                     </Select>
+//                   </FormControl>
+                  
+//                   <FormControl fullWidth size="small">
+//                     <InputLabel id="user-type-label">User Type</InputLabel>
+//                     <Select
+//                       labelId="user-type-label"
+//                       id="user_type"
+//                       value={formData.user_type}
+//                       onChange={(e) => handleChange("user_type", e.target.value)}
+//                       disabled={isViewMode}
+//                       label="User Type"
+//                     >
+//                       {userTypeOptions.map((option) => (
+//                         <MenuItem key={option} value={option}>
+//                           {option}
+//                         </MenuItem>
+//                       ))}
+//                     </Select>
+//                   </FormControl>
+                  
+//                   <FormControl fullWidth size="small">
+//                     <InputLabel id="status-label">Status</InputLabel>
+//                     <Select
+//                       labelId="status-label"
+//                       id="status"
+//                       value={formData.status}
+//                       onChange={(e) => handleChange("status", e.target.value)}
+//                       disabled={isViewMode}
+//                       label="Status"
+//                     >
+//                       <MenuItem value="Active">Active</MenuItem>
+//                       <MenuItem value="Inactive">Inactive</MenuItem>
+//                     </Select>
+//                   </FormControl>
+//                 </Box>
+//               </CardContent>
+//             </Card>
+            
+//             {/* Action buttons - Full width */}
+//             {!isViewMode && (
+//               <Box sx={{ gridColumn: { lg: "1 / -1" }, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+//                 <Button
+//                   variant="outlined"
+//                   onClick={() => navigate(-1)}
+//                   sx={{ px: 3, py: 1, borderRadius: "8px" }}
+//                 >
+//                   Cancel
+//                 </Button>
+//                 <Button
+//                   type="submit"
+//                   variant="contained"
+//                   disabled={loading}
+//                   sx={{
+//                     px: 3,
+//                     py: 1,
+//                     borderRadius: "8px",
+//                     bgcolor: "#16a34a",
+//                     "&:hover": { bgcolor: "#166534" }
+//                   }}
+//                   startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <CheckCircle size={18} />}
+//                 >
+//                   {mode === "new" ? "Create User" : "Update User"}
+//                 </Button>
+//               </Box>
+//             )}
+//           </Box>
+//         )}
+//       </Box>
+      
+//       {/* Success/Error notification */}
+//       <Snackbar
+//         open={snackbar.open}
+//         autoHideDuration={6000}
+//         onClose={handleCloseSnackbar}
+//         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+//       >
+//         <Alert
+//           onClose={handleCloseSnackbar}
+//           severity={snackbar.severity}
+//           sx={{ width: "100%" }}
+//         >
+//           {snackbar.message}
+//         </Alert>
+//       </Snackbar>
+//     </Box>
+//   );
+// };
+
+// export default NewUser;

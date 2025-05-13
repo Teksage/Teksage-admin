@@ -1222,7 +1222,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
         | SelectChangeEvent<string | string[]>
     ) => {
-      let value = e.target.value;
+      let value:any = e.target.value;
 
       if (field === "local_consulting_fee" || field === "foreign_consulting_fee") {
         // Remove existing commas to handle raw input
@@ -1285,6 +1285,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   const handleBlur =
     (field: keyof AstroFormData) =>
     (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      console.log(event)
       const value = formData[field]; // Use raw value from formData
       const error = validateField(field, value);
       if (error) {
@@ -1407,12 +1408,23 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         elevation={2}
         sx={{
           p: { xs: 2, sm: 3 },
-          maxWidth: "800px",
+          maxWidth: "800px", // Constrain width for better alignment
           mx: "auto",
-          backgroundColor: "#f9f9fb",
+          backgroundColor: "#fff",
           borderRadius: "12px",
-          boxShadow: "0 3px 15px rgba(0,0,0,0.05)",
+          boxShadow: "0 3px 15px rgba(0,0,0,0.08)",
           border: "1px solid #e0e0e0",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "4px",
+            background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
+          }
         }}
       >
         <Typography

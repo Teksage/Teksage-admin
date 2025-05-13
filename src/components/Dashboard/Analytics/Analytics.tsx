@@ -1997,7 +1997,7 @@ const Analytics: React.FC = () => {
   const totalUsers = useMemo(
     () =>
       donutData.reduce(
-        (sum, entry) => sum + (entry.value === 0.01 ? 0 : entry.value),
+        (sum:any, entry:any) => sum + (entry.value === 0.01 ? 0 : entry.value),
         0
       ),
     [donutData]
@@ -2078,17 +2078,6 @@ const Analytics: React.FC = () => {
     return null;
   };
 
-  // Custom Label for Donut Chart
-  const renderCustomLabel = ({
-    name,
-    value,
-  }: {
-    name: string;
-    value: number;
-  }) => {
-    return `${name}: ${Math.round(value * 100) / 100}`;
-  };
-
   // Animation variants for the entire component
   const containerVariants = {
     hidden: { opacity: 0, y: 100 },
@@ -2126,44 +2115,6 @@ const Analytics: React.FC = () => {
         duration: 0.6, // Reduced from 0.8
         ease: "easeOut",
         delay: 0.4, // Reduced from 0.6
-      },
-    },
-  };
-
-  // Animation for Donut Chart pie segments
-  const [pieAngles, setPieAngles] = useState(
-    donutData.map(() => ({ startAngle: 90, endAngle: 90 }))
-  );
-
-  useEffect(() => {
-    if (!loading && donutData.length > 0 && !allValuesZero) {
-      setPieAngles(donutData.map(() => ({ startAngle: 90, endAngle: 90 })));
-      const timers = donutData.map((_, index) =>
-        setTimeout(() => {
-          setPieAngles((prev) =>
-            prev.map((angle, i) =>
-              i === index ? { startAngle: 90, endAngle: 450 } : angle
-            )
-          );
-        }, index * 200) // Reduced from 300
-      );
-      return () => {
-        timers.forEach((timer) => clearTimeout(timer));
-      };
-    }
-  }, [loading, donutData, allValuesZero]);
-
-  // Animation for center label in Donut Chart
-  const centerLabelVariants = {
-    hidden: { scale: 0, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.4, // Reduced from 0.5
-        type: "spring",
-        bounce: 0.4,
-        delay: 0.9, // Reduced from 1.2
       },
     },
   };
@@ -2373,7 +2324,7 @@ const Analytics: React.FC = () => {
                           dataKey={plan}
                           stroke={COLORS[index % COLORS.length]}
                           strokeWidth={2}
-                          dot={{ r: 4 }}
+                          // dot={{ r: 4 }}
                           activeDot={{ r: 6 }}
                           name={`${plan} Users`}
                           isAnimationActive={false}
@@ -2382,15 +2333,15 @@ const Analytics: React.FC = () => {
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               transition={{
-                                duration: 0.4, // Reduced from 0.5
-                                delay: 0.4 + index * 0.2, // Reduced from 0.6 + index * 0.3
+                                duration: 0.4,
+                                delay: 0.4 + index * 0.2,
                                 type: "spring",
                                 bounce: 0.4,
                               }}
                               r={4}
                               fill={COLORS[index % COLORS.length]}
                             />
-                          }
+                          }                          
                         />
                       ))}
                   </LineChart>
@@ -2517,14 +2468,16 @@ const Analytics: React.FC = () => {
                     label={false}
                     dataKey="value"
                     isAnimationActive={false}
+                    startAngle={90}
+                    endAngle={-270} 
                   >
-                    {donutData.map((entry, index) => (
+                    {donutData.map((entry:any, index:number) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={DONUT_COLORS[index % DONUT_COLORS.length]}
                         opacity={entry.value === 0.01 ? 0.3 : 1}
-                        startAngle={pieAngles[index]?.startAngle || 90}
-                        endAngle={pieAngles[index]?.endAngle || 90}
+                        // startAngle={pieAngles[index]?.startAngle || 90}
+                        // endAngle={pieAngles[index]?.endAngle || 90}
                       />
                     ))}
                   </Pie>
@@ -2593,7 +2546,7 @@ const Analytics: React.FC = () => {
                 },
               }}>
                 <Grid container spacing={1.5}>
-                  {donutData.map((entry, index) => (
+                  {donutData.map((entry:any, index:number) => (
                     <Grid item xs={6} key={index}>
                       <Box 
                         sx={{

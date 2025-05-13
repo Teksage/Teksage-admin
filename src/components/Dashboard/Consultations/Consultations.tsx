@@ -12,6 +12,7 @@ interface ConsultationData {
   start_time: string;
   status: string;
   customer_name: string;
+  consulting_fee_code: string;
   consultation_fee: string | number | null;
 }
 
@@ -125,6 +126,16 @@ const Consultations: React.FC = () => {
         width: "140px",
         filterOptions: ["Career", "Health", "Wealth", "Relationship"],
         render: (value: string[] | null) => (value && value.length > 0 ? value.map(v => v.charAt(0).toUpperCase() + v.slice(1)).join(", ") : "N/A"),
+      },
+      {
+        id: "consulting_fee_code",
+        label: "Fee Code",
+        filterable: true,
+        filterOptions: ["INR", "USD"],
+        render: (value: number) => {
+          if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+          return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)
+        },
       },
       {
         id: "consultation_fee",
