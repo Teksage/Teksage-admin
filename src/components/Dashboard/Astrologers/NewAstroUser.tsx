@@ -1014,6 +1014,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const isViewMode = mode === "view";
+  const urbanistBoldText = {
+    fontFamily: "Urbanist",
+    fontWeight: 600,
+  };
 
   const [formData, setFormData] = useState<AstroFormData>({
     first_name: "",
@@ -1399,7 +1403,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
-        <Typography variant="body1" fontWeight={600} color="#06402B">
+        <Typography variant="body1" style={{ fontFamily: "Urbanist", fontWeight: 800 }} color="#06402B">
           Back
         </Typography>
       </Box>
@@ -1442,6 +1446,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
             color: "#06402B",
           }}
+          style={{fontFamily: "Urbanist", fontWeight: 800}}
         >
           {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro
           User
@@ -1456,6 +1461,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={urbanistBoldText}
               >
                 Profile Picture
               </Typography>
@@ -1527,6 +1533,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={urbanistBoldText}
               >
                 Personal Information
               </Typography>
@@ -1541,6 +1548,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       fontSize: "0.95rem",
                       fontWeight: 500,
                       color: "#455a64",
+                      fontFamily: "Urbanist"
                     }}
                   >
                     Astrologer User *
@@ -1578,6 +1586,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       <MenuItem
                         key={astrologer.user_id}
                         value={astrologer.user_id.toString()}
+                        style={{fontFamily: "Urbanist"}}
                       >
                         {`${astrologer.first_name} (${astrologer.email})`}
                       </MenuItem>
@@ -1632,6 +1641,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     sx: { fontSize: "0.9rem", borderRadius: "6px" },
                   }}
                   sx={{
+                    "& .MuiInputLabel-root": {
+                      fontFamily: "Urbanist",
+                      fontSize: "0.9rem",
+                    },
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": { borderColor: "#cfd8dc" },
                       "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1650,6 +1663,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={urbanistBoldText}
               >
                 Professional Details
               </Typography>
@@ -1680,6 +1694,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1698,6 +1716,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   }}
                 >
                   Expertise Areas *
@@ -1710,6 +1729,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   disabled={isViewMode}
                   renderValue={(selected) => selected.join(", ")}
                   sx={{
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1772,6 +1792,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1792,6 +1816,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                         : undefined
                     }
                     sx={{
+                      fontFamily: "Urbanist",
                       fontSize: "0.85rem",
                       backgroundColor: "#e8eaf6",
                       color: "#3f51b5",
@@ -1827,6 +1852,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1866,6 +1895,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1905,6 +1938,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1936,6 +1973,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   }}
                   label="Status"
                   sx={{
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1949,8 +1987,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     },
                   }}
                 >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  <MenuItem value="Active" style={{fontFamily: "Urbanist"}}>Active</MenuItem>
+                  <MenuItem value="Inactive" style={{fontFamily: "Urbanist"}}>Inactive</MenuItem>
                 </Select>
                 {errors.status && (
                   <FormHelperText sx={{ fontSize: "0.75rem" }}>

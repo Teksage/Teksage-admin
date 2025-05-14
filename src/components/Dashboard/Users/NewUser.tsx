@@ -77,6 +77,9 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const { userId } = useParams<{ userId: string }>();
   const isViewMode = mode === "view";
   const isFormInitialized = useRef(true);
+  const urbanistBoldText = {
+    fontFamily: "Urbanist", fontWeight: 600,
+  };
 
   const [formData, setFormData] = useState<UserFormData>({
     first_name: "",
@@ -288,7 +291,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         nakshatra: formData.nakshatra,
         status: formData.status.toLowerCase(),
         user_type: formData.user_type.toLowerCase(),
-      })
+      });
       const response = await callAPI({
         endpoint:
           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
@@ -323,7 +326,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       console.error("API Error:", err);
       let errorMessage = "Something went wrong. Please try again.";
       if (err.response && err.response.data) {
-        errorMessage = err.response.data.detail || JSON.stringify(err.response.data.detail);
+        errorMessage =
+          err.response.data.detail || JSON.stringify(err.response.data.detail);
       }
       setSnackbar({
         open: true,
@@ -394,7 +398,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
-        <Typography variant="body1" fontWeight={600} color="#06402B">
+        <Typography
+          variant="body1"
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+          color="#06402B"
+        >
           Back
         </Typography>
       </Box>
@@ -420,7 +428,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             width: "100%",
             height: "4px",
             background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
-          }
+          },
         }}
       >
         {/* Form title - balanced size and styling */}
@@ -429,6 +437,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           fontWeight={600}
           mb={3}
           // color="#1a237e"
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           sx={{
             maxWidth: "50%", // Prevent title from pushing buttons too far
             overflow: "hidden",
@@ -452,6 +461,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={urbanistBoldText}
               >
                 Personal Information
               </Typography>
@@ -479,6 +489,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -510,6 +524,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -542,6 +560,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -576,6 +598,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   sx: { fontSize: "0.9rem", borderRadius: "6px" },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -593,6 +619,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={urbanistBoldText}
               >
                 Birth Details
               </Typography>
@@ -621,6 +648,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       sx: { fontSize: "0.9rem", borderRadius: "6px" },
                     },
                     sx: {
+                      "& .MuiInputLabel-root": {
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                      },
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": { borderColor: "#cfd8dc" },
                         "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -655,6 +686,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       sx: { fontSize: "0.9rem", borderRadius: "6px" },
                     },
                     sx: {
+                      "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": { borderColor: "#cfd8dc" },
                         "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -687,6 +722,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={urbanistBoldText}
               >
                 Additional Details
               </Typography>
@@ -733,6 +769,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontWeight: 500,
                     color: "#455a64",
                   }}
+                  style={{fontFamily: 'Urbanist'}}
                 >
                   Rashi
                 </InputLabel>
@@ -741,6 +778,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("rashi")}
                   label="Rashi"
                   sx={{
+                    fontFamily: 'Urbanist',
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -755,7 +793,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }}
                 >
                   {rasiOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
+                    <MenuItem key={option} value={option} style={{fontFamily: 'Urbanist'}}>
                       {option}
                     </MenuItem>
                   ))}
@@ -780,6 +818,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontWeight: 500,
                     color: "#455a64",
                   }}
+                  style={{fontFamily: 'Urbanist'}}
                 >
                   Nakshatra
                 </InputLabel>
@@ -788,6 +827,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("nakshatra")}
                   label="Nakshatra"
                   sx={{
+                    fontFamily: 'Urbanist',
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -802,7 +842,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }}
                 >
                   {availableNakshatrams.map((option) => (
-                    <MenuItem key={option} value={option}>
+                    <MenuItem key={option} value={option} style={{fontFamily: 'Urbanist'}}>
                       {option}
                     </MenuItem>
                   ))}
@@ -822,6 +862,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontWeight: 500,
                     color: "#455a64",
                   }}
+                  style={{fontFamily: 'Urbanist'}}
                 >
                   User Type
                 </InputLabel>
@@ -830,6 +871,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("user_type")}
                   label="User Type"
                   sx={{
+                    fontFamily: 'Urbanist',
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -844,7 +886,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }}
                 >
                   {userTypeOptions.map((option) => (
-                    <MenuItem key={option} value={option}>
+                    <MenuItem key={option} value={option} style={{fontFamily: 'Urbanist'}}>
                       {option}
                     </MenuItem>
                   ))}
@@ -867,6 +909,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("status")}
                   label="Status"
                   sx={{
+                    fontFamily: 'Urbanist',
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -880,8 +923,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     },
                   }}
                 >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  <MenuItem value="Active" style={{fontFamily: 'Urbanist'}}>Active</MenuItem>
+                  <MenuItem value="Inactive" style={{fontFamily: 'Urbanist'}}>Inactive</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -1115,11 +1158,11 @@ export default NewUser;
 //     newErrors.last_name = validateField("last_name", formData.last_name);
 //     newErrors.email = validateField("email", formData.email);
 //     newErrors.mobile = validateField("mobile", formData.mobile);
-    
+
 //     // Filter out empty errors
 //     return Object.fromEntries(
 //       Object.entries(newErrors).filter(([_, value]) => value !== undefined)
-//     ) as FormErrors;    
+//     ) as FormErrors;
 //   };
 
 //   // Handle input changes
@@ -1134,18 +1177,18 @@ export default NewUser;
 //   const handleSubmit = async (e: React.FormEvent) => {
 //     e.preventDefault();
 //     const validationErrors = validate();
-    
+
 //     if (Object.keys(validationErrors).length > 0) {
 //       setErrors(validationErrors);
 //       return;
 //     }
-    
+
 //     setLoading(true);
-    
+
 //     try {
 //       const endpoint = mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users";
 //       const method = mode === "edit" ? "put" : "post";
-      
+
 //       const response = await callAPI({
 //         endpoint,
 //         method,
@@ -1164,13 +1207,13 @@ export default NewUser;
 //           user_type: formData.user_type.toLowerCase()
 //         }
 //       });
-      
+
 //       setSnackbar({
 //         open: true,
 //         message: mode === "edit" ? "User updated successfully!" : "User created successfully!",
 //         severity: "success"
 //       });
-      
+
 //       // Navigate back after successful submission
 //       navigate(-1);
 //     } catch (err: any) {
@@ -1179,7 +1222,7 @@ export default NewUser;
 //       if (err.response && err.response.data) {
 //         errorMessage = err.response.data.detail || JSON.stringify(err.response.data.detail);
 //       }
-      
+
 //       setSnackbar({
 //         open: true,
 //         message: errorMessage,
@@ -1193,9 +1236,9 @@ export default NewUser;
 //   // Auto fetch rashi & nakshatra when birth details are complete
 //   useEffect(() => {
 //     if (mode === "edit" && !isFormInitialized.current) return;
-    
+
 //     const { dateOfBirth, timeOfBirth, placeOfBirth, preferredLocation } = formData;
-    
+
 //     if (dateOfBirth && timeOfBirth && placeOfBirth.trim() && preferredLocation.trim()) {
 //       const fetchRasiNakshatra = async () => {
 //         try {
@@ -1210,7 +1253,7 @@ export default NewUser;
 //               birth_location: placeOfBirth
 //             }
 //           });
-          
+
 //           if (response?.data?.nakshatra && response?.data?.rashi) {
 //             setFormData(prev => ({
 //               ...prev,
@@ -1224,7 +1267,7 @@ export default NewUser;
 //           setLoadingRasiNakshatram(false);
 //         }
 //       };
-      
+
 //       fetchRasiNakshatra();
 //     }
 //   }, [formData.dateOfBirth, formData.timeOfBirth, formData.placeOfBirth, formData.preferredLocation, mode]);
@@ -1239,17 +1282,17 @@ export default NewUser;
 //   return (
 //     <Box sx={{ backgroundColor: "#f0fdf4", minHeight: "100vh" }}>
 //       {/* Header */}
-//       <Box sx={{ 
-//           display: "flex", 
-//           alignItems: "center", 
+//       <Box sx={{
+//           display: "flex",
+//           alignItems: "center",
 //           mb: 3,
 //           background: "rgba(6, 64, 43, 0.03)",
 //           borderRadius: "8px",
 //           p: 1
 //         }}>
-//           <IconButton 
-//             onClick={() => navigate(-1)} 
-//             sx={{ 
+//           <IconButton
+//             onClick={() => navigate(-1)}
+//             sx={{
 //               mr: 1,
 //               color: "#06402B",
 //               "&:hover": {
@@ -1259,13 +1302,13 @@ export default NewUser;
 //           >
 //             <ArrowBackIcon />
 //           </IconButton>
-//           <Typography 
-//             variant="body1" 
-//             fontWeight={600} 
+//           <Typography
+//             variant="body1"
+//             fontWeight={600}
 //             color="#06402B"
-//             sx={{ 
-//               display: "flex", 
-//               alignItems: "center" 
+//             sx={{
+//               display: "flex",
+//               alignItems: "center"
 //             }}
 //           >
 //             Back to Users
@@ -1279,10 +1322,10 @@ export default NewUser;
 //             {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} User
 //           </Typography>
 //           <Typography variant="body1" sx={{ color: "text.secondary", mt: 1 }}>
-//             {mode === "new" 
-//               ? "Add a new user to the system" 
-//               : mode === "edit" 
-//                 ? "Update existing user information" 
+//             {mode === "new"
+//               ? "Add a new user to the system"
+//               : mode === "edit"
+//                 ? "Update existing user information"
 //                 : "View user details"}
 //           </Typography>
 //         </Box>
@@ -1314,7 +1357,7 @@ export default NewUser;
 //                     variant="outlined"
 //                     size="small"
 //                   />
-                  
+
 //                   <TextField
 //                     label="Last Name *"
 //                     value={formData.last_name}
@@ -1326,7 +1369,7 @@ export default NewUser;
 //                     variant="outlined"
 //                     size="small"
 //                   />
-                  
+
 //                   <TextField
 //                     label="Email *"
 //                     type="email"
@@ -1339,7 +1382,7 @@ export default NewUser;
 //                     variant="outlined"
 //                     size="small"
 //                   />
-                  
+
 //                   <TextField
 //                     label="Mobile Number *"
 //                     value={formData.mobile}
@@ -1358,7 +1401,7 @@ export default NewUser;
 //                 </Box>
 //               </CardContent>
 //             </Card>
-            
+
 //             {/* Middle Column - Birth Details */}
 //             <Card variant="outlined">
 //               <CardContent>
@@ -1387,7 +1430,7 @@ export default NewUser;
 //                       ),
 //                     }}
 //                   />
-                  
+
 //                   <TextField
 //                     label="Time of Birth"
 //                     type="time"
@@ -1416,7 +1459,7 @@ export default NewUser;
 //                       ),
 //                     }}
 //                   />
-                  
+
 //                   <TextField
 //                     label="Place of Birth"
 //                     value={formData.placeOfBirth}
@@ -1433,7 +1476,7 @@ export default NewUser;
 //                       ),
 //                     }}
 //                   />
-                  
+
 //                   <TextField
 //                     label="Preferred Location"
 //                     value={formData.preferredLocation}
@@ -1450,7 +1493,7 @@ export default NewUser;
 //                       ),
 //                     }}
 //                   />
-                  
+
 //                   {loadingRasiNakshatram && (
 //                     <Box sx={{ display: "flex", alignItems: "center", color: "#16a34a", fontSize: "0.875rem" }}>
 //                       <CircularProgress size={16} sx={{ color: "#16a34a", mr: 1 }} />
@@ -1460,7 +1503,7 @@ export default NewUser;
 //                 </Box>
 //               </CardContent>
 //             </Card>
-            
+
 //             {/* Right Column - Additional Details */}
 //             <Card variant="outlined">
 //               <CardContent>
@@ -1491,7 +1534,7 @@ export default NewUser;
 //                       ))}
 //                     </Select>
 //                   </FormControl>
-                  
+
 //                   <FormControl fullWidth size="small">
 //                     <InputLabel id="nakshatra-label">Nakshatra</InputLabel>
 //                     <Select
@@ -1512,7 +1555,7 @@ export default NewUser;
 //                       ))}
 //                     </Select>
 //                   </FormControl>
-                  
+
 //                   <FormControl fullWidth size="small">
 //                     <InputLabel id="user-type-label">User Type</InputLabel>
 //                     <Select
@@ -1530,7 +1573,7 @@ export default NewUser;
 //                       ))}
 //                     </Select>
 //                   </FormControl>
-                  
+
 //                   <FormControl fullWidth size="small">
 //                     <InputLabel id="status-label">Status</InputLabel>
 //                     <Select
@@ -1548,7 +1591,7 @@ export default NewUser;
 //                 </Box>
 //               </CardContent>
 //             </Card>
-            
+
 //             {/* Action buttons - Full width */}
 //             {!isViewMode && (
 //               <Box sx={{ gridColumn: { lg: "1 / -1" }, display: "flex", justifyContent: "flex-end", gap: 2 }}>
@@ -1579,7 +1622,7 @@ export default NewUser;
 //           </Box>
 //         )}
 //       </Box>
-      
+
 //       {/* Success/Error notification */}
 //       <Snackbar
 //         open={snackbar.open}

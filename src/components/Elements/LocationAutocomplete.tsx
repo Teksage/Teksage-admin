@@ -47,8 +47,7 @@ const PlaceAutocomplete = ({
   const handleBlur = () => {
     // Check if the current inputValue matches any option's label or mainText
     const isValidOption = options.some(
-      (option) =>
-        option.label === inputValue || option.mainText === inputValue
+      (option) => option.label === inputValue || option.mainText === inputValue
     );
 
     // If the inputValue doesn't match any suggestion, clear it
@@ -65,6 +64,14 @@ const PlaceAutocomplete = ({
       getOptionLabel={(option) =>
         typeof option === "string" ? option : option.label
       }
+      componentsProps={{
+        paper: {
+          sx: {
+            fontFamily: 'Urbanist',
+            fontSize: '0.9rem',
+          },
+        },
+      }}      
       filterOptions={(x) => x}
       inputValue={inputValue}
       onInputChange={(e, newInputValue) => {
@@ -97,8 +104,8 @@ const PlaceAutocomplete = ({
           InputLabelProps={{
             sx: {
               fontSize: "0.95rem",
-              fontWeight: 500,
-              color: "#455a64",
+              // fontWeight: 600,
+              // color: "#455a64",
             },
           }}
           InputProps={{
@@ -106,6 +113,11 @@ const PlaceAutocomplete = ({
             sx: { fontSize: "0.9rem", borderRadius: "6px" },
           }}
           sx={{
+            "& .MuiInputLabel-root": {
+              fontFamily: "Urbanist",
+              // fontWeight: 600,
+              fontSize: "0.9rem",
+            },
             "& .MuiOutlinedInput-root": {
               "& fieldset": { borderColor: "#cfd8dc" },
               "&:hover fieldset": { borderColor: "#3f51b5" },

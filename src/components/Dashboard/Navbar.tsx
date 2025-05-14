@@ -552,9 +552,6 @@ const NavItem = styled(ListItemButton, {
     "& .MuiListItemIcon-root": {
       color: theme.palette.success.main,
     },
-    "& .MuiListItemText-primary": {
-      fontWeight: 600,
-    },
   },
   "& .MuiListItemIcon-root": {
     minWidth: open ? 40 : 24,
