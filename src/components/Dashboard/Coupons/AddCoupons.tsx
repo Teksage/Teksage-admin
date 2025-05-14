@@ -1406,7 +1406,7 @@ const NewCoupon = ({ mode = "new" }) => {
 
         const transformedPlans = serviceResponse?.data?.map((plan: any) => ({
           id: plan?.plan_id,
-          name: `${plan.plan_name} (${plan.duration_value} ${plan.duration_unit})`,
+          name: `${plan.plan_name} (${plan.tenure_value} ${plan.tenure_count})`,
         }));
 
         setPlanData(transformedPlans);

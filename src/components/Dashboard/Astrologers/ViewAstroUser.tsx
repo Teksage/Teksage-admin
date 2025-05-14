@@ -61,7 +61,7 @@ interface UserData {
   astrologer_profile_info: string;
   local_consulting_fee: number;
   experience: number;
-  expertises: any;
+  expertise: any;
   languages: any;
   user: {
     first_name: string;
@@ -95,8 +95,8 @@ interface ConsultationData {
   category: string;
   languages: string[];
   booking_date: string;
-  start_time: string;
-  end_time: string;
+  start_datetime: string;
+  end_datetime: string;
   consultation_fee: string;
   rating: number;
   astrologer_name: string;
@@ -484,7 +484,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                           <>
                             <InfoItem
                               label="Expertise Areas"
-                              value={(userData?.expertises || []).join(", ")}
+                              value={(userData?.expertise || []).join(", ")}
                               icon={
                                 <Lightbulb sx={{ color: "#90EE90", mr: 1 }} />
                               }
@@ -645,7 +645,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 fontSize: "0.9rem",
                               }}
                             >
-                              {dateFormat(event?.start_time, "DD-MMM-YYYY")}
+                              {dateFormat(event?.start_datetime, "DD-MMM-YYYY")}
                             </Box>
                           </Typography>
 
@@ -669,11 +669,11 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="text.secondary">
                               <strong>Time:</strong>{" "}
-                              {event.start_time && event.end_time
-                                ? `${event.start_time.slice(
+                              {event.start_datetime && event.end_datetime
+                                ? `${event.start_datetime.slice(
                                     11,
                                     16
-                                  )} - ${event.end_time.slice(11, 16)}`
+                                  )} - ${event.end_datetime.slice(11, 16)}`
                                 : "N/A"}
                             </Typography>
                           </Box>

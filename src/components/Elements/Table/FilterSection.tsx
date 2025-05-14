@@ -408,11 +408,11 @@ const FilterSection = <T,>({
   const handleDateRangeChange = (start: Date | null, end: Date | null) => {
     const newFilters = { ...filters };
     if (start && end) {
-      newFilters.start_time = format(start, "yyyy-MM-dd");
-      newFilters.end_time = format(end, "yyyy-MM-dd");
+      newFilters.start_datetime = format(start, "yyyy-MM-dd");
+      newFilters.end_datetime = format(end, "yyyy-MM-dd");
     } else {
-      delete newFilters.start_time;
-      delete newFilters.end_time;
+      delete newFilters.start_datetime;
+      delete newFilters.end_datetime;
     }
     setFilters(newFilters);
     onFilterChange?.(newFilters);

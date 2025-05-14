@@ -11,12 +11,12 @@ interface PlanData {
   plan_name: string;
   local_plan_price: string;
   foreign_plan_price: string;
-  services: string;
+  plan_services: string;
   status: string;
-  service_type: string;
+  plan_type: string;
   tenure: string;
-  duration_value: string;
-  duration_unit: string;
+  tenure_value: string;
+  tenure_count: string;
 }
 
 const Subscription: React.FC = () => {
@@ -38,7 +38,7 @@ const Subscription: React.FC = () => {
       console.log(response, "Plans Response");
       const transformedPlans = response?.data?.map((plan: any) => ({
         ...plan,
-        tenure: `${plan.duration_value} ${plan.duration_unit}`,
+        tenure: `${plan.tenure_value} ${plan.tenure_count}`,
       }));
 
       setPlans(transformedPlans);
@@ -72,7 +72,7 @@ const Subscription: React.FC = () => {
       },
     },
     {
-      id: "service_type",
+      id: "plan_type",
       label: "Services Type",
       width: "250px",
     },

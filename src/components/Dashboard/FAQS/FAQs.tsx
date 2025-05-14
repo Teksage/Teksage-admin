@@ -30,7 +30,7 @@ const FAQs: React.FC = () => {
       console.log(response, "Plans Response");
       const transformedPlans = response?.data?.map((plan: any) => ({
         ...plan,
-        tenure: `${plan.duration_value} ${plan.duration_unit}`,
+        tenure: `${plan.tenure_value} ${plan.tenure_count}`,
       }));
 
       setData(transformedPlans);

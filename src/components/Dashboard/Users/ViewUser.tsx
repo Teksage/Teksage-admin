@@ -1464,8 +1464,8 @@ interface ConsultationData {
     category: string[];
     languages: string[];
     booking_date: string;
-    start_time: string;
-    end_time: string;
+    start_datetime: string;
+    end_datetime: string;
     consultation_fee: string;
     rating: number | string;
     feedback?: string;
@@ -1734,7 +1734,7 @@ const ConsultationDetails = React.memo<{
         <Card elevation={2} sx={{ borderRadius: 2, display: "flex", flexDirection: "column", height: "100%", transition: "transform 0.2s ease-in-out, opacity 0.3s ease-in-out", "&:hover": { transform: "scale(1.02)", boxShadow: "0 6px 12px rgba(0,0,0,0.1)" }, opacity: 0, animation: "fadeIn 0.5s forwards", animationDelay: `${0.2}s` }}>
           <CardContent sx={{ flexGrow: 1 }}>
             <Typography variant="subtitle1" fontWeight={600} color="#006400">
-              Consultation <Box component="span" sx={{ backgroundColor: "rgba(16, 177, 0, 0.7)", color: "white", px: 1, py: 0.2, borderRadius: "6px", fontWeight: 600, fontSize: "0.9rem" }}>{dateFormat(event?.start_time, "DD-MMM-YYYY")}</Box>
+              Consultation <Box component="span" sx={{ backgroundColor: "rgba(16, 177, 0, 0.7)", color: "white", px: 1, py: 0.2, borderRadius: "6px", fontWeight: 600, fontSize: "0.9rem" }}>{dateFormat(event?.start_datetime, "DD-MMM-YYYY")}</Box>
             </Typography>
             <Divider sx={{ my: 1 }} />
             <Box sx={{ mb: 1 }}>
@@ -1747,7 +1747,7 @@ const ConsultationDetails = React.memo<{
               <Typography variant="body2" color="text.secondary"><strong>Booking Date:</strong> {event.booking_date || "N/A"}</Typography>
             </Box>
             <Box sx={{ mb: 1 }}>
-              <Typography variant="body2" color="text.secondary"><strong>Time:</strong> {event.start_time && event.end_time ? `${event.start_time.slice(11, 16)} - ${event.end_time.slice(11, 16)}` : "N/A"}</Typography>
+              <Typography variant="body2" color="text.secondary"><strong>Time:</strong> {event.start_datetime && event.end_datetime ? `${event.start_datetime.slice(11, 16)} - ${event.end_datetime.slice(11, 16)}` : "N/A"}</Typography>
             </Box>
             <Box sx={{ mb: 1 }}>
               <Typography variant="body2" color="text.secondary"><strong>Fee:</strong> ₹{event.consultation_fee || 0}</Typography>

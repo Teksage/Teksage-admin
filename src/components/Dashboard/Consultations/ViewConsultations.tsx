@@ -36,28 +36,7 @@ import InsightsIcon from "@mui/icons-material/Insights";
 import PublicIcon from "@mui/icons-material/Public";
 import DoneIcon from "@mui/icons-material/Done";
 import BadgeIcon from "@mui/icons-material/Badge";
-
-const InfoItem = ({
-  label,
-  value,
-}: {
-  label: string;
-  value?: React.ReactNode;
-}) => (
-  <Box sx={{ py: 1.5 }}>
-    <Typography
-      variant="subtitle2"
-      color="text.secondary"
-      sx={{ fontSize: "0.85rem" }}
-    >
-      {label}
-    </Typography>
-    <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 500 }}>
-      {value ?? <Typography color="text.disabled">—</Typography>}
-    </Typography>
-    <Divider sx={{ mt: 1.5 }} />
-  </Box>
-);
+import { InfoItem } from "../../Elements/CommonFunctions";
 
 const ConsultationView: React.FC<{ mode: "view" }> = () => {
   const navigate = useNavigate();
@@ -66,10 +45,13 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
   const [loading, setLoading] = useState(true);
   const [timeInput, setTimeInput] = useState("");
   const [openModal, setOpenModal] = useState(false);
-  const [selectedHoroscope, setSelectedHoroscope] = useState<any>(null);
+  const [selectedHoroscope, setSelectedHoroscope] = useState<{
+    horoscope: any;
+    customerName: string;
+  } | null>(null);
 
-  const handleOpenModal = (horoscope: any) => {
-    setSelectedHoroscope(horoscope);
+  const handleOpenModal = (horoscope: any, customerName: string) => {
+    setSelectedHoroscope({ horoscope, customerName });
     setOpenModal(true);
   };
 
@@ -87,7 +69,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
         });
         console.log(res?.data);
         setTimeInput(
-          formatTimeRange(`${res?.data.start_time} - ${res?.data.end_time}`)
+          formatTimeRange(`${res?.data.start_datetime} - ${res?.data.end_datetime}`)
         );
         setConsultationData(res?.data || null);
       } catch (err:any) {
@@ -151,7 +133,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
               <Grid item xs={12} md={6}>
                 <InfoItem
                   label="Consultation Fee"
-                  value={`₹${consultationData.consutation_fee}`}
+                  value={`₹${consultationData.consultation_fee}`}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -195,7 +177,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
               <Grid item xs={12} md={6}>
                 <InfoItem
                   label="Consultation Duration"
-                  value={consultationData.consultation_duration}
+                  value={`${consultationData.consultation_duration} Minutes`}
                 />
               </Grid>
               {/* <Grid item xs={12}><InfoItem label="Question" value={consultationData.question} /></Grid> */}
@@ -218,7 +200,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                       variant="outlined"
                       startIcon={<DescriptionIcon />}
                       onClick={() =>
-                        handleOpenModal(consultationData.user_horoscope)
+                        handleOpenModal(consultationData.user_horoscope, consultationData?.customer_name)
                       }
                       sx={{
                         borderColor: "rgba(16, 177, 0, 1)", // Primary green color from the gradient
@@ -468,7 +450,8 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
-                              <strong>Name:</strong> Sathish
+                              <strong>Name:</strong>{" "}
+                              {selectedHoroscope.customerName}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -486,7 +469,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>DOB:</strong>{" "}
-                              {new Date(selectedHoroscope.date_of_birth)
+                              {new Date(selectedHoroscope.horoscope.date_of_birth)
                                 .toLocaleDateString("en-US", {
                                   day: "numeric",
                                   month: "short",
@@ -510,7 +493,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Time:</strong>{" "}
-                              {selectedHoroscope.time_of_birth}
+                              {selectedHoroscope.horoscope.time_of_birth}
                             </Typography>
                           </Box>
                         </Box>
@@ -552,7 +535,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Place:</strong>{" "}
-                              {selectedHoroscope.place_of_birth}
+                              {selectedHoroscope.horoscope.place_of_birth}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -569,7 +552,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
-                              <strong>Rasi:</strong> {selectedHoroscope.rashi}
+                              <strong>Rasi:</strong> {selectedHoroscope.horoscope.rashi}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -587,7 +570,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Nakshatram:</strong>{" "}
-                              {selectedHoroscope.nakshatra}
+                              {selectedHoroscope.horoscope.nakshatra}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -604,7 +587,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
-                              <strong>Lagna:</strong> {selectedHoroscope.lagna}
+                              <strong>Lagna:</strong> {selectedHoroscope.horoscope.lagna}
                             </Typography>
                           </Box>
                         </Box>
@@ -657,7 +640,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                           }}
                         >
                           <AstroChart
-                            chartHtml={selectedHoroscope.rasi_chart}
+                            chartHtml={selectedHoroscope.horoscope.rasi_chart}
                             chartType="Rasi"
                           />
                         </Box>
@@ -679,7 +662,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                           }}
                         >
                           <AstroChart
-                            chartHtml={selectedHoroscope.navamsa_chart}
+                            chartHtml={selectedHoroscope.horoscope.navamsa_chart}
                             chartType="Navamsa"
                           />
                         </Box>

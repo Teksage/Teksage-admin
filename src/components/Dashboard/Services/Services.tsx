@@ -11,7 +11,7 @@ interface ServiceData {
   name: string;
   push_notification_status: boolean;
   status: string;
-  usage: string;
+  service_user_count: string;
 }
 
 const Services: React.FC = () => {
@@ -77,7 +77,7 @@ const Services: React.FC = () => {
         />
       ),
     },
-    { id: "usage", label: "Usage", width: "200px" },
+    { id: "service_user_count", label: "Usage", width: "200px" },
   ];
 
   // const handleAdd = () => navigate("/dashboard/services/new");

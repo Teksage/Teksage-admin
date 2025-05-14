@@ -9,7 +9,7 @@ interface ConsultationData {
   id: number;
   astrologer_name: string;
   category: string[] | null; // Updated to string[] | null
-  start_time: string;
+  start_datetime: string;
   status: string;
   customer_name: string;
   consulting_fee_code: string;
@@ -89,7 +89,7 @@ const Consultations: React.FC = () => {
     }
     try {
       const uniqueValues = await fetchFilterValues("consultation", field as string, searchValue);
-      if (field === "start_time") {
+      if (field === "start_datetime") {
         return uniqueValues.map((value: string) =>
           new Date(value).toISOString().split("T")[0]
         ).filter((value: string) => value);
@@ -149,7 +149,7 @@ const Consultations: React.FC = () => {
         },
       },
       {
-        id: "start_time",
+        id: "start_datetime",
         label: "Consultation Date",
         filterable: false,
         filterType: "date",

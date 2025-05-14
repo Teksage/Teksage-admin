@@ -994,7 +994,7 @@ interface AstroFormData {
   foreign_consulting_fee: string;
   picture: File | string | null;
   languages: string[];
-  expertises: string[];
+  expertise: string[];
   user_id: number | null;
 }
 
@@ -1031,7 +1031,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     foreign_consulting_fee: "",
     picture: null,
     languages: [],
-    expertises: [],
+    expertise: [],
     user_id: null,
   });
 
@@ -1093,7 +1093,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             foreign_consulting_fee: data.foreign_consulting_fee?.toString() || "",
             picture: data.picture || null,
             languages: data.languages || [],
-            expertises: data.expertises.map((item: any) => item.toLowerCase()) || [],
+            expertise: data.expertise.map((item: any) => item.toLowerCase()) || [],
             user_id: data.user_id || null,
           });
         } catch (err) {
@@ -1174,7 +1174,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
           error = "At least one language is required";
         }
         break;
-      case "expertises":
+      case "expertise":
         if (!value.length) {
           error = "At least one expertise is required";
         }
@@ -1204,7 +1204,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             "foreign_consulting_fee",
             "status",
             "languages",
-            "expertises",
+            "expertise",
             "user_id",
           ];
 
@@ -1268,13 +1268,13 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             mobile_number: selectedAstrologer.mobile_number ?? "",
           }));
         }
-      } else if (field === "expertises") {
+      } else if (field === "expertise") {
         setFormData((prev) => ({
           ...prev,
           [field]: value as string[],
         }));
-        const error = validateField("expertises", value);
-        setErrors((prev) => ({ ...prev, expertises: error }));
+        const error = validateField("expertise", value);
+        setErrors((prev) => ({ ...prev, expertise: error }));
       } else {
         setFormData((prev) => ({
           ...prev,
@@ -1298,7 +1298,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     };
 
   const handleTagAdd =
-    (field: "languages" | "expertises") =>
+    (field: "languages" | "expertise") =>
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -1321,7 +1321,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     };
 
   const handleTagDelete =
-    (type: "languages" | "expertises", index: number) => () => {
+    (type: "languages" | "expertise", index: number) => () => {
       const updated = [...formData[type]];
       updated.splice(index, 1);
       setFormData((prev) => ({
@@ -1354,7 +1354,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       payload.append("foreign_consulting_fee", formData.foreign_consulting_fee);
 
       formData.languages.forEach((lang) => payload.append("languages[]", lang));
-      formData.expertises.forEach((exp) => payload.append("expertises[]", exp));
+      formData.expertise.forEach((exp) => payload.append("expertise[]", exp));
 
       if (formData.picture instanceof File) {
         payload.append("picture", formData.picture);
@@ -1710,7 +1710,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
 
             {/* Expertise as Dropdown */}
             <Grid item xs={12}>
-              <FormControl fullWidth size="small" error={!!errors.expertises}>
+              <FormControl fullWidth size="small" error={!!errors.expertise}>
                 <InputLabel
                   sx={{
                     fontSize: "0.95rem",
@@ -1723,8 +1723,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 </InputLabel>
                 <Select
                   multiple
-                  value={formData.expertises}
-                  onChange={handleChange("expertises")}
+                  value={formData.expertise}
+                  onChange={handleChange("expertise")}
                   label="Expertise Areas"
                   disabled={isViewMode}
                   renderValue={(selected) => selected.join(", ")}
@@ -1747,7 +1747,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     (option) => (
                       <MenuItem key={option} value={option.toLowerCase()}>
                         <Checkbox
-                          checked={formData.expertises.includes(
+                          checked={formData.expertise.includes(
                             option.toLowerCase()
                           )}
                         />
@@ -1761,9 +1761,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     )
                   )}
                 </Select>
-                {!!errors.expertises && (
+                {!!errors.expertise && (
                   <FormHelperText sx={{ fontSize: "0.75rem" }}>
-                    {errors.expertises}
+                    {errors.expertise}
                   </FormHelperText>
                 )}
               </FormControl>

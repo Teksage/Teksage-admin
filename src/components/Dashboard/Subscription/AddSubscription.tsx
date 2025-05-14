@@ -722,11 +722,11 @@ interface SubscriptionFormData {
   plan_name: string;
   local_plan_price: number | "";
   foreign_plan_price: number | ""; // Added foreign_plan_price
-  services: string[];
+  plan_services: string[];
   status: "Active" | "Inactive";
-  service_type: "free" | "premium";
-  duration_value: number | "";
-  duration_unit: "days" | "months" | "years";
+  plan_type: "free" | "premium";
+  tenure_value: number | "";
+  tenure_count: "days" | "months" | "years";
 }
 
 const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
@@ -738,11 +738,11 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     plan_name: "",
     local_plan_price: "",
     foreign_plan_price: "", // Added to state
-    services: [],
+    plan_services: [],
     status: "Active",
-    service_type: "free",
-    duration_value: "",
-    duration_unit: "months",
+    plan_type: "free",
+    tenure_value: "",
+    tenure_count: "months",
   });
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -828,7 +828,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       setFormData((prev) => ({
         ...prev,
         [field]:
-          field === "duration_value"
+          field === "tenure_value"
             ? value === ""
               ? ""
               : Number(value) // Convert to number for duration_value
@@ -927,8 +927,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       newErrors.foreign_plan_price =
         "Enter a positive number like 100, 1000.23 or 1,000.23 (up to 2 decimal places).";
     }
-    if (!formData.services.length) {
-      newErrors.services = "Services field is required.";
+    if (!formData.plan_services.length) {
+      newErrors.plan_services = "Services field is required.";
     }
     // if (
     //   formData.duration_value === "" ||
@@ -938,8 +938,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     //   newErrors.duration_value =
     //     "Duration value must be a valid number greater than 0.";
     // }
-    if (!formData.duration_unit) {
-      newErrors.duration_unit = "Duration unit is required.";
+    if (!formData.tenure_count) {
+      newErrors.tenure_count = "Duration unit is required.";
     }
 
     setErrors(newErrors);
@@ -1180,7 +1180,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
               <FormControl
                 fullWidth
                 size="small"
-                error={!!errors.services}
+                error={!!errors.plan_services}
                 disabled={isViewMode}
               >
                 <InputLabel
@@ -1194,8 +1194,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 </InputLabel>
                 <Select<string[]>
                   multiple
-                  value={formData.services}
-                  onChange={handleSelectChange("services")}
+                  value={formData.plan_services}
+                  onChange={handleSelectChange("plan_services")}
                   input={<OutlinedInput label="Services *" />}
                   renderValue={(selected) =>
                     services
@@ -1220,14 +1220,14 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   {services.map((service: any) => (
                     <MenuItem key={service.id} value={service.id}>
                       <Checkbox
-                        checked={formData.services.includes(service.id)}
+                        checked={formData.plan_services.includes(service.id)}
                       />
                       <ListItemText primary={service.name} />
                     </MenuItem>
                   ))}
                 </Select>
                 <FormHelperText sx={{ fontSize: "0.75rem" }}>
-                  {errors.services || ""}
+                  {errors.plan_services || ""}
                 </FormHelperText>
               </FormControl>
             </Grid>
@@ -1248,7 +1248,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                 fullWidth
                 disabled={isViewMode}
                 size="small"
-                error={!!errors.service_type}
+                error={!!errors.plan_type}
               >
                 <InputLabel
                   sx={{
@@ -1260,8 +1260,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   Service Type
                 </InputLabel>
                 <Select
-                  value={formData.service_type}
-                  onChange={handleSelectChange("service_type")}
+                  value={formData.plan_type}
+                  onChange={handleSelectChange("plan_type")}
                   label="Service Type"
                   sx={{
                     fontSize: "0.9rem",
@@ -1281,7 +1281,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   <MenuItem value="premium">Premium</MenuItem>
                 </Select>
                 <FormHelperText sx={{ fontSize: "0.75rem" }}>
-                  {errors.service_type || ""}
+                  {errors.plan_type || ""}
                 </FormHelperText>
               </FormControl>
             </Grid>
@@ -1294,11 +1294,11 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     label="Duration Value *"
                     fullWidth
                     size="small"
-                    value={formData.duration_value}
-                    onChange={handleTextChange("duration_value")}
+                    value={formData.tenure_value}
+                    onChange={handleTextChange("tenure_value")}
                     disabled={isViewMode}
-                    error={!!errors.duration_value}
-                    helperText={errors.duration_value || ""}
+                    error={!!errors.tenure_value}
+                    helperText={errors.tenure_value || ""}
                     InputLabelProps={{
                       sx: {
                         fontSize: "0.95rem",
@@ -1324,7 +1324,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fullWidth
                     disabled={isViewMode}
                     size="small"
-                    error={!!errors.duration_unit}
+                    error={!!errors.tenure_count}
                   >
                     <InputLabel
                       sx={{
@@ -1336,8 +1336,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       Duration Unit *
                     </InputLabel>
                     <Select
-                      value={formData.duration_unit}
-                      onChange={handleSelectChange("duration_unit")}
+                      value={formData.tenure_count}
+                      onChange={handleSelectChange("tenure_count")}
                       label="Duration Unit *"
                       sx={{
                         fontSize: "0.9rem",
@@ -1360,7 +1360,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       ))}
                     </Select>
                     <FormHelperText sx={{ fontSize: "0.75rem" }}>
-                      {errors.duration_unit || ""}
+                      {errors.tenure_count || ""}
                     </FormHelperText>
                   </FormControl>
                 </Grid>
