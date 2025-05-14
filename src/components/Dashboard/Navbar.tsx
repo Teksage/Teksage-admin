@@ -687,6 +687,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    fontFamily: 'Urbanist', fontWeight: 800
                   }}
                 />
               )}
@@ -712,6 +713,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
                   primaryTypographyProps={{
                     variant: "body1",
                     whiteSpace: "nowrap",
+                    fontFamily: 'Urbanist', fontWeight: 800
                   }}
                   sx={{ flexGrow: 1 }}
                 />
@@ -758,6 +760,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
+                      fontFamily: 'Urbanist', fontWeight: 600
                     }}
                   />
                 )}
@@ -787,6 +790,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
+                      fontFamily: 'Urbanist', fontWeight: 600
                     }}
                   />
                 )}

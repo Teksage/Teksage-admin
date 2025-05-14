@@ -27,6 +27,7 @@ import { CssBaseline } from "@mui/material";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./Routes";
 import store from "./redux/store";
+import './styles/fonts.css';
 
 const root = createRoot(document.getElementById("root")!);
 root.render(

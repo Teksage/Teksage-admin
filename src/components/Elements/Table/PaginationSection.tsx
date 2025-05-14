@@ -46,8 +46,9 @@ const PaginationSection: React.FC<PaginationSectionProps> = ({
         bottom: 0,
         zIndex: 2,
         "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-          fontFamily: "Roboto, sans-serif",
-          fontSize: "0.9rem",
+          // fontFamily: "Roboto, sans-serif",
+          fontSize: "1rem",
+          fontFamily: 'Urbanist', fontWeight: 800
         },
       }}
       ActionsComponent={(props) => {

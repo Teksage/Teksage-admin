@@ -10,6 +10,7 @@ interface PlanData {
   plan_id: number;
   plan_name: string;
   local_plan_price: string;
+  foreign_plan_price: string;
   services: string;
   status: string;
   service_type: string;
@@ -54,11 +55,20 @@ const Subscription: React.FC = () => {
     },
     {
       id: "local_plan_price",
-      label: "Price",
+      label: "Local Price",
       width: "150px",
       render: (value: number) => {
         if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
         return `₹ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
+      },
+    },
+    {
+      id: "foreign_plan_price",
+      label: "Foreign Price",
+      width: "150px",
+      render: (value: number) => {
+        if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+        return `$ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
       },
     },
     {

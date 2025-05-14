@@ -578,7 +578,7 @@ const DashboardLayout = () => {
                     bgcolor: alpha(theme.palette.success.main, 0.7), // Use success.main for green theme
                     color: theme.palette.common.white,
                     fontSize: "0.9rem",
-                    fontWeight: 600,
+                    fontFamily: 'Urbanist', fontWeight: 600
                   }}
                 >
                   {getInitials(user)}
@@ -621,20 +621,21 @@ const DashboardLayout = () => {
                       bgcolor: alpha(theme.palette.success.main, 0.7), // Use success.main for green theme
                       color: theme.palette.common.white,
                       fontSize: "1.5rem",
-                      fontWeight: 600,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      fontFamily: 'Urbanist', fontWeight: 600
                     }}
                   >
                     {getInitials(user)}
                   </Avatar>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={600}>
+                    <Typography variant="subtitle1" fontWeight={600} style={{fontFamily: 'Urbanist', fontWeight: 600}}>
                       {user || "User"}
                     </Typography>
                   </Box>
                   <Typography
                     variant="body2"
                     color="text.secondary"
+                    style={{fontFamily: 'Urbanist', fontWeight: 500}}
                     sx={{
                       backgroundColor: "rgba(16, 177, 0, 0.1)",
                       px: 1.5,
@@ -657,8 +658,8 @@ const DashboardLayout = () => {
                     },
                   }}
                 >
-                  <Logout sx={{ marginRight: 2, color: "rgba(0,0,0,0.6)" }} />
-                  <Typography variant="body2" fontWeight={500}>
+                  <Logout sx={{ marginRight: 2, color: "red" }} />
+                  <Typography variant="body2" style={{fontFamily: 'Urbanist', fontWeight: 600, color: 'red'}}>
                     Logout
                   </Typography>
                 </MenuItem>

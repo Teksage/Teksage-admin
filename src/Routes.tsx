@@ -157,35 +157,73 @@
 
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import React from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme";
 
 // Lazy-load components
 const App = React.lazy(() => import("./App"));
 const DashboardLayout = React.lazy(() => import("./layouts/dashboard"));
 const Login = React.lazy(() => import("./components/Auth/Login"));
 const Users = React.lazy(() => import("./components/Dashboard/Users/Users"));
-const NewUser = React.lazy(() => import("./components/Dashboard/Users/NewUser"));
-const UserView = React.lazy(() => import("./components/Dashboard/Users/ViewUser"));
-const Astrologers = React.lazy(() => import("./components/Dashboard/Astrologers/Astrologers"));
-const NewAstroUser = React.lazy(() => import("./components/Dashboard/Astrologers/NewAstroUser"));
-const AstroUserView = React.lazy(() => import("./components/Dashboard/Astrologers/ViewAstroUser"));
-const Services = React.lazy(() => import("./components/Dashboard/Services/Services"));
-const NewService = React.lazy(() => import("./components/Dashboard/Services/AddService"));
+const NewUser = React.lazy(
+  () => import("./components/Dashboard/Users/NewUser")
+);
+const UserView = React.lazy(
+  () => import("./components/Dashboard/Users/ViewUser")
+);
+const Astrologers = React.lazy(
+  () => import("./components/Dashboard/Astrologers/Astrologers")
+);
+const NewAstroUser = React.lazy(
+  () => import("./components/Dashboard/Astrologers/NewAstroUser")
+);
+const AstroUserView = React.lazy(
+  () => import("./components/Dashboard/Astrologers/ViewAstroUser")
+);
+const Services = React.lazy(
+  () => import("./components/Dashboard/Services/Services")
+);
+const NewService = React.lazy(
+  () => import("./components/Dashboard/Services/AddService")
+);
 const FAQs = React.lazy(() => import("./components/Dashboard/FAQS/FAQs"));
 const NewFAQ = React.lazy(() => import("./components/Dashboard/FAQS/AddFaqs"));
-const Coupons = React.lazy(() => import("./components/Dashboard/Coupons/Coupons"));
-const Subscription = React.lazy(() => import("./components/Dashboard/Subscription/Subscription"));
-const Consultations = React.lazy(() => import("./components/Dashboard/Consultations/Consultations"));
-const NewCoupon = React.lazy(() => import("./components/Dashboard/Coupons/AddCoupons"));
-const NewSubscription = React.lazy(() => import("./components/Dashboard/Subscription/AddSubscription"));
-const ConsultationView = React.lazy(() => import("./components/Dashboard/Consultations/ViewConsultations"));
-const Analytics = React.lazy(() => import("./components/Dashboard/Analytics/Analytics"));
-const SendNotification = React.lazy(() => import("./components/Dashboard/Notifications/SendNotification"));
-const NotificationsLog = React.lazy(() => import("./components/Dashboard/Notifications/NotificationsLog"));
+const Coupons = React.lazy(
+  () => import("./components/Dashboard/Coupons/Coupons")
+);
+const Subscription = React.lazy(
+  () => import("./components/Dashboard/Subscription/Subscription")
+);
+const Consultations = React.lazy(
+  () => import("./components/Dashboard/Consultations/Consultations")
+);
+const NewCoupon = React.lazy(
+  () => import("./components/Dashboard/Coupons/AddCoupons")
+);
+const NewSubscription = React.lazy(
+  () => import("./components/Dashboard/Subscription/AddSubscription")
+);
+const ConsultationView = React.lazy(
+  () => import("./components/Dashboard/Consultations/ViewConsultations")
+);
+const Analytics = React.lazy(
+  () => import("./components/Dashboard/Analytics/Analytics")
+);
+const SendNotification = React.lazy(
+  () => import("./components/Dashboard/Notifications/SendNotification")
+);
+const NotificationsLog = React.lazy(
+  () => import("./components/Dashboard/Notifications/NotificationsLog")
+);
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: (
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    ),
     children: [
       {
         index: true,
@@ -251,14 +289,20 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <Subscription /> },
               { path: "new", element: <NewSubscription mode="new" /> },
-              { path: "edit/:userId", element: <NewSubscription mode="edit" /> },
+              {
+                path: "edit/:userId",
+                element: <NewSubscription mode="edit" />,
+              },
             ],
           },
           {
             path: "consultations",
             children: [
               { index: true, element: <Consultations /> },
-              { path: "view/:consultationId", element: <ConsultationView mode="view" /> },
+              {
+                path: "view/:consultationId",
+                element: <ConsultationView mode="view" />,
+              },
             ],
           },
           {

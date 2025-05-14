@@ -11,6 +11,7 @@ interface CouponData {
   coupon_name: string;
   coupon_percentage: number;
   local_max_cap: number;
+  foreign_max_cap: number;
   start_date: string;
   end_date: string;
   plan_name: string;
@@ -48,11 +49,20 @@ const Coupons: React.FC = () => {
     },
     {
       id: "local_max_cap",
-      label: "Max Limit",
+      label: "Local Max Limit",
       width: "150px",
       render: (value: number) => {
         if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
         return `₹ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
+      },
+    },
+    {
+      id: "foreign_max_cap",
+      label: "Foreign Max Limit",
+      width: "150px",
+      render: (value: number) => {
+        if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+        return `$ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
       },
     },
     {

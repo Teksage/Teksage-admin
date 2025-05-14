@@ -157,7 +157,7 @@ const FilterItem = <T,>({
   const isLoading = filterLoading[columnId] || false;
 
   const { optionsListWidth, textMeasureRef } = useOptionsListWidth(
-    options,
+    options
     // theme
   );
 
@@ -202,7 +202,7 @@ const FilterItem = <T,>({
           getOptionLabel={(option) => option}
           value={filters[columnId] || ""}
           onChange={(event, newValue) => {
-            console.log(event)
+            console.log(event);
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue);
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
@@ -238,12 +238,21 @@ const FilterItem = <T,>({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    fontFamily: 'Urbanist',
+                    fontWeight: 500,
                   },
                 },
               }}
               sx={{
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Urbanist',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                },
                 "& .MuiInputBase-root": {
                   fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                  fontFamily: 'Urbanist',
+                  fontWeight: 600,
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor: filters[columnId]
@@ -257,10 +266,12 @@ const FilterItem = <T,>({
             <li
               {...props}
               style={{
-                fontWeight: 400,
+                // fontWeight: 400,
                 background: "transparent",
                 padding: "8px 12px",
                 whiteSpace: "nowrap",
+                fontFamily: 'Urbanist',
+                fontWeight: 500,
               }}
             >
               {option === "" ? "All" : capitalizeFirstLetter(option)}
@@ -296,7 +307,7 @@ const FilterSection = <T,>({
   setSelectedPreset,
   onFilterChange,
   onFetchFilterOptions,
-  title
+  title,
 }: FilterSectionProps<T>) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -316,11 +327,11 @@ const FilterSection = <T,>({
     const isPureNumber = /^\d+(\.\d+)?$/.test(value.trim());
     const processedValue = value && !isPureNumber ? value.toLowerCase() : value;
     // console.log(value, "value", processedValue);
-  
+
     const newFilters = { ...filters, [columnId as string]: processedValue };
     setFilters(newFilters);
     onFilterChange?.(newFilters);
-  };  
+  };
 
   const handleSearchChange = async (columnId: keyof T, searchValue: string) => {
     const columnIdStr = columnId as string;
@@ -389,7 +400,7 @@ const FilterSection = <T,>({
   };
 
   const handleCustomClick = (event: React.MouseEvent<HTMLElement>) => {
-    console.log(event)
+    console.log(event);
     setSelectedPreset("Custom");
     setAnchorEl(selectRef.current); // Reopen Popover
   };
@@ -441,7 +452,7 @@ const FilterSection = <T,>({
           sx={{ width: "100%", maxWidth: { xs: "100%", sm: 200 } }}
           ref={(el: HTMLElement | null) => (selectRef.current = el)}
         >
-          <InputLabel sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>
+          <InputLabel style={{ fontFamily: 'Urbanist', fontWeight: 600 }} sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>
             Date Range
           </InputLabel>
           <Select
@@ -449,6 +460,8 @@ const FilterSection = <T,>({
             onChange={(e) => handleDatePresetChange(e.target.value as string)}
             label="Date Range"
             sx={{
+              fontFamily: 'Urbanist',
+              fontWeight: 500,
               "& .MuiSelect-select": {
                 padding: "6px 10px",
                 fontSize: { xs: "0.8rem", sm: "0.9rem" },
@@ -465,6 +478,10 @@ const FilterSection = <T,>({
               <MenuItem
                 key={preset.value}
                 value={preset.value}
+                sx= {{
+                  fontFamily: 'Urbanist',
+                  fontWeight: 500,
+                }}
                 onClick={
                   preset.value === "Custom" ? handleCustomClick : undefined
                 }
@@ -499,6 +516,7 @@ const FilterSection = <T,>({
           >
             <Typography
               variant="subtitle2"
+              style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
               sx={{
                 mb: 2,
                 fontWeight: 600,
@@ -634,8 +652,8 @@ const FilterSection = <T,>({
   return (
     <FiltersContainer>
       {columns
-        .filter((col:any) => col.filterable)
-        .map((column:any) => (
+        .filter((col: any) => col.filterable)
+        .map((column: any) => (
           <FilterItem
             key={column.id as string}
             column={column}
@@ -648,7 +666,9 @@ const FilterSection = <T,>({
             handleSearchChange={handleSearchChange}
           />
         ))}
-      {title!=="User Management" && title!=="Astrologer Management" && renderDateFilter()}
+      {title !== "User Management" &&
+        title !== "Astrologer Management" &&
+        renderDateFilter()}
     </FiltersContainer>
   );
 };

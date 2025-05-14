@@ -62,9 +62,9 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   "& .MuiTableCell-head": {
     background: `linear-gradient(180deg, ${alpha("#2e7d32", 0.9)} 0%, ${alpha("#1b4d3e", 0.9)} 100%)`,
     color: theme.palette.common.white + " !important",
-    fontWeight: 700,
+    // fontWeight: 700,
     fontSize: "1rem",
-    fontFamily: "Poppins, sans-serif",
+    // fontFamily: "Poppins, sans-serif",
     whiteSpace: "nowrap",
     borderBottom: "none",
     padding: theme.spacing(2, 3),
@@ -107,7 +107,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   "& .MuiTableCell-root": {
     padding: theme.spacing(2, 3),
     borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-    fontFamily: "Roboto, sans-serif",
+    // fontFamily: "Roboto, sans-serif",
     fontSize: "0.95rem",
     color: theme.palette.text.primary,
     textAlign: "center", // Center-align all cells
@@ -121,9 +121,9 @@ const SerialNumberCell = styled(TableCell)(({ theme }) => ({
   maxWidth: "20px", // Prevent expansion
   padding: theme.spacing(2, 0.5), // Minimal padding for S.No data cells
   textAlign: "center",
-  fontWeight: 600,
+  // fontWeight: 600,
   color: theme.palette.text.secondary,
-  fontFamily: "Roboto, sans-serif",
+  // fontFamily: "Roboto, sans-serif",
   fontSize: "0.85rem", // Reduced font size for S.No data
   boxSizing: "border-box",
 }));
@@ -344,7 +344,7 @@ const TableContent = <T,>({
 
   return (
     <StyledPaper>
-      <StyledTableContainer sx={{ height: tableHeight }}>
+      <StyledTableContainer sx={{ height: tableHeight }} style={{fontFamily: 'Urbanist', fontWeight: 500}}>
         {loading ? (
           <Box sx={{ p: 3 }}>
             {[...Array(rowsPerPage)].map((_, index) => (
@@ -360,7 +360,7 @@ const TableContent = <T,>({
           <Table stickyHeader aria-label="data table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: "20px", minWidth: "20px", maxWidth: "20px", textAlign: "center" }}>No.</TableCell>
+                <TableCell sx={{ width: "20px", minWidth: "20px", maxWidth: "20px", textAlign: "center" }} style={{fontFamily: 'Urbanist', fontWeight: 800}}>No.</TableCell>
                 {columns.map((column) => (
                   <TableCell
                     key={column.id as string}
@@ -369,6 +369,7 @@ const TableContent = <T,>({
                       minWidth: "150px", // Use minWidth or default to 150px
                       textAlign: "center",
                     }}
+                    style={{fontFamily: 'Urbanist', fontWeight: 800}}
                   >
                     {column.sortable ? (
                       <TableSortLabel
@@ -383,7 +384,7 @@ const TableContent = <T,>({
                     )}
                   </TableCell>
                 ))}
-                {showActions && <TableCell sx={{ minWidth: "150px", textAlign: "center" }}>Actions</TableCell>}
+                {showActions && <TableCell sx={{ minWidth: "150px", textAlign: "center" }} style={{fontFamily: 'Urbanist', fontWeight: 800}}>Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -406,9 +407,9 @@ const TableContent = <T,>({
                             ...(isLongText && {
                               whiteSpace: "nowrap",
                               overflow: "hidden",
-                              textOverflow: "ellipsis",
                             }),
                           }}
+                          style={{fontFamily: 'Urbanist', fontWeight: 500}}
                         >
                           {isLongText ? (
                             <Tooltip title={value}>
@@ -421,7 +422,7 @@ const TableContent = <T,>({
                       );
                     })}
                     {showActions && (
-                      <TableCell sx={{ minWidth: "150px" }}>
+                      <TableCell sx={{ minWidth: "150px" }} style={{fontFamily: 'Urbanist', fontWeight: 800}}>
                         <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                           {onView && (
                             <Tooltip title="View">

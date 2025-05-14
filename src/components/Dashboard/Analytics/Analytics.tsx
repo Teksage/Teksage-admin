@@ -2080,12 +2080,13 @@ const Analytics: React.FC = () => {
           <Typography
             variant="caption"
             sx={{ fontWeight: 600, color: "#1B5E20" }}
+            style={{fontFamily: 'Urbanist', fontWeight: 600}}
           >
             {label}
           </Typography>
           {payload.map((entry, index) => (
             <Box key={index} sx={{ color: entry.color }}>
-              <Typography variant="caption">
+              <Typography variant="caption" style={{fontFamily: 'Urbanist', fontWeight: 500}}>
                 {entry.name}: {entry.value}
               </Typography>
             </Box>
@@ -2204,6 +2205,7 @@ const Analytics: React.FC = () => {
               borderRadius: "2px",
             },
           }}
+          style= {{fontFamily: 'Urbanist', fontWeight: 800}}
         >
           Analytics Dashboard
         </Typography>
@@ -2214,6 +2216,7 @@ const Analytics: React.FC = () => {
             sx={{
               minWidth: 140,
               background: "#FFFFFF",
+              fontFamily: 'Urbanist', fontWeight: 600,
               borderRadius: "8px",
               "& .MuiSelect-select": { py: 1.5 },
               "&:hover": { background: "#E8F5E9" },
@@ -2221,8 +2224,8 @@ const Analytics: React.FC = () => {
             }}
             disabled={loading}
           >
-            <MenuItem value="previous12">Previous 12 Months</MenuItem>
-            <MenuItem value="year">Year-wise</MenuItem>
+            <MenuItem value="previous12" style={{fontFamily: 'Urbanist', fontWeight: 500}}>Previous 12 Months</MenuItem>
+            <MenuItem value="year" style={{fontFamily: 'Urbanist', fontWeight: 500}}>Year-wise</MenuItem>
           </Select>
           {filterType === "year" && (
             <Select<number>
@@ -2232,6 +2235,7 @@ const Analytics: React.FC = () => {
                 minWidth: 140,
                 background: "#FFFFFF",
                 borderRadius: "8px",
+                fontFamily: 'Urbanist', fontWeight: 600,
                 "& .MuiSelect-select": { py: 1.5 },
                 "&:hover": { background: "#E8F5E9" },
                 "& .MuiOutlinedInput-notchedOutline": {
@@ -2241,7 +2245,7 @@ const Analytics: React.FC = () => {
               disabled={availableYears.length === 0 || loading}
             >
               {availableYears.map((year) => (
-                <MenuItem key={year} value={year}>
+                <MenuItem key={year} value={year} style={{fontFamily: 'Urbanist', fontWeight: 500}}>
                   {year}
                 </MenuItem>
               ))}
@@ -2278,6 +2282,7 @@ const Analytics: React.FC = () => {
           >
             <Typography
               variant="subtitle1"
+              style={{fontFamily: 'Urbanist', fontWeight: 600}}
               sx={{
                 fontWeight: 600,
                 color: "#1B5E20",
@@ -2307,6 +2312,7 @@ const Analytics: React.FC = () => {
                   variant="body2"
                   color="text.secondary"
                   sx={{ textAlign: "center", mt: 2 }}
+                  style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
                 >
                   Loading...
                 </Typography>
@@ -2319,18 +2325,19 @@ const Analytics: React.FC = () => {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                     <XAxis
                       dataKey="name"
-                      tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12 }}
+                      tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12, fontFamily: 'Urbanist', fontWeight: 500 }}
                       axisLine={{ stroke: "#1B5E20", opacity: 0.3 }}
                     />
                     <YAxis
-                      tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12 }}
+                      tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12, fontFamily: 'Urbanist', fontWeight: 500 }}
                       axisLine={{ stroke: "#1B5E20", opacity: 0.3 }}
                       label={{
                         value: "User Count",
                         angle: -90,
                         position: "insideLeft",
-                        fill: "#1B5E20",
+                      fill: "#1B5E20",
                         fontSize: isMobile ? 10 : 12,
+                        fontFamily: 'Urbanist', fontWeight: 600
                       }}
                     />
                     <Tooltip content={<CustomTooltip />} />
@@ -2338,6 +2345,7 @@ const Analytics: React.FC = () => {
                       wrapperStyle={{
                         paddingTop: isMobile ? 10 : 20,
                         fontSize: isMobile ? 10 : 12,
+                        fontFamily: 'Urbanist', fontWeight: 600
                       }}
                     />
                     {selectedYear &&
@@ -2375,6 +2383,7 @@ const Analytics: React.FC = () => {
                   variant="body2"
                   color="text.secondary"
                   sx={{ textAlign: "center", mt: 2 }}
+                  style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
                 >
                   No plan data available.
                 </Typography>
@@ -2408,6 +2417,7 @@ const Analytics: React.FC = () => {
                   }}
                 >
                   <Typography
+                    style= {{fontFamily: 'Urbanist', fontWeight: 500}}
                     variant="h6"
                     sx={{
                       fontWeight: 700,
@@ -2417,6 +2427,7 @@ const Analytics: React.FC = () => {
                     {plan.users}
                   </Typography>
                   <Typography
+                    style= {{fontFamily: 'Urbanist', fontWeight: 500}}
                     variant="caption"
                     sx={{
                       opacity: 0.9,
@@ -2453,6 +2464,7 @@ const Analytics: React.FC = () => {
           >
             <Typography
               variant="subtitle1"
+              style={{fontFamily: 'Urbanist', fontWeight: 600}}
               sx={{
                 fontWeight: 600,
                 color: "#1B5E20",
@@ -2486,6 +2498,7 @@ const Analytics: React.FC = () => {
                   variant="body2"
                   color="text.secondary"
                   sx={{ textAlign: "center", mt: 2 }}
+                  style={{fontFamily: 'Urbanist', fontWeight: 600}}
                 >
                   Loading...
                 </Typography>
@@ -2495,6 +2508,7 @@ const Analytics: React.FC = () => {
                     variant="body2"
                     color="text.secondary"
                     sx={{ textAlign: "center", mt: 2 }}
+                    style={{fontFamily: 'Urbanist', fontWeight: 600}}
                   >
                     No usage recorded for any service.
                   </Typography>
@@ -2579,6 +2593,7 @@ const Analytics: React.FC = () => {
                             color: "#1B5E20",
                             fontSize: isMobile ? "1.1rem" : "1.25rem",
                           }}
+                          style={{fontFamily: 'Urbanist', fontWeight: 800}}
                         >
                           Total Users: {Math.round(totalUsers)}
                         </Typography>
@@ -2652,6 +2667,7 @@ const Analytics: React.FC = () => {
                                       textOverflow: "ellipsis",
                                       whiteSpace: "nowrap",
                                     }}
+                                    style={{fontFamily: 'Urbanist', fontWeight: 500}}
                                   >
                                     {entry.name}
                                   </Typography>

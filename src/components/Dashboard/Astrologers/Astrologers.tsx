@@ -8,6 +8,7 @@ import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 interface UserData {
   astrologer_id: number;
   local_consulting_fee: string;
+  foreign_consulting_fee: string;
   consulting_fee_code: string;
   customer_rating: string;
   experience: number;
@@ -155,12 +156,21 @@ const Astrologers: React.FC = () => {
       },
       {
         id: "local_consulting_fee",
-        label: "Fee",
+        label: "Local Fee",
         filterable: true,
         filterOptions: ["Less than 500", "500 - 1000", "Greater than 1000 "],
         render: (value: number) => {
           if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
           return `₹ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
+        },
+      },
+      {
+        id: "foreign_consulting_fee",
+        label: "Foreign Fee",
+        width: "150px",
+        render: (value: number) => {
+          if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
+          return `$ ${value.toLocaleString("en-US")}`; // Format with commas (e.g., 1234567 -> 1,234,567)
         },
       },
       {
