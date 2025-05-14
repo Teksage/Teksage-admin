@@ -1820,17 +1820,30 @@ const COLORS = [
 ];
 
 // Green variants for Donut Chart
+// const DONUT_COLORS = [
+//   "#1B5E20", // forest green
+//   "#2E7D32", // emerald green
+//   "#4CAF50", // lime green
+//   "#66BB6A", // mint green
+//   "#81C784", // seafoam green
+//   "#A5D6A7", // pale green
+//   "#388E3C", // deep green
+//   "#689F38", // olive green
+//   "#AED581", // spring green
+//   "#C8E6C9", // very light green
+// ];
+
 const DONUT_COLORS = [
-  "#1B5E20", // forest green
-  "#2E7D32", // emerald green
-  "#4CAF50", // lime green
-  "#66BB6A", // mint green
-  "#81C784", // seafoam green
-  "#A5D6A7", // pale green
-  "#388E3C", // deep green
-  "#689F38", // olive green
-  "#AED581", // spring green
-  "#C8E6C9", // very light green
+  "#2E7D32", // Emerald Green
+  "#66BB6A", // Mint Green
+  "#26A69A", // Teal
+  "#009688", // Blue-Green
+  "#8BC34A", // Light Olive
+  "#C0CA33", // Yellow-Green
+  "#00ACC1", // Cyan
+  "#7CB342", // Chartreuse
+  "#43A047", // Deep Leaf Green
+  "#B2DFDB", // Soft Aqua
 ];
 
 const Analytics: React.FC = () => {
@@ -1997,7 +2010,8 @@ const Analytics: React.FC = () => {
   const totalUsers = useMemo(
     () =>
       donutData.reduce(
-        (sum:any, entry:any) => sum + (entry.value === 0.01 ? 0 : entry.value),
+        (sum: any, entry: any) =>
+          sum + (entry.value === 0.01 ? 0 : entry.value),
         0
       ),
     [donutData]
@@ -2006,7 +2020,8 @@ const Analytics: React.FC = () => {
   // Memoize latestMonthData for Compact Stats Row
   const latestMonthData = useMemo(
     () =>
-      selectedYear && analyticsData.subscription[selectedYear]?.plans?.length > 0
+      selectedYear &&
+      analyticsData.subscription[selectedYear]?.plans?.length > 0
         ? analyticsData.subscription[selectedYear].plans.reduce(
             (acc: any, month: any) => {
               Object.keys(month).forEach((key) => {
@@ -2062,7 +2077,10 @@ const Analytics: React.FC = () => {
             boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           }}
         >
-          <Typography variant="caption" sx={{ fontWeight: 600, color: "#1B5E20" }}>
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 600, color: "#1B5E20" }}
+          >
             {label}
           </Typography>
           {payload.map((entry, index) => (
@@ -2216,7 +2234,9 @@ const Analytics: React.FC = () => {
                 borderRadius: "8px",
                 "& .MuiSelect-select": { py: 1.5 },
                 "&:hover": { background: "#E8F5E9" },
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "#4CAF50" },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#4CAF50",
+                },
               }}
               disabled={availableYears.length === 0 || loading}
             >
@@ -2283,7 +2303,11 @@ const Analytics: React.FC = () => {
             </Typography>
             <Box sx={{ height: isMobile ? 250 : 350 }}>
               {loading ? (
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: "center", mt: 2 }}
+                >
                   Loading...
                 </Typography>
               ) : planData.length > 0 ? (
@@ -2341,13 +2365,17 @@ const Analytics: React.FC = () => {
                               r={4}
                               fill={COLORS[index % COLORS.length]}
                             />
-                          }                          
+                          }
                         />
                       ))}
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: "center", mt: 2 }}
+                >
                   No plan data available.
                 </Typography>
               )}
@@ -2369,7 +2397,9 @@ const Analytics: React.FC = () => {
                   sx={{
                     p: 1.5,
                     borderRadius: "8px",
-                    background: `linear-gradient(135deg, ${COLORS[plan.colorIndex]}, ${COLORS[(plan.colorIndex + 1) % COLORS.length]})`,
+                    background: `linear-gradient(135deg, ${
+                      COLORS[plan.colorIndex]
+                    }, ${COLORS[(plan.colorIndex + 1) % COLORS.length]})`,
                     color: "#FFFFFF",
                     textAlign: "center",
                     boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
@@ -2377,10 +2407,22 @@ const Analytics: React.FC = () => {
                     "&:hover": { transform: "scale(1.05)" },
                   }}
                 >
-                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: isMobile ? "1rem" : "1.25rem" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: isMobile ? "1rem" : "1.25rem",
+                    }}
+                  >
                     {plan.users}
                   </Typography>
-                  <Typography variant="caption" sx={{ opacity: 0.9, fontSize: isMobile ? "0.65rem" : "0.75rem" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      opacity: 0.9,
+                      fontSize: isMobile ? "0.65rem" : "0.75rem",
+                    }}
+                  >
                     {plan.plan_name} Users
                   </Typography>
                 </Box>
@@ -2390,235 +2432,262 @@ const Analytics: React.FC = () => {
         </Grid>
 
         {/* Donut Chart: Service Usage */}
-{/* Donut Chart: Service Usage */}
-<motion.div
-  variants={donutChartVariants}
-  initial="hidden"
-  animate={donutChartControls}
->
-  <Paper
-    elevation={2}
-    sx={{
-      p: { xs: 2, md: 3 },
-      borderRadius: "12px",
-      background: "linear-gradient(145deg, #FFFFFF, #F1F8E9)",
-      border: "1px solid #E8F5E9",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-      position: "relative",
-      overflow: "hidden",
-      minHeight: isMobile ? "500px" : "auto", // Increased mobile height
-    }}
-  >
-    <Typography
-      variant="subtitle1"
-      sx={{
-        fontWeight: 600,
-        color: "#1B5E20",
-        mb: 2,
-        display: "flex",
-        alignItems: "center",
-        "&:before": {
-          content: '""',
-          width: "10px",
-          height: "10px",
-          borderRadius: "50%",
-          background: "#4CAF50",
-          mr: 1,
-        },
-      }}
-    >
-      Service Usage
-    </Typography>
-    <Box 
-      sx={{ 
-        height: isMobile ? "400px" : "350px", // Adjusted heights
-        position: "relative",
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        alignItems: "center",
-        gap: isMobile ? 3 : 2,
-      }}
-    >
-      {loading ? (
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
-          Loading...
-        </Typography>
-      ) : donutData.length > 0 ? (
-        allValuesZero ? (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
-            No usage recorded for any service.
-          </Typography>
-        ) : (
-          <>
-            {/* Donut Chart - Top on mobile, left on desktop */}
-            <Box sx={{ 
-              width: isMobile ? "100%" : "50%", 
-              height: isMobile ? "45%" : "100%", // Percentage-based height
-              minHeight: isMobile ? "200px" : "auto",
-            }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={donutData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={isMobile ? 60 : 70} // Slightly larger on mobile
-                    outerRadius={isMobile ? 90 : 110}
-                    labelLine={false}
-                    label={false}
-                    dataKey="value"
-                    isAnimationActive={false}
-                    startAngle={90}
-                    endAngle={-270} 
-                  >
-                    {donutData.map((entry:any, index:number) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={DONUT_COLORS[index % DONUT_COLORS.length]}
-                        opacity={entry.value === 0.01 ? 0.3 : 1}
-                        // startAngle={pieAngles[index]?.startAngle || 90}
-                        // endAngle={pieAngles[index]?.endAngle || 90}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value: number, name: string) => [
-                      value === 0.01 ? 0 : value,
-                      name,
-                    ]}
-                    contentStyle={{
-                      background: "rgba(255, 255, 255, 0.95)",
-                      border: "1px solid #1B5E20",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                      fontSize: isMobile ? "12px" : "14px",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </Box>
-
-            {/* User Counts - Bottom on mobile, right on desktop */}
-            <Box sx={{ 
-              width: "100%",
-              height: isMobile ? "55%" : "100%", // Takes remaining space
-              display: "flex",
-              flexDirection: "column",
-              gap: 1.5, // Increased gap
-              p: isMobile ? 0 : "0 16px",
-            }}>
-              {/* Total Users - More prominent on mobile */}
-              <Box sx={{
-                p: 1.5,
-                mb: 1,
-                borderRadius: "8px",
-                background: "rgba(233, 245, 233, 0.7)",
-                textAlign: "center",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-              }}>
+        {/* Donut Chart: Service Usage */}
+        <motion.div
+          variants={donutChartVariants}
+          initial="hidden"
+          animate={donutChartControls}
+        >
+          <Paper
+            elevation={2}
+            sx={{
+              p: { xs: 2, md: 3 },
+              borderRadius: "12px",
+              background: "linear-gradient(145deg, #FFFFFF, #F1F8E9)",
+              border: "1px solid #E8F5E9",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              position: "relative",
+              overflow: "hidden",
+              minHeight: isMobile ? "500px" : "auto", // Increased mobile height
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 600,
+                color: "#1B5E20",
+                mb: 2,
+                display: "flex",
+                alignItems: "center",
+                "&:before": {
+                  content: '""',
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  background: "#4CAF50",
+                  mr: 1,
+                },
+              }}
+            >
+              Service Usage
+            </Typography>
+            <Box
+              sx={{
+                height: isMobile ? "400px" : "350px", // Adjusted heights
+                position: "relative",
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: "center",
+                gap: isMobile ? 3 : 2,
+              }}
+            >
+              {loading ? (
                 <Typography
-                  variant={isMobile ? "h6" : "h6"}
-                  sx={{
-                    fontWeight: 700,
-                    color: "#1B5E20",
-                    fontSize: isMobile ? "1.1rem" : "1.25rem",
-                  }}
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: "center", mt: 2 }}
                 >
-                  Total Users: {Math.round(totalUsers)}
+                  Loading...
                 </Typography>
-              </Box>
-              
-              {/* Services Grid - Improved mobile layout */}
-              <Box sx={{
-                flex: 1,
-                overflowY: "auto",
-                pr: 1,
-                '&::-webkit-scrollbar': {
-                  width: '6px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: '#f1f1f1',
-                  borderRadius: '10px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: '#4CAF50',
-                  borderRadius: '10px',
-                },
-              }}>
-                <Grid container spacing={1.5}>
-                  {donutData.map((entry:any, index:number) => (
-                    <Grid item xs={6} key={index}>
-                      <Box 
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          p: 1.5,
-                          borderRadius: "6px",
-                          background: "rgba(233, 245, 233, 0.4)",
-                          height: "100%",
-                          minHeight: "70px",
-                          justifyContent: "space-between",
-                          "&:hover": {
-                            background: "rgba(233, 245, 233, 0.8)",
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          },
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <Box
-                            sx={{
-                              width: "12px",
-                              height: "12px",
-                              borderRadius: "2px",
-                              background: DONUT_COLORS[index % DONUT_COLORS.length],
-                              mr: 1.5,
-                              flexShrink: 0,
+              ) : donutData.length > 0 ? (
+                allValuesZero ? (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "center", mt: 2 }}
+                  >
+                    No usage recorded for any service.
+                  </Typography>
+                ) : (
+                  <>
+                    {/* Donut Chart - Top on mobile, left on desktop */}
+                    <Box
+                      sx={{
+                        width: isMobile ? "100%" : "50%",
+                        height: isMobile ? "45%" : "100%", // Percentage-based height
+                        minHeight: isMobile ? "200px" : "auto",
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={donutData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={isMobile ? 60 : 70} // Slightly larger on mobile
+                            outerRadius={isMobile ? 90 : 110}
+                            labelLine={false}
+                            label={false}
+                            dataKey="value"
+                            isAnimationActive={false}
+                            startAngle={90}
+                            endAngle={-270}
+                          >
+                            {donutData.map((entry: any, index: number) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={DONUT_COLORS[index % DONUT_COLORS.length]}
+                                opacity={entry.value === 0.01 ? 0.3 : 1}
+                                // startAngle={pieAngles[index]?.startAngle || 90}
+                                // endAngle={pieAngles[index]?.endAngle || 90}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(value: number, name: string) => [
+                              value === 0.01 ? 0 : value,
+                              name,
+                            ]}
+                            contentStyle={{
+                              background: "rgba(255, 255, 255, 0.95)",
+                              border: "1px solid #1B5E20",
+                              borderRadius: "8px",
+                              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                              fontSize: isMobile ? "12px" : "14px",
                             }}
                           />
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              fontSize: isMobile ? "0.85rem" : "0.875rem",
-                              color: "#1B5E20",
-                              fontWeight: 500,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {entry.name}
-                          </Typography>
-                        </Box>
-                        <Typography 
-                          variant="body1" 
-                          sx={{ 
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Box>
+
+                    {/* User Counts - Bottom on mobile, right on desktop */}
+                    <Box
+                      sx={{
+                        width: "100%",
+                        height: isMobile ? "55%" : "100%", // Takes remaining space
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1.5, // Increased gap
+                        p: isMobile ? 0 : "0 16px",
+                      }}
+                    >
+                      {/* Total Users - More prominent on mobile */}
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          mb: 1,
+                          borderRadius: "8px",
+                          background: "rgba(233, 245, 233, 0.7)",
+                          textAlign: "center",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                        }}
+                      >
+                        <Typography
+                          variant={isMobile ? "h6" : "h6"}
+                          sx={{
                             fontWeight: 700,
-                            fontSize: isMobile ? "1rem" : "1.1rem",
                             color: "#1B5E20",
-                            textAlign: "right",
-                            pt: 0.5,
+                            fontSize: isMobile ? "1.1rem" : "1.25rem",
                           }}
                         >
-                          {entry.value === 0.01 ? 0 : entry.value}
+                          Total Users: {Math.round(totalUsers)}
                         </Typography>
                       </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
+
+                      {/* Services Grid - Improved mobile layout */}
+                      <Box
+                        sx={{
+                          flex: 1,
+                          overflowY: "auto",
+                          pr: 1,
+                          "&::-webkit-scrollbar": {
+                            width: "6px",
+                          },
+                          "&::-webkit-scrollbar-track": {
+                            background: "#f1f1f1",
+                            borderRadius: "10px",
+                          },
+                          "&::-webkit-scrollbar-thumb": {
+                            background: "#4CAF50",
+                            borderRadius: "10px",
+                          },
+                        }}
+                      >
+                        <Grid container spacing={1.5}>
+                          {donutData.map((entry: any, index: number) => (
+                            <Grid item xs={6} key={index}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  p: 1.5,
+                                  borderRadius: "6px",
+                                  background: "rgba(233, 245, 233, 0.4)",
+                                  height: "100%",
+                                  minHeight: "70px",
+                                  justifyContent: "space-between",
+                                  "&:hover": {
+                                    background: "rgba(233, 245, 233, 0.8)",
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                                  },
+                                  transition: "all 0.2s ease",
+                                }}
+                              >
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: "12px",
+                                      height: "12px",
+                                      borderRadius: "2px",
+                                      background:
+                                        DONUT_COLORS[
+                                          index % DONUT_COLORS.length
+                                        ],
+                                      mr: 1.5,
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontSize: isMobile
+                                        ? "0.85rem"
+                                        : "0.875rem",
+                                      color: "#1B5E20",
+                                      fontWeight: 500,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {entry.name}
+                                  </Typography>
+                                </Box>
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    fontWeight: 700,
+                                    fontSize: isMobile ? "1rem" : "1.1rem",
+                                    color: "#1B5E20",
+                                    textAlign: "right",
+                                    pt: 0.5,
+                                  }}
+                                >
+                                  {entry.value === 0.01 ? 0 : entry.value}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </>
+                )
+              ) : (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: "center", mt: 2 }}
+                >
+                  No service usage data available.
+                </Typography>
+              )}
             </Box>
-          </>
-        )
-      ) : (
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
-          No service usage data available.
-        </Typography>
-      )}
-    </Box>
-  </Paper>
-</motion.div>
+          </Paper>
+        </motion.div>
       </Box>
     </motion.div>
   );

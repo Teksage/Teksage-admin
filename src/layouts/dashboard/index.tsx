@@ -449,6 +449,7 @@ const MainContent = styled(Box, {
     : sidebarOpen
     ? `calc(100% - 240px)`
     : `calc(100% - 72px)`,
+    marginTop: isMobile ? '56px' : 0, // Single source of spacing
 }));
 
 const LayoutContainer = styled(Box)(() => ({
@@ -457,6 +458,9 @@ const LayoutContainer = styled(Box)(() => ({
   backgroundColor: "transparent",
   position: "relative",
   overflow: "hidden",
+  '@media (max-width: 600px)': {
+    flexDirection: 'column' // Ensures proper stacking on mobile
+  }
 }));
 
 const DashboardLayout = () => {
@@ -520,10 +524,20 @@ const DashboardLayout = () => {
       .substring(0, 2);
   }, []);
 
-  const ScrollableContent = styled(Box)(() => ({
+  // const ScrollableContent = styled(Box)(() => ({
+  //   flexGrow: 1,
+  //   overflowY: "auto",
+  //   height: isMobile ? "calc(100vh - 64px - 56px)" : "calc(100vh - 64px)",
+  //   boxSizing: "border-box",
+  // }));
+
+  const ScrollableContent = styled(Box)(({ theme }) => ({
     flexGrow: 1,
     overflowY: "auto",
-    height: isMobile ? "calc(100vh - 64px - 56px)" : "calc(100vh - 64px)",
+    height: isMobile 
+      ? `calc(100vh - ${theme.mixins.toolbar.minHeight}px)` 
+      : `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+    paddingTop: isMobile ? 0 : 0, // Remove paddingTop here
     boxSizing: "border-box",
   }));
 
@@ -536,7 +550,12 @@ const DashboardLayout = () => {
       <MainContent sidebarOpen={sidebarOpen} isMobile={isMobile}>
         <GradientAppBar
           position={isMobile ? "fixed" : "static"}
-          sx={isMobile ? { width: "100%", zIndex: 1100 } : {}}
+          // sx={isMobile ? { width: "100%", zIndex: 1100 } : {}}
+          sx={isMobile ? { 
+            width: "100%", 
+            zIndex: 1100,
+            height: '56px' // Standard mobile toolbar height
+          } : {}}
         >
           <Toolbar
             sx={{
@@ -652,7 +671,8 @@ const DashboardLayout = () => {
             sx={{
               p: { xs: 2, sm: 3 },
               height: "100%",
-              pt: isMobile ? 3 : 2,
+              // pt: isMobile ? 3 : 2,
+              pt: isMobile ? 2 : 2, // Reduced padding-top on mobile
               display: "flex",
               flexDirection: "column",
             }}
