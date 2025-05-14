@@ -1920,7 +1920,7 @@ const NewCoupon = ({ mode = "new" }) => {
                       helperText={errors.plan_id || ""}
                       sx={textFieldStyling}
                     >
-                      {planData.map((plan) => (
+                      {planData.map((plan:any) => (
                         <MenuItem key={plan.id} value={plan.id}>
                           {plan.name}
                         </MenuItem>

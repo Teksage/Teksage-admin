@@ -407,7 +407,6 @@ import {
   InputLabel,
   Select,
   Typography,
-  Paper,
   IconButton,
   SelectChangeEvent,
   FormHelperText,
@@ -561,12 +560,12 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   };
 
   const isViewMode = mode === "view";
-  const pageTitle =
-    mode === "new"
-      ? "Create New Service"
-      : mode === "edit"
-      ? "Edit Service"
-      : "View Service";
+  // const pageTitle =
+  //   mode === "new"
+  //     ? "Create New Service"
+  //     : mode === "edit"
+  //     ? "Edit Service"
+  //     : "View Service";
 
   return (
     <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
