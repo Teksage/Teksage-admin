@@ -42,6 +42,7 @@ const Users: React.FC = () => {
         ([_, v]) => v.trim() !== ""
       );
       filterEntries.forEach(([field, value]) => {
+        console.log(field, value, "12345")
         // Ensure status is sent in lowercase to match backend expectations
         if (field === "status") {
           params[field] = value.toLowerCase();
