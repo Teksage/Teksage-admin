@@ -168,6 +168,7 @@ export const AstroChart: React.FC<AstroChartProps> = ({
           justifyContent: "center",
           gap: 1,
         }}
+        style={{fontFamily: "Urbanist"}}
       >
         {isRasi ? (
           <Brightness7Icon fontSize="small" />

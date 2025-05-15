@@ -228,7 +228,6 @@ const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
         sx={{
           position: "relative",
           textAlign: "center",
-          fontWeight: 700,
           fontFamily: "'Poppins', sans-serif",
           background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
           backgroundClip: "text",
@@ -237,6 +236,7 @@ const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
           letterSpacing: "0.5px",
           zIndex: 1,
         }}
+        style={{fontFamily: 'Urbanist', fontWeight: 600}}
       >
         Sign in using your {loginMethod === "email" ? "Email" : "Mobile Number"}
       </Typography>
@@ -277,7 +277,26 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             onChange={handleInputChange}
             error={!!formState.error}
             helperText={formState.error}
+            InputLabelProps={{
+              sx: {
+                fontSize: "0.95rem",
+                fontWeight: 500,
+                color: "#455a64",
+                fontFamily: "Urbanist",
+              },
+            }}
+            InputProps={{
+              sx: {
+                fontSize: "0.9rem",
+                borderRadius: "6px",
+                fontFamily: "Urbanist",
+              },
+            }}
             sx={{
+              "& .MuiInputLabel-root": {
+                fontFamily: "Urbanist",
+                fontSize: "0.9rem",
+              },
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
               },
@@ -296,11 +315,26 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             onChange={handleInputChange}
             error={!!formState.error}
             helperText={formState.error}
-            inputProps={{
-              inputMode: "numeric",
-              pattern: "[0-9+]*",
+            InputLabelProps={{
+              sx: {
+                fontSize: "0.95rem",
+                fontWeight: 500,
+                color: "#455a64",
+                fontFamily: "Urbanist",
+              },
+            }}
+            InputProps={{
+              sx: {
+                fontSize: "0.9rem",
+                borderRadius: "6px",
+                fontFamily: "Urbanist",
+              },
             }}
             sx={{
+              "& .MuiInputLabel-root": {
+                fontFamily: "Urbanist",
+                fontSize: "0.9rem",
+              },
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
               },
@@ -317,6 +351,8 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             "&.Mui-disabled": {
               color: "rgba(255, 255, 255, 0.8)",
             },
+            fontFamily: "Urbanist",
+            fontWeight: 800
           }}
           disabled={
             formState.loading ||

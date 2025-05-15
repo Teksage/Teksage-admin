@@ -628,7 +628,7 @@ const DashboardLayout = () => {
                     {getInitials(user)}
                   </Avatar>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={600} style={{fontFamily: 'Urbanist', fontWeight: 600}}>
+                    <Typography variant="subtitle1" style={{fontFamily: 'Urbanist', fontWeight: 600}}>
                       {user || "User"}
                     </Typography>
                   </Box>
@@ -659,7 +659,7 @@ const DashboardLayout = () => {
                   }}
                 >
                   <Logout sx={{ marginRight: 2, color: "red" }} />
-                  <Typography variant="body2" style={{fontFamily: 'Urbanist', fontWeight: 600, color: 'red'}}>
+                  <Typography variant="body2" style={{fontFamily: 'Urbanist', fontWeight: 800, color: 'red'}}>
                     Logout
                   </Typography>
                 </MenuItem>

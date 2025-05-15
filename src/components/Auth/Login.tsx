@@ -936,7 +936,7 @@ export const Login = () => {
               zIndex: 1,
             }}
           >
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.secondary" style={{fontFamily: 'Urbanist', fontWeight: 600}}>
               Loading...
             </Typography>
           </Box>

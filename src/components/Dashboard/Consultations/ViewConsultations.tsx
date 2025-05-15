@@ -35,7 +35,7 @@ import InsightsIcon from "@mui/icons-material/Insights";
 import PublicIcon from "@mui/icons-material/Public";
 import DoneIcon from "@mui/icons-material/Done";
 import BadgeIcon from "@mui/icons-material/Badge";
-import { InfoItem } from "../../Elements/CommonFunctions";
+import { InfoItem, capitalizeCommaSeparated } from "../../Elements/CommonFunctions";
 
 const ConsultationView: React.FC<{ mode: "view" }> = () => {
   const navigate = useNavigate();
@@ -68,11 +68,13 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
         });
         console.log(res?.data);
         setTimeInput(
-          formatTimeRange(`${res?.data.start_datetime} - ${res?.data.end_datetime}`)
+          formatTimeRange(
+            `${res?.data.start_datetime} - ${res?.data.end_datetime}`
+          )
         );
         setConsultationData(res?.data || null);
-      } catch (err:any) {
-        console.log(err)
+      } catch (err: any) {
+        console.log(err);
         setConsultationData(null);
       } finally {
         setLoading(false);
@@ -89,7 +91,14 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
           <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h5" fontWeight={600}>
+          <Typography
+            variant="h5"
+            style={{
+              fontFamily: "Urbanist",
+              fontWeight: 800,
+              color: "#2e7d32",
+            }}
+          >
             Consultation Details
           </Typography>
         </Box>
@@ -153,7 +162,14 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                           }}
                         />
                       ))}
-                      ({consultationData.rating})
+                      {consultationData.rating != null && (
+                        <Typography
+                          sx={{ fontSize: "0.9rem", color: "text.secondary" }}
+                          style={{fontFamily: "Urbanist"}}
+                        >
+                          ({consultationData.rating})
+                        </Typography>
+                      )}
                     </Box>
                   }
                 />
@@ -190,6 +206,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                   variant="subtitle2"
                   color="text.secondary"
                   sx={{ fontSize: "0.85rem" }}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   User Horoscope
                 </Typography>
@@ -199,13 +216,17 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                       variant="outlined"
                       startIcon={<DescriptionIcon />}
                       onClick={() =>
-                        handleOpenModal(consultationData.user_horoscope, consultationData?.customer_name)
+                        handleOpenModal(
+                          consultationData.user_horoscope,
+                          consultationData?.customer_name
+                        )
                       }
                       sx={{
+                        fontFamily: "Urbanist",
                         borderColor: "rgba(16, 177, 0, 1)", // Primary green color from the gradient
                         color: "rgba(16, 177, 0, 1)", // Text color matches the border
                         textTransform: "none",
-                        fontWeight: 500,
+                        fontWeight: 800,
                         "& .MuiButton-startIcon": {
                           color: "rgba(16, 177, 0, 1)", // Icon color matches the text
                         },
@@ -224,14 +245,21 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                     </Button>
                   </CardActions>
                 ) : (
-                  <Typography color="text.disabled" sx={{ mt: 1 }}>
+                  <Typography
+                    color="text.disabled"
+                    sx={{ mt: 1 }}
+                    style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                  >
                     Not available
                   </Typography>
                 )}
               </Grid>
             </Grid>
           ) : (
-            <Typography color="text.disabled">
+            <Typography
+              color="text.disabled"
+              style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+            >
               No consultation data found.
             </Typography>
           )}
@@ -343,13 +371,13 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                     id="celestial-horoscope-modal"
                     variant="h5"
                     sx={{
-                      fontWeight: 700,
                       letterSpacing: "1px",
                       textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                       display: "flex",
                       alignItems: "center",
                       gap: 1.5,
                     }}
+                    style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                   >
                     <StarsIcon fontSize="large" />
                     Celestial Horoscope
@@ -418,11 +446,11 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                             sx={{
                               mb: 1.5,
                               color: "#1B4D3E",
-                              fontWeight: 700,
                               display: "flex",
                               alignItems: "center",
                               gap: 1,
                             }}
+                            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                           >
                             <PersonIcon fontSize="small" />
                             Cosmic Profile
@@ -444,6 +472,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <BadgeIcon
                                 fontSize="small"
@@ -462,13 +491,16 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <CalendarTodayIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>DOB:</strong>{" "}
-                              {new Date(selectedHoroscope.horoscope.date_of_birth)
+                              {new Date(
+                                selectedHoroscope.horoscope.date_of_birth
+                              )
                                 .toLocaleDateString("en-US", {
                                   day: "numeric",
                                   month: "short",
@@ -486,6 +518,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <AccessTimeIcon
                                 fontSize="small"
@@ -502,11 +535,11 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                             sx={{
                               mb: 1.5,
                               color: "#1B4D3E",
-                              fontWeight: 700,
                               display: "flex",
                               alignItems: "center",
                               gap: 1,
                             }}
+                            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                           >
                             <PublicIcon fontSize="small" />
                             Celestial Data
@@ -528,6 +561,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <LocationOnIcon
                                 fontSize="small"
@@ -546,12 +580,14 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <ScatterPlotIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
-                              <strong>Rasi:</strong> {selectedHoroscope.horoscope.rashi}
+                              <strong>Rasi:</strong>{" "}
+                              {selectedHoroscope.horoscope.rashi}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -563,6 +599,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <StarOutlineIcon
                                 fontSize="small"
@@ -581,12 +618,14 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <LanguageIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
-                              <strong>Lagna:</strong> {selectedHoroscope.horoscope.lagna}
+                              <strong>Lagna:</strong>{" "}
+                              {selectedHoroscope.horoscope.lagna}
                             </Typography>
                           </Box>
                         </Box>
@@ -605,7 +644,6 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                         variant="h6"
                         sx={{
                           mb: 2,
-                          fontWeight: 700,
                           color: "#1B4D3E",
                           display: "inline-flex",
                           alignItems: "center",
@@ -616,6 +654,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                           background: "rgba(16, 177, 0, 0.1)",
                           border: "1px solid rgba(16, 177, 0, 0.2)",
                         }}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                       >
                         <InsightsIcon fontSize="small" />
                         Celestial Charts
@@ -661,7 +700,9 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                           }}
                         >
                           <AstroChart
-                            chartHtml={selectedHoroscope.horoscope.navamsa_chart}
+                            chartHtml={
+                              selectedHoroscope.horoscope.navamsa_chart
+                            }
                             chartType="Navamsa"
                           />
                         </Box>
@@ -698,7 +739,8 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                       "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,240,0.9) 100%)",
                     color: "#1B4D3E",
                     textTransform: "none",
-                    fontWeight: 600,
+                    fontFamily: "Urbanist",
+                    fontWeight: 800,
                     borderRadius: 50,
                     px: 4,
                     py: 1,
@@ -738,14 +780,14 @@ const QuestionsAnswersList = ({ qaList = [] }) => {
     <Box>
       <Typography
         variant="h6"
-        fontWeight={600}
         sx={{ mb: 2, display: "flex", alignItems: "center" }}
+        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
       >
         <QuestionAnswerIcon sx={{ mr: 1 }} /> Questions & Answers
       </Typography>
 
       <Grid container spacing={2}>
-        {itemsToShow.map((item:any, index:number) => (
+        {itemsToShow.map((item: any, index: number) => (
           <Grid item xs={12} key={index}>
             <Paper
               elevation={2}
@@ -763,10 +805,15 @@ const QuestionsAnswersList = ({ qaList = [] }) => {
                     variant="subtitle2"
                     color="text.secondary"
                     sx={{ fontSize: "0.85rem" }}
+                    style={{ fontFamily: "Urbanist", fontWeight: 500 }}
                   >
                     Question {index + 1}
                   </Typography>
-                  <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 500 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ mt: 0.5, fontWeight: 500 }}
+                    style={{ fontFamily: "Urbanist" }}
+                  >
                     {item.question}
                   </Typography>
                 </Box>
@@ -779,10 +826,15 @@ const QuestionsAnswersList = ({ qaList = [] }) => {
                     variant="subtitle2"
                     color="text.secondary"
                     sx={{ fontSize: "0.85rem" }}
+                    style={{ fontFamily: "Urbanist", fontWeight: 500 }}
                   >
                     Answer
                   </Typography>
-                  <Typography variant="body1" sx={{ mt: 0.5 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ mt: 0.5 }}
+                    style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+                  >
                     {item.answer}
                   </Typography>
                 </Box>
@@ -793,7 +845,11 @@ const QuestionsAnswersList = ({ qaList = [] }) => {
 
         {qaList.length > visibleCount && (
           <Grid item xs={12}>
-            <Button onClick={toggleExpanded} size="small">
+            <Button
+              onClick={toggleExpanded}
+              size="small"
+              sx={{ fontFamily: "Urbanist", fontWeight: 800 }}
+            >
               {expanded ? "Show Less" : "Show More"}
             </Button>
           </Grid>

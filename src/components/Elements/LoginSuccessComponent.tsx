@@ -13,6 +13,7 @@ export const LoginSuccessComponent = () => (
           fontWeight: 600,
           mb: 2,
         }}
+        style={{fontFamily: 'Urbanist', fontWeight: 800}}
       >
         Login Successful
       </Typography>

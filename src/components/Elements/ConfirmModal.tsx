@@ -43,22 +43,22 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       }}
     >
       <DialogTitle>
-        <Typography variant="h6" fontWeight="bold">
+        <Typography variant="h6" fontWeight="bold" style={{fontFamily: "Urbanist", fontWeight: 800, color: "#2e7d32"}}>
           {title}
         </Typography>
       </DialogTitle>
 
       <DialogContent>
-        <Typography variant="body1" color="text.secondary" mb={2}>
+        <Typography variant="body1" color="text.secondary" mb={2} style={{fontFamily: "Urbanist", fontWeight: 500}}>
           {message}
         </Typography>
       </DialogContent>
 
       <DialogActions sx={{ justifyContent: "center", gap: 2 }}>
-        <Button variant="outlined" onClick={onClose}>
+        <Button variant="outlined" onClick={onClose} style={{fontFamily: "Urbanist", fontWeight: 800}}>
           {cancelText}
         </Button>
-        <Button variant="contained" color="error" onClick={onConfirm}>
+        <Button variant="contained" color="error" onClick={onConfirm} style={{fontFamily: "Urbanist", fontWeight: 800}}>
           {confirmText}
         </Button>
       </DialogActions>

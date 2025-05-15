@@ -156,7 +156,7 @@ export const SignInTypeTabsComponent = React.memo<SignInTypeTabsProps>(
           fontWeight: loginMethod === "email" ? 600 : 400,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} style={{fontFamily: 'Urbanist', fontWeight: 800}}>
           <svg
             width="20"
             height="20"
@@ -189,7 +189,7 @@ export const SignInTypeTabsComponent = React.memo<SignInTypeTabsProps>(
           fontWeight: loginMethod === "mobile" ? 600 : 400,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} style={{fontFamily: 'Urbanist', fontWeight: 800}}>
           <svg
             width="20"
             height="20"

@@ -109,6 +109,7 @@
 
 import React, { useCallback } from "react";
 import { Box, Typography, TextField, Link, CircularProgress } from "@mui/material";
+import { style } from "@mui/system";
 
 interface OtpFormProps {
   formState: {
@@ -147,7 +148,7 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
 
     return (
       <Box component="form" noValidate>
-        <Typography variant="h6" gutterBottom sx={{ textAlign: "center", mb: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ textAlign: "center", mb: 3 }} style={{fontFamily: "Urbanist", fontWeight: 600}}>
           Enter 6-digit OTP sent to{" "}
           {formState.loginMethod === "email" ? formState.email : formState.mobile_number}
         </Typography>
@@ -165,6 +166,7 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
                 inputMode: "numeric",
                 pattern: "[0-9]*",
                 style: { textAlign: "center" },
+                fontFamily: "Urbanist"
               }}
               sx={{
                 width: 50,
@@ -183,13 +185,13 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
           ))}
         </Box>
         {formState.error && (
-          <Typography color="error" align="center" sx={{ mb: 2 }}>
+          <Typography color="error" align="center" sx={{ mb: 2 }} style={{ fontFamily: "Urbanist", fontWeight: 500 }}>
             {formState.error}
           </Typography>
         )}
         <Box sx={{ textAlign: "center", mt: 2 }}>
           {formState.countdown > 0 ? (
-            <Typography variant="body2" color="textSecondary">
+            <Typography variant="body2" color="textSecondary" style={{ fontFamily: "Urbanist", fontWeight: 500 }}>
               Resend OTP in {formState.countdown}s
             </Typography>
           ) : (
@@ -202,6 +204,8 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
                 color: "text.secondary",
                 textDecoration: "none",
                 "&:hover": { color: "#2e7d32" },
+                fontFamily: "Urbanist",
+                fontWeight: 500
               }}
             >
               Resend OTP
@@ -218,6 +222,8 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
               color: "text.secondary",
               textDecoration: "none",
               "&:hover": { color: "#2e7d32" },
+              fontFamily: "Urbanist",
+              fontWeight: 600
             }}
           >
             Use different {formState.loginMethod === "email" ? "email" : "mobile number"}
