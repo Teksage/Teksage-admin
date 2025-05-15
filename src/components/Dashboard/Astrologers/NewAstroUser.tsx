@@ -1348,7 +1348,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       if (formData.user_id !== null) {
         payload.append("user_id", formData.user_id.toString());
       }
-      payload.append("astrologer_profile_info", formData.astrologer_profile_info);
       payload.append("experience", formData.experience);
       payload.append("local_consulting_fee", formData.local_consulting_fee);
       payload.append("foreign_consulting_fee", formData.foreign_consulting_fee);
@@ -1678,8 +1677,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 value={formData.astrologer_profile_info}
                 onChange={handleChange("astrologer_profile_info")}
                 onBlur={handleBlur("astrologer_profile_info")}
-                error={!!errors.astrologer_profile_info}
-                helperText={errors.astrologer_profile_info || ""}
                 disabled={isViewMode}
                 multiline
                 minRows={3}
@@ -1729,7 +1726,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   disabled={isViewMode}
                   renderValue={(selected) => selected.join(", ")}
                   sx={{
-                    fontFamily: "Urbanist",
+                    fontFamily: 'Urbanist',
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1745,7 +1742,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 >
                   {["Career", "Health", "Wealth", "Relationship"].map(
                     (option) => (
-                      <MenuItem key={option} value={option.toLowerCase()}>
+                      <MenuItem key={option} value={option.toLowerCase()} style={{fontFamily: "Urbanist"}}>
                         <Checkbox
                           checked={formData.expertise.includes(
                             option.toLowerCase()
@@ -1754,7 +1751,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                         <ListItemText
                           primary={option}
                           sx={{
-                            "& .MuiTypography-root": { fontSize: "0.9rem" },
+                            "& .MuiTypography-root": { fontSize: "0.9rem", fontFamily: "Urbanist" },
                           }}
                         />
                       </MenuItem>
@@ -1785,11 +1782,12 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   sx: {
                     fontSize: "0.95rem",
                     fontWeight: 500,
-                    color: "#455a64",
+                    // color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {

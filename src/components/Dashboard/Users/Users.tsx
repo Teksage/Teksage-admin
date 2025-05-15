@@ -24,7 +24,7 @@ const Users: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(filters, "filters")
+  // console.log(filters, "filters")
 
   const fetchUsers = async (
     currentPage: number,

@@ -483,10 +483,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist", },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -518,10 +519,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -554,10 +556,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -592,10 +595,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -642,10 +646,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
+                        fontFamily: "Urbanist"
                       },
                     },
                     InputProps: {
-                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                      sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                     },
                     sx: {
                       "& .MuiInputLabel-root": {
@@ -680,10 +685,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
+                        fontFamily: "Urbanist"
                       },
                     },
                     InputProps: {
-                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                      sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                     },
                     sx: {
                       "& .MuiInputLabel-root": {
@@ -749,6 +755,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   color="primary"
                   display="flex"
                   alignItems="center"
+                  style={{fontFamily: "Urbanist", fontWeight: 600}}
                 >
                   <CircularProgress size={14} sx={{ mr: 1 }} />
                   Fetching rashi & nakshatra based on your input...

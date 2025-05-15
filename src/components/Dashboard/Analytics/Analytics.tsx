@@ -2227,7 +2227,7 @@ const Analytics: React.FC = () => {
             <MenuItem value="previous12" style={{fontFamily: 'Urbanist', fontWeight: 500}}>Previous 12 Months</MenuItem>
             <MenuItem value="year" style={{fontFamily: 'Urbanist', fontWeight: 500}}>Year-wise</MenuItem>
           </Select>
-          {filterType === "year" && (
+          {filterType === "year" && selectedYear!==null && (
             <Select<number>
               value={selectedYear ?? availableYears[0] ?? ""}
               onChange={handleYearChange}
@@ -2694,9 +2694,10 @@ const Analytics: React.FC = () => {
                 )
               ) : (
                 <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: "center", mt: 2 }}
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", mt: 2 }}
+                style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
                 >
                   No service usage data available.
                 </Typography>

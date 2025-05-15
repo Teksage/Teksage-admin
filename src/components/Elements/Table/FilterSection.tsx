@@ -274,7 +274,7 @@ const FilterItem = <T,>({
                 fontWeight: 500,
               }}
             >
-              {option === "" ? "All" : capitalizeFirstLetter(option)}
+              {option === "" ? "All" : (column?.id==="email" ? option : capitalizeFirstLetter(option))}
             </li>
           )}
           disableClearable={false}

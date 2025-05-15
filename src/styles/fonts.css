@@ -1,3 +1,6 @@
+/* Likely in fonts.css */
+/* @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;800&display=swap'); */
+
 /* src/styles/fonts.css */
 @font-face {
   font-family: "Urbanist";
@@ -5,25 +8,27 @@
   font-weight: 400;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Urbanist";
   src: url("../assets/fonts/Urbanist/Urbanist-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Urbanist";
   src: url("../assets/fonts/Urbanist/Urbanist-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
 }
-
 @font-face {
   font-family: "Urbanist";
-  src: url("../assets/fonts/Urbanist/Urbanist-ExtraBold.ttf") format("truetype");
+  src: url("../assets//fonts/Urbanist/Urbanist-ExtraBold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
 }
-/* styles/fonts.css */
+
+/* Remove global font-family rules */
+/* body, *, html {
+  font-family: 'Urbanist', sans-serif;
+} */
+ 

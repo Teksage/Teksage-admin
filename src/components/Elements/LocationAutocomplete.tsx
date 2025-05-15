@@ -104,13 +104,14 @@ const PlaceAutocomplete = ({
           InputLabelProps={{
             sx: {
               fontSize: "0.95rem",
+              fontFamily: "Urbanist"
               // fontWeight: 600,
               // color: "#455a64",
             },
           }}
           InputProps={{
             ...params.InputProps,
-            sx: { fontSize: "0.9rem", borderRadius: "6px" },
+            sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
           }}
           sx={{
             "& .MuiInputLabel-root": {
