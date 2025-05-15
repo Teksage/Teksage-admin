@@ -717,6 +717,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
+import { Subscriptions } from '@mui/icons-material';
 
 interface SubscriptionFormData {
   plan_name: string;
@@ -782,8 +783,12 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
           });
           const data = subscriptionResponse?.data;
           console.log(data, "data");
-          const localPrice = data?.local_plan_price != null ? Number(data.local_plan_price) : "";
-          const foreignPrice = data?.foreign_plan_price != null ? Number(data.foreign_plan_price) : ""; // Added for foreign_plan_price
+          const localPrice =
+            data?.local_plan_price != null ? Number(data.local_plan_price) : "";
+          const foreignPrice =
+            data?.foreign_plan_price != null
+              ? Number(data.foreign_plan_price)
+              : ""; // Added for foreign_plan_price
           setFormData({
             ...data,
             status:
@@ -883,7 +888,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   const handleNumberBlur =
     (field: "local_plan_price" | "foreign_plan_price") =>
     (event: React.FocusEvent<HTMLInputElement>) => {
-      console.log(event)
+      console.log(event);
       const value = formData[field];
       if (value === "" || value == null) return;
 
@@ -994,7 +999,12 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
-        <Typography variant="body1" fontWeight={600} color="#06402B">
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          color="#06402B"
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+        >
           Back
         </Typography>
       </Box>
@@ -1019,24 +1029,29 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             width: "100%",
             height: "4px",
             background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
-          }
+          },
         }}
       >
         <Typography
           variant="h5"
-          fontWeight={600}
-          mb={3}
           sx={{
+            mb: 3,
+            color: "#2e7d32",
+            display: "flex", // Add flex to align icon and text
+            alignItems: "center", // Center icon and text vertically
+            gap: 1, // Space between icon and text
             maxWidth: "50%",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            fontWeight: 600,
             fontFamily: '"Poppins", sans-serif',
             letterSpacing: 0.5,
             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
           }}
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         >
+          <Subscriptions sx={{ fontSize: 24 }} />{" "}
+          {/* Add the Subscriptions icon */}
           {mode === "new"
             ? "Create Subscription"
             : mode === "edit"
@@ -1049,9 +1064,9 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12}>
               <Typography
                 variant="subtitle1"
-                fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
               >
                 Plan Details
               </Typography>
@@ -1072,12 +1087,21 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1093,7 +1117,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} sm={6}>
               <TextField
                 type="text"
-                label="Local Plan Price *"
+                label="Local Plan Price (INR)*"
                 fullWidth
                 size="small"
                 value={
@@ -1113,16 +1137,21 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
                   },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1136,7 +1165,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} sm={6}>
               <TextField
                 type="text"
-                label="Foreign Plan Price *"
+                label="Foreign Plan Price (USD)*"
                 fullWidth
                 size="small"
                 value={
@@ -1156,16 +1185,21 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
                   },
                 }}
                 sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { borderColor: "#cfd8dc" },
                     "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1189,6 +1223,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontWeight: 500,
                     color: "#455a64",
                   }}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   Services *
                 </InputLabel>
@@ -1204,6 +1239,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       .join(", ")
                   }
                   sx={{
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1218,7 +1254,11 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   }}
                 >
                   {services.map((service: any) => (
-                    <MenuItem key={service.id} value={service.id}>
+                    <MenuItem
+                      key={service.id}
+                      value={service.id}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
                       <Checkbox
                         checked={formData.plan_services.includes(service.id)}
                       />
@@ -1235,9 +1275,9 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} mt={1}>
               <Typography
                 variant="subtitle1"
-                fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
               >
                 Service Configuration
               </Typography>
@@ -1256,6 +1296,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontWeight: 500,
                     color: "#455a64",
                   }}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   Service Type
                 </InputLabel>
@@ -1264,6 +1305,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   onChange={handleSelectChange("plan_type")}
                   label="Service Type"
                   sx={{
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1277,8 +1319,12 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     },
                   }}
                 >
-                  <MenuItem value="free">Free</MenuItem>
-                  <MenuItem value="premium">Premium</MenuItem>
+                  <MenuItem value="free" style={{ fontFamily: "Urbanist" }}>
+                    Free
+                  </MenuItem>
+                  <MenuItem value="premium" style={{ fontFamily: "Urbanist" }}>
+                    Premium
+                  </MenuItem>
                 </Select>
                 <FormHelperText sx={{ fontSize: "0.75rem" }}>
                   {errors.plan_type || ""}
@@ -1304,12 +1350,17 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
+                        fontFamily: "Urbanist"
                       },
                     }}
                     InputProps={{
-                      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                      sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                     }}
                     sx={{
+                      "& .MuiInputLabel-root": {
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                      },
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": { borderColor: "#cfd8dc" },
                         "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1332,6 +1383,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                         fontWeight: 500,
                         color: "#455a64",
                       }}
+                      style={{ fontFamily: "Urbanist" }}
                     >
                       Duration Unit *
                     </InputLabel>
@@ -1340,6 +1392,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       onChange={handleSelectChange("tenure_count")}
                       label="Duration Unit *"
                       sx={{
+                        fontFamily: "Urbanist",
                         fontSize: "0.9rem",
                         borderRadius: "6px",
                         "& .MuiOutlinedInput-notchedOutline": {
@@ -1354,7 +1407,11 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       }}
                     >
                       {["days", "months", "years"].map((unit) => (
-                        <MenuItem key={unit} value={unit}>
+                        <MenuItem
+                          key={unit}
+                          value={unit}
+                          style={{ fontFamily: "Urbanist" }}
+                        >
                           {unit.charAt(0).toUpperCase() + unit.slice(1)}
                         </MenuItem>
                       ))}
@@ -1370,9 +1427,9 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} mt={1}>
               <Typography
                 variant="subtitle1"
-                fontWeight={500}
                 color="#546e7a"
                 mb={1.5}
+                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
               >
                 Subscription Status
               </Typography>
@@ -1386,6 +1443,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontWeight: 500,
                     color: "#455a64",
                   }}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   Status
                 </InputLabel>
@@ -1394,6 +1452,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   onChange={handleSelectChange("status")}
                   label="Status"
                   sx={{
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1407,8 +1466,12 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     },
                   }}
                 >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  <MenuItem value="Active" style={{ fontFamily: "Urbanist" }}>
+                    Active
+                  </MenuItem>
+                  <MenuItem value="Inactive" style={{ fontFamily: "Urbanist" }}>
+                    Inactive
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -1425,7 +1488,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "8px 24px",
-                      fontWeight: 600,
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       fontSize: "0.95rem",
                       textTransform: "none",
                       boxShadow: "0 3px 8px rgba(0,0,0,0.15)",

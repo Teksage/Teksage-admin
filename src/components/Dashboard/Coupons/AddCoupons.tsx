@@ -1580,12 +1580,21 @@ const NewCoupon = ({ mode = "new" }) => {
         fontSize: "0.95rem",
         fontWeight: 500,
         color: "#455a64",
+        fontFamily: "Urbanist",
       },
     },
     InputProps: {
-      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+      sx: {
+        fontSize: "0.9rem",
+        borderRadius: "6px",
+        fontFamily: "Urbanist",
+      },
     },
     sx: {
+      "& .MuiInputLabel-root": {
+        fontFamily: "Urbanist",
+        fontSize: "0.9rem",
+      },
       "& .MuiOutlinedInput-root": {
         "& fieldset": { borderColor: "#cfd8dc" },
         "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1605,12 +1614,21 @@ const NewCoupon = ({ mode = "new" }) => {
         fontSize: "0.95rem",
         fontWeight: 500,
         color: "#455a64",
+        fontFamily: "Urbanist",
       },
     },
     InputProps: {
-      sx: { fontSize: "0.9rem", borderRadius: "6px" },
+      sx: {
+        fontSize: "0.9rem",
+        borderRadius: "6px",
+        fontFamily: "Urbanist",
+      },
     },
     sx: {
+      "& .MuiInputLabel-root": {
+        fontFamily: "Urbanist",
+        fontSize: "0.9rem",
+      },
       "& .MuiOutlinedInput-root": {
         "& fieldset": { borderColor: "#cfd8dc" },
         "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1621,6 +1639,8 @@ const NewCoupon = ({ mode = "new" }) => {
   };
 
   const textFieldStyling = {
+    fontFamily: "Urbanist",
+    fontSize: "0.9rem",
     "& .MuiOutlinedInput-root": {
       "& fieldset": { borderColor: "#cfd8dc" },
       "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -1628,9 +1648,8 @@ const NewCoupon = ({ mode = "new" }) => {
       borderRadius: "8px",
     },
     "& .MuiInputLabel-root": {
-      fontSize: "0.95rem",
-      fontWeight: 500,
-      color: "#455a64",
+      fontFamily: "Urbanist",
+      fontSize: "0.9rem",
     },
     "& .MuiInputBase-input": {
       fontSize: "0.95rem",
@@ -1675,12 +1694,12 @@ const NewCoupon = ({ mode = "new" }) => {
           </IconButton>
           <Typography
             variant="body1"
-            fontWeight={600}
             color="#06402B"
             sx={{
               display: "flex",
               alignItems: "center",
             }}
+            style={{fontFamily: "Urbanist", fontWeight: 800}}
           >
             Back to Coupons
           </Typography>
@@ -1715,12 +1734,12 @@ const NewCoupon = ({ mode = "new" }) => {
                   variant="h5"
                   sx={{
                     mb: 3,
-                    fontWeight: 600,
                     color: "#2e7d32",
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
                   }}
+                  style={{fontFamily: "Urbanist", fontWeight: 800}}
                 >
                   <TagIcon size={24} />
                   {mode === "new"
@@ -1735,13 +1754,13 @@ const NewCoupon = ({ mode = "new" }) => {
                     <Typography
                       variant="subtitle1"
                       sx={{
-                        fontWeight: 600,
                         color: "#455a64",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
                         mb: 2,
                       }}
+                      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                     >
                       <InfoIcon size={18} />
                       Coupon Details
@@ -1760,7 +1779,20 @@ const NewCoupon = ({ mode = "new" }) => {
                       error={!!errors.coupon_name}
                       helperText={errors.coupon_name || ""}
                       sx={textFieldStyling}
+                      InputLabelProps={{
+                        sx: {
+                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          color: "#455a64",
+                          fontFamily: "Urbanist",
+                        },
+                      }}
                       InputProps={{
+                        sx: {
+                          fontSize: "0.9rem",
+                          borderRadius: "6px",
+                          fontFamily: "Urbanist",
+                        },
                         startAdornment: (
                           <InputAdornment position="start">
                             <TagIcon size={20} />
@@ -1783,7 +1815,20 @@ const NewCoupon = ({ mode = "new" }) => {
                       error={!!errors.coupon_percentage}
                       helperText={errors.coupon_percentage || ""}
                       sx={textFieldStyling}
+                      InputLabelProps={{
+                        sx: {
+                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          color: "#455a64",
+                          fontFamily: "Urbanist",
+                        },
+                      }}
                       InputProps={{
+                        sx: {
+                          fontSize: "0.9rem",
+                          borderRadius: "6px",
+                          fontFamily: "Urbanist",
+                        },
                         startAdornment: (
                           <InputAdornment position="start">
                             <PercentIcon size={20} />
@@ -1796,7 +1841,7 @@ const NewCoupon = ({ mode = "new" }) => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       type="text"
-                      label="Local Maximum Cap *"
+                      label="Local Maximum Cap (INR)*"
                       fullWidth
                       size="medium"
                       value={inputValues.local_max_cap}
@@ -1806,7 +1851,20 @@ const NewCoupon = ({ mode = "new" }) => {
                       error={!!errors.local_max_cap}
                       helperText={errors.local_max_cap || ""}
                       sx={textFieldStyling}
+                      InputLabelProps={{
+                        sx: {
+                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          color: "#455a64",
+                          fontFamily: "Urbanist",
+                        },
+                      }}
                       InputProps={{
+                        sx: {
+                          fontSize: "0.9rem",
+                          borderRadius: "6px",
+                          fontFamily: "Urbanist",
+                        },
                         startAdornment: (
                           <InputAdornment position="start">
                             <CurrencyIcon size={20} />
@@ -1819,7 +1877,7 @@ const NewCoupon = ({ mode = "new" }) => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       type="text"
-                      label="Foreign Maximum Cap *"
+                      label="Foreign Maximum Cap (USD)*"
                       fullWidth
                       size="medium"
                       value={inputValues.foreign_max_cap}
@@ -1829,7 +1887,20 @@ const NewCoupon = ({ mode = "new" }) => {
                       error={!!errors.foreign_max_cap}
                       helperText={errors.foreign_max_cap || ""}
                       sx={textFieldStyling}
+                      InputLabelProps={{
+                        sx: {
+                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          color: "#455a64",
+                          fontFamily: "Urbanist",
+                        },
+                      }}
                       InputProps={{
+                        sx: {
+                          fontSize: "0.9rem",
+                          borderRadius: "6px",
+                          fontFamily: "Urbanist",
+                        },
                         startAdornment: (
                           <InputAdornment position="start">
                             <CurrencyIcon size={20} />
@@ -1843,13 +1914,13 @@ const NewCoupon = ({ mode = "new" }) => {
                     <Typography
                       variant="subtitle1"
                       sx={{
-                        fontWeight: 600,
                         color: "#455a64",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
                         mb: 2,
                       }}
+                      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                     >
                       <CalendarIcon size={18} />
                       Validity Period
@@ -1893,13 +1964,13 @@ const NewCoupon = ({ mode = "new" }) => {
                     <Typography
                       variant="subtitle1"
                       sx={{
-                        fontWeight: 600,
                         color: "#455a64",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
                         mb: 2,
                       }}
+                      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                     >
                       <PackageIcon size={18} />
                       Applicable Plan
@@ -1921,7 +1992,7 @@ const NewCoupon = ({ mode = "new" }) => {
                       sx={textFieldStyling}
                     >
                       {planData.map((plan:any) => (
-                        <MenuItem key={plan.id} value={plan.id}>
+                        <MenuItem key={plan.id} value={plan.id} style={{fontFamily: "Urbanist"}}>
                           {plan.name}
                         </MenuItem>
                       ))}
@@ -1945,13 +2016,14 @@ const NewCoupon = ({ mode = "new" }) => {
                   <CardContent>
                     <Typography
                       variant="h6"
-                      fontWeight={600}
+                      fontWeight={800}
                       color="#33691e"
                       mb={2}
+                      style={{fontFamily: "Urbanist"}}
                     >
                       Coupon Overview
                     </Typography>
-                    <Typography variant="body2" color="#444" mb={2}>
+                    <Typography variant="body2" color="#444" mb={2} style={{fontFamily: "Urbanist"}}>
                       Create promotional coupons to attract new customers and
                       reward existing ones. Coupons can be applied to specific
                       plans during checkout.
@@ -1961,19 +2033,19 @@ const NewCoupon = ({ mode = "new" }) => {
                         label="Discount"
                         size="small"
                         color="success"
-                        sx={{ fontWeight: 500 }}
+                        sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
                       />
                       <Chip
                         label="Promotion"
                         size="small"
                         color="success"
-                        sx={{ fontWeight: 500 }}
+                        sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
                       />
                       <Chip
                         label="Marketing"
                         size="small"
                         color="success"
-                        sx={{ fontWeight: 500 }}
+                        sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
                       />
                     </Stack>
                   </CardContent>
@@ -1991,25 +2063,26 @@ const NewCoupon = ({ mode = "new" }) => {
                   <CardContent>
                     <Typography
                       variant="h6"
-                      fontWeight={600}
+                      fontWeight={800}
                       color="#33691e"
                       mb={2}
+                      style={{fontFamily: "Urbanist"}}
                     >
                       Coupon Tips
                     </Typography>
                     <Box component="ul" sx={{ pl: 2, mt: 0 }}>
-                      <Typography component="li" variant="body2" mb={1}>
+                      <Typography component="li" variant="body2" mb={1} style={{ fontFamily: "Urbanist", fontWeight: 600}}>
                         Set a reasonable discount percentage (5-30%).
                       </Typography>
-                      <Typography component="li" variant="body2" mb={1}>
+                      <Typography component="li" variant="body2" mb={1} style={{ fontFamily: "Urbanist", fontWeight: 600}}>
                         Always set a maximum cap amount to avoid excessive
                         discounts.
                       </Typography>
-                      <Typography component="li" variant="body2" mb={1}>
+                      <Typography component="li" variant="body2" mb={1} style={{ fontFamily: "Urbanist", fontWeight: 600}}>
                         Choose validity periods that align with marketing
                         campaigns.
                       </Typography>
-                      <Typography component="li" variant="body2">
+                      <Typography component="li" variant="body2" style={{ fontFamily: "Urbanist", fontWeight: 600}}>
                         Target specific plans for better conversion rates.
                       </Typography>
                     </Box>
@@ -2027,7 +2100,8 @@ const NewCoupon = ({ mode = "new" }) => {
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "12px 24px",
-                      fontWeight: 600,
+                      fontFamily: 'Urbanist',
+                      fontWeight: 800,
                       fontSize: "1rem",
                       textTransform: "none",
                       boxShadow: "0 4px 10px rgba(0,0,0,0.15)",

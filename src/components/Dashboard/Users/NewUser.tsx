@@ -14,6 +14,7 @@ import {
   FormHelperText,
   CircularProgress,
   SelectChangeEvent,
+  InputAdornment,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -24,6 +25,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory"; // adjust path as per your project
 import CustomSnackbar from "../../Elements/CustomSnackbar";
 import PlaceAutocomplete from "../../Elements/LocationAutocomplete";
+import { Person } from "@mui/icons-material";
+import ClearIcon from "@mui/icons-material/Clear";
 
 interface UserFormData {
   first_name: string;
@@ -70,6 +73,8 @@ const nakshatramOptions: Record<string, string[]> = {
   Pisces: ["Purva Bhadrapada", "Uttara Bhadrapada", "Revati"],
 };
 
+// Fetch Backend API for the above
+
 const userTypeOptions = ["Customer", "Astrologer", "Admin"];
 
 const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
@@ -78,7 +83,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const isViewMode = mode === "view";
   const isFormInitialized = useRef(true);
   const urbanistBoldText = {
-    fontFamily: "Urbanist", fontWeight: 600,
+    fontFamily: "Urbanist",
+    fontWeight: 600,
   };
 
   const [formData, setFormData] = useState<UserFormData>({
@@ -434,21 +440,23 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         {/* Form title - balanced size and styling */}
         <Typography
           variant="h5"
-          fontWeight={600}
-          mb={3}
-          // color="#1a237e"
-          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           sx={{
+            mb: 3,
+            color: "#2e7d32",
+            display: "flex", // Add flex to align icon and text
+            alignItems: "center", // Center icon and text vertically
+            gap: 1, // Space between icon and text
             maxWidth: "50%", // Prevent title from pushing buttons too far
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            fontWeight: 600, // Bolder font for emphasis
             fontFamily: '"Poppins", sans-serif', // Modern font family
             letterSpacing: 0.5, // Slight spacing for readability
             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
           }}
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         >
+          <Person sx={{ fontSize: 24 }} /> {/* Add the icon */}
           {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} User
         </Typography>
 
@@ -483,11 +491,15 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist", },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -519,11 +531,15 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -556,11 +572,15 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -595,11 +615,15 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -632,7 +656,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             <Grid item xs={12} sm={6} md={4}>
               <DatePicker
                 label="Date of Birth"
-                value={formData.dateOfBirth}
+                value={formData.dateOfBirth} // Controlled value (e.g., Date, null, or Moment object)
                 onChange={handleDateChange}
                 disabled={isViewMode}
                 slotProps={{
@@ -646,11 +670,28 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
-                        fontFamily: "Urbanist"
+                        fontFamily: "Urbanist",
                       },
                     },
                     InputProps: {
-                      sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                      sx: {
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        fontFamily: "Urbanist",
+                      },
+                      endAdornment:
+                        !isViewMode && formData.dateOfBirth ? ( // Show clear button only if not in view mode and a date is selected
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="clear date"
+                              onClick={() => handleDateChange(null)} // Clear the date
+                              edge="end"
+                              size="small"
+                            >
+                              <ClearIcon fontSize="small" />
+                            </IconButton>
+                          </InputAdornment>
+                        ) : null,
                     },
                     sx: {
                       "& .MuiInputLabel-root": {
@@ -674,6 +715,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.timeOfBirth}
                 onChange={handleTimeChange}
                 disabled={isViewMode}
+                format="HH:mm" // Set 24-hour format without AM/PM
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -685,17 +727,21 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
-                        fontFamily: "Urbanist"
+                        fontFamily: "Urbanist",
                       },
                     },
                     InputProps: {
-                      sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                      sx: {
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        fontFamily: "Urbanist",
+                      },
                     },
                     sx: {
                       "& .MuiInputLabel-root": {
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                  },
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                      },
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": { borderColor: "#cfd8dc" },
                         "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -755,7 +801,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   color="primary"
                   display="flex"
                   alignItems="center"
-                  style={{fontFamily: "Urbanist", fontWeight: 600}}
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                 >
                   <CircularProgress size={14} sx={{ mr: 1 }} />
                   Fetching rashi & nakshatra based on your input...
@@ -776,7 +822,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontWeight: 500,
                     color: "#455a64",
                   }}
-                  style={{fontFamily: 'Urbanist'}}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   Rashi
                 </InputLabel>
@@ -785,7 +831,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("rashi")}
                   label="Rashi"
                   sx={{
-                    fontFamily: 'Urbanist',
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -800,7 +846,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }}
                 >
                   {rasiOptions.map((option) => (
-                    <MenuItem key={option} value={option} style={{fontFamily: 'Urbanist'}}>
+                    <MenuItem
+                      key={option}
+                      value={option}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
                       {option}
                     </MenuItem>
                   ))}
@@ -825,7 +875,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontWeight: 500,
                     color: "#455a64",
                   }}
-                  style={{fontFamily: 'Urbanist'}}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   Nakshatra
                 </InputLabel>
@@ -834,7 +884,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("nakshatra")}
                   label="Nakshatra"
                   sx={{
-                    fontFamily: 'Urbanist',
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -849,7 +899,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }}
                 >
                   {availableNakshatrams.map((option) => (
-                    <MenuItem key={option} value={option} style={{fontFamily: 'Urbanist'}}>
+                    <MenuItem
+                      key={option}
+                      value={option}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
                       {option}
                     </MenuItem>
                   ))}
@@ -869,7 +923,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     fontWeight: 500,
                     color: "#455a64",
                   }}
-                  style={{fontFamily: 'Urbanist'}}
+                  style={{ fontFamily: "Urbanist" }}
                 >
                   User Type
                 </InputLabel>
@@ -878,7 +932,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("user_type")}
                   label="User Type"
                   sx={{
-                    fontFamily: 'Urbanist',
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -893,7 +947,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   }}
                 >
                   {userTypeOptions.map((option) => (
-                    <MenuItem key={option} value={option} style={{fontFamily: 'Urbanist'}}>
+                    <MenuItem
+                      key={option}
+                      value={option}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
                       {option}
                     </MenuItem>
                   ))}
@@ -916,7 +974,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   onChange={handleChange("status")}
                   label="Status"
                   sx={{
-                    fontFamily: 'Urbanist',
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -930,8 +988,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     },
                   }}
                 >
-                  <MenuItem value="Active" style={{fontFamily: 'Urbanist'}}>Active</MenuItem>
-                  <MenuItem value="Inactive" style={{fontFamily: 'Urbanist'}}>Inactive</MenuItem>
+                  <MenuItem value="Active" style={{ fontFamily: "Urbanist" }}>
+                    Active
+                  </MenuItem>
+                  <MenuItem value="Inactive" style={{ fontFamily: "Urbanist" }}>
+                    Inactive
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -949,7 +1011,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "8px 24px",
-                      fontWeight: 600,
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       fontSize: "0.95rem",
                       textTransform: "none",
                       boxShadow: "0 3px 8px rgba(0,0,0,0.15)",

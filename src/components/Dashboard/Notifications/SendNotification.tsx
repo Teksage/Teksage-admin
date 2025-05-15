@@ -99,25 +99,82 @@ const SendNotification: React.FC = () => {
   ];
 
   const nakshatras: Nakshatra[] = [
-    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
-    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni",
-    "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishaka", "Anuradha",
-    "Jyeshta", "Moola", "Purva Ashadha", "Uttara Ashadha", "Shravana",
-    "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada",
+    "Ashwini",
+    "Bharani",
+    "Krittika",
+    "Rohini",
+    "Mrigashira",
+    "Ardra",
+    "Punarvasu",
+    "Pushya",
+    "Ashlesha",
+    "Magha",
+    "Purva Phalguni",
+    "Uttara Phalguni",
+    "Hasta",
+    "Chitra",
+    "Swati",
+    "Vishaka",
+    "Anuradha",
+    "Jyeshta",
+    "Moola",
+    "Purva Ashadha",
+    "Uttara Ashadha",
+    "Shravana",
+    "Dhanishta",
+    "Shatabhisha",
+    "Purva Bhadrapada",
+    "Uttara Bhadrapada",
     "Revati",
   ];
 
   const initialNakshatras: Nakshatra[] = [
-    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
-    "Punarvasu", "Pushya", "Ashlesha", "Magha",
+    "Ashwini",
+    "Bharani",
+    "Krittika",
+    "Rohini",
+    "Mrigashira",
+    "Ardra",
+    "Punarvasu",
+    "Pushya",
+    "Ashlesha",
+    "Magha",
   ];
 
   const rashis: Rashi[] = [
-    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
   ];
 
-  const selectedUsers = users.filter((user) => selectedUserIds.includes(user.id));
+  // Map rashis to their zodiac symbols
+  const rashiSymbols: { [key: string]: string } = {
+    Aries: "♈",
+    Taurus: "♉",
+    Gemini: "♊",
+    Cancer: "♋",
+    Leo: "♌",
+    Virgo: "♍",
+    Libra: "♎",
+    Scorpio: "♏",
+    Sagittarius: "♐",
+    Capricorn: "♑",
+    Aquarius: "♒",
+    Pisces: "♓",
+  };
+
+  const selectedUsers = users.filter((user) =>
+    selectedUserIds.includes(user.id)
+  );
 
   const filteredUsers = users.filter(
     (user) =>
@@ -149,7 +206,9 @@ const SendNotification: React.FC = () => {
   const handleDeselectAll = (): void => {
     if (userSearch) {
       const filteredUserIds = filteredUsers.map((user) => user.id);
-      setSelectedUserIds((prev) => prev.filter((id) => !filteredUserIds.includes(id)));
+      setSelectedUserIds((prev) =>
+        prev.filter((id) => !filteredUserIds.includes(id))
+      );
     } else {
       setSelectedUserIds([]);
     }
@@ -183,34 +242,39 @@ const SendNotification: React.FC = () => {
   return (
     <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
       <Typography
-        variant="h4"
+        variant="h5"
         sx={{
-          fontWeight: 600,
-          color: "#1B4D3E",
+          mb: { xs: 3, sm: 4 },
+          color: "#2e7d32",
           display: "flex",
           alignItems: "center",
-          gap: 2,
-          mb: { xs: 3, sm: 4 },
-          fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.6rem" },
+          gap: 1,
         }}
+        style={{ fontFamily: "Urbanist", fontWeight: 800 }}
       >
         <Send sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
         Celestial Notifications
       </Typography>
-      
+
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {/* All Users Section */}
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("all")}>
-              <People sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <People
+                sx={{
+                  mr: 2,
+                  color: "#10B100",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
+              />
               <Typography
                 variant="subtitle1"
                 sx={{
                   flexGrow: 1,
-                  fontWeight: 600,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
                 }}
+                style={{ fontFamily: "Urbanist", fontWeight: 800 }}
               >
                 Broadcast to All Users
               </Typography>
@@ -222,10 +286,10 @@ const SendNotification: React.FC = () => {
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    fontWeight: 600,
                     mb: 1,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                 >
                   Mass Notification
                 </Typography>
@@ -235,8 +299,10 @@ const SendNotification: React.FC = () => {
                     mb: 3,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                 >
-                  Send announcements or updates to all registered users instantly
+                  Send announcements or updates to all registered users
+                  instantly
                 </Typography>
 
                 <TextField
@@ -245,7 +311,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -255,9 +334,6 @@ const SendNotification: React.FC = () => {
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -269,7 +345,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -280,9 +369,6 @@ const SendNotification: React.FC = () => {
                       </InputAdornment>
                     ),
                   }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
-                  }}
                 />
 
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -292,6 +378,8 @@ const SendNotification: React.FC = () => {
                     size={isMobile ? "small" : "medium"}
                     onClick={() => handleSendNotification("all")}
                     sx={{
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       background:
                         "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)",
                       borderRadius: "50px",
@@ -312,14 +400,20 @@ const SendNotification: React.FC = () => {
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("specific")}>
-              <PersonSearch sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <PersonSearch
+                sx={{
+                  mr: 2,
+                  color: "#10B100",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
+              />
               <Typography
                 variant="subtitle1"
                 sx={{
                   flexGrow: 1,
-                  fontWeight: 600,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
                 }}
+                style={{ fontFamily: "Urbanist", fontWeight: 800 }}
               >
                 Target Specific Users
               </Typography>
@@ -331,10 +425,10 @@ const SendNotification: React.FC = () => {
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    fontWeight: 600,
                     mb: 1,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                 >
                   Personalized Notifications
                 </Typography>
@@ -344,6 +438,7 @@ const SendNotification: React.FC = () => {
                     mb: 3,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                 >
                   Select individual users for tailored messages or updates
                 </Typography>
@@ -360,6 +455,7 @@ const SendNotification: React.FC = () => {
                       backgroundColor: "white",
                       padding: "0 4px",
                       fontSize: { xs: "0.875rem", sm: "1rem" },
+                      fontFamily: "Urbanist",
                     }}
                   >
                     Select Users
@@ -374,7 +470,13 @@ const SendNotification: React.FC = () => {
                     displayEmpty
                     renderValue={() =>
                       selectedUserIds.length === 0 ? (
-                        <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            color: "text.secondary",
+                          }}
+                        >
                           {/* <People sx={{ mr: 1, fontSize: { xs: "0.875rem", sm: "1rem" } }} /> */}
                           {/* <Typography
                             sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
@@ -383,7 +485,14 @@ const SendNotification: React.FC = () => {
                           </Typography> */}
                         </Box>
                       ) : (
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 1,
+                            alignItems: "center",
+                          }}
+                        >
                           {selectedUsers.slice(0, 3).map((user) => (
                             <Chip
                               key={user.id}
@@ -393,7 +502,13 @@ const SendNotification: React.FC = () => {
                                 e.stopPropagation();
                                 removeUser(user.id);
                               }}
-                              deleteIcon={<Close sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }} />}
+                              deleteIcon={
+                                <Close
+                                  sx={{
+                                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                                  }}
+                                />
+                              }
                               sx={{
                                 backgroundColor: "rgba(16, 177, 0, 0.1)",
                                 color: "#1B4D3E",
@@ -420,7 +535,13 @@ const SendNotification: React.FC = () => {
                       )
                     }
                     sx={{
-                      "& .MuiSelect-select": { display: "flex", alignItems: "center", minHeight: { xs: "36px", sm: "40px" } },
+                      fontFamily: "Urbanist",
+                      fontSize: "0.9rem",
+                      "& .MuiSelect-select": {
+                        display: "flex",
+                        alignItems: "center",
+                        minHeight: { xs: "36px", sm: "40px" },
+                      },
                       "& .MuiOutlinedInput-notchedOutline": {
                         top: 0,
                       },
@@ -460,15 +581,29 @@ const SendNotification: React.FC = () => {
                         }
                         size={isMobile ? "small" : "medium"}
                         variant="outlined"
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                            fontSize: { xs: "0.875rem", sm: "1rem" },
+                          },
+                        }}
                         InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
                           startAdornment: (
                             <InputAdornment position="start">
-                              <PersonSearch sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }} />
+                              <PersonSearch
+                                sx={{
+                                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                                }}
+                              />
                             </InputAdornment>
                           ),
-                        }}
-                        InputLabelProps={{
-                          sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                         }}
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={(e) => e.stopPropagation()}
@@ -490,6 +625,7 @@ const SendNotification: React.FC = () => {
                           handleSelectAll();
                         }}
                         sx={{ py: 0.5 }}
+                        style={{ fontFamily: "Urbanist" }}
                       >
                         <Typography
                           sx={{
@@ -506,6 +642,7 @@ const SendNotification: React.FC = () => {
                           handleDeselectAll();
                         }}
                         sx={{ py: 0.5 }}
+                        style={{ fontFamily: "Urbanist" }}
                       >
                         <Typography
                           sx={{
@@ -524,7 +661,12 @@ const SendNotification: React.FC = () => {
                             key={user.id}
                             value={user.id}
                             onClick={() => handleUserSelect(user.id)}
-                            sx={{ display: "flex", alignItems: "center", py: 1 }}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              py: 1,
+                            }}
+                            style={{ fontFamily: "Urbanist" }}
                           >
                             <Box
                               sx={{
@@ -538,7 +680,9 @@ const SendNotification: React.FC = () => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 mr: 2,
-                                backgroundColor: selectedUserIds.includes(user.id)
+                                backgroundColor: selectedUserIds.includes(
+                                  user.id
+                                )
                                   ? "#10B100"
                                   : "transparent",
                               }}
@@ -557,14 +701,26 @@ const SendNotification: React.FC = () => {
                             </Box>
                             <Box>
                               <Typography
-                                sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                                sx={{
+                                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                                }}
+                                style={{
+                                  fontFamily: "Urbanist",
+                                  fontWeight: 600,
+                                }}
                               >
                                 {user.name}
                               </Typography>
                               <Typography
                                 variant="caption"
                                 color="text.secondary"
-                                sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                                sx={{
+                                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                                }}
+                                style={{
+                                  fontFamily: "Urbanist",
+                                  fontWeight: 600,
+                                }}
                               >
                                 {user.email}
                               </Typography>
@@ -579,6 +735,7 @@ const SendNotification: React.FC = () => {
                               color: "text.secondary",
                               fontSize: { xs: "0.875rem", sm: "1rem" },
                             }}
+                            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                           >
                             No users found
                           </Typography>
@@ -595,6 +752,7 @@ const SendNotification: React.FC = () => {
                     color: "text.secondary",
                     fontSize: { xs: "0.75rem", sm: "0.875rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 500 }}
                 >
                   {selectedUsers.length} users selected
                 </Typography>
@@ -605,7 +763,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -615,9 +786,6 @@ const SendNotification: React.FC = () => {
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -629,7 +797,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -639,9 +820,6 @@ const SendNotification: React.FC = () => {
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -653,11 +831,14 @@ const SendNotification: React.FC = () => {
                     disabled={selectedUsers.length === 0}
                     onClick={() => handleSendNotification("specific")}
                     sx={{
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       background:
                         selectedUsers.length > 0
                           ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
                           : "rgba(0, 0, 0, 0.12)",
-                      color: selectedUsers.length > 0 ? "white" : "text.disabled",
+                      color:
+                        selectedUsers.length > 0 ? "white" : "text.disabled",
                       borderRadius: "50px",
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
@@ -676,18 +857,28 @@ const SendNotification: React.FC = () => {
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("nakshatra")}>
-              <Star sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <Star
+                sx={{
+                  mr: 2,
+                  color: "#10B100",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
+              />
               <Typography
                 variant="subtitle1"
                 sx={{
                   flexGrow: 1,
-                  fontWeight: 600,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
                 }}
+                style={{ fontFamily: "Urbanist", fontWeight: 800 }}
               >
                 Nakshatra-Based Users
               </Typography>
-              {expandedSection === "nakshatra" ? <ExpandLess /> : <ExpandMore />}
+              {expandedSection === "nakshatra" ? (
+                <ExpandLess />
+              ) : (
+                <ExpandMore />
+              )}
             </SectionHeader>
 
             <Collapse in={expandedSection === "nakshatra"}>
@@ -695,10 +886,10 @@ const SendNotification: React.FC = () => {
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    fontWeight: 600,
                     mb: 1,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                 >
                   Star-Based Targeting
                 </Typography>
@@ -708,20 +899,29 @@ const SendNotification: React.FC = () => {
                     mb: 3,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                 >
-                  Reach users based on their birth nakshatras for astrologically relevant messages
+                  Reach users based on their birth nakshatras for astrologically
+                  relevant messages
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                  <Box
+                    sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}
+                  >
                     {selectedNakshatras.map((nakshatra) => (
                       <Chip
                         key={nakshatra}
                         label={nakshatra}
                         onDelete={() => handleNakshatraSelect(nakshatra)}
-                        deleteIcon={<Close sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }} />}
+                        deleteIcon={
+                          <Close
+                            sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                          />
+                        }
                         size={isMobile ? "small" : "medium"}
                         sx={{
+                          fontFamily: "Urbanist",
                           background: "rgba(16, 177, 0, 0.1)",
                           "& .MuiChip-label": {
                             fontWeight: 600,
@@ -735,38 +935,49 @@ const SendNotification: React.FC = () => {
                   <Divider sx={{ my: 2 }} />
 
                   <Grid container spacing={1}>
-                    {(showAllNakshatras ? nakshatras : initialNakshatras).map((nakshatra) => (
-                      <Grid item xs={6} sm={4} md={3} key={nakshatra}>
-                        <Button
-                          fullWidth
-                          variant={
-                            selectedNakshatras.includes(nakshatra)
-                              ? "contained"
-                              : "outlined"
-                          }
-                          onClick={() => handleNakshatraSelect(nakshatra)}
-                          startIcon={<Star sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }} />}
-                          size={isMobile ? "small" : "medium"}
-                          sx={{
-                            justifyContent: "flex-start",
-                            textTransform: "none",
-                            borderRadius: "8px",
-                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                            ...(selectedNakshatras.includes(nakshatra) && {
-                              background: "rgba(16, 177, 0, 0.1)",
-                              borderColor: "rgba(16, 177, 0, 0.3)",
-                              color: "#1B4D3E",
-                              fontWeight: 600,
-                            }),
-                          }}
-                        >
-                          {nakshatra}
-                        </Button>
-                      </Grid>
-                    ))}
+                    {(showAllNakshatras ? nakshatras : initialNakshatras).map(
+                      (nakshatra) => (
+                        <Grid item xs={6} sm={4} md={3} key={nakshatra}>
+                          <Button
+                            fullWidth
+                            variant={
+                              selectedNakshatras.includes(nakshatra)
+                                ? "contained"
+                                : "outlined"
+                            }
+                            onClick={() => handleNakshatraSelect(nakshatra)}
+                            startIcon={
+                              <Star
+                                sx={{
+                                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                                }}
+                              />
+                            }
+                            size={isMobile ? "small" : "medium"}
+                            sx={{
+                              fontFamily: "Urbanist",
+                              justifyContent: "flex-start",
+                              textTransform: "none",
+                              borderRadius: "8px",
+                              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                              ...(selectedNakshatras.includes(nakshatra) && {
+                                background: "rgba(16, 177, 0, 0.1)",
+                                borderColor: "rgba(16, 177, 0, 0.3)",
+                                color: "#1B4D3E",
+                                fontWeight: 600,
+                              }),
+                            }}
+                          >
+                            {nakshatra}
+                          </Button>
+                        </Grid>
+                      )
+                    )}
                   </Grid>
 
-                  <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+                  <Box
+                    sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+                  >
                     <Button
                       variant="text"
                       size={isMobile ? "small" : "medium"}
@@ -774,6 +985,8 @@ const SendNotification: React.FC = () => {
                       sx={{
                         color: "#10B100",
                         fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        fontFamily: "Urbanist",
+                        fontWeight: 800,
                       }}
                     >
                       {showAllNakshatras ? "Show Less" : "Show More"}
@@ -787,7 +1000,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -797,9 +1023,6 @@ const SendNotification: React.FC = () => {
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -811,7 +1034,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -821,9 +1057,6 @@ const SendNotification: React.FC = () => {
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -835,6 +1068,8 @@ const SendNotification: React.FC = () => {
                     disabled={selectedNakshatras.length === 0}
                     onClick={() => handleSendNotification("nakshatra")}
                     sx={{
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       background:
                         selectedNakshatras.length > 0
                           ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
@@ -857,14 +1092,20 @@ const SendNotification: React.FC = () => {
         <Grid item xs={12}>
           <CelestialCard>
             <SectionHeader onClick={() => toggleSection("rashi")}>
-              <Schema sx={{ mr: 2, color: "#10B100", fontSize: { xs: "1.25rem", sm: "1.5rem" } }} />
+              <Schema
+                sx={{
+                  mr: 2,
+                  color: "#10B100",
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
+              />
               <Typography
                 variant="subtitle1"
                 sx={{
                   flexGrow: 1,
-                  fontWeight: 600,
                   fontSize: { xs: "0.875rem", sm: "1rem" },
                 }}
+                style={{ fontFamily: "Urbanist", fontWeight: 800 }}
               >
                 Rashi-Based Users
               </Typography>
@@ -876,10 +1117,10 @@ const SendNotification: React.FC = () => {
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    fontWeight: 600,
                     mb: 1,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                 >
                   Zodiac-Based Targeting
                 </Typography>
@@ -889,20 +1130,29 @@ const SendNotification: React.FC = () => {
                     mb: 3,
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                   }}
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                 >
-                  Send messages to users based on their zodiac signs for personalized astrological content
+                  Send messages to users based on their zodiac signs for
+                  personalized astrological content
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                  <Box
+                    sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}
+                  >
                     {selectedRashis.map((rashi) => (
                       <Chip
                         key={rashi}
                         label={rashi}
                         onDelete={() => handleRashiSelect(rashi)}
-                        deleteIcon={<Close sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }} />}
+                        deleteIcon={
+                          <Close
+                            sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                          />
+                        }
                         size={isMobile ? "small" : "medium"}
                         sx={{
+                          fontFamily: "Urbanist",
                           background: "rgba(16, 177, 0, 0.1)",
                           "& .MuiChip-label": {
                             fontWeight: 600,
@@ -928,6 +1178,7 @@ const SendNotification: React.FC = () => {
                           onClick={() => handleRashiSelect(rashi)}
                           size={isMobile ? "small" : "medium"}
                           sx={{
+                            fontFamily: "Urbanist",
                             justifyContent: "flex-start",
                             textTransform: "none",
                             borderRadius: "8px",
@@ -940,7 +1191,7 @@ const SendNotification: React.FC = () => {
                             }),
                           }}
                         >
-                          {rashi}
+                          {rashiSymbols[rashi]} {rashi}
                         </Button>
                       </Grid>
                     ))}
@@ -953,7 +1204,20 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
@@ -963,9 +1227,6 @@ const SendNotification: React.FC = () => {
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -977,19 +1238,29 @@ const SendNotification: React.FC = () => {
                   variant="outlined"
                   size={isMobile ? "small" : "medium"}
                   sx={{ mb: 3 }}
+                  InputLabelProps={{
+                    sx: {
+                      fontWeight: 500,
+                      color: "#455a64",
+                      fontFamily: "Urbanist",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                    },
+                  }}
                   InputProps={{
+                    sx: {
+                      fontSize: "0.95rem",
+                      borderRadius: "8px",
+                      fontFamily: "Urbanist",
+                    },
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
                           sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
                         >
-                          ♋️
+                          ☉
                         </Typography>
                       </InputAdornment>
                     ),
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: { xs: "0.875rem", sm: "1rem" } },
                   }}
                 />
 
@@ -1001,6 +1272,8 @@ const SendNotification: React.FC = () => {
                     disabled={selectedRashis.length === 0}
                     onClick={() => handleSendNotification("rashi")}
                     sx={{
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       background:
                         selectedRashis.length > 0
                           ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"

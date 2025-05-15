@@ -421,6 +421,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
+import { MiscellaneousServices } from '@mui/icons-material';
 
 interface ServiceFormData {
   name: string;
@@ -595,12 +596,12 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           </IconButton>
           <Typography
             variant="body1"
-            fontWeight={600}
             color="#06402B"
             sx={{
               display: "flex",
               alignItems: "center",
             }}
+            style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           >
             Back to Services
           </Typography>
@@ -633,17 +634,19 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 <Box component="form" onSubmit={handleSubmit}>
                   <Typography
                     variant="h5"
-                    fontWeight={600}
                     sx={{
-                      fontFamily: '"Poppins", sans-serif',
-                      letterSpacing: 0.5,
-                      color: "#06402B",
                       mb: 3,
+                      color: "#2e7d32",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
+                    style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                   >
+                    <MiscellaneousServices sx={{ fontSize: 24 }} />{" "}
+                    {/* Add the MiscellaneousServices icon */}
                     Service Details
                   </Typography>
-
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <TextField
@@ -661,12 +664,17 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           sx: {
                             fontWeight: 500,
                             color: "#455a64",
+                            fontFamily: "Urbanist"
                           },
                         }}
                         InputProps={{
-                          sx: { borderRadius: "8px" },
+                          sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                         }}
                         sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#cfd8dc" },
                             "&:hover fieldset": { borderColor: "#3f51b5" },
@@ -682,9 +690,9 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       <Divider sx={{ my: 1 }} />
                       <Typography
                         variant="subtitle1"
-                        fontWeight={500}
                         color="#546e7a"
                         sx={{ mt: 2, mb: 2 }}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                       >
                         Notification Settings
                       </Typography>
@@ -712,6 +720,8 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                             "pushNotificationTrigger"
                           )}
                           sx={{
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
                             borderRadius: "8px",
                             "& .MuiOutlinedInput-notchedOutline": {
                               borderColor: "#cfd8dc",
@@ -725,7 +735,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           }}
                         >
                           {pushNotificationOptions.map((option) => (
-                            <MenuItem key={option} value={option}>
+                            <MenuItem key={option} value={option} style={{ fontFamily: "Urbanist" }}>
                               {option}
                             </MenuItem>
                           ))}
@@ -740,9 +750,9 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       <Divider sx={{ my: 1 }} />
                       <Typography
                         variant="subtitle1"
-                        fontWeight={500}
                         color="#546e7a"
                         sx={{ mt: 2, mb: 2 }}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                       >
                         Service Status
                       </Typography>
@@ -767,6 +777,8 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           label="Status"
                           onChange={handleSelectChange("status")}
                           sx={{
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
                             borderRadius: "8px",
                             "& .MuiOutlinedInput-notchedOutline": {
                               borderColor: "#cfd8dc",
@@ -779,8 +791,8 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                             },
                           }}
                         >
-                          <MenuItem value="Active">Active</MenuItem>
-                          <MenuItem value="Inactive">Inactive</MenuItem>
+                          <MenuItem value="Active" style={{ fontFamily: "Urbanist" }}>Active</MenuItem>
+                          <MenuItem value="Inactive" style={{ fontFamily: "Urbanist" }}>Inactive</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -803,7 +815,8 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                               borderColor: "#ccc",
                               borderRadius: "8px",
                               padding: "8px 24px",
-                              fontWeight: 500,
+                              fontFamily: 'Urbanist',
+                              fontWeight: 800,
                               textTransform: "none",
                               "&:hover": {
                                 borderColor: "#999",
@@ -824,7 +837,8 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                               color: "#fff",
                               borderRadius: "8px",
                               padding: "8px 24px",
-                              fontWeight: 600,
+                              fontFamily: 'Urbanist',
+                              fontWeight: 800,
                               fontSize: "0.95rem",
                               textTransform: "none",
                               boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
@@ -889,10 +903,11 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       color: "#06402B",
                       mb: 2,
                     }}
+                    style={{fontFamily: 'Urbanist', fontWeight: 800}}
                   >
                     About Services
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" paragraph>
+                  <Typography variant="body2" color="text.secondary" paragraph style={{fontFamily: 'Urbanist', fontWeight: 500}}>
                     Services are core offerings that your platform provides to
                     users. Each service can have push notifications enabled or
                     disabled.
@@ -900,9 +915,9 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   <Divider sx={{ my: 2 }} />
                   <Typography
                     variant="subtitle2"
-                    fontWeight={600}
                     color="#06402B"
                     mb={1}
+                    style={{fontFamily: 'Urbanist', fontWeight: 600}}
                   >
                     Important Notes:
                   </Typography>
@@ -912,6 +927,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       variant="body2"
                       color="text.secondary"
                       mb={1}
+                      style={{fontFamily: 'Urbanist', fontWeight: 500}}
                     >
                       Service names must be unique across the platform
                     </Typography>
@@ -920,6 +936,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       variant="body2"
                       color="text.secondary"
                       mb={1}
+                      style={{fontFamily: 'Urbanist', fontWeight: 500}}
                     >
                       Push notifications can be toggled on or off for each
                       service
@@ -928,6 +945,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       component="li"
                       variant="body2"
                       color="text.secondary"
+                      style={{fontFamily: 'Urbanist', fontWeight: 500}}
                     >
                       Inactive services won't be visible to users
                     </Typography>
@@ -967,6 +985,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         backgroundColor: "#43a047",
                         mr: 1,
                       }}
+                      style={{fontFamily: 'Urbanist', fontWeight: 800}}
                     />
                     Service Status Indicator
                   </Typography>
@@ -985,11 +1004,12 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         sx={{
                           backgroundColor: "rgba(67, 160, 71, 0.1)",
                           color: "#2e7d32",
-                          fontWeight: 600,
+                          fontWeight: 800,
                           minWidth: "80px",
+                          fontFamily: 'Urbanist'
                         }}
                       />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" style={{fontFamily: 'Urbanist', fontWeight: 500}}>
                         Service is visible and available to users
                       </Typography>
                     </Box>
@@ -1000,11 +1020,12 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         sx={{
                           backgroundColor: "rgba(158, 158, 158, 0.1)",
                           color: "#757575",
-                          fontWeight: 600,
+                          fontWeight: 800,
                           minWidth: "80px",
+                          fontFamily: 'Urbanist'
                         }}
                       />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" style={{fontFamily: 'Urbanist', fontWeight: 500}}>
                         Service is hidden from users
                       </Typography>
                     </Box>

@@ -973,6 +973,7 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
+import { Star } from '@mui/icons-material';
 
 // Input styling for file upload
 const Input = styled("input")({
@@ -1090,10 +1091,12 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             astrologer_profile_info: data.astrologer_profile_info || "",
             experience: data.experience || "",
             local_consulting_fee: data.local_consulting_fee?.toString() || "",
-            foreign_consulting_fee: data.foreign_consulting_fee?.toString() || "",
+            foreign_consulting_fee:
+              data.foreign_consulting_fee?.toString() || "",
             picture: data.picture || null,
             languages: data.languages || [],
-            expertise: data.expertise.map((item: any) => item.toLowerCase()) || [],
+            expertise:
+              data.expertise.map((item: any) => item.toLowerCase()) || [],
             user_id: data.user_id || null,
           });
         } catch (err) {
@@ -1146,12 +1149,17 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         if (!value) {
           error = "This field is required";
         } else if (
-          (field === "local_consulting_fee" || field === "foreign_consulting_fee")
+          field === "local_consulting_fee" ||
+          field === "foreign_consulting_fee"
         ) {
           // Remove commas for validation
           const rawValue = value.replace(/,/g, "").trim();
-          if (!/^\d+(\.\d{0,2})?$/.test(rawValue) || parseFloat(rawValue) <= 0) {
-            error = "Enter a positive number like 1000.23 or 1,000.23 (up to 2 decimal places)";
+          if (
+            !/^\d+(\.\d{0,2})?$/.test(rawValue) ||
+            parseFloat(rawValue) <= 0
+          ) {
+            error =
+              "Enter a positive number like 1000.23 or 1,000.23 (up to 2 decimal places)";
           }
         }
         break;
@@ -1226,9 +1234,12 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
         | SelectChangeEvent<string | string[]>
     ) => {
-      let value:any = e.target.value;
+      let value: any = e.target.value;
 
-      if (field === "local_consulting_fee" || field === "foreign_consulting_fee") {
+      if (
+        field === "local_consulting_fee" ||
+        field === "foreign_consulting_fee"
+      ) {
         // Remove existing commas to handle raw input
         value = value.replace(/,/g, "");
         // Allow digits and one decimal point
@@ -1289,7 +1300,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   const handleBlur =
     (field: keyof AstroFormData) =>
     (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      console.log(event)
+      console.log(event);
       const value = formData[field]; // Use raw value from formData
       const error = validateField(field, value);
       if (error) {
@@ -1402,7 +1413,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
-        <Typography variant="body1" style={{ fontFamily: "Urbanist", fontWeight: 800 }} color="#06402B">
+        <Typography
+          variant="body1"
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+          color="#06402B"
+        >
           Back
         </Typography>
       </Box>
@@ -1427,26 +1442,28 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             width: "100%",
             height: "4px",
             background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
-          }
+          },
         }}
       >
         <Typography
           variant="h5"
-          fontWeight={600}
-          mb={3}
           sx={{
+            mb: 3,
+            color: "#2e7d32",
+            display: "flex", // Add flex to align icon and text
+            alignItems: "center", // Center icon and text vertically
+            gap: 1, // Space between icon and text
             maxWidth: "50%",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            fontWeight: 600,
             fontFamily: '"Poppins", sans-serif',
             letterSpacing: 0.5,
             textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-            color: "#06402B",
           }}
-          style={{fontFamily: "Urbanist", fontWeight: 800}}
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         >
+          <Star sx={{ fontSize: 24 }} /> {/* Add the Star icon */}
           {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro
           User
         </Typography>
@@ -1547,7 +1564,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       fontSize: "0.95rem",
                       fontWeight: 500,
                       color: "#455a64",
-                      fontFamily: "Urbanist"
+                      fontFamily: "Urbanist",
                     }}
                   >
                     Astrologer User *
@@ -1585,7 +1602,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       <MenuItem
                         key={astrologer.user_id}
                         value={astrologer.user_id.toString()}
-                        style={{fontFamily: "Urbanist"}}
+                        style={{ fontFamily: "Urbanist" }}
                       >
                         {`${astrologer.first_name} (${astrologer.email})`}
                       </MenuItem>
@@ -1685,10 +1702,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -1713,7 +1731,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   }}
                 >
                   Expertise Areas *
@@ -1726,7 +1744,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   disabled={isViewMode}
                   renderValue={(selected) => selected.join(", ")}
                   sx={{
-                    fontFamily: 'Urbanist',
+                    fontFamily: "Urbanist",
                     fontSize: "0.9rem",
                     borderRadius: "6px",
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -1742,7 +1760,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 >
                   {["Career", "Health", "Wealth", "Relationship"].map(
                     (option) => (
-                      <MenuItem key={option} value={option.toLowerCase()} style={{fontFamily: "Urbanist"}}>
+                      <MenuItem
+                        key={option}
+                        value={option.toLowerCase()}
+                        style={{ fontFamily: "Urbanist" }}
+                      >
                         <Checkbox
                           checked={formData.expertise.includes(
                             option.toLowerCase()
@@ -1751,7 +1773,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                         <ListItemText
                           primary={option}
                           sx={{
-                            "& .MuiTypography-root": { fontSize: "0.9rem", fontFamily: "Urbanist" },
+                            "& .MuiTypography-root": {
+                              fontSize: "0.9rem",
+                              fontFamily: "Urbanist",
+                            },
                           }}
                         />
                       </MenuItem>
@@ -1783,11 +1808,15 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     // color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -1844,10 +1873,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -1865,7 +1895,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Local Consulting Fee *"
+                label="Local Consulting Fee (INR)*"
                 fullWidth
                 size="small"
                 value={
@@ -1883,10 +1913,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
@@ -1908,7 +1939,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Foreign Consulting Fee *"
+                label="Foreign Consulting Fee (USD)*"
                 fullWidth
                 size="small"
                 value={
@@ -1926,10 +1957,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
+                    fontFamily: "Urbanist"
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px" },
+                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
@@ -1985,8 +2017,12 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     },
                   }}
                 >
-                  <MenuItem value="Active" style={{fontFamily: "Urbanist"}}>Active</MenuItem>
-                  <MenuItem value="Inactive" style={{fontFamily: "Urbanist"}}>Inactive</MenuItem>
+                  <MenuItem value="Active" style={{ fontFamily: "Urbanist" }}>
+                    Active
+                  </MenuItem>
+                  <MenuItem value="Inactive" style={{ fontFamily: "Urbanist" }}>
+                    Inactive
+                  </MenuItem>
                 </Select>
                 {errors.status && (
                   <FormHelperText sx={{ fontSize: "0.75rem" }}>
@@ -2009,7 +2045,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "8px 24px",
-                      fontWeight: 600,
+                      fontFamily: "Urbanist",
+                      fontWeight: 800,
                       fontSize: "0.95rem",
                       textTransform: "none",
                       boxShadow: "0 3px 8px rgba(0,0,0,0.15)",

@@ -404,12 +404,12 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           </IconButton>
           <Typography 
             variant="body1" 
-            fontWeight={600} 
             color="#06402B"
             sx={{ 
               display: "flex", 
               alignItems: "center" 
             }}
+            style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           >
             Back to FAQs
           </Typography>
@@ -447,11 +447,13 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     <Typography
                       variant="h5"
                       sx={{
-                        fontWeight: 600,
-                        fontFamily: '"Poppins", sans-serif',
-                        letterSpacing: 0.5,
-                        color: "#333",
+                        mb: 0.5,
+                        color: "#2e7d32",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
                       }}
+                      style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                     >
                       {mode === "new"
                         ? "Create FAQ"
@@ -480,7 +482,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     <Grid item xs={12}>
                       <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}>
                         <HelpOutlineIcon sx={{ color: "#43a047", mr: 1, mt: 0.5 }} />
-                        <Typography fontWeight={500} color="#455a64">Question</Typography>
+                        <Typography fontWeight={500} color="#455a64" style={{fontFamily: "Urbanist"}}>Question</Typography>
                       </Box>
                       <TextField
                         fullWidth
@@ -492,14 +494,25 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         disabled={isViewMode || isLoading}
                         error={Boolean(errors.question)}
                         helperText={errors.question || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist"
+                          },
+                        }}
                         InputProps={{
                           sx: { 
                             fontSize: "0.95rem", 
                             borderRadius: "8px",
-                            backgroundColor: "#f9f9fb", 
+                            fontFamily: "Urbanist"
                           },
                         }}
                         sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#cfd8dc" },
                             "&:hover fieldset": { borderColor: "#43a047" },
@@ -514,7 +527,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     <Grid item xs={12}>
                       <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}>
                         <QuestionAnswerIcon sx={{ color: "#43a047", mr: 1, mt: 0.5 }} />
-                        <Typography fontWeight={500} color="#455a64">Answer</Typography>
+                        <Typography fontWeight={500} color="#455a64" style={{fontFamily: "Urbanist"}}>Answer</Typography>
                       </Box>
                       <TextField
                         fullWidth
@@ -528,14 +541,25 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         rows={6}
                         error={Boolean(errors.answer)}
                         helperText={errors.answer || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist"
+                          },
+                        }}
                         InputProps={{
                           sx: { 
                             fontSize: "0.95rem", 
                             borderRadius: "8px",
-                            backgroundColor: "#f9f9fb",
+                            fontFamily: "Urbanist"
                           },
                         }}
                         sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#cfd8dc" },
                             "&:hover fieldset": { borderColor: "#43a047" },
@@ -563,7 +587,8 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                               borderColor: "#ccc",
                               borderRadius: "8px",
                               padding: "8px 24px",
-                              fontWeight: 500,
+                              fontWeight: 800,
+                              fontFamily: "Urbanist",
                               textTransform: "none",
                               "&:hover": {
                                 borderColor: "#999",
@@ -583,7 +608,8 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                               color: "#fff",
                               borderRadius: "8px",
                               padding: "8px 24px",
-                              fontWeight: 600,
+                              fontWeight: 800,
+                              fontFamily: "Urbanist",
                               fontSize: "0.95rem",
                               textTransform: "none",
                               boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
@@ -648,7 +674,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     <TipsAndUpdatesIcon sx={{ color: "#fff", fontSize: 38 }} />
                   </CardMedia>
                   <CardContent>
-                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#06402B" }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#06402B" }} style={{fontFamily: "Urbanist", fontWeight: 800}}>
                       Tips for Good FAQs
                     </Typography>
                     
@@ -683,13 +709,13 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           >
                             {index + 1}
                           </Box>
-                          <Typography variant="body2">{tip}</Typography>
+                          <Typography variant="body2" style={{fontFamily: "Urbanist", fontWeight: 600}}>{tip}</Typography>
                         </Box>
                       ))}
                     </Box>
 
                     <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: "8px", border: "1px dashed #43a047" }}>
-                      <Typography variant="body2" sx={{ color: "#444", fontStyle: "italic" }}>
+                      <Typography variant="body2" sx={{ color: "#444", fontStyle: "italic" }} style={{fontFamily: "Urbanist", fontWeight: 500}}>
                         Well-written FAQs can significantly reduce customer support inquiries and improve user satisfaction.
                       </Typography>
                     </Box>
@@ -708,6 +734,8 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 startIcon={<TipsAndUpdatesIcon />}
                 onClick={() => setShowTips(!showTips)}
                 sx={{
+                  fontFamily: "Urbanist",
+                  fontWeight: 800,
                   mt: 1,
                   color: "#43a047",
                   borderColor: "#43a047",
