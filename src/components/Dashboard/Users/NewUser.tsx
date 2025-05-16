@@ -115,10 +115,12 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     message: "",
     severity: "success",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
       if (mode === "edit" && userId) {
+        setIsLoading(true);
         try {
           const res = await callAPI({
             endpoint: `api/admin/users/${userId}`,
@@ -167,10 +169,11 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 user.user_type.slice(1).toLowerCase() || "Customer",
           });
 
-          // ✅ Mark form as initialized after setting data
           isFormInitialized.current = true;
         } catch (err) {
           console.error("Error fetching user data:", err);
+        } finally {
+          setIsLoading(false);
         }
       }
     })();
@@ -283,6 +286,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setErrors(validationErrors);
       return;
     }
+    setIsLoading(true);
     try {
       const response = await callAPI({
         endpoint:
@@ -313,7 +317,9 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         severity: "success",
       });
 
-      navigate(-1);
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
       let errorMessage = "Something went wrong. Please try again.";
@@ -326,6 +332,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         message: errorMessage,
         severity: "error",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -991,6 +999,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   <Button
                     type="submit"
                     variant="contained"
+                    disabled={isLoading}
                     sx={{
                       background:
                         "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",

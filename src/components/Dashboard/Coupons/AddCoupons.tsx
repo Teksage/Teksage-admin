@@ -1345,7 +1345,7 @@ import {
   InputAdornment,
   Chip,
   Stack,
-  TextFieldProps
+  TextFieldProps,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -1361,6 +1361,7 @@ import {
   Info as InfoIcon,
 } from "lucide-react";
 import { callAPI } from "../../../api/crudFactory";
+import CustomSnackbar from "../../Elements/CustomSnackbar";
 
 interface CouponFormData {
   coupon_name: string;
@@ -1395,6 +1396,16 @@ const NewCoupon = ({ mode = "new" }) => {
     local_max_cap: "",
     foreign_max_cap: "",
   });
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -1412,6 +1423,7 @@ const NewCoupon = ({ mode = "new" }) => {
         setPlanData(transformedPlans);
 
         if (mode === "edit" && userId) {
+          setIsLoading(true);
           const couponResponse = await callAPI({
             endpoint: `/api/admin/coupons/${userId}`,
             method: "get",
@@ -1442,6 +1454,8 @@ const NewCoupon = ({ mode = "new" }) => {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -1552,6 +1566,7 @@ const NewCoupon = ({ mode = "new" }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validateForm()) return;
+    setIsLoading(true);
     try {
       console.log("Submitting formData:", formData);
       await callAPI({
@@ -1562,9 +1577,32 @@ const NewCoupon = ({ mode = "new" }) => {
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
-      navigate(-1);
-    } catch (error) {
+      setSnackbar({
+        open: true,
+        message:
+          mode === "edit"
+            ? "Coupons updated successfully!"
+            : "Coupons created successfully!",
+        severity: "success",
+      });
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000);
+    } catch (error: any) {
       console.error("Error submitting coupon:", error);
+      let errorMessage = "Something went wrong. Please try again.";
+      if (error.response && error.response.data) {
+        errorMessage =
+          error.response.data.detail ||
+          JSON.stringify(error.response.data?.detail);
+      }
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1699,7 +1737,7 @@ const NewCoupon = ({ mode = "new" }) => {
               display: "flex",
               alignItems: "center",
             }}
-            style={{fontFamily: "Urbanist", fontWeight: 800}}
+            style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           >
             Back to Coupons
           </Typography>
@@ -1739,7 +1777,7 @@ const NewCoupon = ({ mode = "new" }) => {
                     alignItems: "center",
                     gap: 1,
                   }}
-                  style={{fontFamily: "Urbanist", fontWeight: 800}}
+                  style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                 >
                   <TagIcon size={24} />
                   {mode === "new"
@@ -1991,8 +2029,12 @@ const NewCoupon = ({ mode = "new" }) => {
                       helperText={errors.plan_id || ""}
                       sx={textFieldStyling}
                     >
-                      {planData.map((plan:any) => (
-                        <MenuItem key={plan.id} value={plan.id} style={{fontFamily: "Urbanist"}}>
+                      {planData.map((plan: any) => (
+                        <MenuItem
+                          key={plan.id}
+                          value={plan.id}
+                          style={{ fontFamily: "Urbanist" }}
+                        >
                           {plan.name}
                         </MenuItem>
                       ))}
@@ -2019,11 +2061,16 @@ const NewCoupon = ({ mode = "new" }) => {
                       fontWeight={800}
                       color="#33691e"
                       mb={2}
-                      style={{fontFamily: "Urbanist"}}
+                      style={{ fontFamily: "Urbanist" }}
                     >
                       Coupon Overview
                     </Typography>
-                    <Typography variant="body2" color="#444" mb={2} style={{fontFamily: "Urbanist"}}>
+                    <Typography
+                      variant="body2"
+                      color="#444"
+                      mb={2}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
                       Create promotional coupons to attract new customers and
                       reward existing ones. Coupons can be applied to specific
                       plans during checkout.
@@ -2066,23 +2113,42 @@ const NewCoupon = ({ mode = "new" }) => {
                       fontWeight={800}
                       color="#33691e"
                       mb={2}
-                      style={{fontFamily: "Urbanist"}}
+                      style={{ fontFamily: "Urbanist" }}
                     >
                       Coupon Tips
                     </Typography>
                     <Box component="ul" sx={{ pl: 2, mt: 0 }}>
-                      <Typography component="li" variant="body2" mb={1} style={{ fontFamily: "Urbanist", fontWeight: 600}}>
+                      <Typography
+                        component="li"
+                        variant="body2"
+                        mb={1}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                      >
                         Set a reasonable discount percentage (5-30%).
                       </Typography>
-                      <Typography component="li" variant="body2" mb={1} style={{ fontFamily: "Urbanist", fontWeight: 600}}>
+                      <Typography
+                        component="li"
+                        variant="body2"
+                        mb={1}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                      >
                         Always set a maximum cap amount to avoid excessive
                         discounts.
                       </Typography>
-                      <Typography component="li" variant="body2" mb={1} style={{ fontFamily: "Urbanist", fontWeight: 600}}>
+                      <Typography
+                        component="li"
+                        variant="body2"
+                        mb={1}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                      >
                         Choose validity periods that align with marketing
                         campaigns.
                       </Typography>
-                      <Typography component="li" variant="body2" style={{ fontFamily: "Urbanist", fontWeight: 600}}>
+                      <Typography
+                        component="li"
+                        variant="body2"
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                      >
                         Target specific plans for better conversion rates.
                       </Typography>
                     </Box>
@@ -2094,13 +2160,14 @@ const NewCoupon = ({ mode = "new" }) => {
                     type="submit"
                     variant="contained"
                     size="large"
+                    disabled={isLoading}
                     sx={{
                       background:
                         "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "12px 24px",
-                      fontFamily: 'Urbanist',
+                      fontFamily: "Urbanist",
                       fontWeight: 800,
                       fontSize: "1rem",
                       textTransform: "none",
@@ -2121,6 +2188,12 @@ const NewCoupon = ({ mode = "new" }) => {
             </Grid>
           </Grid>
         </Box>
+        <CustomSnackbar
+          open={snackbar.open}
+          message={snackbar.message}
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        />
       </Box>
     </LocalizationProvider>
   );

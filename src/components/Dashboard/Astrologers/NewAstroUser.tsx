@@ -1050,6 +1050,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     severity: "success",
   });
   const [astrologers, setAstrologers] = useState<DropdownAstrologer[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch dropdown astrologers on mount
   useEffect(() => {
@@ -1075,6 +1076,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   // Fetch astrologer data in edit/view mode
   useEffect(() => {
     if (mode === "edit" || mode === "view") {
+      setIsLoading(true);
       const fetchAstrologer = async () => {
         try {
           const response = await callAPI({
@@ -1106,6 +1108,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             message: "Failed to load astrologer data.",
             severity: "error",
           });
+        } finally {
+          setIsLoading(false);
         }
       };
       fetchAstrologer();
@@ -1126,21 +1130,21 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       : formattedInteger;
   };
 
-  const handleAddLanguage = (newLang: string) => {
-    const trimmedLower = newLang.trim().toLowerCase();
-  
-    // Avoid adding duplicates
-    if (
-      !formData.languages
-        .map((lang) => lang.trim().toLowerCase())
-        .includes(trimmedLower)
-    ) {
-      setFormData((prev) => ({
-        ...prev,
-        languages: [...prev.languages, newLang.trim()],
-      }));
-    }
-  };  
+  // const handleAddLanguage = (newLang: string) => {
+  //   const trimmedLower = newLang.trim().toLowerCase();
+
+  //   // Avoid adding duplicates
+  //   if (
+  //     !formData.languages
+  //       .map((lang) => lang.trim().toLowerCase())
+  //       .includes(trimmedLower)
+  //   ) {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       languages: [...prev.languages, newLang.trim()],
+  //     }));
+  //   }
+  // };
 
   // Field-specific validation function
   const validateField = (field: keyof AstroFormData, value: any) => {
@@ -1194,18 +1198,21 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         }
         break;
       case "languages":
-          if (!Array.isArray(value) || value.length === 0) {
-            error = "At least one language is required";
-          } else {
-            const trimmedLowerCased = value.map((v: string) => v.trim().toLowerCase());
-            console.log(trimmedLowerCased, "trimmedLowerCased")
-            const hasDuplicates = new Set(trimmedLowerCased).size !== trimmedLowerCased.length;
-            console.log(hasDuplicates, "hasDuplicates")
-            if (hasDuplicates) {
-              error = "Languages must not contain duplicates";
-            }
+        if (!Array.isArray(value) || value.length === 0) {
+          error = "At least one language is required";
+        } else {
+          const trimmedLowerCased = value.map((v: string) =>
+            v.trim().toLowerCase()
+          );
+          console.log(trimmedLowerCased, "trimmedLowerCased");
+          const hasDuplicates =
+            new Set(trimmedLowerCased).size !== trimmedLowerCased.length;
+          console.log(hasDuplicates, "hasDuplicates");
+          if (hasDuplicates) {
+            error = "Languages must not contain duplicates";
           }
-          break;        
+        }
+        break;
       case "expertise":
         if (!value.length) {
           error = "At least one expertise is required";
@@ -1243,7 +1250,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             "user_id",
           ] as (keyof AstroFormData)[])
         : (["languages", "expertise"] as (keyof AstroFormData)[])),
-    ];   
+    ];
 
     fieldsToValidate.forEach((field) => {
       const error = validateField(field, formData[field]);
@@ -1337,35 +1344,41 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       }
     };
 
-    const handleTagAdd = (field: "languages" | "expertise") => (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleTagAdd =
+    (field: "languages" | "expertise") =>
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter" && inputLang.trim()) {
         e.preventDefault();
         const normalizedValue = inputLang.trim().toLowerCase();
-    
-        const existingValues = formData[field].map((v) => v.trim().toLowerCase());
-    
+
+        const existingValues = formData[field].map((v) =>
+          v.trim().toLowerCase()
+        );
+
         if (existingValues.includes(normalizedValue)) {
           setErrors((prev) => ({
             ...prev,
-            [field]: `${field === "languages" ? "Language" : "Expertise"} already added`,
+            [field]: `${
+              field === "languages" ? "Language" : "Expertise"
+            } already added`,
           }));
           return;
         }
-    
+
         const updatedTags = [...formData[field], inputLang.trim()];
-    
+
         setFormData((prev) => ({
           ...prev,
           [field]: updatedTags,
         }));
-    
+
         setInputLang("");
         setErrors((prev) => ({
           ...prev,
           [field]: "",
         }));
       }
-    };    
+    };
 
   const handleTagDelete =
     (type: "languages" | "expertise", index: number) => () => {
@@ -1383,6 +1396,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     e.preventDefault();
 
     if (!validate()) return;
+    setIsLoading(true);
 
     try {
       const payload = new FormData();
@@ -1427,7 +1441,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         severity: "success",
       });
 
-      navigate(-1);
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
       let errorMessage = "Something went wrong. Please try again.";
@@ -1440,6 +1456,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         message: errorMessage,
         severity: "error",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -2091,6 +2109,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   <Button
                     type="submit"
                     variant="contained"
+                    disabled={isLoading}
                     sx={{
                       background:
                         "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",

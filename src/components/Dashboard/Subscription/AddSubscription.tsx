@@ -717,7 +717,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
-import { Subscriptions } from '@mui/icons-material';
+import { Subscriptions } from "@mui/icons-material";
 
 interface SubscriptionFormData {
   plan_name: string;
@@ -764,6 +764,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     local_plan_price: "",
     foreign_plan_price: "", // Added for foreign_plan_price
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -777,6 +778,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         setServices(serviceResponse?.data);
 
         if (mode === "edit" && userId) {
+          setIsLoading(true);
           const subscriptionResponse = await callAPI({
             endpoint: `/api/admin/service-catalogs/${userId}`,
             method: "get",
@@ -805,6 +807,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -954,6 +958,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validateForm()) return;
+    setIsLoading(true);
     try {
       console.log("Submitting formData:", formData);
       await callAPI({
@@ -974,7 +979,9 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         severity: "success",
       });
 
-      navigate(-1);
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000);
     } catch (error: any) {
       console.error("Error submitting subscription:", error);
       let errorMessage = "Something went wrong. Please try again.";
@@ -988,6 +995,8 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
         message: errorMessage,
         severity: "error",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1137,11 +1146,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
@@ -1185,11 +1198,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
@@ -1350,11 +1367,15 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
-                        fontFamily: "Urbanist"
+                        fontFamily: "Urbanist",
                       },
                     }}
                     InputProps={{
-                      sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                      sx: {
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        fontFamily: "Urbanist",
+                      },
                     }}
                     sx={{
                       "& .MuiInputLabel-root": {
@@ -1482,6 +1503,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                   <Button
                     type="submit"
                     variant="contained"
+                    disabled={isLoading}
                     sx={{
                       background:
                         "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",

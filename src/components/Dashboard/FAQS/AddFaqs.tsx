@@ -271,7 +271,7 @@ import {
   useTheme,
   useMediaQuery,
   Container,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -281,6 +281,7 @@ import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { callAPI } from "../../../api/crudFactory"; // Make sure this path is correct
+import CustomSnackbar from "../../Elements/CustomSnackbar";
 
 interface FAQFormData {
   question: string;
@@ -292,7 +293,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const { userId } = useParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  
+
   const [formData, setFormData] = useState<FAQFormData>({
     question: "",
     answer: "",
@@ -302,6 +303,15 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   >({});
   const [isLoading, setIsLoading] = useState(false);
   const [showTips, setShowTips] = useState(true);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -352,7 +362,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
-    
+
     setIsLoading(true);
     try {
       await callAPI({
@@ -360,9 +370,30 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         method: mode === "edit" ? "put" : "post",
         data: formData,
       });
-      navigate(-1);
-    } catch (error) {
+      setSnackbar({
+        open: true,
+        message:
+          mode === "edit"
+            ? "FAQs updated successfully!"
+            : "FAQs created successfully!",
+        severity: "success",
+      });
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000);
+    } catch (error: any) {
       console.error("Error submitting FAQ:", error);
+      let errorMessage = "Something went wrong. Please try again.";
+      if (error.response && error.response.data) {
+        errorMessage =
+          error.response.data.detail ||
+          JSON.stringify(error.response.data?.detail);
+      }
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -375,39 +406,41 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     "Keep questions concise and specific",
     "Use clear, simple language",
     "Answer with complete information",
-    "Address the most common questions first"
+    "Address the most common questions first",
   ];
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Container maxWidth="xl" sx={{ py: 2 }}>
         {/* Header with back button - compact and aligned */}
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          mb: 3,
-          background: "rgba(6, 64, 43, 0.03)",
-          borderRadius: "8px",
-          p: 1
-        }}>
-          <IconButton 
-            onClick={() => navigate(-1)} 
-            sx={{ 
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 3,
+            background: "rgba(6, 64, 43, 0.03)",
+            borderRadius: "8px",
+            p: 1,
+          }}
+        >
+          <IconButton
+            onClick={() => navigate(-1)}
+            sx={{
               mr: 1,
               color: "#06402B",
               "&:hover": {
                 background: "rgba(6, 64, 43, 0.1)",
-              }
+              },
             }}
           >
             <ArrowBackIcon />
           </IconButton>
-          <Typography 
-            variant="body1" 
+          <Typography
+            variant="body1"
             color="#06402B"
-            sx={{ 
-              display: "flex", 
-              alignItems: "center" 
+            sx={{
+              display: "flex",
+              alignItems: "center",
             }}
             style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           >
@@ -437,13 +470,23 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     left: 0,
                     width: "100%",
                     height: "4px",
-                    background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
-                  }
+                    background:
+                      "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
+                  },
                 }}
               >
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 3,
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <QuestionAnswerIcon sx={{ color: "#43a047", mr: 1.5, fontSize: 28 }} />
+                    <QuestionAnswerIcon
+                      sx={{ color: "#43a047", mr: 1.5, fontSize: 28 }}
+                    />
                     <Typography
                       variant="h5"
                       sx={{
@@ -464,7 +507,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   </Box>
                   {!isMobile && (
                     <Tooltip title={showTips ? "Hide tips" : "Show tips"}>
-                      <IconButton 
+                      <IconButton
                         onClick={() => setShowTips(!showTips)}
                         sx={{ color: "#43a047" }}
                       >
@@ -480,9 +523,23 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   <Grid container spacing={3}>
                     {/* Question Field */}
                     <Grid item xs={12}>
-                      <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}>
-                        <HelpOutlineIcon sx={{ color: "#43a047", mr: 1, mt: 0.5 }} />
-                        <Typography fontWeight={500} color="#455a64" style={{fontFamily: "Urbanist"}}>Question</Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question
+                        </Typography>
                       </Box>
                       <TextField
                         fullWidth
@@ -498,14 +555,14 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           sx: {
                             fontWeight: 500,
                             color: "#455a64",
-                            fontFamily: "Urbanist"
+                            fontFamily: "Urbanist",
                           },
                         }}
                         InputProps={{
-                          sx: { 
-                            fontSize: "0.95rem", 
+                          sx: {
+                            fontSize: "0.95rem",
                             borderRadius: "8px",
-                            fontFamily: "Urbanist"
+                            fontFamily: "Urbanist",
                           },
                         }}
                         sx={{
@@ -516,7 +573,9 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#cfd8dc" },
                             "&:hover fieldset": { borderColor: "#43a047" },
-                            "&.Mui-focused fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
                           },
                           "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
                         }}
@@ -525,9 +584,23 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
                     {/* Answer Field */}
                     <Grid item xs={12}>
-                      <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1 }}>
-                        <QuestionAnswerIcon sx={{ color: "#43a047", mr: 1, mt: 0.5 }} />
-                        <Typography fontWeight={500} color="#455a64" style={{fontFamily: "Urbanist"}}>Answer</Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer
+                        </Typography>
                       </Box>
                       <TextField
                         fullWidth
@@ -545,14 +618,14 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           sx: {
                             fontWeight: 500,
                             color: "#455a64",
-                            fontFamily: "Urbanist"
+                            fontFamily: "Urbanist",
                           },
                         }}
                         InputProps={{
-                          sx: { 
-                            fontSize: "0.95rem", 
+                          sx: {
+                            fontSize: "0.95rem",
                             borderRadius: "8px",
-                            fontFamily: "Urbanist"
+                            fontFamily: "Urbanist",
                           },
                         }}
                         sx={{
@@ -563,7 +636,9 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#cfd8dc" },
                             "&:hover fieldset": { borderColor: "#43a047" },
-                            "&.Mui-focused fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
                           },
                           "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
                         }}
@@ -573,11 +648,13 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     {/* Button Section */}
                     {!isViewMode && (
                       <Grid item xs={12} mt={1}>
-                        <Box sx={{ 
-                          display: "flex", 
-                          justifyContent: "flex-end",
-                          mt: 2
-                        }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            mt: 2,
+                          }}
+                        >
                           <Button
                             variant="outlined"
                             onClick={() => navigate(-1)}
@@ -592,8 +669,8 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                               textTransform: "none",
                               "&:hover": {
                                 borderColor: "#999",
-                                backgroundColor: "rgba(0,0,0,0.03)"
-                              }
+                                backgroundColor: "rgba(0,0,0,0.03)",
+                              },
                             }}
                             disabled={isLoading}
                           >
@@ -604,7 +681,8 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                             variant="contained"
                             disabled={isLoading}
                             sx={{
-                              background: "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+                              background:
+                                "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
                               color: "#fff",
                               borderRadius: "8px",
                               padding: "8px 24px",
@@ -615,17 +693,23 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                               boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
                               transition: "all 0.3s ease",
                               "&:hover": {
-                                background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                                background:
+                                  "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
                                 boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
                                 transform: "scale(1.02)",
                               },
                               "&:disabled": {
-                                background: "linear-gradient(135deg, #a5d6a7 0%, #81c784 100%)",
+                                background:
+                                  "linear-gradient(135deg, #a5d6a7 0%, #81c784 100%)",
                                 color: "#fff",
-                              }
+                              },
                             }}
                           >
-                            {isLoading ? "Saving..." : mode === "new" ? "Add FAQ" : "Save Changes"}
+                            {isLoading
+                              ? "Saving..."
+                              : mode === "new"
+                              ? "Add FAQ"
+                              : "Save Changes"}
                           </Button>
                         </Box>
                       </Grid>
@@ -667,24 +751,29 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         left: 0,
                         width: "100%",
                         height: "30%",
-                        background: "linear-gradient(0deg, rgba(6,64,43,0.7) 0%, rgba(6,64,43,0) 100%)",
-                      }
+                        background:
+                          "linear-gradient(0deg, rgba(6,64,43,0.7) 0%, rgba(6,64,43,0) 100%)",
+                      },
                     }}
                   >
                     <TipsAndUpdatesIcon sx={{ color: "#fff", fontSize: 38 }} />
                   </CardMedia>
                   <CardContent>
-                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#06402B" }} style={{fontFamily: "Urbanist", fontWeight: 800}}>
+                    <Typography
+                      variant="h6"
+                      sx={{ mb: 2, fontWeight: 600, color: "#06402B" }}
+                      style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+                    >
                       Tips for Good FAQs
                     </Typography>
-                    
+
                     <Box sx={{ mb: 3 }}>
                       {faqTips.map((tip, index) => (
-                        <Box 
-                          key={index} 
-                          sx={{ 
-                            display: "flex", 
-                            mb: 2, 
+                        <Box
+                          key={index}
+                          sx={{
+                            display: "flex",
+                            mb: 2,
                             alignItems: "center",
                             p: 1.5,
                             borderRadius: "8px",
@@ -692,31 +781,48 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                             boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                           }}
                         >
-                          <Box 
-                            sx={{ 
-                              width: 24, 
-                              height: 24, 
-                              borderRadius: "50%", 
-                              bgcolor: "#43a047", 
-                              color: "#fff", 
-                              display: "flex", 
-                              alignItems: "center", 
+                          <Box
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              borderRadius: "50%",
+                              bgcolor: "#43a047",
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
                               justifyContent: "center",
                               mr: 2,
                               fontSize: "0.8rem",
-                              fontWeight: 600
+                              fontWeight: 600,
                             }}
                           >
                             {index + 1}
                           </Box>
-                          <Typography variant="body2" style={{fontFamily: "Urbanist", fontWeight: 600}}>{tip}</Typography>
+                          <Typography
+                            variant="body2"
+                            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                          >
+                            {tip}
+                          </Typography>
                         </Box>
                       ))}
                     </Box>
 
-                    <Box sx={{ p: 2, bgcolor: "#fff", borderRadius: "8px", border: "1px dashed #43a047" }}>
-                      <Typography variant="body2" sx={{ color: "#444", fontStyle: "italic" }} style={{fontFamily: "Urbanist", fontWeight: 500}}>
-                        Well-written FAQs can significantly reduce customer support inquiries and improve user satisfaction.
+                    <Box
+                      sx={{
+                        p: 2,
+                        bgcolor: "#fff",
+                        borderRadius: "8px",
+                        border: "1px dashed #43a047",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#444", fontStyle: "italic" }}
+                        style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+                      >
+                        Well-written FAQs can significantly reduce customer
+                        support inquiries and improve user satisfaction.
                       </Typography>
                     </Box>
                   </CardContent>
@@ -724,11 +830,11 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               </Fade>
             </Grid>
           )}
-          
+
           {/* Mobile Show/Hide Tips */}
           {isMobile && (
             <Grid item xs={12}>
-              <Button 
+              <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<TipsAndUpdatesIcon />}
@@ -741,8 +847,8 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                   borderColor: "#43a047",
                   "&:hover": {
                     borderColor: "#2e7d32",
-                    backgroundColor: "rgba(67, 160, 71, 0.04)"
-                  }
+                    backgroundColor: "rgba(67, 160, 71, 0.04)",
+                  },
                 }}
               >
                 {showTips ? "Hide FAQ Tips" : "Show FAQ Tips"}
@@ -751,6 +857,12 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           )}
         </Grid>
       </Container>
+      <CustomSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </LocalizationProvider>
   );
 };

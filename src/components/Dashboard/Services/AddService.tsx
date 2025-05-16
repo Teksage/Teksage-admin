@@ -541,7 +541,9 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             : "Service created successfully!",
         severity: "success",
       });
-      navigate(-1);
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000);
     } catch (error: any) {
       console.error("Error submitting service:", error);
       let errorMessage = "Something went wrong. Please try again.";
