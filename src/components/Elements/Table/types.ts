@@ -40,7 +40,7 @@ export interface TableColumn<T> {
   label: string;
   filterable?: boolean;
   filterOptions?: string[];
-  filterOnly?: boolean; // New property for filter-only columns
+  filterOnly?: boolean;
   render?: (value: any, row: T) => React.ReactNode;
   sortable?: boolean;
   width?: string;
@@ -67,4 +67,5 @@ export interface TableProps<T> {
   onSortChange?: (columnId: keyof T, direction: "asc" | "desc") => void;
   onFetchFilterOptions?: (field: keyof T, searchValue: string) => Promise<string[]>;
   loading?: boolean;
+  filters?: Record<string, string>; // Add filters prop
 }

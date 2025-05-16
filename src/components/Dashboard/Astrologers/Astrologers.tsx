@@ -261,17 +261,16 @@ import { Chip, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
-// Extend UserData to include consulting_fee as a virtual key
 interface UserData {
   astrologer_id: number;
-  local_consulting_fee: string; // API returns string, we'll parse in render
+  local_consulting_fee: string;
   foreign_consulting_fee: string;
   consulting_fee_code: string;
   customer_rating: string;
   experience: number;
   first_name: string;
   status: string;
-  consulting_fee?: string; // Virtual key for table rendering
+  consulting_fee?: string;
 }
 
 const Astrologers: React.FC = () => {
@@ -281,7 +280,7 @@ const Astrologers: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [filters, setFilters] = useState<Record<string, string>>({
-    consulting_fee_code: "INR", // Default to INR
+    consulting_fee_code: "INR",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -298,26 +297,23 @@ const Astrologers: React.FC = () => {
         per_page: rowsPerPage,
       };
 
-      // Map consulting_fee filter to the correct backend key
       const filterEntries = Object.entries(currentFilters).filter(
         ([_, v]) => v.trim() !== ""
       );
       filterEntries.forEach(([field, value]) => {
         if (field === "consulting_fee") {
-          // Determine the correct backend key based on consulting_fee_code and value
-          const feeCode = currentFilters.consulting_fee_code || "inr";
+          const feeCode = currentFilters.consulting_fee_code || "INR";
+          const localOptions = [
+            "Less than 500",
+            "500 - 1000",
+            "Greater than 1000",
+          ];
+          const foreignOptions = [
+            "Less than 30",
+            "30 - 100",
+            "Greater than 100",
+          ];
           if (feeCode === "All") {
-            // Check if value belongs to local or foreign fee options
-            const localOptions = [
-              "Less than 500",
-              "500 - 1000",
-              "Greater than 1000",
-            ];
-            const foreignOptions = [
-              "Less than 30",
-              "30 - 100",
-              "Greater than 100",
-            ];
             if (localOptions.includes(value)) {
               params["local_consulting_fee"] = value;
             } else if (foreignOptions.includes(value)) {
@@ -391,8 +387,21 @@ const Astrologers: React.FC = () => {
     fetchAstrologers(page, filters);
   }, [page, rowsPerPage, filters]);
 
-  const columns: TableColumn<UserData>[] = useMemo(
-    () => [
+  const columns: TableColumn<UserData>[] = useMemo(() => {
+    const feeCode = filters.consulting_fee_code || "INR";
+    const localOptions = ["Less than 500", "500 - 1000", "Greater than 1000"];
+    const foreignOptions = ["Less than 30", "30 - 100", "Greater than 100"];
+    let feeFilterOptions: string[] = [];
+
+    if (feeCode === "USD") {
+      feeFilterOptions = foreignOptions;
+    } else if (feeCode === "All") {
+      feeFilterOptions = [...localOptions, ...foreignOptions];
+    } else {
+      feeFilterOptions = localOptions;
+    }
+
+    return [
       {
         id: "first_name",
         label: "Name",
@@ -421,19 +430,7 @@ const Astrologers: React.FC = () => {
         id: "consulting_fee",
         label: "Fee",
         filterable: true,
-        filterOptions:
-          filters.consulting_fee_code === "USD"
-            ? ["Less than 30", "30 - 100", "Greater than 100"]
-            : filters.consulting_fee_code === "All"
-            ? [
-                "local_consulting_fee: Less than 500",
-                "local_consulting_fee: 500 - 1000",
-                "local_consulting_fee: Greater than 1000",
-                "foreign_consulting_fee: Less than 30",
-                "foreign_consulting_fee: 30 - 100",
-                "foreign_consulting_fee: Greater than 100",
-              ]
-            : ["Less than 500", "500 - 1000", "Greater than 1000"],
+        filterOptions: feeFilterOptions,
         render: (_: any, row: UserData) => {
           const feeValue =
             row.consulting_fee_code === "USD"
@@ -471,9 +468,8 @@ const Astrologers: React.FC = () => {
         filterOptions: ["All", "INR", "USD"],
         filterOnly: true,
       },
-    ],
-    [filters.consulting_fee_code]
-  );
+    ];
+  }, [filters.consulting_fee_code]);
 
   const handleAdd = () => {
     navigate("/dashboard/astrologers/new");
@@ -497,11 +493,11 @@ const Astrologers: React.FC = () => {
   };
 
   const handleFilterChange = (newFilters: Record<string, string>) => {
-    // Reset consulting_fee filter when consulting_fee_code changes
+    const updatedFilters = { ...newFilters };
     if (newFilters.consulting_fee_code !== filters.consulting_fee_code) {
-      delete newFilters.consulting_fee;
+      delete updatedFilters.consulting_fee;
     }
-    setFilters(newFilters);
+    setFilters(updatedFilters);
     setPage(0);
   };
 
@@ -530,6 +526,7 @@ const Astrologers: React.FC = () => {
         onFilterChange={handleFilterChange}
         onFetchFilterOptions={fetchFilterOptions}
         loading={loading}
+        filters={filters} // Pass filters to GenericTable
       />
     </>
   );
