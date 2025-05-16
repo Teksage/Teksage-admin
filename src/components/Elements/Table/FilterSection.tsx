@@ -200,7 +200,7 @@ const FilterItem = <T,>({
         <Autocomplete
           options={["", ...options]}
           getOptionLabel={(option) => option}
-          value={filters[columnId] || ""}
+          value={(columnId==="email" ? filters[columnId] : capitalizeFirstLetter(filters[columnId]) )|| ""}
           onChange={(event, newValue) => {
             console.log(event);
             const selectedValue = newValue || "";
@@ -266,7 +266,6 @@ const FilterItem = <T,>({
             <li
               {...props}
               style={{
-                // fontWeight: 400,
                 background: "transparent",
                 padding: "8px 12px",
                 whiteSpace: "nowrap",

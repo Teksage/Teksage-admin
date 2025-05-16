@@ -973,7 +973,7 @@ import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
-import { Star } from '@mui/icons-material';
+import { Star } from "@mui/icons-material";
 
 // Input styling for file upload
 const Input = styled("input")({
@@ -1126,6 +1126,22 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       : formattedInteger;
   };
 
+  const handleAddLanguage = (newLang: string) => {
+    const trimmedLower = newLang.trim().toLowerCase();
+  
+    // Avoid adding duplicates
+    if (
+      !formData.languages
+        .map((lang) => lang.trim().toLowerCase())
+        .includes(trimmedLower)
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        languages: [...prev.languages, newLang.trim()],
+      }));
+    }
+  };  
+
   // Field-specific validation function
   const validateField = (field: keyof AstroFormData, value: any) => {
     let error = "";
@@ -1178,10 +1194,18 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         }
         break;
       case "languages":
-        if (!value.length) {
-          error = "At least one language is required";
-        }
-        break;
+          if (!Array.isArray(value) || value.length === 0) {
+            error = "At least one language is required";
+          } else {
+            const trimmedLowerCased = value.map((v: string) => v.trim().toLowerCase());
+            console.log(trimmedLowerCased, "trimmedLowerCased")
+            const hasDuplicates = new Set(trimmedLowerCased).size !== trimmedLowerCased.length;
+            console.log(hasDuplicates, "hasDuplicates")
+            if (hasDuplicates) {
+              error = "Languages must not contain duplicates";
+            }
+          }
+          break;        
       case "expertise":
         if (!value.length) {
           error = "At least one expertise is required";
@@ -1203,10 +1227,13 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof AstroFormData, string>> = {};
 
-    const fieldsToValidate: (keyof AstroFormData)[] =
-      mode === "edit"
-        ? ["first_name", "last_name", "email", "mobile_number"]
-        : [
+    const fieldsToValidate: (keyof AstroFormData)[] = [
+      "first_name",
+      "last_name",
+      "email",
+      "mobile_number",
+      ...(mode === "new"
+        ? ([
             "experience",
             "local_consulting_fee",
             "foreign_consulting_fee",
@@ -1214,7 +1241,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             "languages",
             "expertise",
             "user_id",
-          ];
+          ] as (keyof AstroFormData)[])
+        : (["languages", "expertise"] as (keyof AstroFormData)[])),
+    ];   
 
     fieldsToValidate.forEach((field) => {
       const error = validateField(field, formData[field]);
@@ -1308,28 +1337,35 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       }
     };
 
-  const handleTagAdd =
-    (field: "languages" | "expertise") =>
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") {
+    const handleTagAdd = (field: "languages" | "expertise") => (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter" && inputLang.trim()) {
         e.preventDefault();
-        if (!e.target) return;
-        const value = (e.target as HTMLInputElement).value.trim();
-        if (!value) return;
-
-        if (!formData[field].includes(value)) {
-          const updatedValues = [...formData[field], value];
-          setFormData((prev) => ({
+        const normalizedValue = inputLang.trim().toLowerCase();
+    
+        const existingValues = formData[field].map((v) => v.trim().toLowerCase());
+    
+        if (existingValues.includes(normalizedValue)) {
+          setErrors((prev) => ({
             ...prev,
-            [field]: updatedValues,
+            [field]: `${field === "languages" ? "Language" : "Expertise"} already added`,
           }));
-          const error = validateField(field, updatedValues);
-          setErrors((prev) => ({ ...prev, [field]: error }));
+          return;
         }
-
+    
+        const updatedTags = [...formData[field], inputLang.trim()];
+    
+        setFormData((prev) => ({
+          ...prev,
+          [field]: updatedTags,
+        }));
+    
         setInputLang("");
+        setErrors((prev) => ({
+          ...prev,
+          [field]: "",
+        }));
       }
-    };
+    };    
 
   const handleTagDelete =
     (type: "languages" | "expertise", index: number) => () => {
@@ -1702,11 +1738,15 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -1873,11 +1913,15 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                 }}
                 sx={{
                   "& .MuiInputLabel-root": {
@@ -1913,11 +1957,15 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
@@ -1957,11 +2005,15 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                     fontSize: "0.95rem",
                     fontWeight: 500,
                     color: "#455a64",
-                    fontFamily: "Urbanist"
+                    fontFamily: "Urbanist",
                   },
                 }}
                 InputProps={{
-                  sx: { fontSize: "0.9rem", borderRadius: "6px", fontFamily: "Urbanist" },
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
                   inputProps: {
                     pattern: "[0-9,.]*",
                     type: "text",
