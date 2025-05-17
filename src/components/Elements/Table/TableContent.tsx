@@ -21,8 +21,13 @@ import {
   TableSortLabel,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
-import { Visibility as ViewIcon, Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import {
+  Visibility as ViewIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import { TableColumn } from "./types";
+import InboxIcon from "@mui/icons-material/Inbox";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
@@ -39,7 +44,8 @@ const StyledPaper = styled(Box)(({ theme }) => ({
   borderRadius: "12px",
   overflow: "hidden",
   boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.95) 100%)",
+  background:
+    "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.95) 100%)",
   backdropFilter: "blur(8px)",
   [theme.breakpoints.down("sm")]: {
     borderRadius: "0",
@@ -60,7 +66,10 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
     tableLayout: "auto",
   },
   "& .MuiTableCell-head": {
-    background: `linear-gradient(180deg, ${alpha("#2e7d32", 0.9)} 0%, ${alpha("#1b4d3e", 0.9)} 100%)`,
+    background: `linear-gradient(180deg, ${alpha("#2e7d32", 0.9)} 0%, ${alpha(
+      "#1b4d3e",
+      0.9
+    )} 100%)`,
     color: theme.palette.common.white + " !important",
     fontSize: "1rem",
     whiteSpace: "normal",
@@ -181,18 +190,29 @@ const TableContent = <T,>({
     const index = match.index!; // Index of the first alphabet
     if (/[A-Z]/.test(str[index])) return str; // If already uppercase, return unchanged
 
-    return str.substring(0, index) + str[index].toUpperCase() + str.substring(index + 1);
+    return (
+      str.substring(0, index) +
+      str[index].toUpperCase() +
+      str.substring(index + 1)
+    );
   };
 
   // Helper function to detect and format date-time strings
   const formatDateTime = (value: string) => {
-    const dateTimeRegex = /^([A-Za-z]+\s\d{1,2},\s\d{4}),\s(\d{2}:\d{2}\s[A|P]M)$/;
+    const dateTimeRegex =
+      /^([A-Za-z]+\s\d{1,2},\s\d{4}),\s(\d{2}:\d{2}\s[A|P]M)$/;
     const match = value.match(dateTimeRegex);
     if (match) {
       const date = match[1]; // e.g., "May 15, 2025"
       const time = match[2]; // e.g., "09:00 AM"
       return (
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="body2">{date}</Typography>
           <Typography variant="body2">{time}</Typography>
         </Box>
@@ -224,14 +244,17 @@ const TableContent = <T,>({
           );
         }
         // Apply capitalization for strings starting with a number
-        const capitalizedNumberString = capitalizeFirstAlphabetAfterNumber(renderedValue);
+        const capitalizedNumberString =
+          capitalizeFirstAlphabetAfterNumber(renderedValue);
         return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
       }
       return renderedValue || "N/A";
     }
 
     if (value && typeof value === "object" && "first_name" in value) {
-      const fullName = `${value.first_name || ""} ${value.last_name || ""}`.trim();
+      const fullName = `${value.first_name || ""} ${
+        value.last_name || ""
+      }`.trim();
       return fullName ? capitalizeFirstLetter(fullName) : "N/A";
     }
 
@@ -255,11 +278,27 @@ const TableContent = <T,>({
 
   if (isMobile) {
     return (
-      <StyledPaper sx={{ paddingTop: 0, display: "flex", flexDirection: "column", height: "100%" }}>
+      <StyledPaper
+        sx={{
+          paddingTop: 0,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        }}
+      >
         {loading ? (
           <Box sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
             {[...Array(rowsPerPage)].map((_, index) => (
-              <Box key={index} sx={{ p: 2, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}` }}>
+              <Box
+                key={index}
+                sx={{
+                  p: 2,
+                  borderBottom: `1px solid ${alpha(
+                    theme.palette.divider,
+                    0.2
+                  )}`,
+                }}
+              >
                 <Skeleton variant="text" width="40%" height={30} />
                 <Skeleton variant="text" width="60%" height={20} />
               </Box>
@@ -267,76 +306,100 @@ const TableContent = <T,>({
           </Box>
         ) : (
           <List sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
-            {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
-              const id = getRowId(row);
-              const serialNumber = page * rowsPerPage + index + 1;
-              return (
-                <React.Fragment key={id}>
-                  <ListItem
-                    component="button"
-                    onClick={() => setMobileRowDetail(row)}
-                    sx={{
-                      pl: 2,
-                      py: 1.5,
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        border: `2px solid ${theme.palette.primary.main}`,
-                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
-                        background: alpha(theme.palette.primary.light, 0.05),
-                      },
-                      animation: `${fadeIn} 0.5s ease-in-out`,
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 600, color: theme.palette.text.secondary, minWidth: "24px", mr: 1, textAlign: "center" }}
+            {data
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                const id = getRowId(row);
+                const serialNumber = page * rowsPerPage + index + 1;
+                return (
+                  <React.Fragment key={id}>
+                    <ListItem
+                      component="button"
+                      onClick={() => setMobileRowDetail(row)}
+                      sx={{
+                        pl: 2,
+                        py: 1.5,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          border: `2px solid ${theme.palette.primary.main}`,
+                          boxShadow: `0 4px 12px ${alpha(
+                            theme.palette.primary.main,
+                            0.2
+                          )}`,
+                          background: alpha(theme.palette.primary.light, 0.05),
+                        },
+                        animation: `${fadeIn} 0.5s ease-in-out`,
+                      }}
                     >
-                      {serialNumber}.
-                    </Typography>
-                    <ListItemText
-                      primary={safeRenderValue(row[columns[0].id], row, columns[0].render)}
-                      secondary={
-                        columns[1] ? safeRenderValue(row[columns[1].id], row, columns[1].render) : undefined
-                      }
-                      primaryTypographyProps={{
-                        fontWeight: 600,
-                        fontFamily: "Urbanist",
-                        fontSize: "1rem",
-                        textAlign: "center",
-                        sx: {
-                          whiteSpace: "normal",
-                          wordBreak: "normal",
-                        },
-                      }}
-                      secondaryTypographyProps={{
-                        fontFamily: "Urbanist",
-                        fontSize: "0.85rem",
-                        textAlign: "center",
-                        sx: {
-                          whiteSpace: "normal",
-                          wordBreak: "normal",
-                        },
-                      }}
-                    />
-                    {showActions && onView && (
-                      <Tooltip title="View Details">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onView(row);
-                          }}
-                          sx={{ color: "#1976d2", "&:active": { transform: "scale(0.95)" } }}
-                        >
-                          <ViewIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </ListItem>
-                  <Divider component="li" />
-                </React.Fragment>
-              );
-            })}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.text.secondary,
+                          minWidth: "24px",
+                          mr: 1,
+                          textAlign: "center",
+                        }}
+                      >
+                        {serialNumber}.
+                      </Typography>
+                      <ListItemText
+                        primary={safeRenderValue(
+                          row[columns[0].id],
+                          row,
+                          columns[0].render
+                        )}
+                        secondary={
+                          columns[1]
+                            ? safeRenderValue(
+                                row[columns[1].id],
+                                row,
+                                columns[1].render
+                              )
+                            : undefined
+                        }
+                        primaryTypographyProps={{
+                          fontWeight: 600,
+                          fontFamily: "Urbanist",
+                          fontSize: "1rem",
+                          textAlign: "center",
+                          sx: {
+                            whiteSpace: "normal",
+                            wordBreak: "normal",
+                          },
+                        }}
+                        secondaryTypographyProps={{
+                          fontFamily: "Urbanist",
+                          fontSize: "0.85rem",
+                          textAlign: "center",
+                          sx: {
+                            whiteSpace: "normal",
+                            wordBreak: "normal",
+                          },
+                        }}
+                      />
+                      {showActions && onView && (
+                        <Tooltip title="View Details">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onView(row);
+                            }}
+                            sx={{
+                              color: "#1976d2",
+                              "&:active": { transform: "scale(0.95)" },
+                            }}
+                          >
+                            <ViewIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </ListItem>
+                    <Divider component="li" />
+                  </React.Fragment>
+                );
+              })}
           </List>
         )}
       </StyledPaper>
@@ -352,7 +415,12 @@ const TableContent = <T,>({
               <Box key={index} sx={{ display: "flex", gap: 2, py: 1 }}>
                 <Skeleton variant="text" width="20px" height={30} />
                 {columns.map((_, colIndex) => (
-                  <Skeleton key={colIndex} variant="text" width="100px" height={30} />
+                  <Skeleton
+                    key={colIndex}
+                    variant="text"
+                    width="100px"
+                    height={30}
+                  />
                 ))}
               </Box>
             ))}
@@ -362,7 +430,12 @@ const TableContent = <T,>({
             <TableHead>
               <TableRow>
                 <TableCell
-                  sx={{ width: "20px", minWidth: "20px", maxWidth: "40px", textAlign: "center" }}
+                  sx={{
+                    width: "20px",
+                    minWidth: "20px",
+                    maxWidth: "40px",
+                    textAlign: "center",
+                  }}
                   style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                 >
                   No.
@@ -370,9 +443,15 @@ const TableContent = <T,>({
                 {columns.map((column) => (
                   <TableCell
                     key={column.id as string}
-                    sortDirection={sortConfig.key === column.id ? sortConfig.direction : false}
+                    sortDirection={
+                      sortConfig.key === column.id
+                        ? sortConfig.direction
+                        : false
+                    }
                     sx={{
-                      width: `${100 / (columns.length + (showActions ? 1 : 0))}%`,
+                      width: `${
+                        100 / (columns.length + (showActions ? 1 : 0))
+                      }%`,
                       minWidth: "120px",
                       maxWidth: "220px",
                       textAlign: "center",
@@ -390,7 +469,11 @@ const TableContent = <T,>({
                     {column.sortable ? (
                       <TableSortLabel
                         active={sortConfig.key === column.id}
-                        direction={sortConfig.key === column.id ? sortConfig.direction : "asc"}
+                        direction={
+                          sortConfig.key === column.id
+                            ? sortConfig.direction
+                            : "asc"
+                        }
                         onClick={() => handleSort(column.id)}
                       >
                         {column.label}
@@ -416,104 +499,160 @@ const TableContent = <T,>({
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row, index) => {
-                const id = getRowId(row);
-                const serialNumber = page * rowsPerPage + index + 1;
-                return (
-                  <TableRow hover key={id}>
-                    <SerialNumberCell style={{ fontFamily: "Urbanist", fontWeight: 500 }}>
-                      {serialNumber}
-                    </SerialNumberCell>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      const displayValue = safeRenderValue(value, row, column.render);
-                      const isLongText = typeof value === "string" && value.length > 30;
-                      return (
+              {data?.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length + (showActions ? 2 : 1)}
+                    sx={{
+                      textAlign: "center",
+                      py: 4,
+                      fontFamily: "Urbanist",
+                      fontWeight: 500,
+                      fontSize: "1rem",
+                      color: "text.secondary",
+                    }}
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      gap={1}
+                    >
+                      <InboxIcon sx={{ fontSize: 48, color: "#cfd8dc" }} />
+                      <Typography
+                        variant="body1"
+                        sx={{ fontFamily: "Urbanist", color: "text.secondary" }}
+                      >
+                        No data available
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.map((row, index) => {
+                  const id = getRowId(row);
+                  const serialNumber = page * rowsPerPage + index + 1;
+                  return (
+                    <TableRow hover key={id}>
+                      <SerialNumberCell
+                        style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+                      >
+                        {serialNumber}
+                      </SerialNumberCell>
+                      {columns.map((column) => {
+                        const value = row[column.id];
+                        const displayValue = safeRenderValue(
+                          value,
+                          row,
+                          column.render
+                        );
+                        const isLongText =
+                          typeof value === "string" && value.length > 30;
+                        return (
+                          <TableCell
+                            key={column.id as string}
+                            sx={{
+                              textAlign: "center",
+                              width: `${
+                                100 / (columns.length + (showActions ? 1 : 0))
+                              }%`,
+                              minWidth: "120px",
+                              maxWidth: "220px",
+                              [theme.breakpoints.down("md")]: {
+                                minWidth: "100px",
+                                maxWidth: "180px",
+                              },
+                              [theme.breakpoints.down("sm")]: {
+                                minWidth: "80px",
+                                maxWidth: "150px",
+                              },
+                            }}
+                            style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+                          >
+                            {isLongText ? (
+                              <Tooltip title={value}>
+                                <span>{displayValue}</span>
+                              </Tooltip>
+                            ) : (
+                              displayValue
+                            )}
+                          </TableCell>
+                        );
+                      })}
+                      {showActions && (
                         <TableCell
-                          key={column.id as string}
                           sx={{
-                            textAlign: "center",
-                            width: `${100 / (columns.length + (showActions ? 1 : 0))}%`,
-                            minWidth: "120px",
-                            maxWidth: "220px",
-                            [theme.breakpoints.down("md")]: {
-                              minWidth: "100px",
-                              maxWidth: "180px",
-                            },
-                            [theme.breakpoints.down("sm")]: {
-                              minWidth: "80px",
-                              maxWidth: "150px",
-                            },
+                            width: "120px",
+                            minWidth: "100px",
+                            maxWidth: "150px",
                           }}
                           style={{ fontFamily: "Urbanist", fontWeight: 500 }}
                         >
-                          {isLongText ? (
-                            <Tooltip title={value}>
-                              <span>{displayValue}</span>
-                            </Tooltip>
-                          ) : (
-                            displayValue
-                          )}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              gap: 1,
+                              justifyContent: "center",
+                            }}
+                          >
+                            {onView && (
+                              <Tooltip title="View">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => onView(row)}
+                                  sx={{
+                                    background: alpha("#1976d2", 0.1),
+                                    "&:hover": {
+                                      background: alpha("#1976d2", 0.2),
+                                    },
+                                    "&:active": { transform: "scale(0.95)" },
+                                  }}
+                                >
+                                  <ViewIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {onEdit && (
+                              <Tooltip title="Edit">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => onEdit(row)}
+                                  sx={{
+                                    background: alpha("#ff9800", 0.1),
+                                    "&:hover": {
+                                      background: alpha("#ff9800", 0.2),
+                                    },
+                                    "&:active": { transform: "scale(0.95)" },
+                                  }}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {onDelete && (
+                              <Tooltip title="Delete">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => onDelete(row)}
+                                  sx={{
+                                    background: alpha("#f44336", 0.1),
+                                    "&:hover": {
+                                      background: alpha("#f44336", 0.2),
+                                    },
+                                    "&:active": { transform: "scale(0.95)" },
+                                  }}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </Box>
                         </TableCell>
-                      );
-                    })}
-                    {showActions && (
-                      <TableCell
-                        sx={{ width: "120px", minWidth: "100px", maxWidth: "150px" }}
-                        style={{ fontFamily: "Urbanist", fontWeight: 500 }}
-                      >
-                        <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-                          {onView && (
-                            <Tooltip title="View">
-                              <IconButton
-                                size="small"
-                                onClick={() => onView(row)}
-                                sx={{
-                                  background: alpha("#1976d2", 0.1),
-                                  "&:hover": { background: alpha("#1976d2", 0.2) },
-                                  "&:active": { transform: "scale(0.95)" },
-                                }}
-                              >
-                                <ViewIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                          {onEdit && (
-                            <Tooltip title="Edit">
-                              <IconButton
-                                size="small"
-                                onClick={() => onEdit(row)}
-                                sx={{
-                                  background: alpha("#ff9800", 0.1),
-                                  "&:hover": { background: alpha("#ff9800", 0.2) },
-                                  "&:active": { transform: "scale(0.95)" },
-                                }}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                          {onDelete && (
-                            <Tooltip title="Delete">
-                              <IconButton
-                                size="small"
-                                onClick={() => onDelete(row)}
-                                sx={{
-                                  background: alpha("#f44336", 0.1),
-                                  "&:hover": { background: alpha("#f44336", 0.2) },
-                                  "&:active": { transform: "scale(0.95)" },
-                                }}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </Box>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                );
-              })}
+                      )}
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         )}

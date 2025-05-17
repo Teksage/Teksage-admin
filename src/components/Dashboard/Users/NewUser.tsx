@@ -1001,8 +1001,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     variant="contained"
                     disabled={isLoading}
                     sx={{
+                      // background:
+                      //   "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
                       background:
-                        "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+                        "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "8px 24px",
@@ -1013,8 +1015,9 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
                       transition: "all 0.3s ease",
                       "&:hover": {
+                        // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
                         background:
-                          "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
                         boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
                         transform: "scale(1.02)",
                       },

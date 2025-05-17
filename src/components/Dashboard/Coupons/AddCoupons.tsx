@@ -2163,7 +2163,7 @@ const NewCoupon = ({ mode = "new" }) => {
                     disabled={isLoading}
                     sx={{
                       background:
-                        "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+                        "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
                       color: "#fff",
                       borderRadius: "8px",
                       padding: "12px 24px",
@@ -2174,10 +2174,11 @@ const NewCoupon = ({ mode = "new" }) => {
                       boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
                       transition: "all 0.3s ease",
                       "&:hover": {
+                        // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
                         background:
-                          "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
-                        boxShadow: "0 6px 12px rgba(0,0,0,0.2)",
-                        transform: "translateY(-2px)",
+                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
+                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                        transform: "scale(1.02)",
                       },
                     }}
                   >

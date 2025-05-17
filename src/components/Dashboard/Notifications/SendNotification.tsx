@@ -381,11 +381,20 @@ const SendNotification: React.FC = () => {
                       fontFamily: "Urbanist",
                       fontWeight: 800,
                       background:
-                        "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)",
+                        "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
                       borderRadius: "50px",
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
                       fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                        background:
+                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
+                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                        transform: "scale(1.02)",
+                      },
                     }}
                   >
                     Send to All
@@ -835,7 +844,7 @@ const SendNotification: React.FC = () => {
                       fontWeight: 800,
                       background:
                         selectedUsers.length > 0
-                          ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
+                          ? "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)"
                           : "rgba(0, 0, 0, 0.12)",
                       color:
                         selectedUsers.length > 0 ? "white" : "text.disabled",
@@ -843,6 +852,15 @@ const SendNotification: React.FC = () => {
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
                       fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                        background:
+                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
+                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                        transform: "scale(1.02)",
+                      },
                     }}
                   >
                     Send to Selected
@@ -1072,12 +1090,21 @@ const SendNotification: React.FC = () => {
                       fontWeight: 800,
                       background:
                         selectedNakshatras.length > 0
-                          ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
+                          ? "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)"
                           : "rgba(0, 0, 0, 0.12)",
                       borderRadius: "50px",
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
                       fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                        background:
+                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
+                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                        transform: "scale(1.02)",
+                      },
                     }}
                   >
                     Send to Nakshatra
@@ -1276,12 +1303,21 @@ const SendNotification: React.FC = () => {
                       fontWeight: 800,
                       background:
                         selectedRashis.length > 0
-                          ? "linear-gradient(135deg, #10B100 0%, #1B4D3E 100%)"
+                          ? "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)"
                           : "rgba(0, 0, 0, 0.12)",
                       borderRadius: "50px",
                       px: { xs: 3, sm: 4 },
                       py: { xs: 1, sm: 1.5 },
                       fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                        background:
+                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
+                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                        transform: "scale(1.02)",
+                      },
                     }}
                   >
                     Send to Rashi
