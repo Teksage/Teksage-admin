@@ -38,7 +38,7 @@ const TableHeader = ({
   clearAllFilters,
   hasFilterableColumns,
   // hasFeeData,
-  mobileFiltersOpen
+  mobileFiltersOpen,
 }: TableHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -58,7 +58,7 @@ const TableHeader = ({
     >
       <Typography
         variant="h5"
-        style={{ fontFamily: 'Urbanist', fontWeight: 800 }}
+        style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         sx={{
           maxWidth: "50%", // Prevent title from pushing buttons too far
           overflow: "hidden",
@@ -90,17 +90,19 @@ const TableHeader = ({
             style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
             sx={{
               px: isMobile ? 1 : 2,
-              background: "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+              // background: "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
+              background: "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
               color: "#fff",
               borderRadius: "8px",
-              padding: "8px 24px",
+              padding: "7px 22px",
               // fontWeight: 600,
               fontSize: "0.95rem",
               textTransform: "none",
               boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
               transition: "all 0.3s ease",
               "&:hover": {
-                background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
+                background: "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
                 boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
                 transform: "scale(1.02)",
               },
@@ -114,7 +116,7 @@ const TableHeader = ({
             <ExportIcon />
           </IconButton>
         )}
-        {(hasFilterableColumns) && (
+        {hasFilterableColumns && (
           <Box
             sx={{
               display: "flex",
@@ -128,7 +130,7 @@ const TableHeader = ({
                 color="error"
                 size={isMobile ? "small" : "medium"}
                 sx={{ px: isMobile ? 1 : 2 }}
-                style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
+                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
               >
                 Clear
               </Button>

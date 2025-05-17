@@ -35,10 +35,10 @@ root.render(
   <StrictMode>
     <Provider store={store}>
       <HelmetProvider>
-        {/* <ThemeProvider theme={theme}> */}
+        <ThemeProvider theme={theme}>
           <CssBaseline />
           <RouterProvider router={router} />
-        {/* </ThemeProvider> */}
+        </ThemeProvider>
       </HelmetProvider>
     </Provider>
   </StrictMode>
