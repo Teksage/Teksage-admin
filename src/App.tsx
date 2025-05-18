@@ -4,7 +4,7 @@ import OfflineNotification from "./components/Elements/OfflineNotification";
 
 const App: React.FC = React.memo(() => {
   return (
-    <div style={{ backgroundColor: '#bfd9ff', minHeight: '100vh', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', position: 'relative' }}>
       <Outlet />
       <OfflineNotification />
     </div>
