@@ -159,6 +159,7 @@ const UserView: React.FC<{ mode: "view" }> = () => {
       setUserData(res?.data || null);
       setSubscriptionData(res?.data?.subscription || null);
       setConsultationData(res?.data?.events || null);
+      console.log(res?.data, "TTF")
     } catch (err) {
       setUserData(null);
       setSubscriptionData(null);
@@ -796,6 +797,8 @@ const ConsultationDetails = React.memo<{
       </Grid>
     );
   });
+
+  console.log(consultationData, typeof consultationData, "consultationData")
 
   return (
     <>
