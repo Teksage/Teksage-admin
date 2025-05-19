@@ -92,28 +92,29 @@ interface SubscriptionData {
 }
 
 interface ConsultationData {
-  event: {
-    user_horoscope: {
-      rasi_chart: string;
-      navamsa_chart: string;
-      date_of_birth: string;
-      time_of_birth: string;
-      place_of_birth: string;
-      rashi: string;
-      nakshatra: string;
-      lagna: string;
-    };
-    category: string[];
-    languages: string[];
-    booking_date: string;
-    start_datetime: string;
-    end_datetime: string;
-    consultation_fee: string;
-    rating: number | string;
-    feedback?: string;
-    status?: string;
-    id?: string;
+  // event: {
+  user_horoscope: {
+    rasi_chart: string;
+    navamsa_chart: string;
+    date_of_birth: string;
+    time_of_birth: string;
+    place_of_birth: string;
+    rashi: string;
+    nakshatra: string;
+    lagna: string;
   };
+  category: string[];
+  languages: string[];
+  booking_date: string;
+  start_datetime: string;
+  end_datetime: string;
+  consultation_fee: string;
+  currency: string;
+  rating: number | string;
+  feedback?: string;
+  status?: string;
+  id?: string;
+  // };
   astrologer_first_name: string;
   astrologer_last_name: string;
 }
@@ -159,8 +160,8 @@ const UserView: React.FC<{ mode: "view" }> = () => {
       setUserData(res?.data || null);
       setSubscriptionData(res?.data?.subscription || null);
       setConsultationData(res?.data?.events || null);
-      console.log(res?.data, "TTF")
-    } catch (err) {
+      console.log(res?.data, "TTF");
+    } catch (err: any) {
       setUserData(null);
       setSubscriptionData(null);
       setConsultationData(null);
@@ -583,42 +584,251 @@ const ConsultationDetails = React.memo<{
     setVisibleCount((prev) => Math.max(6, prev - 6));
   }, []);
 
+  // const ConsultationCard = React.memo<{
+  //   consultation: ConsultationData;
+  //   index: number;
+  //   handleOpenModal: (horoscope: any) => void;
+  // }>(({ consultation, index, handleOpenModal }) => {
+  //   // const event = consultation.event;
+  //   // const astrologerName = `${consultation.astrologer_first_name} ${consultation.astrologer_last_name}`;
+  //   // const hasHoroscope = event?.user_horoscope || [];
+  //   // const languages = event.languages ? event.languages.join(", ") : "N/A";
+  //   // const category = event.category ? event.category.join(", ") : "N/A";
+  //   // const rating = event.rating || "Not Rated";
+  //   const event = consultation?.event || {};
+  //   console.log(consultation, "event")
+  //   const astrologerName = `${consultation?.astrologer_first_name || "N/A"} ${
+  //     consultation?.astrologer_last_name || ""
+  //   }`.trim();
+
+  //   const hasHoroscope = Array.isArray(event.user_horoscope)
+  //     ? event.user_horoscope
+  //     : [];
+
+  //   const languages =
+  //     Array.isArray(event.languages) && event.languages.length > 0
+  //       ? event.languages.join(", ")
+  //       : "N/A";
+
+  //   const category =
+  //     Array.isArray(event.category) && event.category.length > 0
+  //       ? event.category.join(", ")
+  //       : "N/A";
+
+  //   const rating =
+  //     typeof event.rating === "number" ? `${event.rating} ★` : "Not Rated";
+
+  //   return (
+  //     <Grid item xs={12} sm={6} md={4} key={event.id || index}>
+  //       <Card
+  //         elevation={2}
+  //         sx={{
+  //           borderRadius: 2,
+  //           display: "flex",
+  //           flexDirection: "column",
+  //           height: "100%",
+  //           transition: "transform 0.2s ease-in-out, opacity 0.3s ease-in-out",
+  //           "&:hover": {
+  //             transform: "scale(1.02)",
+  //             boxShadow: "0 6px 12px rgba(0,0,0,0.1)",
+  //           },
+  //           opacity: 0,
+  //           animation: "fadeIn 0.5s forwards",
+  //           animationDelay: `${0.2}s`,
+  //         }}
+  //       >
+  //         <CardContent sx={{ flexGrow: 1 }}>
+  //           <Typography
+  //             variant="subtitle1"
+  //             style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+  //             color="#006400"
+  //           >
+  //             Consultation{" "}
+  //             <Box
+  //               component="span"
+  //               sx={{
+  //                 backgroundColor: "rgba(16, 177, 0, 0.7)",
+  //                 color: "white",
+  //                 px: 1,
+  //                 py: 0.2,
+  //                 borderRadius: "6px",
+  //                 fontWeight: 600,
+  //                 fontSize: "0.9rem",
+  //               }}
+  //             >
+  //               {dateFormat(event?.start_datetime, "DD-MMM-YYYY")}
+  //             </Box>
+  //           </Typography>
+  //           <Divider sx={{ my: 1 }} />
+  //           <Box sx={{ mb: 1 }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Category:</strong> {capitalizeCommaSeparated(category)}
+  //             </Typography>
+  //           </Box>
+  //           <Box sx={{ mb: 1 }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Astrologer:</strong>{" "}
+  //               {capitalizeFirstLetter(astrologerName)}
+  //             </Typography>
+  //           </Box>
+  //           <Box sx={{ mb: 1 }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Booking Date:</strong> {event.booking_date || "N/A"}
+  //             </Typography>
+  //           </Box>
+  //           <Box sx={{ mb: 1 }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Time:</strong>{" "}
+  //               {event.start_datetime && event.end_datetime
+  //                 ? `${event.start_datetime.slice(
+  //                     11,
+  //                     16
+  //                   )} - ${event.end_datetime.slice(11, 16)}`
+  //                 : "N/A"}
+  //             </Typography>
+  //           </Box>
+  //           <Box sx={{ mb: 1 }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Fee:</strong> ₹{event.consultation_fee || 0}
+  //             </Typography>
+  //           </Box>
+  //           <Box sx={{ mb: 1, display: "flex", alignItems: "center" }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Rating:</strong>{" "}
+  //             </Typography>
+  //             {typeof rating === "number" ? (
+  //               <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
+  //                 <StarIcon sx={{ color: "#fbc02d", fontSize: 18, mr: 0.5 }} />
+  //                 <Typography variant="body2">{rating}</Typography>
+  //               </Box>
+  //             ) : (
+  //               <Typography
+  //                 variant="body2"
+  //                 sx={{ ml: 1 }}
+  //                 style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //               >
+  //                 {rating}
+  //               </Typography>
+  //             )}
+  //           </Box>
+  //           <Box sx={{ mb: 1 }}>
+  //             <Typography
+  //               variant="body2"
+  //               color="text.secondary"
+  //               style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //             >
+  //               <strong>Languages:</strong>{" "}
+  //               {capitalizeCommaSeparated(languages)}
+  //             </Typography>
+  //           </Box>
+  //           {event.feedback && (
+  //             <Box sx={{ mb: 1 }}>
+  //               <Typography
+  //                 variant="body2"
+  //                 color="text.secondary"
+  //                 style={{ fontFamily: "Urbanist", fontWeight: 500 }}
+  //               >
+  //                 <strong>Feedback:</strong>{" "}
+  //                 {capitalizeFirstLetter(event.feedback)}
+  //               </Typography>
+  //             </Box>
+  //           )}
+  //           {event.status && (
+  //             <Box sx={{ mt: 1 }}>
+  //               <Chip
+  //                 label={event.status.toUpperCase()}
+  //                 color={event.status === "new" ? "info" : "default"}
+  //                 size="small"
+  //                 sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
+  //               />
+  //             </Box>
+  //           )}
+  //         </CardContent>
+  //         {hasHoroscope && (
+  //           <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
+  //             <Button
+  //               variant="outlined"
+  //               startIcon={<DescriptionIcon />}
+  //               onClick={() => handleOpenModal(event.user_horoscope)}
+  //               sx={{
+  //                 fontFamily: "Urbanist",
+  //                 borderColor: "rgba(16, 177, 0, 1)",
+  //                 color: "rgba(16, 177, 0, 1)",
+  //                 textTransform: "none",
+  //                 fontWeight: 800,
+  //                 "& .MuiButton-startIcon": { color: "rgba(16, 177, 0, 1)" },
+  //                 "&:hover": {
+  //                   borderColor: "rgba(27, 77, 62, 1)",
+  //                   color: "rgba(27, 77, 62, 1)",
+  //                   "& .MuiButton-startIcon": { color: "rgba(27, 77, 62, 1)" },
+  //                   transform: "scale(1.05)",
+  //                 },
+  //                 transition: "all 0.3s ease-in-out",
+  //               }}
+  //             >
+  //               View Horoscope
+  //             </Button>
+  //           </CardActions>
+  //         )}
+  //       </Card>
+  //     </Grid>
+  //   );
+  // });
+
+  console.log(consultationData, typeof consultationData, "consultationData");
+
   const ConsultationCard = React.memo<{
     consultation: ConsultationData;
     index: number;
     handleOpenModal: (horoscope: any) => void;
   }>(({ consultation, index, handleOpenModal }) => {
-    // const event = consultation.event;
-    // const astrologerName = `${consultation.astrologer_first_name} ${consultation.astrologer_last_name}`;
-    // const hasHoroscope = event?.user_horoscope || [];
-    // const languages = event.languages ? event.languages.join(", ") : "N/A";
-    // const category = event.category ? event.category.join(", ") : "N/A";
-    // const rating = event.rating || "Not Rated";
-    const event = consultation?.event || {};
-    console.log(consultation, "event")
     const astrologerName = `${consultation?.astrologer_first_name || "N/A"} ${
       consultation?.astrologer_last_name || ""
     }`.trim();
 
-    const hasHoroscope = Array.isArray(event.user_horoscope)
-      ? event.user_horoscope
-      : [];
+    const hasHoroscope = consultation?.user_horoscope || null;
 
     const languages =
-      Array.isArray(event.languages) && event.languages.length > 0
-        ? event.languages.join(", ")
+      Array.isArray(consultation.languages) && consultation.languages.length > 0
+        ? consultation.languages.join(", ")
         : "N/A";
 
     const category =
-      Array.isArray(event.category) && event.category.length > 0
-        ? event.category.join(", ")
+      Array.isArray(consultation.category) && consultation.category.length > 0
+        ? consultation.category.join(", ")
         : "N/A";
 
     const rating =
-      typeof event.rating === "number" ? `${event.rating} ★` : "Not Rated";
+      typeof consultation.rating === "number"
+        ? `${consultation.rating} ★`
+        : "Not Rated";
 
     return (
-      <Grid item xs={12} sm={6} md={4} key={event.id || index}>
+      <Grid item xs={12} sm={6} md={4} key={consultation.id || index}>
         <Card
           elevation={2}
           sx={{
@@ -655,7 +865,7 @@ const ConsultationDetails = React.memo<{
                   fontSize: "0.9rem",
                 }}
               >
-                {dateFormat(event?.start_datetime, "DD-MMM-YYYY")}
+                {dateFormat(consultation?.start_datetime, "DD-MMM-YYYY")}
               </Box>
             </Typography>
             <Divider sx={{ my: 1 }} />
@@ -684,7 +894,8 @@ const ConsultationDetails = React.memo<{
                 color="text.secondary"
                 style={{ fontFamily: "Urbanist", fontWeight: 500 }}
               >
-                <strong>Booking Date:</strong> {event.booking_date || "N/A"}
+                <strong>Booking Date:</strong>{" "}
+                {consultation.booking_date || "N/A"}
               </Typography>
             </Box>
             <Box sx={{ mb: 1 }}>
@@ -694,11 +905,11 @@ const ConsultationDetails = React.memo<{
                 style={{ fontFamily: "Urbanist", fontWeight: 500 }}
               >
                 <strong>Time:</strong>{" "}
-                {event.start_datetime && event.end_datetime
-                  ? `${event.start_datetime.slice(
+                {consultation.start_datetime && consultation.end_datetime
+                  ? `${consultation.start_datetime.slice(
                       11,
                       16
-                    )} - ${event.end_datetime.slice(11, 16)}`
+                    )} - ${consultation.end_datetime.slice(11, 16)}`
                   : "N/A"}
               </Typography>
             </Box>
@@ -708,7 +919,9 @@ const ConsultationDetails = React.memo<{
                 color="text.secondary"
                 style={{ fontFamily: "Urbanist", fontWeight: 500 }}
               >
-                <strong>Fee:</strong> ₹{event.consultation_fee || 0}
+                <strong>Fee:</strong>{" "}
+                {consultation.currency === "INR" ? "₹" : "$"}
+                {consultation.consultation_fee || 0}
               </Typography>
             </Box>
             <Box sx={{ mb: 1, display: "flex", alignItems: "center" }}>
@@ -744,7 +957,7 @@ const ConsultationDetails = React.memo<{
                 {capitalizeCommaSeparated(languages)}
               </Typography>
             </Box>
-            {event.feedback && (
+            {consultation.feedback && (
               <Box sx={{ mb: 1 }}>
                 <Typography
                   variant="body2"
@@ -752,15 +965,15 @@ const ConsultationDetails = React.memo<{
                   style={{ fontFamily: "Urbanist", fontWeight: 500 }}
                 >
                   <strong>Feedback:</strong>{" "}
-                  {capitalizeFirstLetter(event.feedback)}
+                  {capitalizeFirstLetter(consultation.feedback)}
                 </Typography>
               </Box>
             )}
-            {event.status && (
+            {consultation.status && (
               <Box sx={{ mt: 1 }}>
                 <Chip
-                  label={event.status.toUpperCase()}
-                  color={event.status === "new" ? "info" : "default"}
+                  label={consultation.status.toUpperCase()}
+                  color={consultation.status === "new" ? "info" : "default"}
                   size="small"
                   sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
                 />
@@ -772,7 +985,7 @@ const ConsultationDetails = React.memo<{
               <Button
                 variant="outlined"
                 startIcon={<DescriptionIcon />}
-                onClick={() => handleOpenModal(event.user_horoscope)}
+                onClick={() => handleOpenModal(consultation.user_horoscope)}
                 sx={{
                   fontFamily: "Urbanist",
                   borderColor: "rgba(16, 177, 0, 1)",
@@ -797,8 +1010,6 @@ const ConsultationDetails = React.memo<{
       </Grid>
     );
   });
-
-  console.log(consultationData, typeof consultationData, "consultationData")
 
   return (
     <>
