@@ -207,7 +207,7 @@
 
 // export default GenericTable;
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMediaQuery, useTheme } from "@mui/material";
 import TableHeader from "./TableHeader";
 import FilterSection from "./FilterSection";
@@ -242,8 +242,52 @@ function GenericTable<T>({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // State for filters, sorting, and mobile dialogs
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  // Initialize filters with default values, considering dependencies
+  const initialFilters = useMemo(() => {
+    const filters: Record<string, string> = {};
+    const dependencyMap: Record<string, keyof T> = {};
+
+    // First pass: Set non-dependent default values and collect dependencies
+    columns.forEach((column) => {
+      if (column.filterable && column.defaultValue && !column.dependsOn) {
+        filters[column.id as string] = column.defaultValue;
+      }
+      if (column.dependsOn) {
+        dependencyMap[column.id as string] = column.dependsOn;
+      }
+    });
+
+    // Second pass: Set default values for dependent columns
+    columns.forEach((column) => {
+      if (column.filterable && column.defaultValue && column.dependsOn) {
+        const dependentValue = filters[column.dependsOn as string] || "";
+        if (column.id === "local_consulting_fee" && column.dependsOn === "consulting_fee_code") {
+          const code = dependentValue.toLowerCase();
+          const options = column.dynamicFilterOptions?.(code) || [];
+          const defaultValue = code === "dlr" && column.defaultValue === "Less than 500"
+            ? "Less than 30"
+            : code === "inr" && column.defaultValue === "Less than 30"
+            ? "Less than 500"
+            : column.defaultValue;
+          const filterKey = typeof column.filterKey === "function"
+            ? column.filterKey(filters)
+            : column.filterKey || column.id;
+          if (defaultValue && defaultValue !== "") {
+            filters[filterKey as string] = defaultValue;
+          }
+        } else if (column.defaultValue !== "") {
+          const filterKey = typeof column.filterKey === "function"
+            ? column.filterKey(filters)
+            : column.filterKey || column.id;
+          filters[filterKey as string] = column.defaultValue;
+        }
+      }
+    });
+
+    return filters;
+  }, [columns]);
+
+  const [filters, setFilters] = useState<Record<string, string>>(initialFilters);
   const [showFilters, setShowFilters] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [mobileRowDetail, setMobileRowDetail] = useState<T | null>(null);
@@ -264,13 +308,43 @@ function GenericTable<T>({
   }>({ start: null, end: null });
   const [selectedPreset, setSelectedPreset] = useState<string>("");
 
-  // Memoized calculations
   const hasFilterableColumns = useMemo(
     () => columns.some((col) => col.filterable),
     [columns]
   );
 
-  // Handlers for filter, sort, and pagination
+  // Effect to call onFilterChange with initial filters on mount
+  useEffect(() => {
+    if (Object.keys(initialFilters).length > 0) {
+      onFilterChange?.(initialFilters);
+    }
+  }, [initialFilters, onFilterChange]);
+
+  // Effect to update consulting_fee filter when consulting_fee_code changes
+  useEffect(() => {
+    const consultingFeeColumn = columns.find(
+      (col) => col.id === "local_consulting_fee" && col.dependsOn === "consulting_fee_code"
+    );
+    if (consultingFeeColumn) {
+      const code = (filters["consulting_fee_code"] || "INR").toLowerCase();
+      const currentConsultingFee = filters["local_consulting_fee"] || filters["foreign_consulting_fee"];
+      const options = consultingFeeColumn.dynamicFilterOptions?.(code) || [];
+      const filterKey = typeof consultingFeeColumn.filterKey === "function"
+        ? consultingFeeColumn.filterKey(filters)
+        : consultingFeeColumn.filterKey || consultingFeeColumn.id;
+      const otherKey = code === "dlr" ? "local_consulting_fee" : "foreign_consulting_fee";
+
+      if (currentConsultingFee && !options.includes(currentConsultingFee)) {
+        const newDefault = code === "dlr" ? "Less than 30" : "Less than 500";
+        const newFilters = { ...filters };
+        delete newFilters[otherKey];
+        newFilters[filterKey as string] = newDefault;
+        setFilters(newFilters);
+        onFilterChange?.(newFilters);
+      }
+    }
+  }, [filters["consulting_fee_code"], columns, onFilterChange]);
+
   const handleSort = (columnId: keyof T) => {
     const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";
     const newDirection = isAsc ? "desc" : "asc";
@@ -279,13 +353,12 @@ function GenericTable<T>({
   };
 
   const clearAllFilters = () => {
-    setFilters({});
-    setUrlFilters({});
+    setFilters(initialFilters);
     setTempDateRange({ start: null, end: null });
     setSelectedPreset("");
     setFilterOptions({});
     setSearchValues({});
-    onFilterChange?.({});
+    onFilterChange?.(initialFilters);
   };
 
   const handleExport = () => {

@@ -131,7 +131,7 @@ const Consultations: React.FC = () => {
         id: "consulting_fee_code",
         label: "Fee Code",
         filterable: true,
-        filterOptions: ["INR", "USD"],
+        filterOptions: ["INR", "DLR"],
         render: (value: number) => {
           if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
           return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)

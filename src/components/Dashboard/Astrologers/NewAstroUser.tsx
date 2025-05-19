@@ -2005,7 +2005,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Foreign Consulting Fee (USD)*"
+                label="Foreign Consulting Fee (DLR)*"
                 fullWidth
                 size="small"
                 value={

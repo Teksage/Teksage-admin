@@ -42,6 +42,7 @@ const TableHeader = ({
 }: TableHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  console.log(filters, "filters--filters")
 
   const hasActiveFilters = Object.values(filters).some(
     (value) => value.trim() !== ""

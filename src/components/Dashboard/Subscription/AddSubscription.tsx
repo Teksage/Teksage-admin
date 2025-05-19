@@ -1178,7 +1178,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} sm={6}>
               <TextField
                 type="text"
-                label="Foreign Plan Price (USD)*"
+                label="Foreign Plan Price (DLR)*"
                 fullWidth
                 size="small"
                 value={

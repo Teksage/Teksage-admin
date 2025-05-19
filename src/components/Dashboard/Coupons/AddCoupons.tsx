@@ -1915,7 +1915,7 @@ const NewCoupon = ({ mode = "new" }) => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       type="text"
-                      label="Foreign Maximum Cap (USD)*"
+                      label="Foreign Maximum Cap (DLR)*"
                       fullWidth
                       size="medium"
                       value={inputValues.foreign_max_cap}
