@@ -12,6 +12,7 @@ interface UserData {
   mobile_number: string;
   status: string;
   plan_type: string;
+  user_type: string;
 }
 
 const Users: React.FC = () => {
@@ -112,28 +113,24 @@ const Users: React.FC = () => {
       label: "Name",
       filterable: true,
       width: "200px",
-      align: "left", // Left-align name
     },
     {
       id: "email",
       label: "Email",
       filterable: true,
       width: "250px",
-      align: "left", // Left-align email
     },
     {
       id: "mobile_number",
       label: "Mobile",
       filterable: true,
       width: "250px",
-      align: "left", // Center-align mobile number
     },
     {
       id: "plan_type",
       label: "Subscription",
       filterable: true,
       filterOptions: ["Free", "Premium"],
-      align: "center", // Center-align subscription
     },
     {
       id: "status",
@@ -153,7 +150,12 @@ const Users: React.FC = () => {
           />
         );
       },
-      align: "center", // Center-align status chip
+    },
+    {
+      id: "user_type",
+      label: "User Type",
+      filterable: true,
+      filterOptions: ["Customer", "Astrologer", "Admin"],
     },
   ];
 

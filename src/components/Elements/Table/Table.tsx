@@ -261,12 +261,12 @@ function GenericTable<T>({
     columns.forEach((column) => {
       if (column.filterable && column.defaultValue && column.dependsOn) {
         const dependentValue = filters[column.dependsOn as string] || "";
-        if (column.id === "local_consulting_fee" && column.dependsOn === "consulting_fee_code") {
+        if (column.id === "local_consulting_fee" && column.dependsOn === "currency") {
           const code = dependentValue.toLowerCase();
           const options = column.dynamicFilterOptions?.(code) || [];
-          const defaultValue = code === "dlr" && column.defaultValue === "Less than 500"
+          const defaultValue = code === "DLR" && column.defaultValue === "Less than 500"
             ? "Less than 30"
-            : code === "inr" && column.defaultValue === "Less than 30"
+            : code === "INR" && column.defaultValue === "Less than 30"
             ? "Less than 500"
             : column.defaultValue;
           const filterKey = typeof column.filterKey === "function"
@@ -320,22 +320,22 @@ function GenericTable<T>({
     }
   }, [initialFilters, onFilterChange]);
 
-  // Effect to update consulting_fee filter when consulting_fee_code changes
+  // Effect to update consulting_fee filter when currency changes
   useEffect(() => {
     const consultingFeeColumn = columns.find(
-      (col) => col.id === "local_consulting_fee" && col.dependsOn === "consulting_fee_code"
+      (col) => col.id === "local_consulting_fee" && col.dependsOn === "currency"
     );
     if (consultingFeeColumn) {
-      const code = (filters["consulting_fee_code"] || "INR").toLowerCase();
+      const code = (filters["currency"] || "INR").toLowerCase();
       const currentConsultingFee = filters["local_consulting_fee"] || filters["foreign_consulting_fee"];
       const options = consultingFeeColumn.dynamicFilterOptions?.(code) || [];
       const filterKey = typeof consultingFeeColumn.filterKey === "function"
         ? consultingFeeColumn.filterKey(filters)
         : consultingFeeColumn.filterKey || consultingFeeColumn.id;
-      const otherKey = code === "dlr" ? "local_consulting_fee" : "foreign_consulting_fee";
+      const otherKey = code === "DLR" ? "local_consulting_fee" : "foreign_consulting_fee";
 
       if (currentConsultingFee && !options.includes(currentConsultingFee)) {
-        const newDefault = code === "dlr" ? "Less than 30" : "Less than 500";
+        const newDefault = code === "DLR" ? "Less than 30" : "Less than 500";
         const newFilters = { ...filters };
         delete newFilters[otherKey];
         newFilters[filterKey as string] = newDefault;
@@ -343,7 +343,7 @@ function GenericTable<T>({
         onFilterChange?.(newFilters);
       }
     }
-  }, [filters["consulting_fee_code"], columns, onFilterChange]);
+  }, [filters["currency"], columns, onFilterChange]);
 
   const handleSort = (columnId: keyof T) => {
     const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";

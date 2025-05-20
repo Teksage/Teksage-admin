@@ -265,7 +265,7 @@ interface UserData {
   astrologer_id: number;
   local_consulting_fee: string;
   foreign_consulting_fee: string;
-  consulting_fee_code: string;
+  currency: string;
   customer_rating: string;
   experience: number;
   first_name: string;
@@ -390,7 +390,7 @@ const Astrologers: React.FC = () => {
         filterOptions: ["1", "2", "3", "4", "5"],
       },
       {
-        id: "consulting_fee_code",
+        id: "currency",
         label: "Fee Code",
         filterable: true,
         filterOnly: true,
@@ -402,17 +402,17 @@ const Astrologers: React.FC = () => {
         label: "Consulting Fee",
         filterable: true,
         filterOnly: true, // This column is only for filtering, not for display
-        dependsOn: "consulting_fee_code",
+        dependsOn: "currency",
         dynamicFilterOptions: (code) => {
-          if (code.toLowerCase() === "dlr") {
-            return ["Less than 30", "30 - 100", "Greater than 100"];
+          if (code.toLowerCase() === "DLR") {
+            return ["<30", "30-100", ">100"];
           }
-          return ["Less than 500", "500 - 1000", "Greater than 1000"];
+          return ["<500", "500-1000", ">1000"];
         },
-        defaultValue: "Less than 500",
+        // defaultValue: "Less than 500",
         filterKey: (filters: Record<string, string>) => {
-          const code = (filters["consulting_fee_code"] || "INR").toLowerCase();
-          return code === "dlr" ? "foreign_consulting_fee" : "local_consulting_fee";
+          const code = (filters["currency"] || "INR").toLowerCase();
+          return code === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee";
         },
       },
       {
@@ -437,7 +437,7 @@ const Astrologers: React.FC = () => {
         label: "Status",
         filterable: true,
         filterOptions: ["Active", "Inactive"],
-        defaultValue: "Active",
+        // defaultValue: "Active",
         render: (value: any) => {
           if (!value) {
             return <Chip label="N/A" color="default" />;

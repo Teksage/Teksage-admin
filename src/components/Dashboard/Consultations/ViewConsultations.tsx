@@ -121,12 +121,12 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <InfoItem label="Category" value={consultationData.category} />
+                <InfoItem label="Category" value={capitalizeCommaSeparated(consultationData.category?.join(", "))} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <InfoItem
                   label="Languages"
-                  value={consultationData.languages?.join(", ")}
+                  value={capitalizeCommaSeparated(consultationData.languages?.join(", "))}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -140,7 +140,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <InfoItem
-                  label="Consultation Fee"
+                  label={`Consultation Fee (${consultationData?.currency})`}
                   value={`₹${consultationData.consultation_fee}`}
                 />
               </Grid>

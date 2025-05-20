@@ -813,7 +813,11 @@ interface FilterItemProps<T> {
   setFilterOptions: React.Dispatch<
     React.SetStateAction<Record<string, string[]>>
   >;
-  handleFilterChange: (columnId: keyof T, value: string, filterKey?: keyof T | ((filters: Record<string, string>) => keyof T)) => void;
+  handleFilterChange: (
+    columnId: keyof T,
+    value: string,
+    filterKey?: keyof T | ((filters: Record<string, string>) => keyof T)
+  ) => void;
   handleSearchChange: (columnId: keyof T, searchValue: string) => Promise<void>;
 }
 
@@ -829,6 +833,7 @@ const FilterItem = <T,>({
 }: FilterItemProps<T>) => {
   const theme = useTheme();
   const columnId = column.id as string;
+  const isCurrency = columnId === "currency";
 
   // Determine the options based on whether the column has dynamicFilterOptions
   const options = column.dynamicFilterOptions
@@ -853,13 +858,19 @@ const FilterItem = <T,>({
   );
 
   // Determine the selected value based on filterKey
-  const filterKey = typeof column.filterKey === "function"
-    ? column.filterKey(filters)
-    : column.filterKey || column.id;
+  const filterKey =
+    typeof column.filterKey === "function"
+      ? column.filterKey(filters)
+      : column.filterKey || column.id;
   const selectedValue = filters[filterKey as string] || "";
 
-  // Don't show "All" in the input; leave it empty
-  const displayValue = selectedValue === "" ? "" : capitalizeFirstLetter(selectedValue);
+  // Display logic: For currency, show in uppercase; for others, capitalize first letter; hide "All"
+  const displayValue =
+    selectedValue === ""
+      ? ""
+      : isCurrency
+      ? selectedValue.toUpperCase()
+      : capitalizeFirstLetter(selectedValue);
 
   return (
     <>
@@ -886,7 +897,13 @@ const FilterItem = <T,>({
       >
         <Autocomplete
           options={["", ...options]}
-          getOptionLabel={(option) => (option === "" ? "All" : capitalizeFirstLetter(option))}
+          getOptionLabel={(option) =>
+            option === ""
+              ? "All"
+              : isCurrency
+              ? option.toUpperCase()
+              : capitalizeFirstLetter(option)
+          }
           value={selectedValue}
           onChange={(event, newValue) => {
             const selectedValue = newValue || "";
@@ -898,7 +915,12 @@ const FilterItem = <T,>({
             }));
           }}
           onInputChange={(event, newInputValue, reason) => {
-            if (event && reason === "input" && !column.filterOptions && !column.dynamicFilterOptions) {
+            if (
+              event &&
+              reason === "input" &&
+              !column.filterOptions &&
+              !column.dynamicFilterOptions
+            ) {
               handleSearchChange(column.id, newInputValue);
             }
           }}
@@ -924,24 +946,24 @@ const FilterItem = <T,>({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                    fontFamily: 'Urbanist',
+                    fontFamily: "Urbanist",
                     fontWeight: 500,
                   },
                 },
               }}
               sx={{
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'Urbanist',
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Urbanist",
                   fontWeight: 600,
-                  fontSize: '0.9rem',
+                  fontSize: "0.9rem",
                 },
                 "& .MuiInputBase-root": {
                   fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                  fontFamily: 'Urbanist',
+                  fontFamily: "Urbanist",
                   fontWeight: 600,
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: selectedValue
+                  borderColor: selectedValue && selectedValue !== ""
                     ? "#4caf50"
                     : alpha(theme.palette.divider, 0.3),
                 },
@@ -952,14 +974,21 @@ const FilterItem = <T,>({
             <li
               {...props}
               style={{
-                background: option === selectedValue ? alpha(theme.palette.primary.light, 0.2) : "transparent",
+                background:
+                  option === selectedValue
+                    ? alpha(theme.palette.primary.light, 0.2)
+                    : "transparent",
                 padding: "8px 12px",
                 whiteSpace: "nowrap",
-                fontFamily: 'Urbanist',
+                fontFamily: "Urbanist",
                 fontWeight: 500,
               }}
             >
-              {option === "" ? "All" : capitalizeFirstLetter(option)}
+              {option === ""
+                ? "All"
+                : isCurrency
+                ? option.toUpperCase()
+                : capitalizeFirstLetter(option)}
             </li>
           )}
           disableClearable={false}
@@ -998,14 +1027,19 @@ const FilterSection = <T,>({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const selectRef = useRef<HTMLElement | null>(null);
 
-  const handleFilterChange = (columnId: keyof T, value: string, filterKey?: keyof T | ((filters: Record<string, string>) => keyof T)) => {
+  const handleFilterChange = (
+    columnId: keyof T,
+    value: string,
+    filterKey?: keyof T | ((filters: Record<string, string>) => keyof T)
+  ) => {
     const isPureNumber = /^\d+(\.\d+)?$/.test(value.trim());
-    const processedValue = value && !isPureNumber ? value.toLowerCase() : value;
+    const processedValue = value && !isPureNumber && columnId!=="currency" ? value.toLowerCase() : value;
 
     const newFilters = { ...filters };
-    const keyToUpdate = typeof filterKey === "function" ? filterKey(newFilters) : filterKey || columnId;
+    const keyToUpdate =
+      typeof filterKey === "function" ? filterKey(newFilters) : filterKey || columnId;
 
-    if (columnId === "local_consulting_fee" && filters["consulting_fee_code"]) {
+    if (columnId === "local_consulting_fee" && filters["currency"]) {
       delete newFilters["local_consulting_fee"];
       delete newFilters["foreign_consulting_fee"];
       if (processedValue) {
@@ -1044,7 +1078,7 @@ const FilterSection = <T,>({
   };
 
   const handleDatePresetChange = (preset: string) => {
-    const today = new Date();
+    const today = new Date("2025-05-20"); // Updated to match current date (May 20, 2025)
     let start: Date | null = null;
     let end: Date | null = null;
     switch (preset) {
@@ -1140,7 +1174,10 @@ const FilterSection = <T,>({
           sx={{ width: "100%", maxWidth: { xs: "100%", sm: 200 } }}
           ref={(el: HTMLElement | null) => (selectRef.current = el)}
         >
-          <InputLabel style={{ fontFamily: 'Urbanist', fontWeight: 600 }} sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}>
+          <InputLabel
+            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
+          >
             Date Range
           </InputLabel>
           <Select
@@ -1148,7 +1185,7 @@ const FilterSection = <T,>({
             onChange={(e) => handleDatePresetChange(e.target.value as string)}
             label="Date Range"
             sx={{
-              fontFamily: 'Urbanist',
+              fontFamily: "Urbanist",
               fontWeight: 500,
               "& .MuiSelect-select": {
                 padding: "6px 10px",
@@ -1167,7 +1204,7 @@ const FilterSection = <T,>({
                 key={preset.value}
                 value={preset.value}
                 sx={{
-                  fontFamily: 'Urbanist',
+                  fontFamily: "Urbanist",
                   fontWeight: 500,
                 }}
                 onClick={
@@ -1204,7 +1241,7 @@ const FilterSection = <T,>({
           >
             <Typography
               variant="subtitle2"
-              style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
+              style={{ fontFamily: "Urbanist", fontWeight: 600 }}
               sx={{
                 mb: 2,
                 fontWeight: 600,
@@ -1249,10 +1286,7 @@ const FilterSection = <T,>({
                       sx: {
                         "& .MuiInputBase-root": {
                           borderRadius: "8px",
-                          background: alpha(
-                            theme.palette.background.paper,
-                            0.9
-                          ),
+                          background: alpha(theme.palette.background.paper, 0.9),
                           fontSize: { xs: "0.8rem", sm: "0.9rem" },
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
@@ -1296,10 +1330,7 @@ const FilterSection = <T,>({
                       sx: {
                         "& .MuiInputBase-root": {
                           borderRadius: "8px",
-                          background: alpha(
-                            theme.palette.background.paper,
-                            0.9
-                          ),
+                          background: alpha(theme.palette.background.paper, 0.9),
                           fontSize: { xs: "0.8rem", sm: "0.9rem" },
                         },
                         "& .MuiOutlinedInput-notchedOutline": {

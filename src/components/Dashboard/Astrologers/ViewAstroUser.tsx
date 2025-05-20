@@ -54,14 +54,20 @@ import InsightsIcon from "@mui/icons-material/Insights";
 import PublicIcon from "@mui/icons-material/Public";
 import DoneIcon from "@mui/icons-material/Done";
 import BadgeIcon from "@mui/icons-material/Badge";
-import { InfoItem, capitalizeFirstLetter, capitalizeCommaSeparated } from "../../Elements/CommonFunctions";
-import { fontWeight } from "@mui/system";
+import {
+  InfoItem,
+  capitalizeFirstLetter,
+  capitalizeCommaSeparated,
+} from "../../Elements/CommonFunctions";
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 
 interface UserData {
   astrologer_id: number;
   picture: any;
   astrologer_profile_info: string;
   local_consulting_fee: number;
+  foreign_consulting_fee: number;
+  currency: string;
   experience: number;
   expertise: any;
   languages: any;
@@ -178,7 +184,11 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" fontWeight={600} style={{fontFamily: "Urbanist", fontWeight: 800, color: "#2e7d32"}}>
+        <Typography
+          variant="h5"
+          fontWeight={600}
+          style={{ fontFamily: "Urbanist", fontWeight: 800, color: "#2e7d32" }}
+        >
           Astrologer Details
         </Typography>
       </Box>
@@ -262,7 +272,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                     variant="h5"
                     fontWeight={600}
                     sx={{ color: "#1a237e" }}
-                    style={{fontFamily: "Urbanist", fontWeight: 800}}
+                    style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                   >
                     {fullName}
                   </Typography>
@@ -277,7 +287,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                     size="large"
                     disabled={!userData}
                     sx={{
-                      fontFamily: "Urbanist", 
+                      fontFamily: "Urbanist",
                       fontWeight: 800,
                       borderRadius: "8px",
                       padding: "10px 24px",
@@ -333,7 +343,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                     letterSpacing: 0.5, // Slight spacing for readability
                     textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
                   }}
-                  style={{fontFamily: "Urbanist", fontWeight: 600}}
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                 >
                   Account Information
                 </Typography>
@@ -441,7 +451,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                     <Typography
                       variant="subtitle1"
                       color="#06402B"
-                      style={{fontFamily: "Urbanist", fontWeight: 600}}
+                      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                     >
                       Professional Information
                     </Typography>
@@ -463,12 +473,12 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                               icon={<Info sx={{ color: "#90EE90", mr: 1 }} />}
                             />
                             <InfoItem
-                              label="Consulting Fee"
+                              label="Local Consulting Fee (INR)"
                               value={userData?.local_consulting_fee?.toLocaleString(
                                 "en-IN"
                               )}
                               icon={
-                                <AttachMoney sx={{ color: "#90EE90", mr: 1 }} />
+                                <CurrencyRupeeIcon sx={{ color: "#90EE90", mr: 1 }} />
                               }
                             />
                             <InfoItem
@@ -501,6 +511,15 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                                 <Language sx={{ color: "#90EE90", mr: 1 }} />
                               }
                             />
+                            <InfoItem
+                              label="Foreign Consulting Fee (DLR)"
+                              value={userData?.foreign_consulting_fee?.toLocaleString(
+                                "en-IN"
+                              )}
+                              icon={
+                                <AttachMoney sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
                           </>
                         )}
                       </Grid>
@@ -515,7 +534,11 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
 
       {/* Subscription Info */}
       <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }} style={{fontFamily: "Urbanist", fontWeight: 800}}>
+        <Typography
+          variant="h6"
+          sx={{ mb: 2 }}
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+        >
           Subscription Details
         </Typography>
         {loading ? (
@@ -545,7 +568,10 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
             </Grid>
           </Grid>
         ) : (
-          <Typography color="text.disabled" style={{fontFamily: "Urbanist", fontWeight: 600}}>
+          <Typography
+            color="text.disabled"
+            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+          >
             No subscription data available.
           </Typography>
         )}
@@ -589,7 +615,11 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
   return (
     <>
       <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }} style={{fontFamily: "Urbanist", fontWeight: 800}}>
+        <Typography
+          variant="h6"
+          sx={{ mb: 2 }}
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+        >
           Consultation Details
         </Typography>
         {loading ? (
@@ -657,12 +687,14 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                           <Divider sx={{ my: 1 }} />
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="text.secondary">
-                              <strong>Category:</strong> {capitalizeCommaSeparated(category)}
+                              <strong>Category:</strong>{" "}
+                              {capitalizeCommaSeparated(category)}
                             </Typography>
                           </Box>
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="text.secondary">
-                              <strong>Customer:</strong> {capitalizeFirstLetter(customerName)}
+                              <strong>Customer:</strong>{" "}
+                              {capitalizeFirstLetter(customerName)}
                             </Typography>
                           </Box>
                           <Box sx={{ mb: 1 }}>
@@ -725,7 +757,8 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                           </Box>
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="text.secondary">
-                              <strong>Languages:</strong> {capitalizeCommaSeparated(languages)}
+                              <strong>Languages:</strong>{" "}
+                              {capitalizeCommaSeparated(languages)}
                             </Typography>
                           </Box>
                           {event.feedback && (
@@ -734,7 +767,8 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                <strong>Feedback:</strong> {capitalizeFirstLetter(event.feedback)}
+                                <strong>Feedback:</strong>{" "}
+                                {capitalizeFirstLetter(event.feedback)}
                               </Typography>
                             </Box>
                           )}
@@ -858,7 +892,10 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
             </Box>
           </>
         ) : (
-          <Typography color="text.disabled" style={{fontFamily: "Urbanist", fontWeight: 600}}>
+          <Typography
+            color="text.disabled"
+            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+          >
             No consultation data available.
           </Typography>
         )}
@@ -972,7 +1009,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                       alignItems: "center",
                       gap: 1.5,
                     }}
-                    style={{fontFamily: "Urbanist", fontWeight: 800}}
+                    style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                   >
                     <StarsIcon fontSize="large" />
                     Celestial Horoscope
@@ -1043,7 +1080,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                               alignItems: "center",
                               gap: 1,
                             }}
-                            style={{fontFamily: "Urbanist", fontWeight: 600}}
+                            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                           >
                             <PersonIcon fontSize="small" />
                             Cosmic Profile
@@ -1065,14 +1102,16 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <BadgeIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Name:</strong>{" "}
-                              {capitalizeFirstLetter(selectedHoroscope.customerName)}
+                              {capitalizeFirstLetter(
+                                selectedHoroscope.customerName
+                              )}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -1084,7 +1123,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <CalendarTodayIcon
                                 fontSize="small"
@@ -1111,7 +1150,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <AccessTimeIcon
                                 fontSize="small"
@@ -1133,7 +1172,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                               alignItems: "center",
                               gap: 1,
                             }}
-                            style={{fontFamily: "Urbanist"}}
+                            style={{ fontFamily: "Urbanist" }}
                           >
                             <PublicIcon fontSize="small" />
                             Celestial Data
@@ -1155,7 +1194,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <LocationOnIcon
                                 fontSize="small"
@@ -1174,14 +1213,16 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <ScatterPlotIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Rasi:</strong>{" "}
-                              {capitalizeFirstLetter(selectedHoroscope.horoscope.rashi)}
+                              {capitalizeFirstLetter(
+                                selectedHoroscope.horoscope.rashi
+                              )}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -1193,14 +1234,16 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <StarOutlineIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Nakshatram:</strong>{" "}
-                              {capitalizeFirstLetter(selectedHoroscope.horoscope.nakshatra)}
+                              {capitalizeFirstLetter(
+                                selectedHoroscope.horoscope.nakshatra
+                              )}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -1212,14 +1255,16 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                                 alignItems: "center",
                                 gap: 1,
                               }}
-                              style={{fontFamily: "Urbanist"}}
+                              style={{ fontFamily: "Urbanist" }}
                             >
                               <LanguageIcon
                                 fontSize="small"
                                 sx={{ opacity: 0.7 }}
                               />
                               <strong>Lagna:</strong>{" "}
-                              {capitalizeFirstLetter(selectedHoroscope.horoscope.lagna)}
+                              {capitalizeFirstLetter(
+                                selectedHoroscope.horoscope.lagna
+                              )}
                             </Typography>
                           </Box>
                         </Box>
@@ -1247,7 +1292,7 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                           background: "rgba(16, 177, 0, 0.1)",
                           border: "1px solid rgba(16, 177, 0, 0.2)",
                         }}
-                        style={{fontFamily: "Urbanist", fontWeight: 600}}
+                        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
                       >
                         <InsightsIcon fontSize="small" />
                         Celestial Charts
