@@ -27,6 +27,7 @@ import CustomSnackbar from "../../Elements/CustomSnackbar";
 import PlaceAutocomplete from "../../Elements/LocationAutocomplete";
 import { Person } from "@mui/icons-material";
 import ClearIcon from "@mui/icons-material/Clear";
+import { capitalizeFirstLetter } from "../../Elements/CommonFunctions";
 
 interface UserFormData {
   first_name: string;
@@ -128,26 +129,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           });
 
           const user = res?.data;
-          console.log(user, {
-            first_name: user.first_name || "",
-            last_name: user.last_name || "",
-            email: user.email || "",
-            mobile: user.mobile_number || "",
-            dateOfBirth: user.date_of_birth
-              ? new Date(user.date_of_birth)
-              : null,
-            timeOfBirth: user.time_of_birth
-              ? new Date(`1970-01-01T${user.time_of_birth}`)
-              : null,
-            placeOfBirth: user.place_of_birth || "",
-            preferredLocation: user.preferred_location || "",
-            rashi: user.rashi || "",
-            nakshatra: user.nakshatra || "",
-            status: user.status === "inactive" ? "Inactive" : "Active",
-            user_type:
-              user.user_type.charAt(0).toUpperCase() +
-                user.user_type.slice(1).toLowerCase() || "Customer",
-          });
           setFormData({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -159,8 +140,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             timeOfBirth: user.time_of_birth
               ? new Date(`1970-01-01T${user.time_of_birth}`)
               : null,
-            placeOfBirth: user.place_of_birth || "",
-            preferredLocation: user.preferred_location || "",
+            placeOfBirth: capitalizeFirstLetter(user.place_of_birth) || "",
+            preferredLocation: capitalizeFirstLetter(user.preferred_location) || "",
             rashi: user.rashi || "",
             nakshatra: user.nakshatra || "",
             status: user.status === "inactive" ? "Inactive" : "Active",

@@ -245,45 +245,11 @@ function GenericTable<T>({
   // Initialize filters with default values, considering dependencies
   const initialFilters = useMemo(() => {
     const filters: Record<string, string> = {};
-    const dependencyMap: Record<string, keyof T> = {};
-
-    // First pass: Set non-dependent default values and collect dependencies
     columns.forEach((column) => {
       if (column.filterable && column.defaultValue && !column.dependsOn) {
-        filters[column.id as string] = column.defaultValue;
-      }
-      if (column.dependsOn) {
-        dependencyMap[column.id as string] = column.dependsOn;
+        filters[column.id as string] = column.defaultValue.toUpperCase();
       }
     });
-
-    // Second pass: Set default values for dependent columns
-    columns.forEach((column) => {
-      if (column.filterable && column.defaultValue && column.dependsOn) {
-        const dependentValue = filters[column.dependsOn as string] || "";
-        if (column.id === "local_consulting_fee" && column.dependsOn === "currency") {
-          const code = dependentValue.toLowerCase();
-          const options = column.dynamicFilterOptions?.(code) || [];
-          const defaultValue = code === "DLR" && column.defaultValue === "Less than 500"
-            ? "Less than 30"
-            : code === "INR" && column.defaultValue === "Less than 30"
-            ? "Less than 500"
-            : column.defaultValue;
-          const filterKey = typeof column.filterKey === "function"
-            ? column.filterKey(filters)
-            : column.filterKey || column.id;
-          if (defaultValue && defaultValue !== "") {
-            filters[filterKey as string] = defaultValue;
-          }
-        } else if (column.defaultValue !== "") {
-          const filterKey = typeof column.filterKey === "function"
-            ? column.filterKey(filters)
-            : column.filterKey || column.id;
-          filters[filterKey as string] = column.defaultValue;
-        }
-      }
-    });
-
     return filters;
   }, [columns]);
 
@@ -295,12 +261,8 @@ function GenericTable<T>({
     key: keyof T | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
-  const [filterOptions, setFilterOptions] = useState<Record<string, string[]>>(
-    {}
-  );
-  const [filterLoading, setFilterLoading] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [filterOptions, setFilterOptions] = useState<Record<string, string[]>>({});
+  const [filterLoading, setFilterLoading] = useState<Record<string, boolean>>({});
   const [searchValues, setSearchValues] = useState<Record<string, string>>({});
   const [tempDateRange, setTempDateRange] = useState<{
     start: Date | null;
@@ -319,31 +281,6 @@ function GenericTable<T>({
       onFilterChange?.(initialFilters);
     }
   }, [initialFilters, onFilterChange]);
-
-  // Effect to update consulting_fee filter when currency changes
-  useEffect(() => {
-    const consultingFeeColumn = columns.find(
-      (col) => col.id === "local_consulting_fee" && col.dependsOn === "currency"
-    );
-    if (consultingFeeColumn) {
-      const code = (filters["currency"] || "INR").toLowerCase();
-      const currentConsultingFee = filters["local_consulting_fee"] || filters["foreign_consulting_fee"];
-      const options = consultingFeeColumn.dynamicFilterOptions?.(code) || [];
-      const filterKey = typeof consultingFeeColumn.filterKey === "function"
-        ? consultingFeeColumn.filterKey(filters)
-        : consultingFeeColumn.filterKey || consultingFeeColumn.id;
-      const otherKey = code === "DLR" ? "local_consulting_fee" : "foreign_consulting_fee";
-
-      if (currentConsultingFee && !options.includes(currentConsultingFee)) {
-        const newDefault = code === "DLR" ? "Less than 30" : "Less than 500";
-        const newFilters = { ...filters };
-        delete newFilters[otherKey];
-        newFilters[filterKey as string] = newDefault;
-        setFilters(newFilters);
-        onFilterChange?.(newFilters);
-      }
-    }
-  }, [filters["currency"], columns, onFilterChange]);
 
   const handleSort = (columnId: keyof T) => {
     const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";

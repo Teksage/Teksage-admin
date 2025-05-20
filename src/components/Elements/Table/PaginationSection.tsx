@@ -114,6 +114,7 @@ const PaginationSection: React.FC<PaginationSectionProps> = ({
   const theme = useTheme();
 
   const handleChangePage = (event: any, newPage: number) => {
+    console.log(event)
     onPageChange?.(newPage);
   };
 

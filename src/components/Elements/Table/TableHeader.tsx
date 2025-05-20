@@ -42,11 +42,21 @@ const TableHeader = ({
 }: TableHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  console.log(filters, "filters--filters")
 
-  const hasActiveFilters = Object.values(filters).some(
-    (value) => value.trim() !== ""
-  );
+  // const hasActiveFilters = Object.values(filters).some(
+  //   (value) => value.trim() !== ""
+  // );
+
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    if (key === "currency" && value) {
+      return false;
+    }
+    if (typeof value === "string") {
+      return value.trim() !== "";
+    }
+    // Special case: include currency even if it's not a string
+    return false;
+  });
 
   return (
     <Box
@@ -88,11 +98,12 @@ const TableHeader = ({
             startIcon={<AddIcon />}
             onClick={onAdd}
             size={isMobile ? "small" : "medium"}
-            style={{ fontFamily: 'Urbanist', fontWeight: 600 }}
+            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
             sx={{
               px: isMobile ? 1 : 2,
               // background: "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
-              background: "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
+              background:
+                "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
               color: "#fff",
               borderRadius: "8px",
               padding: "7px 22px",

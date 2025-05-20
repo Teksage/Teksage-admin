@@ -39,6 +39,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import StarIcon from "@mui/icons-material/Star";
 import { dateFormat } from "../../Elements/DateFormat";
 import { AstroChart } from "../../Elements/AstroChart";
+import { formatYears } from "../../Elements/CommonFunctions";
 
 // Material Icons
 import CloseIcon from "@mui/icons-material/Close";
@@ -483,7 +484,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                             />
                             <InfoItem
                               label="Experience"
-                              value={userData?.experience}
+                              value={`${formatYears(userData?.experience)}`}
                               icon={<Work sx={{ color: "#90EE90", mr: 1 }} />}
                             />
                           </>

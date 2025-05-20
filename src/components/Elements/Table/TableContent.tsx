@@ -1156,7 +1156,7 @@ const TableContent = <T,>({
                       }}
                       style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                     >
-                      {column.sortable ? (
+                      {/* {column.sortable ? ( */}
                         <TableSortLabel
                           active={sortConfig.key === column.id}
                           direction={
@@ -1168,9 +1168,9 @@ const TableContent = <T,>({
                         >
                           {column.label}
                         </TableSortLabel>
-                      ) : (
-                        column.label
-                      )}
+                      {/* // ) : (
+                      //   column.label
+                      // )} */}
                     </TableCell>
                   ))}
                 {showActions && (

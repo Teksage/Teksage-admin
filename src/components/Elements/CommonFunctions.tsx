@@ -1,6 +1,13 @@
 import React from "react";
 import { Box, Typography, Divider } from "@mui/material";
 
+export const formatYears = (years: number): string => {
+  return `${years} Year${years === 1 ? "" : "s"}`;
+}
+
+export const normalizeYearText = (text: string) =>
+  text.replace(/(Year)(s?)/gi, (_, y, s) => 'year' + s.toLowerCase());
+
 export const capitalizeFirstLetter = (text: string) =>
   text.charAt(0).toUpperCase() + text.slice(1);
 

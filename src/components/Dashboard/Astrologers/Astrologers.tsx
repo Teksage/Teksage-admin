@@ -263,8 +263,8 @@ import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
 interface UserData {
   astrologer_id: number;
-  local_consulting_fee: string;
-  foreign_consulting_fee: string;
+  local_consulting_fee: string | number; // Allow string or number based on API response
+  foreign_consulting_fee: string | number;
   currency: string;
   customer_rating: string;
   experience: number;
@@ -297,14 +297,13 @@ const Astrologers: React.FC = () => {
       };
 
       const filterEntries = Object.entries(currentFilters).filter(
-        ([_, v]) => v.trim() !== ""
+        ([_, v]:any) => v.trim() !== ""
       );
       filterEntries.forEach(([field, value]) => {
         params[field] = value.trim();
       });
 
       const endpoint = "api/admin/astrologers";
-
       const response = await callAPI({
         endpoint,
         method: "get",
@@ -376,10 +375,10 @@ const Astrologers: React.FC = () => {
         label: "Experience",
         filterable: true,
         filterOptions: [
-          "< 3 Years",
-          "3 - 5 Years",
-          "5 - 10 Years",
-          "> 10 Years",
+          "< 3 years",
+          "3 - 5 years",    
+          "5 - 10 years",
+          "> 10 years",
         ],
       },
       {
@@ -398,38 +397,34 @@ const Astrologers: React.FC = () => {
         defaultValue: "INR",
       },
       {
-        id: "consulting_fee_filter", // Unique ID for the filter-only column
+        id: "consultation_fee",
         label: "Consulting Fee",
         filterable: true,
-        filterOnly: true, // This column is only for filtering, not for display
+        filterOnly: true,
         dependsOn: "currency",
         dynamicFilterOptions: (code) => {
-          if (code.toLowerCase() === "DLR") {
-            return ["<30", "30-100", ">100"];
-          }
-          return ["<500", "500-1000", ">1000"];
+          return code.toUpperCase() === "DLR"
+            ? ["<30", "30-100", ">100"]
+            : ["<500", "500-1000", ">1000"];
         },
-        // defaultValue: "Less than 500",
-        filterKey: (filters: Record<string, string>) => {
-          const code = (filters["currency"] || "INR").toLowerCase();
-          return code === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee";
-        },
+        filterKey: (filters: Record<string, string>) =>
+          filters["currency"]?.toUpperCase() === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee",
       },
       {
         id: "local_consulting_fee",
         label: "Local Fee",
-        render: (value: number) => {
-          if (value == null || isNaN(value)) return "N/A";
-          return `₹ ${value.toLocaleString("en-US")}`;
+        render: (value: string | number) => {
+          if (value == null || isNaN(Number(value))) return "N/A";
+          return `₹ ${Number(value).toLocaleString("en-US")}`;
         },
       },
       {
         id: "foreign_consulting_fee",
         label: "Foreign Fee",
         width: "150px",
-        render: (value: number) => {
-          if (value == null || isNaN(value)) return "N/A";
-          return `$ ${value.toLocaleString("en-US")}`;
+        render: (value: string | number) => {
+          if (value == null || isNaN(Number(value))) return "N/A";
+          return `$ ${Number(value).toLocaleString("en-US")}`;
         },
       },
       {
@@ -437,8 +432,7 @@ const Astrologers: React.FC = () => {
         label: "Status",
         filterable: true,
         filterOptions: ["Active", "Inactive"],
-        // defaultValue: "Active",
-        render: (value: any) => {
+        render: (value: string) => {
           if (!value) {
             return <Chip label="N/A" color="default" />;
           }
@@ -468,20 +462,6 @@ const Astrologers: React.FC = () => {
     navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
   };
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleRowsPerPageChange = (newRowsPerPage: number) => {
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-  };
-
-  const handleFilterChange = (newFilters: Record<string, string>) => {
-    setFilters(newFilters);
-    setPage(0);
-  };
-
   return (
     <>
       {error && (
@@ -502,9 +482,15 @@ const Astrologers: React.FC = () => {
         initialRowsPerPage={rowsPerPage}
         page={page}
         rowsPerPage={rowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        onFilterChange={handleFilterChange}
+        onPageChange={(newPage) => setPage(newPage)}
+        onRowsPerPageChange={(newRowsPerPage) => {
+          setRowsPerPage(newRowsPerPage);
+          setPage(0);
+        }}
+        onFilterChange={(newFilters) => {
+          setFilters(newFilters);
+          setPage(0);
+        }}
         onFetchFilterOptions={fetchFilterOptions}
         loading={loading}
       />

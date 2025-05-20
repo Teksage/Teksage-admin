@@ -299,7 +299,6 @@ const Consultations: React.FC = () => {
       const fetchedTotal =
         typeof responseData.total === "number" ? responseData.total : 0;
 
-      // Ensure category is an array (handle edge cases if API returns inconsistent data)
       const normalizedConsultations = fetchedConsultations.map(
         (consultation: any) => ({
           ...consultation,
@@ -392,22 +391,18 @@ const Consultations: React.FC = () => {
         defaultValue: "INR",
       },
       {
-        id: "consulting_fee",
+        id: "consultation_fee",
         label: "Consulting Fee",
         filterable: true,
         filterOnly: true,
         dependsOn: "currency",
         dynamicFilterOptions: (code) => {
-          if (code.toLowerCase() === "DLR") {
-            return ["<30", "30-100", ">100"];
-          }
-          return ["<500", "500-1000", ">1000"];
+          return code.toUpperCase() === "DLR"
+            ? ["<30", "30-100", ">100"]
+            : ["<500", "500-1000", ">1000"];
         },
-        // defaultValue: "Less than 500",
-        filterKey: (filters: Record<string, string>) => {
-          const code = (filters["currency"] || "INR").toLowerCase();
-          return code === "DLR" ? "foreign_consultation_fee" : "consultation_fee";
-        },
+        filterKey: (filters: Record<string, string>) =>
+          filters["currency"]?.toUpperCase() === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee",
       },
       {
         id: "consultation_fee",
@@ -416,7 +411,7 @@ const Consultations: React.FC = () => {
         render: (value: string | number | null, row: ConsultationData) => {
           if (value == null || isNaN(Number(value))) return "N/A";
           const currency = row.currency || "INR";
-          const symbol = currency.toLowerCase() === "DLR" ? "$" : "₹";
+          const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
           return `${symbol} ${Number(value).toLocaleString("en-US")}`;
         },
       },
