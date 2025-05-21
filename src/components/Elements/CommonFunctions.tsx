@@ -6,7 +6,7 @@ export const formatYears = (years: number): string => {
 }
 
 export const normalizeYearText = (text: string) =>
-  text.replace(/(Year)(s?)/gi, (_, y, s) => 'year' + s.toLowerCase());
+  text.replace(/(Year)(s?)/gi, (_match, _y, s) => 'year' + s.toLowerCase());
 
 export const capitalizeFirstLetter = (text: string) =>
   text.charAt(0).toUpperCase() + text.slice(1);

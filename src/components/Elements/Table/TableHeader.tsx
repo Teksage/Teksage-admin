@@ -23,7 +23,6 @@ interface TableHeaderProps {
   filters: Record<string, string>;
   clearAllFilters: () => void;
   hasFilterableColumns: boolean;
-  // hasFeeData: boolean;
   mobileFiltersOpen: boolean;
 }
 
@@ -37,25 +36,16 @@ const TableHeader = ({
   filters,
   clearAllFilters,
   hasFilterableColumns,
-  // hasFeeData,
   mobileFiltersOpen,
 }: TableHeaderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // const hasActiveFilters = Object.values(filters).some(
-  //   (value) => value.trim() !== ""
-  // );
-
   const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
     if (key === "currency" && value) {
       return false;
     }
-    if (typeof value === "string") {
-      return value.trim() !== "";
-    }
-    // Special case: include currency even if it's not a string
-    return false;
+    return typeof value === "string" && value.trim() !== "";
   });
 
   return (
@@ -69,17 +59,16 @@ const TableHeader = ({
     >
       <Typography
         variant="h5"
-        style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         sx={{
-          maxWidth: "50%", // Prevent title from pushing buttons too far
+          maxWidth: "50%",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
-          // fontWeight: 600, // Bolder font for emphasis
-          // fontFamily: '"Poppins", sans-serif', // Modern font family
-          color: theme.palette.mode === "light" ? "#10B100" : "#4CAF50", // Green shade, adjusted for light/dark mode
-          letterSpacing: 0.5, // Slight spacing for readability
-          textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+          fontFamily: "Urbanist",
+          fontWeight: 800,
+          color: theme.palette.mode === "light" ? "#10B100" : "#4CAF50",
+          letterSpacing: 0.5,
+          textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
         }}
       >
         {title}
@@ -98,22 +87,20 @@ const TableHeader = ({
             startIcon={<AddIcon />}
             onClick={onAdd}
             size={isMobile ? "small" : "medium"}
-            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
             sx={{
               px: isMobile ? 1 : 2,
-              // background: "linear-gradient(135deg, #43a047 0%, #1b5e20 100%)",
               background:
                 "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
               color: "#fff",
               borderRadius: "8px",
               padding: "7px 22px",
-              // fontWeight: 600,
+              fontFamily: "Urbanist",
+              fontWeight: 600,
               fontSize: "0.95rem",
               textTransform: "none",
               boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
               transition: "all 0.3s ease",
               "&:hover": {
-                // background: "linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%)",
                 background: "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
                 boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
                 transform: "scale(1.02)",
@@ -141,8 +128,7 @@ const TableHeader = ({
                 onClick={clearAllFilters}
                 color="error"
                 size={isMobile ? "small" : "medium"}
-                sx={{ px: isMobile ? 1 : 2 }}
-                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                sx={{ px: isMobile ? 1 : 2, fontFamily: "Urbanist", fontWeight: 600 }}
               >
                 Clear
               </Button>
@@ -158,10 +144,10 @@ const TableHeader = ({
               size={isMobile ? "small" : "medium"}
               sx={{
                 backgroundColor: (isMobile ? mobileFiltersOpen : showFilters)
-                  ? "rgba(76, 175, 80, 0.2)" // light green background
+                  ? "rgba(76, 175, 80, 0.2)"
                   : "transparent",
                 border: (isMobile ? mobileFiltersOpen : showFilters)
-                  ? "2px solid #4CAF50" // green border
+                  ? "2px solid #4CAF50"
                   : "none",
                 borderRadius: "8px",
                 padding: "6px",

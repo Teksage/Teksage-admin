@@ -259,8 +259,6 @@ const Consultations: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(filters, "filters");
-
   const fetchConsultations = async (
     currentPage: number,
     currentFilters: Record<string, string>
@@ -288,7 +286,6 @@ const Consultations: React.FC = () => {
       });
 
       const responseData = response?.data;
-      console.log(responseData, "responseData");
       if (!responseData) {
         throw new Error("No data in response");
       }
@@ -317,7 +314,6 @@ const Consultations: React.FC = () => {
         setPage(0);
       }
     } catch (error) {
-      console.error("Failed to fetch consultations:", error);
       setError("Failed to load consultations. Please try again.");
       setConsultations([]);
       setTotalCount(0);
@@ -345,8 +341,7 @@ const Consultations: React.FC = () => {
           .filter((value: string) => value);
       }
       return uniqueValues;
-    } catch (error) {
-      console.error(`Failed to fetch filter options for ${field}:`, error);
+    } catch (error:any) {
       return [];
     }
   };
@@ -375,23 +370,24 @@ const Consultations: React.FC = () => {
         filterable: true,
         width: "140px",
         filterOptions: ["Career", "Health", "Wealth", "Relationship"],
-        render: (value: string[] | null) =>
-          value && value.length > 0
-            ? value
+        render: (value: any) => {
+          const categories = Array.isArray(value) ? value : value ? [value] : null;
+          return categories && categories.length > 0
+            ? categories
                 .map((v) => v.charAt(0).toUpperCase() + v.slice(1))
                 .join(", ")
-            : "N/A",
+            : "N/A";
+        },
       },
       {
         id: "currency",
         label: "Fee Code",
         filterable: true,
-        // filterOnly: true,
         filterOptions: ["INR", "DLR"],
         defaultValue: "INR",
       },
       {
-        id: "consultation_fee",
+        id: "consultation_fee_filter", // Renamed to avoid duplicate id
         label: "Consulting Fee",
         filterable: true,
         filterOnly: true,
@@ -402,13 +398,15 @@ const Consultations: React.FC = () => {
             : ["<500", "500-1000", ">1000"];
         },
         filterKey: (filters: Record<string, string>) =>
-          filters["currency"]?.toUpperCase() === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee",
+          filters["currency"]?.toUpperCase() === "DLR"
+            ? "foreign_consulting_fee"
+            : "local_consulting_fee",
       },
       {
         id: "consultation_fee",
         label: "Fee",
         width: "140px",
-        render: (value: string | number | null, row: ConsultationData) => {
+        render: (value: any, row: ConsultationData) => {
           if (value == null || isNaN(Number(value))) return "N/A";
           const currency = row.currency || "INR";
           const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
@@ -419,27 +417,30 @@ const Consultations: React.FC = () => {
         id: "start_datetime",
         label: "Consultation Date",
         filterable: false,
-        filterType: "date",
         width: "140px",
-        render: (value) =>
-          value
-            ? new Date(value).toLocaleString("en-US", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "N/A",
+        render: (value: any) => {
+          if (typeof value !== "string" || !value) return "N/A";
+          try {
+            return new Date(value).toLocaleString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          } catch {
+            return "N/A";
+          }
+        },
       },
       {
         id: "status",
         label: "Status",
         filterable: true,
         filterOptions: ["New", "Confirmed", "Completed"],
-        render: (value) => (
+        render: (value: any) => (
           <Chip
-            label={value}
+            label={value || "N/A"}
             color={
               value === "Completed"
                 ? "success"

@@ -263,7 +263,7 @@ import { callAPI, fetchFilterValues } from "../../../api/crudFactory";
 
 interface UserData {
   astrologer_id: number;
-  local_consulting_fee: string | number; // Allow string or number based on API response
+  local_consulting_fee: string | number;
   foreign_consulting_fee: string | number;
   currency: string;
   customer_rating: string;
@@ -282,8 +282,6 @@ const Astrologers: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(filters, "filters");
-
   const fetchAstrologers = async (
     currentPage: number,
     currentFilters: Record<string, string>
@@ -297,7 +295,7 @@ const Astrologers: React.FC = () => {
       };
 
       const filterEntries = Object.entries(currentFilters).filter(
-        ([_, v]:any) => v.trim() !== ""
+        ([_, v]) => v.trim() !== ""
       );
       filterEntries.forEach(([field, value]) => {
         params[field] = value.trim();
@@ -327,8 +325,7 @@ const Astrologers: React.FC = () => {
       if (currentPage * rowsPerPage >= fetchedTotal && fetchedTotal > 0) {
         setPage(0);
       }
-    } catch (error) {
-      console.error("Failed to fetch astrologers:", error);
+    } catch (error:any) {
       setError("Failed to load astrologers. Please try again.");
       setAstrologers([]);
       setTotalCount(0);
@@ -353,7 +350,6 @@ const Astrologers: React.FC = () => {
       );
       return uniqueValues;
     } catch (error) {
-      console.error(`Failed to fetch filter options for ${field}:`, error);
       return [];
     }
   };
@@ -376,7 +372,7 @@ const Astrologers: React.FC = () => {
         filterable: true,
         filterOptions: [
           "< 3 years",
-          "3 - 5 years",    
+          "3 - 5 years",
           "5 - 10 years",
           "> 10 years",
         ],
@@ -408,7 +404,9 @@ const Astrologers: React.FC = () => {
             : ["<500", "500-1000", ">1000"];
         },
         filterKey: (filters: Record<string, string>) =>
-          filters["currency"]?.toUpperCase() === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee",
+          filters["currency"]?.toUpperCase() === "DLR"
+            ? "foreign_consulting_fee"
+            : "local_consulting_fee",
       },
       {
         id: "local_consulting_fee",

@@ -484,7 +484,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                             />
                             <InfoItem
                               label="Experience"
-                              value={`${formatYears(userData?.experience)}`}
+                              value={`${formatYears(userData?.experience ?? 0)}`}
                               icon={<Work sx={{ color: "#90EE90", mr: 1 }} />}
                             />
                           </>

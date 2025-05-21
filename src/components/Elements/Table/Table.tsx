@@ -215,7 +215,7 @@ import TableContent from "./TableContent";
 import PaginationSection from "./PaginationSection";
 import MobileRowDetailDialog from "./MobileRowDetailDialog";
 import MobileFiltersDialog from "./MobileFiltersDialog";
-import { TableProps } from "./types";
+import { TableColumn, TableProps } from "./types";
 
 function GenericTable<T>({
   data,
@@ -242,7 +242,6 @@ function GenericTable<T>({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Initialize filters with default values, considering dependencies
   const initialFilters = useMemo(() => {
     const filters: Record<string, string> = {};
     columns.forEach((column) => {
@@ -275,7 +274,6 @@ function GenericTable<T>({
     [columns]
   );
 
-  // Effect to call onFilterChange with initial filters on mount
   useEffect(() => {
     if (Object.keys(initialFilters).length > 0) {
       onFilterChange?.(initialFilters);
@@ -300,23 +298,30 @@ function GenericTable<T>({
 
   const handleExport = () => {
     const csv = [
-      columns.map((col: any) => col.label).join(","),
-      ...data.map((row: any) =>
+      columns.map((col: TableColumn<T>) => col.label).join(","),
+      ...data.map((row:any) =>
         columns
-          .map((col: any) => {
+          .map((col: TableColumn<T>) => {
             const value = col.render
               ? col.render(row[col.id], row)
               : row[col.id]?.toString() || "";
-            return `"${value.toString().replace(/"/g, '""') || ""}"`;
+            // Convert React nodes or objects to string, handle quotes for CSV
+            const stringValue =
+              typeof value === "string"
+                ? value
+                : value && typeof value === "object" && "props" in value
+                ? value.props.children?.toString() || ""
+                : value?.toString() || "";
+            return `"${stringValue.replace(/"/g, '""')}"`;
           })
           .join(",")
       ),
     ].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${title}.csv`;
+    a.download = `${title.replace(/\s+/g, "_").toLowerCase()}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -415,6 +420,7 @@ function GenericTable<T>({
             onFilterChange={onFilterChange}
             onFetchFilterOptions={onFetchFilterOptions}
             clearAllFilters={clearAllFilters}
+            title={title}
           />
         </>
       )}

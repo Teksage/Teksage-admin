@@ -678,10 +678,6 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   Box,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
   Autocomplete,
   TextField,
   alpha,
@@ -689,6 +685,10 @@ import {
   Popper,
   CircularProgress,
   Popover,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -703,36 +703,6 @@ import {
   subMonths,
 } from "date-fns";
 import { TableColumn } from "./types";
-import { capitalizeFirstLetter, normalizeYearText } from "../CommonFunctions";
-
-// Custom hook to calculate options list width
-const useOptionsListWidth = (options: string[]) => {
-  const [optionsListWidth, setOptionsListWidth] = useState(250);
-  const textMeasureRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (options.length > 0 && textMeasureRef.current) {
-      const allOptions = ["", ...options];
-      const optionTexts = allOptions.map((option) =>
-        option === "" ? "Select" : option.toUpperCase()
-      );
-
-      let maxWidth = 0;
-      optionTexts.forEach((text) => {
-        if (textMeasureRef.current) {
-          textMeasureRef.current.textContent = text;
-          const width = textMeasureRef.current.offsetWidth;
-          maxWidth = Math.max(maxWidth, width);
-        }
-      });
-
-      const finalWidth = Math.max(maxWidth + 30, 250);
-      setOptionsListWidth(finalWidth);
-    }
-  }, [options]);
-
-  return { optionsListWidth, textMeasureRef };
-};
 
 const FiltersContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -809,12 +779,40 @@ interface FilterItemProps<T> {
     React.SetStateAction<Record<string, string[]>>
   >;
   handleFilterChange: (
-    columnId: keyof T,
+    columnId: keyof T | string,
     value: string,
     filterKey?: keyof T | ((filters: Record<string, string>) => string)
   ) => void;
   handleSearchChange: (columnId: keyof T, searchValue: string) => Promise<void>;
 }
+
+const useOptionsListWidth = (options: string[]) => {
+  const [optionsListWidth, setOptionsListWidth] = useState(250);
+  const textMeasureRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (options.length > 0 && textMeasureRef.current) {
+      const allOptions = ["", ...options];
+      const optionTexts = allOptions.map((option) =>
+        option === "" ? "Select" : option.toUpperCase()
+      );
+
+      let maxWidth = 0;
+      optionTexts.forEach((text) => {
+        if (textMeasureRef.current) {
+          textMeasureRef.current.textContent = text;
+          const width = textMeasureRef.current.offsetWidth;
+          maxWidth = Math.max(maxWidth, width);
+        }
+      });
+
+      const finalWidth = Math.max(maxWidth + 30, 250);
+      setOptionsListWidth(finalWidth);
+    }
+  }, [options]);
+
+  return { optionsListWidth, textMeasureRef };
+};
 
 const FilterItem = <T,>({
   column,
@@ -830,10 +828,11 @@ const FilterItem = <T,>({
   const columnId = column.id as string;
   const isCurrency = columnId === "currency";
 
-  // Determine the options based on whether the column has dynamicFilterOptions
   const options = useMemo(() => {
     return column.dynamicFilterOptions
-      ? column.dynamicFilterOptions(filters[column.dependsOn as string]?.toUpperCase() || "INR")
+      ? column.dynamicFilterOptions(
+          filters[column.dependsOn as string]?.toUpperCase() || "INR"
+        )
       : column.filterOptions || filterOptions[columnId] || [];
   }, [column, filters, filterOptions]);
 
@@ -854,7 +853,6 @@ const FilterItem = <T,>({
     />
   );
 
-  // Determine the selected value based on filterKey
   const filterKey = useMemo(() => {
     return typeof column.filterKey === "function"
       ? column.filterKey(filters)
@@ -862,8 +860,6 @@ const FilterItem = <T,>({
   }, [column, filters]);
 
   const selectedValue = filters[filterKey as string] || "";
-
-  // Display value: empty for "Select", uppercase for currency, as-is for others
   const displayValue = selectedValue === "" ? "" : isCurrency ? selectedValue.toUpperCase() : selectedValue;
 
   return (
@@ -894,9 +890,8 @@ const FilterItem = <T,>({
           getOptionLabel={(option) =>
             option === "" ? "" : isCurrency ? option.toUpperCase() : option
           }
-          value={(columnId==="email" ? selectedValue : capitalizeFirstLetter(selectedValue) )|| ""}
-          onChange={(event, newValue) => {
-            console.log(event)
+          value={displayValue || ""}
+          onChange={(_, newValue) => {
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue, column.filterKey);
             setSearchValues((prev) => ({ ...prev, [columnId]: selectedValue }));
@@ -910,9 +905,10 @@ const FilterItem = <T,>({
               event &&
               reason === "input" &&
               !column.filterOptions &&
-              !column.dynamicFilterOptions
+              !column.dynamicFilterOptions &&
+              !column.filterOnly // Only search for data-bound columns
             ) {
-              handleSearchChange(column.id, newInputValue);
+              handleSearchChange(column.id as keyof T, newInputValue);
             }
           }}
           renderInput={(params) => (
@@ -921,7 +917,6 @@ const FilterItem = <T,>({
               label={column.label}
               size="small"
               variant="outlined"
-              value={displayValue}
               placeholder="Select"
               InputProps={{
                 ...params.InputProps,
@@ -982,8 +977,8 @@ const FilterItem = <T,>({
                 {option === ""
                   ? "Select"
                   : isCurrency
-                  ? option.toUpperCase() : column?.id==="email" ? option : capitalizeFirstLetter(option)
-                  }
+                  ? option.toUpperCase()
+                  : option}
               </li>
             );
           }}
@@ -1020,11 +1015,10 @@ const FilterSection = <T,>({
   title,
 }: FilterSectionProps<T>) => {
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const selectRef = useRef<HTMLElement | null>(null);
   const prevCurrencyRef = useRef<string | undefined>(filters["currency"]);
 
-  // Reset consultation_fee when currency changes
   useEffect(() => {
     const currentCurrency = filters["currency"]?.toUpperCase();
     const prevCurrency = prevCurrencyRef.current?.toUpperCase();
@@ -1043,17 +1037,17 @@ const FilterSection = <T,>({
     }
 
     prevCurrencyRef.current = currentCurrency;
-  }, [filters["currency"], setFilters, onFilterChange]);
+  }, [filters, setFilters, onFilterChange]);
 
   const handleFilterChange = (
-    columnId: keyof T,
+    columnId: keyof T | string,
     value: string,
     filterKey?: keyof T | ((filters: Record<string, string>) => string)
   ) => {
     const newFilters = { ...filters };
     let keyToUpdate: string;
 
-    if (columnId === "consultation_fee") {
+    if (columnId === "consultation_fee" || columnId === "consultation_fee_filter") {
       const currency = filters["currency"]?.toUpperCase() || "INR";
       keyToUpdate = currency === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee";
       const otherKey = currency === "DLR" ? "local_consulting_fee" : "foreign_consulting_fee";
@@ -1061,7 +1055,7 @@ const FilterSection = <T,>({
     } else {
       keyToUpdate =
         typeof filterKey === "function"
-          ? filterKey(newFilters) as string
+          ? filterKey(newFilters)
           : (filterKey || columnId) as string;
     }
 
@@ -1088,7 +1082,6 @@ const FilterSection = <T,>({
       const options = await onFetchFilterOptions(columnId, searchValue);
       setFilterOptions((prev) => ({ ...prev, [columnIdStr]: options }));
     } catch (error) {
-      console.error(`Failed to fetch filter`, error);
       setFilterOptions((prev) => ({ ...prev, [columnIdStr]: [] }));
     } finally {
       setFilterLoading((prev) => ({ ...prev, [columnIdStr]: false }));
@@ -1096,7 +1089,7 @@ const FilterSection = <T,>({
   };
 
   const handleDatePresetChange = (preset: string) => {
-    const today = new Date("2025-05-20");
+    const today = new Date();
     let start: Date | null = null;
     let end: Date | null = null;
     switch (preset) {
@@ -1142,6 +1135,7 @@ const FilterSection = <T,>({
   };
 
   const handleCustomClick = (event: React.MouseEvent<HTMLElement>) => {
+    console.log(event)
     setSelectedPreset("Custom");
     setAnchorEl(selectRef.current);
   };
@@ -1193,8 +1187,7 @@ const FilterSection = <T,>({
           ref={(el: HTMLElement | null) => (selectRef.current = el)}
         >
           <InputLabel
-            style={{ fontFamily: "Urbanist", fontWeight: 600 }}
-            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
+            sx={{ fontFamily: "Urbanist", fontWeight: 600, fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
           >
             Date Range
           </InputLabel>
@@ -1259,9 +1252,9 @@ const FilterSection = <T,>({
           >
             <Typography
               variant="subtitle2"
-              style={{ fontFamily: "Urbanist", fontWeight: 600 }}
               sx={{
                 mb: 2,
+                fontFamily: "Urbanist",
                 fontWeight: 600,
                 color: theme.palette.success.main,
               }}
