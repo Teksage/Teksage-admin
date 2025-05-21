@@ -259,6 +259,8 @@ const Consultations: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  console.log(filters, "filters")
+
   const fetchConsultations = async (
     currentPage: number,
     currentFilters: Record<string, string>
@@ -399,8 +401,8 @@ const Consultations: React.FC = () => {
         },
         filterKey: (filters: Record<string, string>) =>
           filters["currency"]?.toUpperCase() === "DLR"
-            ? "foreign_consulting_fee"
-            : "local_consulting_fee",
+            ? "consultation_fee"
+            : "consultation_fee",
       },
       {
         id: "consultation_fee",

@@ -703,6 +703,7 @@ import {
   subMonths,
 } from "date-fns";
 import { TableColumn } from "./types";
+import { capitalizeFirstLetter } from "../CommonFunctions";
 
 const FiltersContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -860,7 +861,7 @@ const FilterItem = <T,>({
   }, [column, filters]);
 
   const selectedValue = filters[filterKey as string] || "";
-  const displayValue = selectedValue === "" ? "" : isCurrency ? selectedValue.toUpperCase() : selectedValue;
+  // const displayValue = selectedValue === "" ? "" : isCurrency ? selectedValue.toUpperCase() : selectedValue;
 
   return (
     <>
@@ -890,7 +891,11 @@ const FilterItem = <T,>({
           getOptionLabel={(option) =>
             option === "" ? "" : isCurrency ? option.toUpperCase() : option
           }
-          value={displayValue || ""}
+          value={
+            (columnId === "email"
+              ? filters[columnId]
+              : capitalizeFirstLetter(filters[columnId])) || ""
+          }
           onChange={(_, newValue) => {
             const selectedValue = newValue || "";
             handleFilterChange(column.id, selectedValue, column.filterKey);
@@ -950,9 +955,10 @@ const FilterItem = <T,>({
                   fontWeight: 600,
                 },
                 "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: selectedValue && selectedValue !== ""
-                    ? "#4caf50"
-                    : alpha(theme.palette.divider, 0.3),
+                  borderColor:
+                    selectedValue && selectedValue !== ""
+                      ? "#4caf50"
+                      : alpha(theme.palette.divider, 0.3),
                 },
               }}
             />
@@ -976,9 +982,11 @@ const FilterItem = <T,>({
               >
                 {option === ""
                   ? "Select"
+                  : column?.id === "email"
+                  ? option
                   : isCurrency
                   ? option.toUpperCase()
-                  : option}
+                  : capitalizeFirstLetter(option)}
               </li>
             );
           }}
@@ -1047,20 +1055,34 @@ const FilterSection = <T,>({
     const newFilters = { ...filters };
     let keyToUpdate: string;
 
-    if (columnId === "consultation_fee" || columnId === "consultation_fee_filter") {
+    if (
+      columnId === "consultation_fee" ||
+      columnId === "consultation_fee_filter"
+    ) {
       const currency = filters["currency"]?.toUpperCase() || "INR";
-      keyToUpdate = currency === "DLR" ? "foreign_consulting_fee" : "local_consulting_fee";
-      const otherKey = currency === "DLR" ? "local_consulting_fee" : "foreign_consulting_fee";
+      keyToUpdate =
+        columnId === "consultation_fee_filter"
+          ? "consultation_fee"
+          : currency === "DLR"
+          ? "foreign_consulting_fee"
+          : "local_consulting_fee";
+      const otherKey =
+        columnId === "consultation_fee_filter"
+          ? "consultation_fee"
+          : currency === "DLR"
+          ? "local_consulting_fee"
+          : "foreign_consulting_fee";
       delete newFilters[otherKey];
     } else {
       keyToUpdate =
         typeof filterKey === "function"
           ? filterKey(newFilters)
-          : (filterKey || columnId) as string;
+          : ((filterKey || columnId) as string);
     }
 
     if (value && value !== "") {
-      newFilters[keyToUpdate] = columnId === "currency" ? value.toUpperCase() : value;
+      newFilters[keyToUpdate] =
+        columnId === "currency" ? value.toUpperCase() : value;
     } else {
       delete newFilters[keyToUpdate];
     }
@@ -1135,7 +1157,7 @@ const FilterSection = <T,>({
   };
 
   const handleCustomClick = (event: React.MouseEvent<HTMLElement>) => {
-    console.log(event)
+    console.log(event);
     setSelectedPreset("Custom");
     setAnchorEl(selectRef.current);
   };
@@ -1187,7 +1209,11 @@ const FilterSection = <T,>({
           ref={(el: HTMLElement | null) => (selectRef.current = el)}
         >
           <InputLabel
-            sx={{ fontFamily: "Urbanist", fontWeight: 600, fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
+            sx={{
+              fontFamily: "Urbanist",
+              fontWeight: 600,
+              fontSize: { xs: "0.8rem", sm: "0.9rem" },
+            }}
           >
             Date Range
           </InputLabel>
@@ -1297,7 +1323,10 @@ const FilterSection = <T,>({
                       sx: {
                         "& .MuiInputBase-root": {
                           borderRadius: "8px",
-                          background: alpha(theme.palette.background.paper, 0.9),
+                          background: alpha(
+                            theme.palette.background.paper,
+                            0.9
+                          ),
                           fontSize: { xs: "0.8rem", sm: "0.9rem" },
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
@@ -1341,7 +1370,10 @@ const FilterSection = <T,>({
                       sx: {
                         "& .MuiInputBase-root": {
                           borderRadius: "8px",
-                          background: alpha(theme.palette.background.paper, 0.9),
+                          background: alpha(
+                            theme.palette.background.paper,
+                            0.9
+                          ),
                           fontSize: { xs: "0.8rem", sm: "0.9rem" },
                         },
                         "& .MuiOutlinedInput-notchedOutline": {

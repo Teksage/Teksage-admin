@@ -8,8 +8,13 @@ export const formatYears = (years: number): string => {
 export const normalizeYearText = (text: string) =>
   text.replace(/(Year)(s?)/gi, (_match, _y, s) => 'year' + s.toLowerCase());
 
-export const capitalizeFirstLetter = (text: string) =>
-  text.charAt(0).toUpperCase() + text.slice(1);
+// export const capitalizeFirstLetter = (text: string) =>
+//   text?.charAt(0).toUpperCase() + text.slice(1);
+
+export const capitalizeFirstLetter = (text?: string): string => {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
 export const capitalizeCommaSeparated = (str: string) =>
   str
