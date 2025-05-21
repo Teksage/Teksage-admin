@@ -199,6 +199,10 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import {
+  FirstPage as FirstPageIcon,
+  LastPage as LastPageIcon,
+} from "@mui/icons-material";
 
 const StyledPaginationContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -246,7 +250,7 @@ const PaginationSection = ({
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> | SelectChangeEvent<number>
   ) => {
     // Ensure value is a string for parseInt
-    const value:any = "value" in event ? String(event.value) : event.target.value;
+    const value: any = "value" in event ? String(event.value) : event.target.value;
     const newRowsPerPage = parseInt(value, 10);
     onRowsPerPageChange?.(newRowsPerPage);
   };
@@ -286,6 +290,8 @@ const PaginationSection = ({
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={[]}
+            showFirstButton
+            showLastButton
             labelDisplayedRows={({ from, to, count }) =>
               `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`
             }
@@ -312,6 +318,8 @@ const PaginationSection = ({
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           rowsPerPageOptions={rowsPerPageOptions}
+          showFirstButton
+          showLastButton
           labelRowsPerPage="Rows per page:"
           labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`

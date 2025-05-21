@@ -1357,11 +1357,12 @@ import {
   Calendar as CalendarIcon,
   Tag as TagIcon,
   Package as PackageIcon,
-  DollarSign as CurrencyIcon,
   Info as InfoIcon,
 } from "lucide-react";
 import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 
 interface CouponFormData {
   coupon_name: string;
@@ -1905,7 +1906,7 @@ const NewCoupon = ({ mode = "new" }) => {
                         },
                         startAdornment: (
                           <InputAdornment position="start">
-                            <CurrencyIcon size={20} />
+                            <CurrencyRupeeIcon fontSize="medium" />
                           </InputAdornment>
                         ),
                       }}
@@ -1941,7 +1942,7 @@ const NewCoupon = ({ mode = "new" }) => {
                         },
                         startAdornment: (
                           <InputAdornment position="start">
-                            <CurrencyIcon size={20} />
+                            <AttachMoneyIcon fontSize="medium" />
                           </InputAdornment>
                         ),
                       }}

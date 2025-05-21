@@ -129,6 +129,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           });
 
           const user = res?.data;
+          console.log(user, "user 112")
           setFormData({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -269,6 +270,20 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     }
     setIsLoading(true);
     try {
+      console.log({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        preferred_location: formData.preferredLocation,
+        email: formData.email,
+        mobile_number: formData.mobile,
+        birth_location: formData.placeOfBirth,
+        date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
+        time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+        rashi: formData.rashi,
+        nakshatra: formData.nakshatra,
+        status: formData.status.toLowerCase(),
+        user_type: formData.user_type.toLowerCase(),
+      })
       const response = await callAPI({
         endpoint:
           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
