@@ -60,7 +60,7 @@ import {
   capitalizeFirstLetter,
   capitalizeCommaSeparated,
 } from "../../Elements/CommonFunctions";
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
 interface UserData {
   astrologer_id: number;
@@ -479,12 +479,16 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                                 "en-IN"
                               )}
                               icon={
-                                <CurrencyRupeeIcon sx={{ color: "#90EE90", mr: 1 }} />
+                                <CurrencyRupeeIcon
+                                  sx={{ color: "#90EE90", mr: 1 }}
+                                />
                               }
                             />
                             <InfoItem
                               label="Experience"
-                              value={`${formatYears(userData?.experience ?? 0)}`}
+                              value={`${formatYears(
+                                userData?.experience ?? 0
+                              )}`}
                               icon={<Work sx={{ color: "#90EE90", mr: 1 }} />}
                             />
                           </>
@@ -774,14 +778,30 @@ const ConsultationDetails = ({ loading, consultationData }: any) => {
                             </Box>
                           )}
                           {event.status && (
+                            // <Box sx={{ mt: 1 }}>
+                            //   <Chip
+                            //     label={event.status.toUpperCase()}
+                            //     color={
+                            //       event.status === "new" ? "info" : "default"
+                            //     }
+                            //     size="small"
+                            //     sx={{ fontWeight: 500 }}
+                            //   />
+                            // </Box>
                             <Box sx={{ mt: 1 }}>
                               <Chip
-                                label={event.status.toUpperCase()}
+                                label={
+                                  event.status === "new"
+                                    ? "Failed"
+                                    : event.status.toUpperCase()
+                                }
                                 color={
-                                  event.status === "new" ? "info" : "default"
+                                  event.status === "new"
+                                    ? "error"
+                                    : "default"
                                 }
                                 size="small"
-                                sx={{ fontWeight: 500 }}
+                                sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
                               />
                             </Box>
                           )}

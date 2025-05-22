@@ -292,10 +292,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       }
     };
 
-  const handleDateChange = (value: Date | null) => {
-    setFormData((prev) => ({ ...prev, dateOfBirth: value }));
-    setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
-  };
+  // const handleDateChange = (value: Date | null) => {
+  //   setFormData((prev) => ({ ...prev, dateOfBirth: value }));
+  //   setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+  // };
 
   const handleTimeChange = (value: Date | null) => {
     setFormData((prev) => ({ ...prev, timeOfBirth: value }));
@@ -689,11 +689,34 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 label="Date of Birth *"
                 value={formData.dateOfBirth}
                 onChange={(newValue) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    dateOfBirth: newValue,
-                  }));
-                  setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+                  const today = new Date();
+                  today.setHours(23, 59, 59, 999); // Set to end of today for comparison
+                  // Check if newValue is valid and not in the future
+                  if (newValue && newValue <= today) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      dateOfBirth: newValue,
+                    }));
+                    setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+                  } else if (newValue && newValue > today) {
+                    // Handle invalid future date
+                    setErrors((prev) => ({
+                      ...prev,
+                      dateOfBirth: "Date of Birth cannot be in the future",
+                    }));
+                    // Optionally reset to null or today
+                    setFormData((prev) => ({
+                      ...prev,
+                      dateOfBirth: null, // Or set to today: new Date()
+                    }));
+                  } else {
+                    // Handle null or invalid date
+                    setFormData((prev) => ({
+                      ...prev,
+                      dateOfBirth: null,
+                    }));
+                    setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+                  }
                 }}
                 disabled={isViewMode}
                 maxDate={new Date()} // Restrict future dates

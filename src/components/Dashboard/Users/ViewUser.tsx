@@ -970,10 +970,22 @@ const ConsultationDetails = React.memo<{
               </Box>
             )}
             {consultation.status && (
+              // <Box sx={{ mt: 1 }}>
+              //   <Chip
+              //     label={consultation.status.toUpperCase()}
+              //     color={consultation.status === "new" ? "info" : "default"}
+              //     size="small"
+              //     sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
+              //   />
+              // </Box>
               <Box sx={{ mt: 1 }}>
                 <Chip
-                  label={consultation.status.toUpperCase()}
-                  color={consultation.status === "new" ? "info" : "default"}
+                  label={
+                    consultation.status === "new"
+                      ? "Failed"
+                      : consultation.status.toUpperCase()
+                  }
+                  color={consultation.status === "new" ? "error" : "default"}
                   size="small"
                   sx={{ fontWeight: 500, fontFamily: "Urbanist" }}
                 />

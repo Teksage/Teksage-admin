@@ -1361,8 +1361,8 @@ import {
 } from "lucide-react";
 import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
 interface CouponFormData {
   coupon_name: string;
@@ -1971,14 +1971,41 @@ const NewCoupon = ({ mode = "new" }) => {
                     <DatePicker
                       label="Start Date *"
                       value={formData.start_date}
+                      // onChange={(newValue) => {
+                      //   setFormData((prev) => ({
+                      //     ...prev,
+                      //     start_date: newValue,
+                      //   }));
+                      //   setErrors((prev) => ({ ...prev, start_date: "" }));
+                      // }}
                       onChange={(newValue) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          start_date: newValue,
-                        }));
-                        setErrors((prev) => ({ ...prev, start_date: "" }));
+                        const today = new Date();
+                        today.setHours(23, 59, 59, 999); // Set to end of today for comparison
+                        if (newValue && newValue <= today) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            start_date: newValue,
+                          }));
+                          setErrors((prev) => ({ ...prev, start_date: "" }));
+                        } else if (newValue && newValue > today) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            start_date: "Start Date cannot be in the future",
+                          }));
+                          setFormData((prev) => ({
+                            ...prev,
+                            start_date: null,
+                          }));
+                        } else {
+                          setFormData((prev) => ({
+                            ...prev,
+                            start_date: null,
+                          }));
+                          setErrors((prev) => ({ ...prev, start_date: "" }));
+                        }
                       }}
                       disabled={isViewMode}
+                      maxDate={new Date()} // Restrict future dates
                       slotProps={{ textField: startDateTextFieldProps }}
                     />
                   </Grid>
@@ -1988,13 +2015,27 @@ const NewCoupon = ({ mode = "new" }) => {
                       label="End Date *"
                       value={formData.end_date}
                       onChange={(newValue) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          end_date: newValue,
-                        }));
-                        setErrors((prev) => ({ ...prev, end_date: "" }));
+                        const today = new Date();
+                        today.setHours(23, 59, 59, 999); // Set to end of today for comparison
+                        if (newValue && newValue <= today) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            end_date: newValue,
+                          }));
+                          setErrors((prev) => ({ ...prev, end_date: "" }));
+                        } else if (newValue && newValue > today) {
+                          setErrors((prev) => ({
+                            ...prev,
+                            end_date: "End Date cannot be in the future",
+                          }));
+                          setFormData((prev) => ({ ...prev, end_date: null }));
+                        } else {
+                          setFormData((prev) => ({ ...prev, end_date: null }));
+                          setErrors((prev) => ({ ...prev, end_date: "" }));
+                        }
                       }}
                       disabled={isViewMode}
+                      maxDate={new Date()} // Restrict future dates
                       slotProps={{ textField: endDateTextFieldProps }}
                     />
                   </Grid>

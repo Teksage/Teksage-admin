@@ -2332,7 +2332,7 @@ const Analytics: React.FC = () => {
                       tick={{ fill: "#1B5E20", fontSize: isMobile ? 10 : 12, fontFamily: 'Urbanist', fontWeight: 500 }}
                       axisLine={{ stroke: "#1B5E20", opacity: 0.3 }}
                       label={{
-                        value: "User Count",
+                        value: "Users Count",
                         angle: -90,
                         position: "insideLeft",
                       fill: "#1B5E20",

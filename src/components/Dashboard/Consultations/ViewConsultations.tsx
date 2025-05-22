@@ -187,7 +187,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <InfoItem label="Status" value={consultationData.status} />
+                <InfoItem label="Status" value={consultationData.status==="new" ? "Failed" : consultationData.status} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <InfoItem

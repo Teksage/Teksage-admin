@@ -259,7 +259,7 @@ const Consultations: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(filters, "filters")
+  console.log(filters, "filters");
 
   const fetchConsultations = async (
     currentPage: number,
@@ -343,7 +343,7 @@ const Consultations: React.FC = () => {
           .filter((value: string) => value);
       }
       return uniqueValues;
-    } catch (error:any) {
+    } catch (error: any) {
       return [];
     }
   };
@@ -373,7 +373,11 @@ const Consultations: React.FC = () => {
         width: "140px",
         filterOptions: ["Career", "Health", "Wealth", "Relationship"],
         render: (value: any) => {
-          const categories = Array.isArray(value) ? value : value ? [value] : null;
+          const categories = Array.isArray(value)
+            ? value
+            : value
+            ? [value]
+            : null;
           return categories && categories.length > 0
             ? categories
                 .map((v) => v.charAt(0).toUpperCase() + v.slice(1))
@@ -442,14 +446,14 @@ const Consultations: React.FC = () => {
         filterOptions: ["New", "Confirmed", "Completed"],
         render: (value: any) => (
           <Chip
-            label={value || "N/A"}
+            label={value === "new" ? "Failed" : value.toUpperCase()}
             color={
               value === "Completed"
                 ? "success"
                 : value === "Pending"
                 ? "warning"
                 : value === "New"
-                ? "info"
+                ? "error"
                 : "default"
             }
           />
