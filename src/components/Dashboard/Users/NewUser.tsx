@@ -15,6 +15,7 @@ import {
   CircularProgress,
   SelectChangeEvent,
   InputAdornment,
+  TextFieldProps
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,6 +29,7 @@ import PlaceAutocomplete from "../../Elements/LocationAutocomplete";
 import { Person } from "@mui/icons-material";
 import ClearIcon from "@mui/icons-material/Clear";
 import { capitalizeFirstLetter } from "../../Elements/CommonFunctions";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 interface UserFormData {
   first_name: string;
@@ -42,6 +44,10 @@ interface UserFormData {
   nakshatra: string;
   status: string;
   user_type: string;
+}
+
+interface DatePickerTextFieldProps extends Omit<TextFieldProps, "variant"> {
+  size?: "small" | "medium";
 }
 
 const rasiOptions = [
@@ -129,7 +135,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           });
 
           const user = res?.data;
-          console.log(user, "user 112")
+          console.log(user, "user 112");
           setFormData({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -142,7 +148,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               ? new Date(`1970-01-01T${user.time_of_birth}`)
               : null,
             placeOfBirth: capitalizeFirstLetter(user.place_of_birth) || "",
-            preferredLocation: capitalizeFirstLetter(user.preferred_location) || "",
+            preferredLocation:
+              capitalizeFirstLetter(user.preferred_location) || "",
             rashi: user.rashi || "",
             nakshatra: user.nakshatra || "",
             status: user.status === "inactive" ? "Inactive" : "Active",
@@ -160,6 +167,40 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       }
     })();
   }, [mode, userId]);
+
+  const dateOfBirthTextFieldProps: DatePickerTextFieldProps = {
+    fullWidth: true,
+    size: "small",
+    error: !!errors.dateOfBirth,
+    helperText: errors.dateOfBirth || "",
+    InputLabelProps: {
+      sx: {
+        fontSize: "0.95rem",
+        fontWeight: 500,
+        color: "#455a64",
+        fontFamily: "Urbanist",
+      },
+    },
+    InputProps: {
+      sx: {
+        fontSize: "0.9rem",
+        borderRadius: "6px",
+        fontFamily: "Urbanist",
+      },
+    },
+    sx: {
+      "& .MuiInputLabel-root": {
+        fontFamily: "Urbanist",
+        fontSize: "0.9rem",
+      },
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": { borderColor: "#cfd8dc" },
+        "&:hover fieldset": { borderColor: "#3f51b5" },
+        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+      },
+      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+    },
+  };
 
   // Field-specific validation function
   const validateField = (field: keyof UserFormData, value: string) => {
@@ -283,7 +324,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         nakshatra: formData.nakshatra,
         status: formData.status.toLowerCase(),
         user_type: formData.user_type.toLowerCase(),
-      })
+      });
       const response = await callAPI({
         endpoint:
           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
@@ -645,58 +686,18 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
             <Grid item xs={12} sm={6} md={4}>
               <DatePicker
-                label="Date of Birth"
-                value={formData.dateOfBirth} // Controlled value (e.g., Date, null, or Moment object)
-                onChange={handleDateChange}
-                disabled={isViewMode}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                    error: !!errors.dateOfBirth,
-                    helperText: errors.dateOfBirth || "",
-                    InputLabelProps: {
-                      sx: {
-                        fontSize: "0.95rem",
-                        fontWeight: 500,
-                        color: "#455a64",
-                        fontFamily: "Urbanist",
-                      },
-                    },
-                    InputProps: {
-                      sx: {
-                        fontSize: "0.9rem",
-                        borderRadius: "6px",
-                        fontFamily: "Urbanist",
-                      },
-                      endAdornment:
-                        !isViewMode && formData.dateOfBirth ? ( // Show clear button only if not in view mode and a date is selected
-                          <InputAdornment position="end">
-                            <IconButton
-                              aria-label="clear date"
-                              onClick={() => handleDateChange(null)} // Clear the date
-                              edge="end"
-                              size="small"
-                            >
-                              <ClearIcon fontSize="small" />
-                            </IconButton>
-                          </InputAdornment>
-                        ) : null,
-                    },
-                    sx: {
-                      "& .MuiInputLabel-root": {
-                        fontFamily: "Urbanist",
-                        fontSize: "0.9rem",
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#cfd8dc" },
-                        "&:hover fieldset": { borderColor: "#3f51b5" },
-                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                      },
-                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                    },
-                  },
+                label="Date of Birth *"
+                value={formData.dateOfBirth}
+                onChange={(newValue) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    dateOfBirth: newValue,
+                  }));
+                  setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
                 }}
+                disabled={isViewMode}
+                maxDate={new Date()} // Restrict future dates
+                slotProps={{ textField: dateOfBirthTextFieldProps }}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
