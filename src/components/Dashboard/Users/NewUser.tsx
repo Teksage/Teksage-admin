@@ -1232,8 +1232,20 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             dateOfBirth: user.date_of_birth
               ? new Date(user.date_of_birth)
               : null,
+            // timeOfBirth: user.time_of_birth
+            //   ? new Date(`1970-01-01T${user.time_of_birth}`)
+            //   : null,
             timeOfBirth: user.time_of_birth
-              ? new Date(`1970-01-01T${user.time_of_birth}`)
+              ? (() => {
+                  const timeParts = user.time_of_birth.split(":");
+                  if (timeParts.length === 2) {
+                    const hours = parseInt(timeParts[0], 10);
+                    const minutes = parseInt(timeParts[1], 10);
+                    const date = new Date(1970, 0, 1, hours, minutes);
+                    return isNaN(date.getTime()) ? null : date;
+                  }
+                  return null;
+                })()
               : null,
             placeOfBirth: capitalizeFirstLetter(user.place_of_birth) || "",
             preferredLocation:
@@ -1416,9 +1428,19 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       }
     };
 
-  const handleTimeChange = (value: Date | null) => {
-    setFormData((prev) => ({ ...prev, timeOfBirth: value }));
-    setErrors((prev) => ({ ...prev, timeOfBirth: "" }));
+  // const handleTimeChange = (value: Date | null) => {
+  //   setFormData((prev) => ({ ...prev, timeOfBirth: value }));
+  //   setErrors((prev) => ({ ...prev, timeOfBirth: "" }));
+  // };
+
+  const handleTimeChange = (newTime: Date | null) => {
+    if (newTime && !isNaN(newTime.getTime())) {
+      // Ensure the date is valid before updating
+      updateFormData("timeOfBirth", newTime);
+    } else {
+      // If the time is invalid, set it to null
+      updateFormData("timeOfBirth", null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1457,7 +1479,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           mobile_number: `${formData.countryCode}${formData.mobile}`, // Combine country code and mobile number
           birth_location: formData.placeOfBirth,
           date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
-          time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+          // time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
+          time_of_birth: formData.timeOfBirth
+            ? formData.timeOfBirth.toTimeString().slice(0, 5) // Extracts "HH:mm"
+            : null,
           rashi: formData.rashi,
           nakshatra: formData.nakshatra,
           status: formData.status.toLowerCase(),
@@ -2030,8 +2055,16 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                 value={formData.timeOfBirth}
                 onChange={handleTimeChange}
                 disabled={isViewMode}
+                views={["hours", "minutes"]}
+                ampm={false}
                 format="HH:mm"
                 slotProps={{
+                  actionBar: {
+                    actions: [], // From your previous request to remove "OK" button
+                  },
+                  popper: {
+                    placement: "top", // Force the dialog/popover to open above the input
+                  },
                   textField: {
                     fullWidth: true,
                     size: "small",
