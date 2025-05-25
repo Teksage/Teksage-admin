@@ -231,7 +231,7 @@
 
 // export default Consultations;
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import GenericTable from "../../Elements/Table/Table";
 import { TableColumn } from "../../Elements/Table/types";
 import { Chip, Alert } from "@mui/material";
@@ -255,11 +255,154 @@ const Consultations: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+
+  const columns: TableColumn<ConsultationData>[] = useMemo(
+    () => [
+      {
+        id: "customer_name",
+        label: "User",
+        width: "180px",
+        filterable: true,
+      },
+      {
+        id: "astrologer_name",
+        label: "Astrologer",
+        width: "180px",
+        filterable: true,
+      },
+      {
+        id: "category",
+        label: "Category",
+        filterable: true,
+        width: "140px",
+        filterOptions: ["Career", "Health", "Wealth", "Relationship"],
+        render: (value: any) => {
+          const categories = Array.isArray(value)
+            ? value
+            : value
+            ? [value]
+            : null;
+          return categories && categories.length > 0
+            ? categories
+                .map((v) => v.charAt(0).toUpperCase() + v.slice(1))
+                .join(", ")
+            : "N/A";
+        },
+      },
+      {
+        id: "currency",
+        label: "Fee Code",
+        filterable: true,
+        filterOptions: ["INR", "USD"],
+        defaultValue: "INR",
+      },
+      {
+        id: "consultation_fee_filter", // Renamed to avoid duplicate id
+        label: "Consulting Fee",
+        filterable: true,
+        filterOnly: true,
+        dependsOn: "currency",
+        dynamicFilterOptions: (code) => {
+          return code.toUpperCase() === "USD"
+            ? ["<30", "30-100", ">100"]
+            : ["<500", "500-1000", ">1000"];
+        },
+        filterKey: (filters: Record<string, string>) =>
+          filters["currency"]?.toUpperCase() === "USD"
+            ? "consultation_fee"
+            : "consultation_fee",
+      },
+      {
+        id: "consultation_fee",
+        label: "Fee",
+        width: "140px",
+        render: (value: any, row: ConsultationData) => {
+          if (value == null || isNaN(Number(value))) return "N/A";
+          const currency = row.currency || "INR";
+          const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
+          return `${symbol} ${Number(value).toLocaleString("en-US")}`;
+        },
+      },
+      {
+        id: "start_datetime",
+        label: "Consultation Date",
+        filterable: false,
+        width: "140px",
+        render: (value: any) => {
+          if (typeof value !== "string" || !value) return "N/A";
+          try {
+            return new Date(value).toLocaleString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          } catch {
+            return "N/A";
+          }
+        },
+      },
+      {
+        id: "status",
+        label: "Status",
+        filterable: true,
+        filterOptions: ["failed", "confirmed", "completed"],
+        render: (value: any) => {
+          const lowerValue = value?.toLowerCase();
+
+          const displayLabel =
+            lowerValue === "new"
+              ? "Failed"
+              : lowerValue === "confirmed"
+              ? "Confirmed"
+              : lowerValue === "completed"
+              ? "Completed"
+              : value?.toString()?.toUpperCase() ?? "";
+
+          const color =
+            lowerValue === "new"
+              ? "error"
+              : lowerValue === "completed"
+              ? "success"
+              : lowerValue === "confirmed"
+              ? "info"
+              : "default";
+
+          return (
+            <Chip
+              label={displayLabel}
+              color={color as any}
+              sx={{
+                fontWeight: 600,
+                fontFamily: "Urbanist",
+                textTransform: "capitalize",
+              }}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
+
+  const initialFilters = useMemo(() => {
+    const filters: Record<string, string> = {};
+    columns.forEach((column) => {
+      if (column.filterable && column.defaultValue && !column.dependsOn) {
+        filters[column.id as string] = column.defaultValue.toUpperCase();
+      }
+    });
+    return filters;
+  }, [columns]);
+
+  const [filters, setFilters] =
+    useState<Record<string, string>>(initialFilters);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  console.log(filters, "filters");
+  // console.log(filters, "filters");
 
   const fetchConsultations = async (
     currentPage: number,
@@ -337,6 +480,7 @@ const Consultations: React.FC = () => {
         field as string,
         searchValue
       );
+      console.log(uniqueValues, "uniqueValues");
       if (field === "start_datetime") {
         return uniqueValues
           .map((value: string) => new Date(value).toISOString().split("T")[0])
@@ -352,120 +496,36 @@ const Consultations: React.FC = () => {
     fetchConsultations(page, filters);
   }, [page, rowsPerPage, filters]);
 
-  const columns: TableColumn<ConsultationData>[] = useMemo(
-    () => [
-      {
-        id: "customer_name",
-        label: "User",
-        width: "180px",
-        filterable: true,
-      },
-      {
-        id: "astrologer_name",
-        label: "Astrologer",
-        width: "180px",
-        filterable: true,
-      },
-      {
-        id: "category",
-        label: "Category",
-        filterable: true,
-        width: "140px",
-        filterOptions: ["Career", "Health", "Wealth", "Relationship"],
-        render: (value: any) => {
-          const categories = Array.isArray(value)
-            ? value
-            : value
-            ? [value]
-            : null;
-          return categories && categories.length > 0
-            ? categories
-                .map((v) => v.charAt(0).toUpperCase() + v.slice(1))
-                .join(", ")
-            : "N/A";
-        },
-      },
-      {
-        id: "currency",
-        label: "Fee Code",
-        filterable: true,
-        filterOptions: ["INR", "DLR"],
-        defaultValue: "INR",
-      },
-      {
-        id: "consultation_fee_filter", // Renamed to avoid duplicate id
-        label: "Consulting Fee",
-        filterable: true,
-        filterOnly: true,
-        dependsOn: "currency",
-        dynamicFilterOptions: (code) => {
-          return code.toUpperCase() === "DLR"
-            ? ["<30", "30-100", ">100"]
-            : ["<500", "500-1000", ">1000"];
-        },
-        filterKey: (filters: Record<string, string>) =>
-          filters["currency"]?.toUpperCase() === "DLR"
-            ? "consultation_fee"
-            : "consultation_fee",
-      },
-      {
-        id: "consultation_fee",
-        label: "Fee",
-        width: "140px",
-        render: (value: any, row: ConsultationData) => {
-          if (value == null || isNaN(Number(value))) return "N/A";
-          const currency = row.currency || "INR";
-          const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
-          return `${symbol} ${Number(value).toLocaleString("en-US")}`;
-        },
-      },
-      {
-        id: "start_datetime",
-        label: "Consultation Date",
-        filterable: false,
-        width: "140px",
-        render: (value: any) => {
-          if (typeof value !== "string" || !value) return "N/A";
-          try {
-            return new Date(value).toLocaleString("en-US", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-          } catch {
-            return "N/A";
-          }
-        },
-      },
-      {
-        id: "status",
-        label: "Status",
-        filterable: true,
-        filterOptions: ["New", "Confirmed", "Completed"],
-        render: (value: any) => (
-          <Chip
-            label={value === "new" ? "Failed" : value.toUpperCase()}
-            color={
-              value === "Completed"
-                ? "success"
-                : value === "Pending"
-                ? "warning"
-                : value === "New"
-                ? "error"
-                : "default"
-            }
-          />
-        ),
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [isInitialLoad]);
 
   const handleView = (row: ConsultationData) => {
     navigate(`/dashboard/consultations/view/${row?.id}`);
   };
+
+  const handleFilterChange = useCallback(
+    (newFilters: Record<string, string>) => {
+      console.log("Filter change:", { newFilters, isInitialLoad });
+      const normalizedFilters = {
+        ...newFilters,
+        ...(newFilters.status &&
+          typeof newFilters.status === "string" && {
+            status:
+              newFilters.status.toLowerCase() === "failed"
+                ? "new"
+                : newFilters.status.toLowerCase(),
+          }),
+      };
+      setFilters(normalizedFilters);
+      if (!isInitialLoad) {
+        setPage(0);
+      }
+    },
+    [isInitialLoad]
+  );
 
   return (
     <>
@@ -490,10 +550,11 @@ const Consultations: React.FC = () => {
           setRowsPerPage(newRowsPerPage);
           setPage(0);
         }}
-        onFilterChange={(newFilters) => {
-          setFilters(newFilters);
-          setPage(0);
-        }}
+        // onFilterChange={(newFilters) => {
+        //   setFilters(newFilters);
+        //   setPage(0);
+        // }}
+        onFilterChange={handleFilterChange}
         onFetchFilterOptions={fetchFilterOptions}
         showActions={true}
         loading={loading}

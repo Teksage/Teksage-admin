@@ -199,10 +199,10 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import {
-  FirstPage as FirstPageIcon,
-  LastPage as LastPageIcon,
-} from "@mui/icons-material";
+// import {
+//   FirstPage as FirstPageIcon,
+//   LastPage as LastPageIcon,
+// } from "@mui/icons-material";
 
 const StyledPaginationContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -239,20 +239,36 @@ const PaginationSection = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  // Ensure totalCount is non-negative to prevent pagination issues
+  const safeTotalCount = Math.max(0, totalCount);
+  // Ensure page is within valid bounds
+  const maxPage = Math.max(0, Math.ceil(safeTotalCount / rowsPerPage) - 1);
+  const safePage = Math.min(Math.max(0, page), maxPage);
+
   const handleChangePage = (
-    _event: React.MouseEvent<HTMLButtonElement> | null,
+    event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    onPageChange?.(newPage);
+    console.log(event)
+    if (onPageChange && newPage >= 0 && newPage <= maxPage) {
+      onPageChange(newPage);
+    } else {
+      console.warn(`Invalid page change attempt: newPage=${newPage}, maxPage=${maxPage}`);
+    }
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> | SelectChangeEvent<number>
   ) => {
-    // Ensure value is a string for parseInt
-    const value: any = "value" in event ? String(event.value) : event.target.value;
+    const value:any = "value" in event ? String(event.value) : event.target.value;
     const newRowsPerPage = parseInt(value, 10);
-    onRowsPerPageChange?.(newRowsPerPage);
+    if (onRowsPerPageChange && !isNaN(newRowsPerPage)) {
+      onRowsPerPageChange(newRowsPerPage);
+      // Reset to page 0 when rows per page changes to avoid invalid page
+      if (onPageChange) {
+        onPageChange(0);
+      }
+    }
   };
 
   const rowsPerPageOptions = useMemo(() => [10, 25, 50, 100], []);
@@ -285,11 +301,11 @@ const PaginationSection = ({
           </Select>
           <TablePagination
             component="div"
-            count={totalCount}
-            page={page}
+            count={safeTotalCount}
+            page={safePage}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[]}
+            rowsPerPageOptions={[]} // Hide rows per page in mobile view since handled by Select
             showFirstButton
             showLastButton
             labelDisplayedRows={({ from, to, count }) =>
@@ -300,20 +316,19 @@ const PaginationSection = ({
                 minHeight: "40px",
                 padding: 0,
               },
-              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-                {
-                  fontFamily: "Urbanist",
-                  fontWeight: 500,
-                  fontSize: "0.85rem",
-                },
+              "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+                fontFamily: "Urbanist",
+                fontWeight: 500,
+                fontSize: "0.85rem",
+              },
             }}
           />
         </Box>
       ) : (
         <TablePagination
           component="div"
-          count={totalCount}
-          page={page}
+          count={safeTotalCount}
+          page={safePage}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
@@ -328,12 +343,11 @@ const PaginationSection = ({
             "& .MuiTablePagination-toolbar": {
               minHeight: "48px",
             },
-            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select":
-              {
-                fontFamily: "Urbanist",
-                fontWeight: 500,
-                fontSize: "0.9rem",
-              },
+            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select": {
+              fontFamily: "Urbanist",
+              fontWeight: 500,
+              fontSize: "0.9rem",
+            },
             "& .MuiTablePagination-actions": {
               marginLeft: theme.spacing(1),
             },

@@ -1101,11 +1101,11 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               data.expertise.map((item: any) => item.toLowerCase()) || [],
             user_id: data.user_id || null,
           });
-        } catch (err) {
-          console.error("Failed to fetch astrologer data:", err);
+        } catch (err:any) {
+          console.error("Error fetching user data:", err);
           setSnackbar({
             open: true,
-            message: "Failed to load astrologer data.",
+            message: err.message || "Failed to load astrologer data. Please try again.",
             severity: "error",
           });
         } finally {
@@ -1161,6 +1161,12 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     switch (field) {
       case "first_name":
       case "last_name":
+        if (mode === "edit") {
+          if (!value) {
+            error = "This field is required";
+          }
+        }
+        break;
       case "experience":
       case "local_consulting_fee":
       case "foreign_consulting_fee":
@@ -1184,17 +1190,21 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         }
         break;
       case "email":
-        if (!value) {
-          error = "This field is required";
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          error = "Please enter a valid email address";
+        if (mode === "edit") {
+          if (!value) {
+            error = "This field is required";
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            error = "Please enter a valid email address";
+          }
         }
         break;
       case "mobile_number":
-        if (!value) {
-          error = "This field is required";
-        } else if (!/^\d{10}$/.test(value)) {
-          error = "Please enter a valid 10-digit mobile number";
+        if (mode === "edit") {
+          if (!value) {
+            error = "This field is required";
+          } else if (!/^\d{10}$/.test(value)) {
+            error = "Please enter a valid 10-digit mobile number";
+          }
         }
         break;
       case "languages":
@@ -1446,14 +1456,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
-      let errorMessage = "Something went wrong. Please try again.";
-      if (err.response && err.response.data) {
-        errorMessage =
-          err.response.data.detail || JSON.stringify(err.response.data?.detail);
-      }
       setSnackbar({
         open: true,
-        message: errorMessage,
+        message: err.message || "Something went wrong. Please try again.",
         severity: "error",
       });
     } finally {
@@ -1917,7 +1922,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             {/* Experience, Local Consulting Fee, Foreign Consulting Fee, Status */}
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Experience *"
+                label="Experience (Years)*"
                 fullWidth
                 size="small"
                 value={formData.experience}
@@ -2005,7 +2010,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Foreign Consulting Fee (DLR)*"
+                label="Foreign Consulting Fee (USD)*"
                 fullWidth
                 size="small"
                 value={

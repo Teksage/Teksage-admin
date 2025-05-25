@@ -326,8 +326,13 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           setFormData({
             ...data,
           });
-        } catch (error) {
-          console.error("Failed to fetch data:", error);
+        } catch (err:any) {
+          console.error("Error fetching data:", err);
+          setSnackbar({
+            open: true,
+            message: err.message || "Failed to load data. Please try again.",
+            severity: "error",
+          });
         } finally {
           setIsLoading(false);
         }
@@ -381,17 +386,11 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       setTimeout(() => {
         navigate(-1);
       }, 1000);
-    } catch (error: any) {
-      console.error("Error submitting FAQ:", error);
-      let errorMessage = "Something went wrong. Please try again.";
-      if (error.response && error.response.data) {
-        errorMessage =
-          error.response.data.detail ||
-          JSON.stringify(error.response.data?.detail);
-      }
+    } catch (err: any) {
+      console.error("API Error:", err);
       setSnackbar({
         open: true,
-        message: errorMessage,
+        message: err.message || "Something went wrong. Please try again.",
         severity: "error",
       });
     } finally {

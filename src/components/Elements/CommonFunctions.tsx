@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, Typography, Divider, FormControl, alpha } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 export const formatYears = (years: number): string => {
   return `${years} Year${years === 1 ? "" : "s"}`;
@@ -73,3 +74,70 @@ export const InfoItem = ({
     </Box>
   );
 };
+
+export const GlassSelect = styled(FormControl)(({ theme }) => ({
+  width: "120px", // Increased width to accommodate country names
+  position: "relative",
+  "& .MuiInputLabel-root": {
+    fontFamily: "Urbanist",
+    fontSize: "0.85rem", // Slightly smaller to fit better
+    fontWeight: 500,
+    color: "#4caf50",
+    background: `rgba(255, 255, 255, 0.9)`, // More opaque background
+    padding: "2px 8px",
+    borderRadius: "4px",
+    transform: "translate(14px, -9px) scale(0.75)", // Always in shrunk position
+    zIndex: 1,
+    "&.MuiInputLabel-shrink": {
+      transform: "translate(14px, -9px) scale(0.75)",
+      background: `rgba(255, 255, 255, 0.9)`,
+      color: "#4caf50",
+    },
+  },
+  "& .MuiSelect-select": {
+    fontFamily: "Urbanist",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    color: "#4caf50",
+    padding: theme.spacing(1.5, 2),
+    height: "24px",
+    lineHeight: "24px",
+    borderRadius: "6px",
+    background: `rgba(255, 255, 255, 0.05)`,
+    backdropFilter: "blur(10px)",
+    border: "2px solid transparent",
+    borderImage: "linear-gradient(45deg, #1b4d3e, #4caf50, #1b4d3e) 1",
+    boxShadow: `0 0 8px ${alpha("#4caf50", 0.3)}`,
+    boxSizing: "border-box",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    "&:focus": {
+      background: `rgba(255, 255, 255, 0.1)`,
+      boxShadow: `0 0 12px ${alpha("#4caf50", 0.5)}`,
+    },
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderImage: "linear-gradient(45deg, #1b4d3e, #4caf50, #1b4d3e) 1",
+      borderRadius: "6px",
+    },
+    "&:hover fieldset": {
+      borderImage: "linear-gradient(45deg, #1b4d3e, #4caf50, #1b4d3e) 1",
+    },
+    "&.Mui-focused fieldset": {
+      borderImage: "linear-gradient(45deg, #1b4d3e, #4caf50, #1b4d3e) 1",
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: "2px solid transparent",
+      borderImage: "linear-gradient(45deg, #1b4d3e, #4caf50, #1b4d3e) 1",
+    },
+  },
+  "&:hover .MuiSelect-select": {
+    animation: "shimmer 2s infinite",
+  },
+  "@keyframes shimmer": {
+    "0%": { backgroundPosition: "200% 0" },
+    "100%": { backgroundPosition: "-200% 0" },
+  },
+}));

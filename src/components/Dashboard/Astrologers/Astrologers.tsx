@@ -132,7 +132,7 @@
 //         filterable: true,
 //         filterOptions: [
 //           "< 3 Years",
-//           "3 - 5 Years",    
+//           "3 - 5 Years",
 //           "5 - 10 Years",
 //           "> 10 Years",
 //         ], // Default dropdown options
@@ -148,7 +148,7 @@
 //         id: "currency",
 //         label: "Fee Code",
 //         filterable: true,
-//         filterOptions: ["INR", "DLR"],
+//         filterOptions: ["INR", "USD"],
 //         render: (value: number) => {
 //           if (value == null || isNaN(value)) return "N/A"; // Handle null/undefined/NaN
 //           return value.toLocaleString("en-US"); // Format with commas (e.g., 1234567 -> 1,234,567)
@@ -254,7 +254,7 @@
 
 // export default Astrologers;
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import GenericTable from "../../Elements/Table/Table";
 import { TableColumn } from "../../Elements/Table/types";
 import { Chip, Alert } from "@mui/material";
@@ -278,9 +278,112 @@ const Astrologers: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+
+  const columns: TableColumn<UserData>[] = useMemo(
+    () => [
+      {
+        id: "first_name",
+        label: "Name",
+        filterable: true,
+        width: "300px",
+      },
+      {
+        id: "experience",
+        label: "Experience",
+        filterable: true,
+        filterOptions: [
+          "< 3 years",
+          "3 - 5 years",
+          "5 - 10 years",
+          "> 10 years",
+        ],
+      },
+      {
+        id: "customer_rating",
+        label: "Rating",
+        filterable: true,
+        width: "250px",
+        filterOptions: ["1", "2", "3", "4", "5"],
+      },
+      {
+        id: "currency",
+        label: "Fee Code",
+        filterable: true,
+        filterOnly: true,
+        filterOptions: ["INR", "USD"],
+        defaultValue: "INR",
+      },
+      {
+        id: "consultation_fee",
+        label: "Consulting Fee",
+        filterable: true,
+        filterOnly: true,
+        dependsOn: "currency",
+        dynamicFilterOptions: (code) => {
+          return code.toUpperCase() === "USD"
+            ? ["<30", "30-100", ">100"]
+            : ["<500", "500-1000", ">1000"];
+        },
+        filterKey: (filters: Record<string, string>) =>
+          filters["currency"]?.toUpperCase() === "USD"
+            ? "foreign_consulting_fee"
+            : "local_consulting_fee",
+      },
+      {
+        id: "local_consulting_fee",
+        label: "Local Fee",
+        render: (value: string | number) => {
+          if (value == null || isNaN(Number(value))) return "N/A";
+          return `₹ ${Number(value).toLocaleString("en-US")}`;
+        },
+      },
+      {
+        id: "foreign_consulting_fee",
+        label: "Foreign Fee",
+        width: "150px",
+        render: (value: string | number) => {
+          if (value == null || isNaN(Number(value))) return "N/A";
+          return `$ ${Number(value).toLocaleString("en-US")}`;
+        },
+      },
+      {
+        id: "status",
+        label: "Status",
+        filterable: true,
+        filterOptions: ["Active", "Inactive"],
+        render: (value: string) => {
+          if (!value) {
+            return <Chip label="N/A" color="default" />;
+          }
+          const formattedValue =
+            value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+          return (
+            <Chip
+              label={formattedValue}
+              color={formattedValue === "Active" ? "success" : "default"}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
+
+  const initialFilters = useMemo(() => {
+    const filters: Record<string, string> = {};
+    columns.forEach((column) => {
+      if (column.filterable && column.defaultValue && !column.dependsOn) {
+        filters[column.id as string] = column.defaultValue.toUpperCase();
+      }
+    });
+    return filters;
+  }, [columns]);
+
+  const [filters, setFilters] =
+    useState<Record<string, string>>(initialFilters);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const fetchAstrologers = async (
     currentPage: number,
@@ -325,7 +428,7 @@ const Astrologers: React.FC = () => {
       if (currentPage * rowsPerPage >= fetchedTotal && fetchedTotal > 0) {
         setPage(0);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       setError("Failed to load astrologers. Please try again.");
       setAstrologers([]);
       setTotalCount(0);
@@ -358,95 +461,11 @@ const Astrologers: React.FC = () => {
     fetchAstrologers(page, filters);
   }, [page, rowsPerPage, filters]);
 
-  const columns: TableColumn<UserData>[] = useMemo(
-    () => [
-      {
-        id: "first_name",
-        label: "Name",
-        filterable: true,
-        width: "300px",
-      },
-      {
-        id: "experience",
-        label: "Experience",
-        filterable: true,
-        filterOptions: [
-          "< 3 years",
-          "3 - 5 years",
-          "5 - 10 years",
-          "> 10 years",
-        ],
-      },
-      {
-        id: "customer_rating",
-        label: "Rating",
-        filterable: true,
-        width: "250px",
-        filterOptions: ["1", "2", "3", "4", "5"],
-      },
-      {
-        id: "currency",
-        label: "Fee Code",
-        filterable: true,
-        filterOnly: true,
-        filterOptions: ["INR", "DLR"],
-        defaultValue: "INR",
-      },
-      {
-        id: "consultation_fee",
-        label: "Consulting Fee",
-        filterable: true,
-        filterOnly: true,
-        dependsOn: "currency",
-        dynamicFilterOptions: (code) => {
-          return code.toUpperCase() === "DLR"
-            ? ["<30", "30-100", ">100"]
-            : ["<500", "500-1000", ">1000"];
-        },
-        filterKey: (filters: Record<string, string>) =>
-          filters["currency"]?.toUpperCase() === "DLR"
-            ? "foreign_consulting_fee"
-            : "local_consulting_fee",
-      },
-      {
-        id: "local_consulting_fee",
-        label: "Local Fee",
-        render: (value: string | number) => {
-          if (value == null || isNaN(Number(value))) return "N/A";
-          return `₹ ${Number(value).toLocaleString("en-US")}`;
-        },
-      },
-      {
-        id: "foreign_consulting_fee",
-        label: "Foreign Fee",
-        width: "150px",
-        render: (value: string | number) => {
-          if (value == null || isNaN(Number(value))) return "N/A";
-          return `$ ${Number(value).toLocaleString("en-US")}`;
-        },
-      },
-      {
-        id: "status",
-        label: "Status",
-        filterable: true,
-        filterOptions: ["Active", "Inactive"],
-        render: (value: string) => {
-          if (!value) {
-            return <Chip label="N/A" color="default" />;
-          }
-          const formattedValue =
-            value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-          return (
-            <Chip
-              label={formattedValue}
-              color={formattedValue === "Active" ? "success" : "default"}
-            />
-          );
-        },
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [isInitialLoad]);
 
   const handleAdd = () => {
     navigate("/dashboard/astrologers/new");
@@ -459,6 +478,18 @@ const Astrologers: React.FC = () => {
   const handleEdit = (row: UserData) => {
     navigate(`/dashboard/astrologers/edit/${row?.astrologer_id}`);
   };
+
+  const handleFilterChange = useCallback(
+    (newFilters: Record<string, string>) => {
+      console.log("Filter change:", { newFilters, isInitialLoad });
+      setFilters(newFilters);
+      // Only reset page if this is not the initial load
+      if (!isInitialLoad) {
+        setPage(0);
+      }
+    },
+    [isInitialLoad]
+  );
 
   return (
     <>
@@ -485,10 +516,7 @@ const Astrologers: React.FC = () => {
           setRowsPerPage(newRowsPerPage);
           setPage(0);
         }}
-        onFilterChange={(newFilters) => {
-          setFilters(newFilters);
-          setPage(0);
-        }}
+        onFilterChange={handleFilterChange}
         onFetchFilterOptions={fetchFilterOptions}
         loading={loading}
       />

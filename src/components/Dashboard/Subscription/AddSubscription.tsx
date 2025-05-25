@@ -805,8 +805,13 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             foreign_plan_price: foreignPrice === "" ? "" : String(foreignPrice), // Added for foreign_plan_price
           });
         }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+      } catch (err:any) {
+        console.error("Error fetching data:", err);
+        setSnackbar({
+          open: true,
+          message: err.message || "Failed to load data. Please try again.",
+          severity: "error",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -939,14 +944,14 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     if (!formData.plan_services.length) {
       newErrors.plan_services = "Services field is required.";
     }
-    // if (
-    //   formData.duration_value === "" ||
-    //   isNaN(formData.duration_value as number) ||
-    //   (formData.duration_value as number) <= 0
-    // ) {
-    //   newErrors.duration_value =
-    //     "Duration value must be a valid number greater than 0.";
-    // }
+    if (
+      formData.tenure_value === "" ||
+      isNaN(formData.tenure_value as number) ||
+      (formData.tenure_value as number) < 0
+    ) {
+      newErrors.tenure_value =
+        "Duration value must be a valid number greater than 0.";
+    }
     if (!formData.tenure_count) {
       newErrors.tenure_count = "Duration unit is required.";
     }
@@ -982,17 +987,11 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       setTimeout(() => {
         navigate(-1);
       }, 1000);
-    } catch (error: any) {
-      console.error("Error submitting subscription:", error);
-      let errorMessage = "Something went wrong. Please try again.";
-      if (error.response && error.response.data) {
-        errorMessage =
-          error.response.data.detail ||
-          JSON.stringify(error.response.data?.detail);
-      }
+    } catch (err: any) {
+      console.error("API Error:", err);
       setSnackbar({
         open: true,
-        message: errorMessage,
+        message: err.message || "Something went wrong. Please try again.",
         severity: "error",
       });
     } finally {
@@ -1178,7 +1177,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             <Grid item xs={12} sm={6}>
               <TextField
                 type="text"
-                label="Foreign Plan Price (DLR)*"
+                label="Foreign Plan Price (USD)*"
                 fullWidth
                 size="small"
                 value={

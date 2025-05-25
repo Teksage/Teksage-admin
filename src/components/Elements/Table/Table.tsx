@@ -207,7 +207,7 @@
 
 // export default GenericTable;
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useMediaQuery, useTheme } from "@mui/material";
 import TableHeader from "./TableHeader";
 import FilterSection from "./FilterSection";
@@ -235,7 +235,7 @@ function GenericTable<T>({
   onPageChange,
   onRowsPerPageChange,
   onFilterChange,
-  onSortChange,
+  // onSortChange,
   onFetchFilterOptions,
   loading = false,
 }: TableProps<T>) {
@@ -246,6 +246,7 @@ function GenericTable<T>({
     const filters: Record<string, string> = {};
     columns.forEach((column) => {
       if (column.filterable && column.defaultValue && !column.dependsOn) {
+        console.log(column, column.defaultValue, "column.defaultValue")
         filters[column.id as string] = column.defaultValue.toUpperCase();
       }
     });
@@ -256,10 +257,10 @@ function GenericTable<T>({
   const [showFilters, setShowFilters] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [mobileRowDetail, setMobileRowDetail] = useState<T | null>(null);
-  const [sortConfig, setSortConfig] = useState<{
-    key: keyof T | null;
-    direction: "asc" | "desc";
-  }>({ key: null, direction: "asc" });
+  // const [sortConfig, setSortConfig] = useState<{
+  //   key: keyof T | null;
+  //   direction: "asc" | "desc";
+  // }>({ key: null, direction: "asc" });
   const [filterOptions, setFilterOptions] = useState<Record<string, string[]>>({});
   const [filterLoading, setFilterLoading] = useState<Record<string, boolean>>({});
   const [searchValues, setSearchValues] = useState<Record<string, string>>({});
@@ -274,18 +275,18 @@ function GenericTable<T>({
     [columns]
   );
 
-  useEffect(() => {
-    if (Object.keys(initialFilters).length > 0) {
-      onFilterChange?.(initialFilters);
-    }
-  }, [initialFilters, onFilterChange]);
+  // useEffect(() => {
+  //   if (Object.keys(initialFilters).length > 0) {
+  //     onFilterChange?.(initialFilters);
+  //   }
+  // }, [initialFilters, onFilterChange]);
 
-  const handleSort = (columnId: keyof T) => {
-    const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";
-    const newDirection = isAsc ? "desc" : "asc";
-    setSortConfig({ key: columnId, direction: newDirection });
-    onSortChange?.(columnId, newDirection);
-  };
+  // const handleSort = (columnId: keyof T) => {
+  //   const isAsc = sortConfig.key === columnId && sortConfig.direction === "asc";
+  //   const newDirection = isAsc ? "desc" : "asc";
+  //   setSortConfig({ key: columnId, direction: newDirection });
+  //   onSortChange?.(columnId, newDirection);
+  // };
 
   const clearAllFilters = () => {
     setFilters(initialFilters);
@@ -379,8 +380,8 @@ function GenericTable<T>({
           tableHeight="100%"
           page={page}
           rowsPerPage={rowsPerPage}
-          sortConfig={sortConfig}
-          handleSort={handleSort}
+          // sortConfig={sortConfig}
+          // handleSort={handleSort}
           setMobileRowDetail={setMobileRowDetail}
           loading={loading}
         />

@@ -1453,8 +1453,13 @@ const NewCoupon = ({ mode = "new" }) => {
             foreign_max_cap: foreignMaxCap === "" ? "" : String(foreignMaxCap),
           });
         }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+      } catch (err:any) {
+        console.error("Error fetching data:", err);
+        setSnackbar({
+          open: true,
+          message: err.message || "Failed to load data. Please try again.",
+          severity: "error",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -1589,17 +1594,11 @@ const NewCoupon = ({ mode = "new" }) => {
       setTimeout(() => {
         navigate(-1);
       }, 1000);
-    } catch (error: any) {
-      console.error("Error submitting coupon:", error);
-      let errorMessage = "Something went wrong. Please try again.";
-      if (error.response && error.response.data) {
-        errorMessage =
-          error.response.data.detail ||
-          JSON.stringify(error.response.data?.detail);
-      }
+    } catch (err: any) {
+      console.error("API Error:", err);
       setSnackbar({
         open: true,
-        message: errorMessage,
+        message: err.message || "Something went wrong. Please try again.",
         severity: "error",
       });
     } finally {
@@ -1916,7 +1915,7 @@ const NewCoupon = ({ mode = "new" }) => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       type="text"
-                      label="Foreign Maximum Cap (DLR)*"
+                      label="Foreign Maximum Cap (USD)*"
                       fullWidth
                       size="medium"
                       value={inputValues.foreign_max_cap}

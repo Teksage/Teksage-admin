@@ -257,12 +257,26 @@ export const callAPI = async ({
       ...config,
     });
 
+    console.log(response, "response");
+
     return response;
   } catch (error: any) {
-    const errorMessage = `API ${method.toUpperCase()} ${endpoint} failed: ${
-      error.message || "Unknown error"
-    }`;
-    console.error(errorMessage, error);
+    // // const errorMessage = `API ${method.toUpperCase()} ${endpoint} failed: ${
+    // //   error.message || "Unknown error"
+    // // }`;
+    // console.error(error, new Error(error));
+    // // const errorMessage = error.response.data.detail || "Something went wrong. Please try again."
+    // throw new Error(error);
+    // Log the error for debugging
+    console.error(`API ${method.toUpperCase()} ${endpoint} failed:`, error);
+
+    // Extract the detailed error message from the response, if available
+    const errorMessage =
+      error.response?.data?.detail ||
+      error.message ||
+      "Something went wrong. Please try again.";
+
+    // Throw a new error with the detailed message
     throw new Error(errorMessage);
   }
 };
@@ -299,7 +313,10 @@ export const fetchPlaceSuggestions = async (inputText: string) => {
         mainText: s.placePrediction.structuredFormat.mainText.text,
       }));
 
-    suggestionCache.set(cacheKey, { data: formattedSuggestions, timestamp: Date.now() });
+    suggestionCache.set(cacheKey, {
+      data: formattedSuggestions,
+      timestamp: Date.now(),
+    });
     return formattedSuggestions;
   } catch (err) {
     console.error("Error fetching place suggestions:", err);
@@ -315,7 +332,11 @@ const deduplicateAndSort = (values: any[]): string[] => {
     : [];
 };
 
-export const fetchFilterValues = async (table: string, field: string, searchValue: string = "") => {
+export const fetchFilterValues = async (
+  table: string,
+  field: string,
+  searchValue: string = ""
+) => {
   const cacheKey = `filter:${table}:${field}:${searchValue}`;
   const cached = filterCache.get(cacheKey);
 

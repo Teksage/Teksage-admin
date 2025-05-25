@@ -1,9 +1,5 @@
-// import React, { useState, useEffect, useRef } from "react";
-// import {
-//   Box,
-//   Paper,
-//   alpha,
-// } from "@mui/material";
+// import React, { useEffect, useRef, useCallback, useReducer } from "react";
+// import { Box, Paper, alpha, Typography } from "@mui/material";
 // import { styled } from "@mui/material/styles";
 // import { useNavigate } from "react-router-dom";
 // import { useDispatch } from "react-redux";
@@ -15,6 +11,7 @@
 // import { LoginSuccessComponent } from "../Elements/LoginSuccessComponent";
 // import { validateEmail, validateMobileNumber } from "../Elements/CommonValidations";
 // import { LoginInputFormComponent } from "../Elements/LoginInputFormComponent";
+// import { debounce } from "lodash";
 
 // // Styled Components
 // const LoginWrapper = styled(Box)(() => ({
@@ -77,9 +74,7 @@
 //   justifyContent: "center",
 //   marginBottom: theme.spacing(4),
 //   position: "relative",
-//   "& svg": {
-//     fontSize: 40,
-//     color: "#2e7d32",
+//   "& img": {
 //     animation: "pulse 2s infinite",
 //   },
 //   "@keyframes pulse": {
@@ -89,7 +84,7 @@
 //   },
 // }));
 
-// // Interface
+// // State Management with useReducer
 // interface LoginState {
 //   loginMethod: "email" | "mobile";
 //   email: string;
@@ -102,297 +97,338 @@
 //   error: string | null;
 // }
 
+// type Action =
+//   | { type: "SET_FIELD"; field: keyof LoginState; value: any }
+//   | { type: "SET_OTP"; otp: string[]; activeOtpIndex: number }
+//   | { type: "SET_ERROR"; error: string | null }
+//   | { type: "SET_LOADING"; loading: boolean }
+//   | { type: "SET_COUNTDOWN"; countdown: number }
+//   | { type: "RESET_FIELDS" };
+
+// const initialState: LoginState = {
+//   loginMethod: "email",
+//   email: "",
+//   mobile_number: "",
+//   otp: Array(6).fill(""),
+//   activeOtpIndex: 0,
+//   step: "input",
+//   loading: false,
+//   countdown: 0,
+//   error: null,
+// };
+
+// const reducer = (state: LoginState, action: Action): LoginState => {
+//   switch (action.type) {
+//     case "SET_FIELD":
+//       return { ...state, [action.field]: action.value };
+//     case "SET_OTP":
+//       return { ...state, otp: action.otp, activeOtpIndex: action.activeOtpIndex };
+//     case "SET_ERROR":
+//       return { ...state, error: action.error };
+//     case "SET_LOADING":
+//       return { ...state, loading: action.loading };
+//     case "SET_COUNTDOWN":
+//       return { ...state, countdown: action.countdown };
+//     case "RESET_FIELDS":
+//       return {
+//         ...state,
+//         email: "",
+//         mobile_number: "",
+//         otp: Array(6).fill(""),
+//         activeOtpIndex: 0,
+//         error: null,
+//       };
+//     default:
+//       return state;
+//   }
+// };
+
 // // Components
-// const LoginWrapperComponent = ({ children }: { children: React.ReactNode }) => (
-//   <LoginWrapper>
-//     <OfflineNotification />
-//     <Box sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}>
-//       {children}
-//     </Box>
-//   </LoginWrapper>
+// const LoginWrapperComponent = React.memo<{ children: React.ReactNode }>(
+//   ({ children }) => (
+//     <LoginWrapper>
+//       <OfflineNotification />
+//       <Box sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}>
+//         {children}
+//       </Box>
+//     </LoginWrapper>
+//   )
 // );
 
-// const LoginCardComponent = ({ children }: { children: React.ReactNode }) => (
-//   <StyledPaper>{children}</StyledPaper>
+// const LoginCardComponent = React.memo<{ children: React.ReactNode }>(
+//   ({ children }) => <StyledPaper>{children}</StyledPaper>
 // );
 
-// const LogoBoxComponent = () => (
+// const LogoBoxComponent = React.memo(() => (
 //   <LogoBox>
-//     <img src={astro_prompt_logo_login} alt="Astro Prompt Logo" />
+//     <img src={astro_prompt_logo_login} alt="Astro Prompt Logo" loading="lazy" />
 //   </LogoBox>
-// );
+// ));
 
 // // Main Login Component
 // export const Login = () => {
 //   const dispatch = useDispatch();
 //   const navigate = useNavigate();
 //   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-//   const [formState, setFormState] = useState<LoginState>({
-//     loginMethod: "email",
-//     email: "",
-//     mobile_number: "",
-//     otp: Array(6).fill(""),
-//     activeOtpIndex: 0,
-//     step: "input",
-//     loading: false,
-//     countdown: 0,
-//     error: null,
-//   });
+//   const [state, dispatchState] = useReducer(reducer, initialState);
 
 //   // Countdown timer for OTP resend
 //   useEffect(() => {
-//     if (formState.countdown > 0) {
+//     if (state.countdown > 0) {
 //       const timer = setTimeout(() => {
-//         setFormState((prev) => ({ ...prev, countdown: prev.countdown - 1 }));
+//         dispatchState({ type: "SET_COUNTDOWN", countdown: state.countdown - 1 });
 //       }, 1000);
 //       return () => clearTimeout(timer);
 //     }
-//   }, [formState.countdown]);
+//   }, [state.countdown]);
 
 //   useEffect(() => {
-//     if (formState.step === "success") {
+//     if (state.step === "success") {
 //       const timer = setTimeout(() => {
-//         if (formState.step === "success") {
+//         if (state.step === "success") {
 //           navigate("/dashboard/users");
 //         }
 //       }, 2000);
 //       return () => clearTimeout(timer);
 //     }
-//   }, [formState.step, navigate]);
+//   }, [state.step, navigate]);
 
-//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target;
+//   const handleSwitchMethod = useCallback((newMethod: "email" | "mobile") => {
+//     dispatchState({ type: "SET_FIELD", field: "loginMethod", value: newMethod });
+//     dispatchState({
+//       type: "SET_FIELD",
+//       field: newMethod === "email" ? "mobile_number" : "email",
+//       value: "",
+//     });
+//     dispatchState({ type: "SET_ERROR", error: null });
+//   }, []);
 
-//     if (name === "mobile_number") {
-//       if (/^[0-9+]*$/.test(value)) {
-//         setFormState({
-//           ...formState,
-//           mobile_number: value,
-//           error: null,
+//   const handleInputChange = useCallback(
+//     (e: React.ChangeEvent<HTMLInputElement>) => {
+//       const { name, value } = e.target;
+
+//       if (name === "mobile_number") {
+//         if (/^[0-9+]*$/.test(value)) {
+//           dispatchState({ type: "SET_FIELD", field: "mobile_number", value });
+//           dispatchState({ type: "SET_ERROR", error: null });
+//         }
+//       } else {
+//         dispatchState({ type: "SET_FIELD", field: name as keyof LoginState, value });
+//         dispatchState({ type: "SET_ERROR", error: null });
+//       }
+//     },
+//     []
+//   );
+
+//   const handleOtpChange = useCallback(
+//     (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+//       const value = e.target.value;
+
+//       if (/^[0-9]*$/.test(value)) {
+//         const newOtp = [...state.otp];
+//         newOtp[index] = value.substring(value.length - 1);
+
+//         const newIndex = value ? Math.min(index + 1, 5) : Math.max(index - 1, 0);
+//         dispatchState({
+//           type: "SET_OTP",
+//           otp: newOtp,
+//           activeOtpIndex: newIndex,
 //         });
+//         dispatchState({ type: "SET_ERROR", error: null });
+
+//         if (value && index < 5) {
+//           otpInputRefs.current[index + 1]?.focus();
+//         }
 //       }
-//     } else {
-//       setFormState({
-//         ...formState,
-//         [name]: value,
-//         error: null,
-//       });
-//     }
-//   };
+//     },
+//     [state.otp]
+//   );
 
-//   const handleOtpChange = (
-//     e: React.ChangeEvent<HTMLInputElement>,
-//     index: number
-//   ) => {
-//     const value = e.target.value;
+//   const handleOtpPaste = useCallback(
+//     (e: React.ClipboardEvent<HTMLInputElement>) => {
+//       e.preventDefault();
+//       const pastedData = e.clipboardData.getData("text/plain");
+//       const otpArray = pastedData.replace(/\D/g, "").split("").slice(0, 6);
 
-//     if (/^[0-9]*$/.test(value)) {
-//       const newOtp = [...formState.otp];
-//       newOtp[index] = value.substring(value.length - 1);
+//       if (otpArray.length === 6) {
+//         dispatchState({
+//           type: "SET_OTP",
+//           otp: otpArray,
+//           activeOtpIndex: 5,
+//         });
+//         dispatchState({ type: "SET_ERROR", error: null });
 
-//       setFormState({
-//         ...formState,
-//         otp: newOtp,
-//         activeOtpIndex: value ? Math.min(index + 1, 5) : Math.max(index - 1, 0),
-//         error: null,
-//       });
-
-//       if (value && index < 5) {
-//         otpInputRefs.current[index + 1]?.focus();
+//         if (otpArray.every((digit) => digit !== "")) {
+//           handleVerifyOtp();
+//         }
 //       }
-//     }
-//   };
+//     },
+//     []
+//   );
 
-//   const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-//     e.preventDefault();
-//     const pastedData = e.clipboardData.getData("text/plain");
-//     const otpArray = pastedData.replace(/\D/g, "").split("").slice(0, 6);
-
-//     if (otpArray.length === 6) {
-//       const newOtp = [...formState.otp];
-//       otpArray.forEach((digit, i) => {
-//         newOtp[i] = digit;
-//       });
-
-//       setFormState({
-//         ...formState,
-//         otp: newOtp,
-//         activeOtpIndex: 5,
-//         error: null,
-//       });
-
-//       if (newOtp.every((digit) => digit !== "")) {
-//         handleVerifyOtp();
+//   const handleKeyDown = useCallback(
+//     (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+//       if (e.key === "Backspace" && !state.otp[index] && index > 0) {
+//         otpInputRefs.current[index - 1]?.focus();
 //       }
-//     }
-//   };
-
-//   const handleKeyDown = (
-//     e: React.KeyboardEvent<HTMLInputElement>,
-//     index: number
-//   ) => {
-//     if (e.key === "Backspace" && !formState.otp[index] && index > 0) {
-//       otpInputRefs.current[index - 1]?.focus();
-//     }
-//   };
+//     },
+//     [state.otp]
+//   );
 
 //   useEffect(() => {
-//     if (
-//       formState.otp.every((digit) => digit !== "") &&
-//       formState.step === "otp"
-//     ) {
+//     if (state.otp.every((digit) => digit !== "") && state.step === "otp") {
 //       handleVerifyOtp();
 //     }
-//   }, [formState.otp]);
+//   }, [state.otp, state.step]);
 
-//   const handleSendOtp = async (e: React.FormEvent) => {
-//     e.preventDefault();
-  
-//     if (formState.loginMethod === "email") {
-//       if (!formState.email) {
-//         setFormState((prev) => ({ ...prev, error: "Please enter your email" }));
-//         return;
-//       }
-//       if (!validateEmail(formState.email)) {
-//         setFormState((prev) => ({
-//           ...prev,
-//           error: "Please enter a valid email address",
-//         }));
-//         return;
-//       }
-//     } else {
-//       if (!formState.mobile_number) {
-//         setFormState((prev) => ({
-//           ...prev,
-//           error: "Please enter your mobile number",
-//         }));
-//         return;
-//       }
-//       if (!validateMobileNumber(formState.mobile_number)) {
-//         setFormState((prev) => ({
-//           ...prev,
-//           error: "Please enter a valid mobile number (e.g., +12025550123 or +919876543210)",
-//         }));
-//         return;
-//       }
-//     }
-  
-//     setFormState((prev) => ({ ...prev, loading: true, error: null }));
-  
-//     try {
-//       const endpoint =
-//         formState.loginMethod === "email"
-//           ? "api/auth/otp/request"
-//           : "api/auth/mobile-otp/request";
-  
-//       const data =
-//         formState.loginMethod === "email"
-//           ? { email: formState.email, user_type: "admin" }
-//           : { mobile_number: formState.mobile_number, user_type: "admin" };
-  
-//       const response = await callAPI({
-//         endpoint,
-//         method: "post",
-//         data,
-//       });
-  
-//       // Check for access error in response
-//       if (response.data.error === "400: Dont have an access") {
-//         throw new Error("Access Denied: You do not have permission to proceed.");
-//       }
-  
-//       setFormState((prev) => ({
-//         ...prev,
-//         step: "otp",
-//         loading: false,
-//         countdown: 30,
-//         otp: Array(6).fill(""),
-//         activeOtpIndex: 0,
-//       }));
-  
-//       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
-//     } catch (error: any) {
-//       const errorMessage = "Invalid User";
-//       setFormState((prev) => ({
-//         ...prev,
-//         loading: false,
-//         error: errorMessage,
-//         step: "input",
-//       }));
-//     }
-//   };
+//   const handleSendOtp = useCallback(
+//     async (e: React.FormEvent) => {
+//       e.preventDefault();
 
-//   const handleResendOtp = async () => {
-//     if (formState.countdown > 0) return;
+//       if (state.loginMethod === "email") {
+//         if (!state.email) {
+//           dispatchState({ type: "SET_ERROR", error: "Please enter your email" });
+//           return;
+//         }
+//         if (!validateEmail(state.email)) {
+//           dispatchState({
+//             type: "SET_ERROR",
+//             error: "Please enter a valid email address",
+//           });
+//           return;
+//         }
+//       } else {
+//         if (!state.mobile_number) {
+//           dispatchState({
+//             type: "SET_ERROR",
+//             error: "Please enter your mobile number",
+//           });
+//           return;
+//         }
+//         if (!validateMobileNumber(state.mobile_number)) {
+//           dispatchState({
+//             type: "SET_ERROR",
+//             error: "Please enter a valid mobile number (e.g., +12025550123 or +919876543210)",
+//           });
+//           return;
+//         }
+//       }
 
-//     setFormState((prev) => ({ ...prev, loading: true, error: null }));
+//       dispatchState({ type: "SET_LOADING", loading: true });
+//       dispatchState({ type: "SET_ERROR", error: null });
 
-//     try {
 //       try {
 //         const endpoint =
-//           formState.loginMethod === "email"
+//           state.loginMethod === "email"
 //             ? "api/auth/otp/request"
 //             : "api/auth/mobile-otp/request";
 
 //         const data =
-//           formState.loginMethod === "email"
-//             ? { email: formState.email }
-//             : { mobile_number: formState.mobile_number };
+//           state.loginMethod === "email"
+//             ? { email: state.email, user_type: "admin" }
+//             : { mobile_number: state.mobile_number, user_type: "admin" };
+
+//         const response = await callAPI({
+//           endpoint,
+//           method: "post",
+//           data,
+//         });
+
+//         if (response.data.error === "400: Dont have an access") {
+//           throw new Error("Access Denied: You do not have permission to proceed.");
+//         }
+
+//         dispatchState({ type: "SET_FIELD", field: "step", value: "otp" });
+//         dispatchState({ type: "SET_LOADING", loading: false });
+//         dispatchState({ type: "SET_COUNTDOWN", countdown: 30 });
+//         dispatchState({
+//           type: "SET_OTP",
+//           otp: Array(6).fill(""),
+//           activeOtpIndex: 0,
+//         });
+
+//         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+//       } catch (error: any) {
+//         console.log(error, "error")
+//         dispatchState({ type: "SET_LOADING", loading: false });
+//         dispatchState({ type: "SET_ERROR", error: "Invalid User" });
+//         dispatchState({ type: "SET_FIELD", field: "step", value: "input" });
+//       }
+//     },
+//     [state.loginMethod, state.email, state.mobile_number]
+//   );
+
+//   const handleResendOtp = useCallback(
+//     debounce(async () => {
+//       if (state.countdown > 0) return;
+
+//       dispatchState({ type: "SET_LOADING", loading: true });
+//       dispatchState({ type: "SET_ERROR", error: null });
+
+//       try {
+//         const endpoint =
+//           state.loginMethod === "email"
+//             ? "api/auth/otp/request"
+//             : "api/auth/mobile-otp/request";
+
+//         const data =
+//           state.loginMethod === "email"
+//             ? { email: state.email }
+//             : { mobile_number: state.mobile_number };
 
 //         await callAPI({
 //           endpoint,
 //           method: "post",
 //           data,
 //         });
-//       } catch (error: any) {
-//         console.log("Resend OTP API call failed, but continuing with bypass", error);
+
+//         dispatchState({ type: "SET_LOADING", loading: false });
+//         dispatchState({ type: "SET_COUNTDOWN", countdown: 30 });
+//         dispatchState({
+//           type: "SET_OTP",
+//           otp: Array(6).fill(""),
+//           activeOtpIndex: 0,
+//         });
+
+//         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+//       } catch (error) {
+//         console.error("Error in resend process:", error);
+//         dispatchState({ type: "SET_LOADING", loading: false });
+//         dispatchState({ type: "SET_COUNTDOWN", countdown: 30 });
+//         dispatchState({
+//           type: "SET_OTP",
+//           otp: Array(6).fill(""),
+//           activeOtpIndex: 0,
+//         });
+
+//         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
 //       }
+//     }, 300),
+//     [state.countdown, state.loginMethod, state.email, state.mobile_number]
+//   );
 
-//       setFormState((prev) => ({
-//         ...prev,
-//         loading: false,
-//         countdown: 30,
-//         otp: Array(6).fill(""),
-//         activeOtpIndex: 0,
-//       }));
-
-//       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
-//     } catch (error) {
-//       console.error("Error in resend process:", error);
-//       setFormState((prev) => ({
-//         ...prev,
-//         loading: false,
-//         countdown: 30,
-//         otp: Array(6).fill(""),
-//         activeOtpIndex: 0,
-//       }));
-
-//       setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
-//     }
-//   };
-
-//   const handleVerifyOtp = async () => {
-//     const otp = formState.otp.join("");
+//   const handleVerifyOtp = useCallback(async () => {
+//     const otp = state.otp.join("");
 //     if (otp.length !== 6) return;
-  
-//     setFormState((prev) => ({ ...prev, loading: true, error: null }));
-  
+
+//     dispatchState({ type: "SET_LOADING", loading: true });
+//     dispatchState({ type: "SET_ERROR", error: null });
+
 //     try {
 //       const endpoint =
-//         formState.loginMethod === "email"
+//         state.loginMethod === "email"
 //           ? "api/auth/otp/login-verify"
 //           : "api/auth/mobile-otp/login-verify";
-  
+
 //       const data =
-//         formState.loginMethod === "email"
+//         state.loginMethod === "email"
 //           ? otp === "111111"
-//             ? { email: formState.email, otp: "111111" }
-//             : { email: formState.email, otp }
+//             ? { email: state.email, otp: "111111" }
+//             : { email: state.email, otp }
 //           : otp === "111111"
-//           ? { mobile_number: formState.mobile_number, otp: "111111" }
-//           : { mobile_number: formState.mobile_number, otp };
-  
+//           ? { mobile_number: state.mobile_number, otp: "111111" }
+//           : { mobile_number: state.mobile_number, otp };
+
 //       const response = await callAPI({
 //         endpoint,
 //         method: "post",
@@ -401,52 +437,71 @@
 
 //       const access_token = response.data.access_token;
 //       const refresh_token = response.data.refresh_token;
-  
+
 //       tokenService.setTokens({
 //         access: access_token,
 //         refresh: refresh_token,
-//         user: `${response.data.first_name} ${response.data.last_name}`
+//         user: `${response.data.first_name} ${response.data.last_name}`,
 //       });
 
 //       dispatch({ type: "setAuth", payload: true });
-  
-//       setFormState((prev) => ({
-//         ...prev,
-//         step: "success",
-//         loading: false,
-//       }));
+
+//       dispatchState({ type: "SET_FIELD", field: "step", value: "success" });
+//       dispatchState({ type: "SET_LOADING", loading: false });
 //     } catch (error: any) {
 //       console.error("OTP verification error:", error);
-//       setFormState((prev) => ({
-//         ...prev,
-//         loading: false,
+//       dispatchState({ type: "SET_LOADING", loading: false });
+//       dispatchState({
+//         type: "SET_ERROR",
 //         error: error.message || "Invalid OTP. Please try again.",
-//         step: "error",
-//       }));
+//       });
+//       dispatchState({ type: "SET_FIELD", field: "step", value: "error" });
 //     }
-//   };
+//   }, [state.otp, state.loginMethod, state.email, state.mobile_number, dispatch]);
 
 //   return (
 //     <LoginWrapperComponent>
 //       <LoginCardComponent>
 //         <LogoBoxComponent />
-//         {formState.step === "success" && <LoginSuccessComponent />}
-//         {formState.step === "input" && (
+//         {state.loading && (
+//           <Box
+//             sx={{
+//               position: "absolute",
+//               top: 0,
+//               left: 0,
+//               right: 0,
+//               bottom: 0,
+//               display: "flex",
+//               alignItems: "center",
+//               justifyContent: "center",
+//               backgroundColor: alpha("#ffffff", 0.8),
+//               zIndex: 1,
+//             }}
+//           >
+//             <Typography variant="body1" color="text.secondary" style={{fontFamily: 'Urbanist', fontWeight: 600}}>
+//               Loading...
+//             </Typography>
+//           </Box>
+//         )}
+//         {state.step === "success" && <LoginSuccessComponent />}
+//         {state.step === "input" && (
 //           <LoginInputFormComponent
-//             formState={{ ...formState, setFormState }}
+//             formState={state}
+//             dispatchState={dispatchState}
 //             handleInputChange={handleInputChange}
 //             handleSendOtp={handleSendOtp}
+//             handleSwitchMethod={handleSwitchMethod}
 //           />
 //         )}
-//         {formState.step === "otp" && (
+//         {state.step === "otp" && (
 //           <OtpFormComponent
-//             formState={formState}
+//             formState={state}
+//             dispatchState={dispatchState}
 //             otpInputRefs={otpInputRefs}
 //             handleOtpChange={handleOtpChange}
 //             handleOtpPaste={handleOtpPaste}
 //             handleKeyDown={handleKeyDown}
 //             handleResendOtp={handleResendOtp}
-//             setFormState={setFormState}
 //           />
 //         )}
 //       </LoginCardComponent>
@@ -543,10 +598,11 @@ const LogoBox = styled(Box)(({ theme }) => ({
 }));
 
 // State Management with useReducer
-interface LoginState {
+export interface LoginState {
   loginMethod: "email" | "mobile";
   email: string;
   mobile_number: string;
+  countryCode: string;
   otp: string[];
   activeOtpIndex: number;
   step: "input" | "otp" | "success" | "error";
@@ -555,7 +611,7 @@ interface LoginState {
   error: string | null;
 }
 
-type Action =
+export type Action =
   | { type: "SET_FIELD"; field: keyof LoginState; value: any }
   | { type: "SET_OTP"; otp: string[]; activeOtpIndex: number }
   | { type: "SET_ERROR"; error: string | null }
@@ -567,6 +623,7 @@ const initialState: LoginState = {
   loginMethod: "email",
   email: "",
   mobile_number: "",
+  countryCode: "+91",
   otp: Array(6).fill(""),
   activeOtpIndex: 0,
   step: "input",
@@ -592,6 +649,7 @@ const reducer = (state: LoginState, action: Action): LoginState => {
         ...state,
         email: "",
         mobile_number: "",
+        countryCode: "+91",
         otp: Array(6).fill(""),
         activeOtpIndex: 0,
         error: null,
@@ -658,6 +716,7 @@ export const Login = () => {
       field: newMethod === "email" ? "mobile_number" : "email",
       value: "",
     });
+    dispatchState({ type: "SET_FIELD", field: "countryCode", value: "+91" });
     dispatchState({ type: "SET_ERROR", error: null });
   }, []);
 
@@ -666,7 +725,7 @@ export const Login = () => {
       const { name, value } = e.target;
 
       if (name === "mobile_number") {
-        if (/^[0-9+]*$/.test(value)) {
+        if (/^[0-9]*$/.test(value)) {
           dispatchState({ type: "SET_FIELD", field: "mobile_number", value });
           dispatchState({ type: "SET_ERROR", error: null });
         }
@@ -766,7 +825,7 @@ export const Login = () => {
         if (!validateMobileNumber(state.mobile_number)) {
           dispatchState({
             type: "SET_ERROR",
-            error: "Please enter a valid mobile number (e.g., +12025550123 or +919876543210)",
+            error: "Please enter a valid mobile number (e.g., 9952368687)",
           });
           return;
         }
@@ -784,7 +843,10 @@ export const Login = () => {
         const data =
           state.loginMethod === "email"
             ? { email: state.email, user_type: "admin" }
-            : { mobile_number: state.mobile_number, user_type: "admin" };
+            : {
+                mobile_number: `${state.countryCode}${state.mobile_number}`,
+                user_type: "admin",
+              };
 
         const response = await callAPI({
           endpoint,
@@ -807,13 +869,13 @@ export const Login = () => {
 
         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
       } catch (error: any) {
-        console.log(error, "error")
+        console.log(error, "error");
         dispatchState({ type: "SET_LOADING", loading: false });
         dispatchState({ type: "SET_ERROR", error: "Invalid User" });
         dispatchState({ type: "SET_FIELD", field: "step", value: "input" });
       }
     },
-    [state.loginMethod, state.email, state.mobile_number]
+    [state.loginMethod, state.email, state.mobile_number, state.countryCode]
   );
 
   const handleResendOtp = useCallback(
@@ -832,7 +894,7 @@ export const Login = () => {
         const data =
           state.loginMethod === "email"
             ? { email: state.email }
-            : { mobile_number: state.mobile_number };
+            : { mobile_number: `${state.countryCode}${state.mobile_number}` };
 
         await callAPI({
           endpoint,
@@ -862,7 +924,7 @@ export const Login = () => {
         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
       }
     }, 300),
-    [state.countdown, state.loginMethod, state.email, state.mobile_number]
+    [state.countdown, state.loginMethod, state.email, state.mobile_number, state.countryCode]
   );
 
   const handleVerifyOtp = useCallback(async () => {
@@ -884,8 +946,8 @@ export const Login = () => {
             ? { email: state.email, otp: "111111" }
             : { email: state.email, otp }
           : otp === "111111"
-          ? { mobile_number: state.mobile_number, otp: "111111" }
-          : { mobile_number: state.mobile_number, otp };
+          ? { mobile_number: `${state.countryCode}${state.mobile_number}`, otp: "111111" }
+          : { mobile_number: `${state.countryCode}${state.mobile_number}`, otp };
 
       const response = await callAPI({
         endpoint,
@@ -915,7 +977,7 @@ export const Login = () => {
       });
       dispatchState({ type: "SET_FIELD", field: "step", value: "error" });
     }
-  }, [state.otp, state.loginMethod, state.email, state.mobile_number, dispatch]);
+  }, [state.otp, state.loginMethod, state.email, state.mobile_number, state.countryCode, dispatch]);
 
   return (
     <LoginWrapperComponent>
@@ -936,7 +998,7 @@ export const Login = () => {
               zIndex: 1,
             }}
           >
-            <Typography variant="body1" color="text.secondary" style={{fontFamily: 'Urbanist', fontWeight: 600}}>
+            <Typography variant="body1" color="text.secondary" style={{ fontFamily: "Urbanist", fontWeight: 600 }}>
               Loading...
             </Typography>
           </Box>

@@ -1381,7 +1381,7 @@ import {
   Skeleton,
   Tooltip,
   Typography,
-  TableSortLabel,
+  // TableSortLabel,
   CircularProgress,
 } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
@@ -1513,8 +1513,8 @@ interface TableContentProps<T> {
   tableHeight: string;
   page: number;
   rowsPerPage: number;
-  sortConfig: { key: keyof T | null; direction: "asc" | "desc" };
-  handleSort: (columnId: keyof T) => void;
+  // sortConfig: { key: keyof T | null; direction: "asc" | "desc" };
+  // handleSort: (columnId: keyof T) => void;
   setMobileRowDetail: React.Dispatch<React.SetStateAction<T | null>>;
   loading: boolean;
 }
@@ -1530,8 +1530,8 @@ const TableContent = <T,>({
   tableHeight,
   page,
   rowsPerPage,
-  sortConfig,
-  handleSort,
+  // sortConfig,
+  // handleSort,
   setMobileRowDetail,
   loading,
 }: TableContentProps<T>) => {
@@ -1539,7 +1539,10 @@ const TableContent = <T,>({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const dataColumns = useMemo(
-    () => columns.filter((col) => !col.filterOnly) as Array<TableColumn<T> & { id: keyof T }>,
+    () =>
+      columns.filter((col) => !col.filterOnly) as Array<
+        TableColumn<T> & { id: keyof T }
+      >,
     [columns]
   );
 
@@ -1806,7 +1809,9 @@ const TableContent = <T,>({
           <CircularProgress />
         </Box>
       )}
-      <StyledTableContainer sx={{ height: tableHeight, opacity: loading ? 0.5 : 1 }}>
+      <StyledTableContainer
+        sx={{ height: tableHeight, opacity: loading ? 0.5 : 1 }}
+      >
         {loading ? (
           <Box sx={{ p: 3 }}>
             {[...Array(rowsPerPage)].map((_, index) => (
@@ -1841,13 +1846,12 @@ const TableContent = <T,>({
                 {dataColumns.map((column) => (
                   <TableCell
                     key={column.id as string}
-                    sortDirection={
-                      sortConfig.key === column.id ? sortConfig.direction : false
-                    }
+                    // sortDirection={
+                    //   sortConfig.key === column.id ? sortConfig.direction : false
+                    // }
                     sx={{
                       width: `${
-                        100 /
-                        (dataColumns.length + (showActions ? 1 : 0))
+                        100 / (dataColumns.length + (showActions ? 1 : 0))
                       }%`,
                       minWidth: "120px",
                       maxWidth: "220px",
@@ -1863,15 +1867,15 @@ const TableContent = <T,>({
                     }}
                     style={{ fontFamily: "Urbanist", fontWeight: 800 }}
                   >
-                    <TableSortLabel
+                    {/* <TableSortLabel
                       active={sortConfig.key === column.id}
                       direction={
                         sortConfig.key === column.id ? sortConfig.direction : "asc"
                       }
                       onClick={() => handleSort(column.id)}
-                    >
-                      {column.label}
-                    </TableSortLabel>
+                    > */}
+                    {column.label}
+                    {/* </TableSortLabel> */}
                   </TableCell>
                 ))}
                 {showActions && (
@@ -1921,6 +1925,7 @@ const TableContent = <T,>({
                 </TableRow>
               ) : (
                 paginatedData.map((row, index) => {
+                  console.log(row, index);
                   const id = getRowId(row);
                   const serialNumber = page * rowsPerPage + index + 1;
                   return (
@@ -1938,7 +1943,7 @@ const TableContent = <T,>({
                           column.render
                         );
                         const isLongText =
-                          typeof value === "string" && value.length > 30;
+                          typeof value === "string" && value.length > 20;
                         return (
                           <TableCell
                             key={column.id as string}
@@ -1961,9 +1966,53 @@ const TableContent = <T,>({
                             }}
                             style={{ fontFamily: "Urbanist", fontWeight: 500 }}
                           >
-                            {isLongText ? (
+                            {/* {isLongText ? (
                               <Tooltip title={value}>
                                 <span>{displayValue}</span>
+                              </Tooltip>
+                            ) : (
+                              displayValue
+                            )} */}
+                            {isLongText? (
+                              <Tooltip title={value as React.ReactNode}>
+                                <Box
+                                  sx={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    maxWidth: "100%",
+                                    "&:hover": {
+                                      "& .email-part1": {
+                                        opacity: 0.7,
+                                      },
+                                      "& .email-part2": {
+                                        opacity: 1,
+                                      },
+                                    },
+                                  }}
+                                >
+                                  <span
+                                    className="email-part1"
+                                    style={{
+                                      display: "inline-block",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      transition: "opacity 0.2s ease",
+                                    }}
+                                  >
+                                    {value.split("@")[0]}
+                                  </span>
+                                  <span
+                                    className="email-part2"
+                                    style={{
+                                      opacity: 0.7,
+                                      transition: "opacity 0.2s ease",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {value.split("@")[1]}
+                                  </span>
+                                </Box>
                               </Tooltip>
                             ) : (
                               displayValue

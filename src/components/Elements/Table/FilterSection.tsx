@@ -1063,13 +1063,13 @@ const FilterSection = <T,>({
       keyToUpdate =
         columnId === "consultation_fee_filter"
           ? "consultation_fee"
-          : currency === "DLR"
+          : currency === "USD"
           ? "foreign_consulting_fee"
           : "local_consulting_fee";
       const otherKey =
         columnId === "consultation_fee_filter"
           ? "consultation_fee"
-          : currency === "DLR"
+          : currency === "USD"
           ? "local_consulting_fee"
           : "foreign_consulting_fee";
       delete newFilters[otherKey];

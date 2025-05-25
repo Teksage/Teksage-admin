@@ -517,7 +517,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                               }
                             />
                             <InfoItem
-                              label="Foreign Consulting Fee (DLR)"
+                              label="Foreign Consulting Fee (USD)"
                               value={userData?.foreign_consulting_fee?.toLocaleString(
                                 "en-IN"
                               )}
