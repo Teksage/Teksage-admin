@@ -1,6 +1,10 @@
 import React from "react";
 import { Box, Typography, Divider, FormControl, alpha } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { callAPI } from "../../api/crudFactory";
+import { setCountriesList } from "../../redux/reducer";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
 
 export const formatYears = (years: number): string => {
   return `${years} Year${years === 1 ? "" : "s"}`;
@@ -141,3 +145,56 @@ export const GlassSelect = styled(FormControl)(({ theme }) => ({
     "100%": { backgroundPosition: "-200% 0" },
   },
 }));
+
+export interface AppState {
+  isAuthenticated: boolean;
+  userInfo: Record<string, any>;
+  users: any[];
+  notification: { message: string; type: string; show: boolean };
+  isLoading: boolean;
+  countriesList: { dial_code: string; name: string; mobile_number_length: number }[];
+}
+
+export type AppDispatch = ThunkDispatch<AppState, unknown, AnyAction>;
+
+export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({ type: "setloading", payload: true });
+
+    const response = await callAPI({
+      endpoint: "/api/countries",
+      method: "get",
+    });
+
+    console.log(response, "response");
+
+    const countriesData = response?.data;
+    if (!Array.isArray(countriesData)) {
+      throw new Error("Invalid countries data");
+    }
+
+    // Deduplicate countries by countryCode
+    const uniqueCountriesMap = new Map<string, []>();
+    countriesData.forEach((country: any) => {
+      if (!uniqueCountriesMap.has(country.dial_code)) {
+        uniqueCountriesMap.set(country.dial_code, country);
+      }
+    });
+    const uniqueCountriesList = Array.from(uniqueCountriesMap.values());
+
+    dispatch(setCountriesList(uniqueCountriesList));
+  } catch (error) {
+    console.error("Failed to fetch countries:", error);
+    dispatch(setCountriesList([]));
+    dispatch({
+      type: "setnotification",
+      payload: {
+        message: "Failed to load countries. Please try again.",
+        type: "error",
+        show: true,
+      },
+    });
+  } finally {
+    dispatch({ type: "setloading", payload: false });
+  }
+};

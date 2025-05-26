@@ -1083,7 +1083,7 @@ import {
   CircularProgress,
   SelectChangeEvent,
   TextFieldProps,
-  alpha,
+  Skeleton
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -1095,13 +1095,9 @@ import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
 import PlaceAutocomplete from "../../Elements/LocationAutocomplete";
 import { Person } from "@mui/icons-material";
-import {
-  capitalizeFirstLetter,
-  GlassSelect,
-} from "../../Elements/CommonFunctions";
+import { capitalizeFirstLetter } from "../../Elements/CommonFunctions";
 import { useSelector } from "react-redux";
-import { AppState } from "../../Auth/Login";
-// import { fetchCountriesList } from "../../Auth/Login";
+import { AppState } from "../../Elements/CommonFunctions";
 
 interface UserFormData {
   first_name: string;
@@ -1200,6 +1196,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     severity: "success",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const loadingTemplate = useSelector((state: AppState) => state.isLoading); // Use Redux isLoading instead of local state
+
   const countriesList = useSelector((state: AppState) => state.countriesList);
   console.log(countriesList, "countriesList");
 
@@ -1670,205 +1668,219 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      {/* Header with back button - compact and aligned */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-          <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
-        </IconButton>
-        <Typography
-          variant="body1"
-          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
-          color="#06402B"
-        >
-          Back
-        </Typography>
-      </Box>
+    <>
+      {loadingTemplate ? (
+        <Box sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
+          <Box sx={{ p: 2 }}>
+            <Skeleton variant="text" width="40%" height={30} />
+            <Skeleton variant="text" width="60%" height={20} />
+          </Box>
+        </Box>
+      ) : (
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          {/* Header with back button - compact and aligned */}
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+              <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
+            </IconButton>
+            <Typography
+              variant="body1"
+              style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+              color="#06402B"
+            >
+              Back
+            </Typography>
+          </Box>
 
-      <Paper
-        elevation={2}
-        sx={{
-          p: { xs: 2, sm: 3 },
-          maxWidth: "800px",
-          mx: "auto",
-          height: "100%",
-          backgroundColor: "#fff",
-          borderRadius: "12px",
-          boxShadow: "0 3px 15px rgba(0,0,0,0.08)",
-          border: "1px solid #e0e0e0",
-          position: "relative",
-          overflow: "hidden",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "4px",
-            background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
-          },
-        }}
-      >
-        {/* Form title - balanced size and styling */}
-        <Typography
-          variant="h5"
-          sx={{
-            mb: 3,
-            color: "#2e7d32",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            maxWidth: "50%",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            fontFamily: '"Poppins", sans-serif',
-            letterSpacing: 0.5,
-            textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-          }}
-          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
-        >
-          <Person sx={{ fontSize: 24 }} />
-          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} User
-        </Typography>
+          <Paper
+            elevation={2}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              maxWidth: "800px",
+              mx: "auto",
+              height: "100%",
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              boxShadow: "0 3px 15px rgba(0,0,0,0.08)",
+              border: "1px solid #e0e0e0",
+              position: "relative",
+              overflow: "hidden",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "4px",
+                background: "linear-gradient(90deg, #43a047 0%, #1b5e20 100%)",
+              },
+            }}
+          >
+            {/* Form title - balanced size and styling */}
+            <Typography
+              variant="h5"
+              sx={{
+                mb: 3,
+                color: "#2e7d32",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                maxWidth: "50%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                fontFamily: '"Poppins", sans-serif',
+                letterSpacing: 0.5,
+                textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+              }}
+              style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+            >
+              <Person sx={{ fontSize: 24 }} />
+              {mode === "new"
+                ? "Create"
+                : mode === "edit"
+                ? "Edit"
+                : "View"}{" "}
+              User
+            </Typography>
 
-        <Box component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            {/* Personal Information */}
-            <Grid item xs={12}>
-              <Typography
-                variant="subtitle1"
-                fontWeight={500}
-                color="#546e7a"
-                mb={1.5}
-                style={urbanistBoldText}
-              >
-                Personal Information
-              </Typography>
-            </Grid>
+            <Box component="form" onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                {/* Personal Information */}
+                <Grid item xs={12}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={500}
+                    color="#546e7a"
+                    mb={1.5}
+                    style={urbanistBoldText}
+                  >
+                    Personal Information
+                  </Typography>
+                </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="First Name *"
-                fullWidth
-                size="small"
-                value={formData.first_name}
-                onChange={handleChange("first_name")}
-                onBlur={handleBlur("first_name")}
-                error={!!errors.first_name}
-                helperText={errors.first_name || ""}
-                disabled={isViewMode}
-                InputLabelProps={{
-                  sx: {
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                    fontFamily: "Urbanist",
-                  },
-                }}
-                InputProps={{
-                  sx: {
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    fontFamily: "Urbanist",
-                  },
-                }}
-                sx={{
-                  "& .MuiInputLabel-root": {
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#cfd8dc" },
-                    "&:hover fieldset": { borderColor: "#3f51b5" },
-                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                  },
-                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Last Name *"
-                fullWidth
-                size="small"
-                value={formData.last_name}
-                onChange={handleChange("last_name")}
-                onBlur={handleBlur("last_name")}
-                error={!!errors.last_name}
-                helperText={errors.last_name || ""}
-                disabled={isViewMode}
-                InputLabelProps={{
-                  sx: {
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                    fontFamily: "Urbanist",
-                  },
-                }}
-                InputProps={{
-                  sx: {
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    fontFamily: "Urbanist",
-                  },
-                }}
-                sx={{
-                  "& .MuiInputLabel-root": {
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#cfd8dc" },
-                    "&:hover fieldset": { borderColor: "#3f51b5" },
-                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                  },
-                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                }}
-              />
-            </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="First Name *"
+                    fullWidth
+                    size="small"
+                    value={formData.first_name}
+                    onChange={handleChange("first_name")}
+                    onBlur={handleBlur("first_name")}
+                    error={!!errors.first_name}
+                    helperText={errors.first_name || ""}
+                    disabled={isViewMode}
+                    InputLabelProps={{
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                        fontFamily: "Urbanist",
+                      },
+                    }}
+                    InputProps={{
+                      sx: {
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        fontFamily: "Urbanist",
+                      },
+                    }}
+                    sx={{
+                      "& .MuiInputLabel-root": {
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Last Name *"
+                    fullWidth
+                    size="small"
+                    value={formData.last_name}
+                    onChange={handleChange("last_name")}
+                    onBlur={handleBlur("last_name")}
+                    error={!!errors.last_name}
+                    helperText={errors.last_name || ""}
+                    disabled={isViewMode}
+                    InputLabelProps={{
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                        fontFamily: "Urbanist",
+                      },
+                    }}
+                    InputProps={{
+                      sx: {
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        fontFamily: "Urbanist",
+                      },
+                    }}
+                    sx={{
+                      "& .MuiInputLabel-root": {
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    }}
+                  />
+                </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Email *"
-                fullWidth
-                size="small"
-                value={formData.email}
-                onChange={handleChange("email")}
-                onBlur={handleBlur("email")}
-                error={!!errors.email}
-                helperText={errors.email || ""}
-                disabled={isViewMode}
-                InputLabelProps={{
-                  sx: {
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                    fontFamily: "Urbanist",
-                  },
-                }}
-                InputProps={{
-                  sx: {
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    fontFamily: "Urbanist",
-                  },
-                }}
-                sx={{
-                  "& .MuiInputLabel-root": {
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#cfd8dc" },
-                    "&:hover fieldset": { borderColor: "#3f51b5" },
-                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                  },
-                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                }}
-              />
-            </Grid>
-            {/* <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Email *"
+                    fullWidth
+                    size="small"
+                    value={formData.email}
+                    onChange={handleChange("email")}
+                    onBlur={handleBlur("email")}
+                    error={!!errors.email}
+                    helperText={errors.email || ""}
+                    disabled={isViewMode}
+                    InputLabelProps={{
+                      sx: {
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                        fontFamily: "Urbanist",
+                      },
+                    }}
+                    InputProps={{
+                      sx: {
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        fontFamily: "Urbanist",
+                      },
+                    }}
+                    sx={{
+                      "& .MuiInputLabel-root": {
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#cfd8dc" },
+                        "&:hover fieldset": { borderColor: "#3f51b5" },
+                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                      },
+                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                    }}
+                  />
+                </Grid>
+                {/* <Grid item xs={12} sm={6}>
               <TextField
                 label="Mobile Number *"
                 fullWidth
@@ -1912,488 +1924,501 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               />
             </Grid> */}
 
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                {/* Country Code Dropdown */}
-                <FormControl size="small" sx={{ minWidth: 100 }}>
-                  <InputLabel
-                    sx={{
-                      fontSize: "0.95rem",
-                      fontWeight: 500,
-                      color: "#455a64",
-                      fontFamily: "Urbanist",
-                    }}
-                  >
-                    Code
-                  </InputLabel>
-                  <Select
-                    value={formData.country_code || "+91"}
-                    onChange={handleCountryCodeChange}
-                    label="Code"
-                    disabled={isViewMode}
-                    sx={{
-                      fontFamily: "Urbanist",
-                      fontSize: "0.9rem",
-                      borderRadius: "6px",
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#cfd8dc",
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#3f51b5",
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#3f51b5",
-                      },
-                    }}
-                  >
-                    {countriesList.map((option: any) => (
-                      <MenuItem
-                        // key={option.countryCode}
-                        key={`${option.countryCode}-${option.countryName}`}
-                        value={option.countryCode}
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    {/* Country Code Dropdown */}
+                    <FormControl size="small" sx={{ minWidth: 100 }}>
+                      <InputLabel
+                        sx={{
+                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          color: "#455a64",
+                          fontFamily: "Urbanist",
+                        }}
+                      >
+                        Code
+                      </InputLabel>
+                      <Select
+                        value={formData.country_code || "+91"}
+                        onChange={handleCountryCodeChange}
+                        label="Code"
+                        disabled={isViewMode}
                         sx={{
                           fontFamily: "Urbanist",
                           fontSize: "0.9rem",
+                          borderRadius: "6px",
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#cfd8dc",
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#3f51b5",
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#3f51b5",
+                          },
                         }}
                       >
-                        {`${option.countryCode} (${option.countryName})`}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                        {countriesList.map((option: any) => (
+                          <MenuItem
+                            // key={option.countryCode}
+                            key={`${option.dial_code}-${option.name}`}
+                            value={option.dial_code}
+                            sx={{
+                              fontFamily: "Urbanist",
+                              fontSize: "0.9rem",
+                            }}
+                          >
+                            {`${option.dial_code} (${option.name})`}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
 
-                {/* Mobile Number Input */}
-                <TextField
-                  label="Mobile Number *"
-                  fullWidth
-                  size="small"
-                  value={formData.mobile}
-                  onChange={(e) => {
-                    const numericValue = e.target.value.replace(/\D/g, "");
-                    handleChange("mobile")(numericValue);
-                  }}
-                  onBlur={handleBlur("mobile")}
-                  error={!!errors.mobile}
-                  helperText={errors.mobile || ""}
-                  disabled={isViewMode}
-                  InputLabelProps={{
-                    sx: {
-                      fontSize: "0.95rem",
-                      fontWeight: 500,
-                      color: "#455a64",
-                      fontFamily: "Urbanist",
-                    },
-                  }}
-                  InputProps={{
-                    sx: {
-                      fontSize: "0.9rem",
-                      borderRadius: "6px",
-                      fontFamily: "Urbanist",
-                    },
-                  }}
-                  sx={{
-                    "& .MuiInputLabel-root": {
-                      fontFamily: "Urbanist",
-                      fontSize: "0.9rem",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#cfd8dc" },
-                      "&:hover fieldset": { borderColor: "#3f51b5" },
-                      "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                    },
-                    "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                  }}
-                />
-              </Box>
-            </Grid>
+                    {/* Mobile Number Input */}
+                    <TextField
+                      label="Mobile Number *"
+                      fullWidth
+                      size="small"
+                      value={formData.mobile}
+                      onChange={(e) => {
+                        const numericValue = e.target.value.replace(/\D/g, "");
+                        handleChange("mobile")(numericValue);
+                      }}
+                      onBlur={handleBlur("mobile")}
+                      error={!!errors.mobile}
+                      helperText={errors.mobile || ""}
+                      disabled={isViewMode}
+                      InputLabelProps={{
+                        sx: {
+                          fontSize: "0.95rem",
+                          fontWeight: 500,
+                          color: "#455a64",
+                          fontFamily: "Urbanist",
+                        },
+                      }}
+                      InputProps={{
+                        sx: {
+                          fontSize: "0.9rem",
+                          borderRadius: "6px",
+                          fontFamily: "Urbanist",
+                        },
+                      }}
+                      sx={{
+                        "& .MuiInputLabel-root": {
+                          fontFamily: "Urbanist",
+                          fontSize: "0.9rem",
+                        },
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": { borderColor: "#cfd8dc" },
+                          "&:hover fieldset": { borderColor: "#3f51b5" },
+                          "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                        },
+                        "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                      }}
+                    />
+                  </Box>
+                </Grid>
 
-            {/* Birth Information */}
-            <Grid item xs={12} mt={1}>
-              <Typography
-                variant="subtitle1"
-                fontWeight={500}
-                color="#546e7a"
-                mb={1.5}
-                style={urbanistBoldText}
-              >
-                Birth Details
-              </Typography>
-            </Grid>
+                {/* Birth Information */}
+                <Grid item xs={12} mt={1}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={500}
+                    color="#546e7a"
+                    mb={1.5}
+                    style={urbanistBoldText}
+                  >
+                    Birth Details
+                  </Typography>
+                </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
-              <DatePicker
-                label="Date of Birth *"
-                value={formData.dateOfBirth}
-                onChange={(newValue) => {
-                  const today = new Date();
-                  today.setHours(23, 59, 59, 999);
-                  if (newValue && newValue <= today) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      dateOfBirth: newValue,
-                    }));
-                    setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
-                  } else if (newValue && newValue > today) {
-                    setErrors((prev) => ({
-                      ...prev,
-                      dateOfBirth: "Date of Birth cannot be in the future",
-                    }));
-                    setFormData((prev) => ({
-                      ...prev,
-                      dateOfBirth: null,
-                    }));
-                  } else {
-                    setFormData((prev) => ({
-                      ...prev,
-                      dateOfBirth: null,
-                    }));
-                    setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
-                  }
-                }}
-                disabled={isViewMode}
-                maxDate={new Date()}
-                slotProps={{ textField: dateOfBirthTextFieldProps }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <TimePicker
-                label="Time of Birth"
-                value={formData.timeOfBirth}
-                onChange={handleTimeChange}
-                disabled={isViewMode}
-                views={["hours", "minutes"]}
-                ampm={false}
-                format="HH:mm"
-                slotProps={{
-                  actionBar: {
-                    actions: [], // From your previous request to remove "OK" button
-                  },
-                  popper: {
-                    placement: "top", // Force the dialog/popover to open above the input
-                  },
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                    error: !!errors.timeOfBirth,
-                    helperText: errors.timeOfBirth || "",
-                    InputLabelProps: {
-                      sx: {
+                <Grid item xs={12} sm={6} md={4}>
+                  <DatePicker
+                    label="Date of Birth *"
+                    value={formData.dateOfBirth}
+                    onChange={(newValue) => {
+                      const today = new Date();
+                      today.setHours(23, 59, 59, 999);
+                      if (newValue && newValue <= today) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          dateOfBirth: newValue,
+                        }));
+                        setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+                      } else if (newValue && newValue > today) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          dateOfBirth: "Date of Birth cannot be in the future",
+                        }));
+                        setFormData((prev) => ({
+                          ...prev,
+                          dateOfBirth: null,
+                        }));
+                      } else {
+                        setFormData((prev) => ({
+                          ...prev,
+                          dateOfBirth: null,
+                        }));
+                        setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+                      }
+                    }}
+                    disabled={isViewMode}
+                    maxDate={new Date()}
+                    slotProps={{ textField: dateOfBirthTextFieldProps }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TimePicker
+                    label="Time of Birth"
+                    value={formData.timeOfBirth}
+                    onChange={handleTimeChange}
+                    disabled={isViewMode}
+                    views={["hours", "minutes"]}
+                    ampm={false}
+                    format="HH:mm"
+                    slotProps={{
+                      actionBar: {
+                        actions: [], // From your previous request to remove "OK" button
+                      },
+                      popper: {
+                        placement: "top", // Force the dialog/popover to open above the input
+                      },
+                      textField: {
+                        fullWidth: true,
+                        size: "small",
+                        error: !!errors.timeOfBirth,
+                        helperText: errors.timeOfBirth || "",
+                        InputLabelProps: {
+                          sx: {
+                            fontSize: "0.95rem",
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        },
+                        InputProps: {
+                          sx: {
+                            fontSize: "0.9rem",
+                            borderRadius: "6px",
+                            fontFamily: "Urbanist",
+                          },
+                        },
+                        sx: {
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#3f51b5" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#3f51b5",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        },
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <PlaceAutocomplete
+                    label="Place of Birth"
+                    value={formData.placeOfBirth}
+                    onChange={(val) => {
+                      setFormData((prev) => ({ ...prev, placeOfBirth: val }));
+                    }}
+                    error={!!errors.placeOfBirth}
+                    helperText={errors.placeOfBirth}
+                    disabled={isViewMode}
+                  />
+                </Grid>
+
+                {/* Additional Information */}
+                <Grid item xs={12} mt={1}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={500}
+                    color="#546e7a"
+                    mb={1.5}
+                    style={urbanistBoldText}
+                  >
+                    Additional Details
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <PlaceAutocomplete
+                    label="Preferred Location"
+                    value={formData.preferredLocation}
+                    onChange={(val) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        preferredLocation: val,
+                      }));
+                    }}
+                    error={!!errors.preferredLocation}
+                    helperText={errors.preferredLocation}
+                    disabled={isViewMode}
+                  />
+                </Grid>
+
+                {loadingRasiNakshatram && (
+                  <Grid item xs={12}>
+                    <Typography
+                      variant="caption"
+                      color="primary"
+                      display="flex"
+                      alignItems="center"
+                      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                    >
+                      <CircularProgress size={14} sx={{ mr: 1 }} />
+                      Fetching rashi & nakshatra based on your input...
+                    </Typography>
+                  </Grid>
+                )}
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl
+                    fullWidth
+                    error={!!errors.rashi}
+                    disabled={isViewMode}
+                    size="small"
+                  >
+                    <InputLabel
+                      sx={{
                         fontSize: "0.95rem",
                         fontWeight: 500,
                         color: "#455a64",
+                      }}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
+                      Rashi
+                    </InputLabel>
+                    <Select
+                      value={formData.rashi}
+                      onChange={handleChange("rashi")}
+                      label="Rashi"
+                      sx={{
                         fontFamily: "Urbanist",
-                      },
-                    },
-                    InputProps: {
-                      sx: {
                         fontSize: "0.9rem",
                         borderRadius: "6px",
-                        fontFamily: "Urbanist",
-                      },
-                    },
-                    sx: {
-                      "& .MuiInputLabel-root": {
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#cfd8dc",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                      }}
+                    >
+                      {rasiOptions.map((option) => (
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.rashi && (
+                      <FormHelperText sx={{ fontSize: "0.75rem" }}>
+                        {errors.rashi}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl
+                    fullWidth
+                    error={!!errors.nakshatra}
+                    disabled={isViewMode}
+                    size="small"
+                  >
+                    <InputLabel
+                      sx={{
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      }}
+                      style={{ fontFamily: "Urbanist" }}
+                    >
+                      Nakshatra
+                    </InputLabel>
+                    <Select
+                      value={formData.nakshatra}
+                      onChange={handleChange("nakshatra")}
+                      label="Nakshatra"
+                      sx={{
                         fontFamily: "Urbanist",
                         fontSize: "0.9rem",
-                      },
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": { borderColor: "#cfd8dc" },
-                        "&:hover fieldset": { borderColor: "#3f51b5" },
-                        "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
-                      },
-                      "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
-                    },
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <PlaceAutocomplete
-                label="Place of Birth"
-                value={formData.placeOfBirth}
-                onChange={(val) => {
-                  setFormData((prev) => ({ ...prev, placeOfBirth: val }));
-                }}
-                error={!!errors.placeOfBirth}
-                helperText={errors.placeOfBirth}
-                disabled={isViewMode}
-              />
-            </Grid>
-
-            {/* Additional Information */}
-            <Grid item xs={12} mt={1}>
-              <Typography
-                variant="subtitle1"
-                fontWeight={500}
-                color="#546e7a"
-                mb={1.5}
-                style={urbanistBoldText}
-              >
-                Additional Details
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <PlaceAutocomplete
-                label="Preferred Location"
-                value={formData.preferredLocation}
-                onChange={(val) => {
-                  setFormData((prev) => ({ ...prev, preferredLocation: val }));
-                }}
-                error={!!errors.preferredLocation}
-                helperText={errors.preferredLocation}
-                disabled={isViewMode}
-              />
-            </Grid>
-
-            {loadingRasiNakshatram && (
-              <Grid item xs={12}>
-                <Typography
-                  variant="caption"
-                  color="primary"
-                  display="flex"
-                  alignItems="center"
-                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
-                >
-                  <CircularProgress size={14} sx={{ mr: 1 }} />
-                  Fetching rashi & nakshatra based on your input...
-                </Typography>
-              </Grid>
-            )}
-
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl
-                fullWidth
-                error={!!errors.rashi}
-                disabled={isViewMode}
-                size="small"
-              >
-                <InputLabel
-                  sx={{
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                  }}
-                  style={{ fontFamily: "Urbanist" }}
-                >
-                  Rashi
-                </InputLabel>
-                <Select
-                  value={formData.rashi}
-                  onChange={handleChange("rashi")}
-                  label="Rashi"
-                  sx={{
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#cfd8dc",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                  }}
-                >
-                  {rasiOptions.map((option) => (
-                    <MenuItem
-                      key={option}
-                      value={option}
+                        borderRadius: "6px",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#cfd8dc",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                      }}
+                    >
+                      {availableNakshatrams.map((option) => (
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.nakshatra && (
+                      <FormHelperText sx={{ fontSize: "0.75rem" }}>
+                        {errors.nakshatra}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth disabled={isViewMode} size="small">
+                    <InputLabel
+                      sx={{
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      }}
                       style={{ fontFamily: "Urbanist" }}
                     >
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.rashi && (
-                  <FormHelperText sx={{ fontSize: "0.75rem" }}>
-                    {errors.rashi}
-                  </FormHelperText>
+                      User Type
+                    </InputLabel>
+                    <Select
+                      value={formData.user_type}
+                      onChange={handleChange("user_type")}
+                      label="User Type"
+                      sx={{
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#cfd8dc",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                      }}
+                    >
+                      {userTypeOptions.map((option) => (
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth disabled={isViewMode} size="small">
+                    <InputLabel
+                      sx={{
+                        fontSize: "0.95rem",
+                        fontWeight: 500,
+                        color: "#455a64",
+                      }}
+                    >
+                      Status
+                    </InputLabel>
+                    <Select
+                      value={formData.status}
+                      onChange={handleChange("status")}
+                      label="Status"
+                      sx={{
+                        fontFamily: "Urbanist",
+                        fontSize: "0.9rem",
+                        borderRadius: "6px",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#cfd8dc",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#3f51b5",
+                        },
+                      }}
+                    >
+                      <MenuItem
+                        value="Active"
+                        style={{ fontFamily: "Urbanist" }}
+                      >
+                        Active
+                      </MenuItem>
+                      <MenuItem
+                        value="Inactive"
+                        style={{ fontFamily: "Urbanist" }}
+                      >
+                        Inactive
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* Submit Button - Centered and styled */}
+                {!isViewMode && (
+                  <Grid item xs={12} mt={2}>
+                    <Box sx={{ display: "flex", justifyContent: "end" }}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={isLoading}
+                        sx={{
+                          background:
+                            "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
+                          color: "#fff",
+                          borderRadius: "8px",
+                          padding: "8px 24px",
+                          fontFamily: "Urbanist",
+                          fontWeight: 800,
+                          fontSize: "0.95rem",
+                          textTransform: "none",
+                          boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background:
+                              "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
+                            boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
+                            transform: "scale(1.02)",
+                          },
+                        }}
+                      >
+                        {mode === "new" ? "Create User" : "Update User"}
+                      </Button>
+                    </Box>
+                  </Grid>
                 )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl
-                fullWidth
-                error={!!errors.nakshatra}
-                disabled={isViewMode}
-                size="small"
-              >
-                <InputLabel
-                  sx={{
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                  }}
-                  style={{ fontFamily: "Urbanist" }}
-                >
-                  Nakshatra
-                </InputLabel>
-                <Select
-                  value={formData.nakshatra}
-                  onChange={handleChange("nakshatra")}
-                  label="Nakshatra"
-                  sx={{
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#cfd8dc",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                  }}
-                >
-                  {availableNakshatrams.map((option) => (
-                    <MenuItem
-                      key={option}
-                      value={option}
-                      style={{ fontFamily: "Urbanist" }}
-                    >
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.nakshatra && (
-                  <FormHelperText sx={{ fontSize: "0.75rem" }}>
-                    {errors.nakshatra}
-                  </FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth disabled={isViewMode} size="small">
-                <InputLabel
-                  sx={{
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                  }}
-                  style={{ fontFamily: "Urbanist" }}
-                >
-                  User Type
-                </InputLabel>
-                <Select
-                  value={formData.user_type}
-                  onChange={handleChange("user_type")}
-                  label="User Type"
-                  sx={{
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#cfd8dc",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                  }}
-                >
-                  {userTypeOptions.map((option) => (
-                    <MenuItem
-                      key={option}
-                      value={option}
-                      style={{ fontFamily: "Urbanist" }}
-                    >
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth disabled={isViewMode} size="small">
-                <InputLabel
-                  sx={{
-                    fontSize: "0.95rem",
-                    fontWeight: 500,
-                    color: "#455a64",
-                  }}
-                >
-                  Status
-                </InputLabel>
-                <Select
-                  value={formData.status}
-                  onChange={handleChange("status")}
-                  label="Status"
-                  sx={{
-                    fontFamily: "Urbanist",
-                    fontSize: "0.9rem",
-                    borderRadius: "6px",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#cfd8dc",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                  }}
-                >
-                  <MenuItem value="Active" style={{ fontFamily: "Urbanist" }}>
-                    Active
-                  </MenuItem>
-                  <MenuItem value="Inactive" style={{ fontFamily: "Urbanist" }}>
-                    Inactive
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {/* Submit Button - Centered and styled */}
-            {!isViewMode && (
-              <Grid item xs={12} mt={2}>
-                <Box sx={{ display: "flex", justifyContent: "end" }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isLoading}
-                    sx={{
-                      background:
-                        "linear-gradient(135deg, #43A047 0%, #1B5E20 50%, #FDD835 150%)",
-                      color: "#fff",
-                      borderRadius: "8px",
-                      padding: "8px 24px",
-                      fontFamily: "Urbanist",
-                      fontWeight: 800,
-                      fontSize: "0.95rem",
-                      textTransform: "none",
-                      boxShadow: "0 3px 8px rgba(0,0,0,0.15)",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        background:
-                          "linear-gradient(135deg, #388E3C 0%, #004D40 100%)",
-                        boxShadow: "0 5px 12px rgba(0,0,0,0.2)",
-                        transform: "scale(1.02)",
-                      },
-                    }}
-                  >
-                    {mode === "new" ? "Create User" : "Update User"}
-                  </Button>
-                </Box>
               </Grid>
-            )}
-          </Grid>
-        </Box>
-      </Paper>
+            </Box>
+          </Paper>
 
-      <CustomSnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-      />
-    </LocalizationProvider>
+          <CustomSnackbar
+            open={snackbar.open}
+            message={snackbar.message}
+            severity={snackbar.severity}
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          />
+        </LocalizationProvider>
+      )}
+    </>
   );
 };
 

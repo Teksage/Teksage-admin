@@ -2004,7 +2004,7 @@ const NewCoupon = ({ mode = "new" }) => {
                         }
                       }}
                       disabled={isViewMode}
-                      maxDate={new Date()} // Restrict future dates
+                      minDate={new Date()}
                       slotProps={{ textField: startDateTextFieldProps }}
                     />
                   </Grid>
@@ -2034,7 +2034,7 @@ const NewCoupon = ({ mode = "new" }) => {
                         }
                       }}
                       disabled={isViewMode}
-                      maxDate={new Date()} // Restrict future dates
+                      minDate={new Date()}
                       slotProps={{ textField: endDateTextFieldProps }}
                     />
                   </Grid>

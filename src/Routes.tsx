@@ -113,6 +113,7 @@ export const router = createBrowserRouter([
             children: [
               { path: "send", element: <SendNotification /> },
               { path: "log", element: <NotificationsLog /> },
+              { path: "log/:logId", element: <ConsultationView mode="view" /> },
               { index: true, element: <Navigate to="send" replace /> },
             ],
           },

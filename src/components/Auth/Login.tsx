@@ -528,9 +528,11 @@ import {
 } from "../Elements/CommonValidations";
 import { LoginInputFormComponent } from "../Elements/LoginInputFormComponent";
 import { debounce } from "lodash";
-import { ThunkDispatch } from "redux-thunk";
-import { AnyAction } from "redux";
-import { setCountriesList } from "../../redux/reducer";
+import {
+  fetchCountriesList,
+  AppState,
+  AppDispatch,
+} from "../Elements/CommonFunctions";
 
 // Styled Components
 const LoginWrapper = styled(Box)(() => ({
@@ -692,60 +694,6 @@ const LogoBoxComponent = React.memo(() => (
     <img src={astro_prompt_logo_login} alt="Astro Prompt Logo" loading="lazy" />
   </LogoBox>
 ));
-
-// Define types for your Redux state and dispatch (add this near the top of the file)
-export interface AppState {
-  isAuthenticated: boolean;
-  userInfo: Record<string, any>;
-  users: any[];
-  notification: { message: string; type: string; show: boolean };
-  isLoading: boolean;
-  countriesList: { name: string; code: string }[];
-}
-
-export type AppDispatch = ThunkDispatch<AppState, unknown, AnyAction>;
-
-export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
-  try {
-    dispatch({ type: "setloading", payload: true });
-
-    const response = await callAPI({
-      endpoint: "/api/countries",
-      method: "get",
-    });
-
-    console.log(response, "response");
-
-    const countriesData = response?.data;
-    if (!Array.isArray(countriesData)) {
-      throw new Error("Invalid countries data");
-    }
-
-    // Deduplicate countries by countryCode
-    const uniqueCountriesMap = new Map<string, []>();
-    countriesData.forEach((country: any) => {
-      if (!uniqueCountriesMap.has(country.countryCode)) {
-        uniqueCountriesMap.set(country.countryCode, country);
-      }
-    });
-    const uniqueCountriesList = Array.from(uniqueCountriesMap.values());
-
-    dispatch(setCountriesList(uniqueCountriesList));
-  } catch (error) {
-    console.error("Failed to fetch countries:", error);
-    dispatch(setCountriesList([]));
-    dispatch({
-      type: "setnotification",
-      payload: {
-        message: "Failed to load countries. Please try again.",
-        type: "error",
-        show: true,
-      },
-    });
-  } finally {
-    dispatch({ type: "setloading", payload: false });
-  }
-};
 
 // Main Login Component
 export const Login = () => {
@@ -1092,64 +1040,66 @@ export const Login = () => {
 
   return (
     <LoginWrapperComponent>
-      {isLoading ? ( // Use isLoading from Redux instead of local loading
-        <Box sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
-          <Box sx={{ p: 2 }}>
-            <Skeleton variant="text" width="40%" height={30} />
-            <Skeleton variant="text" width="60%" height={20} />
-          </Box>
-        </Box>
-      ) : (
-        <LoginCardComponent>
-          <LogoBoxComponent />
-          {state.loading && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: alpha("#ffffff", 0.8),
-                zIndex: 1,
-              }}
-            >
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
-              >
-                Loading...
-              </Typography>
+      <LoginCardComponent>
+        {isLoading ? ( // Use isLoading from Redux instead of local loading
+          <Box sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
+            <Box sx={{ p: 2 }}>
+              <Skeleton variant="text" width="40%" height={30} />
+              <Skeleton variant="text" width="60%" height={20} />
             </Box>
-          )}
-          {state.step === "success" && <LoginSuccessComponent />}
-          {state.step === "input" && (
-            <LoginInputFormComponent
-              formState={state}
-              dispatchState={dispatchState}
-              handleInputChange={handleInputChange}
-              handleSendOtp={handleSendOtp}
-              handleSwitchMethod={handleSwitchMethod}
-              countriesList={countriesList}
-            />
-          )}
-          {state.step === "otp" && (
-            <OtpFormComponent
-              formState={state}
-              dispatchState={dispatchState}
-              otpInputRefs={otpInputRefs}
-              handleOtpChange={handleOtpChange}
-              handleOtpPaste={handleOtpPaste}
-              handleKeyDown={handleKeyDown}
-              handleResendOtp={handleResendOtp}
-            />
-          )}
-        </LoginCardComponent>
-      )}
+          </Box>
+        ) : (
+          <>
+            <LogoBoxComponent />
+            {state.loading && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: alpha("#ffffff", 0.8),
+                  zIndex: 1,
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                >
+                  Loading...
+                </Typography>
+              </Box>
+            )}
+            {state.step === "success" && <LoginSuccessComponent />}
+            {state.step === "input" && (
+              <LoginInputFormComponent
+                formState={state}
+                dispatchState={dispatchState}
+                handleInputChange={handleInputChange}
+                handleSendOtp={handleSendOtp}
+                handleSwitchMethod={handleSwitchMethod}
+                countriesList={countriesList}
+              />
+            )}
+            {state.step === "otp" && (
+              <OtpFormComponent
+                formState={state}
+                dispatchState={dispatchState}
+                otpInputRefs={otpInputRefs}
+                handleOtpChange={handleOtpChange}
+                handleOtpPaste={handleOtpPaste}
+                handleKeyDown={handleKeyDown}
+                handleResendOtp={handleResendOtp}
+              />
+            )}
+          </>
+        )}
+      </LoginCardComponent>
     </LoginWrapperComponent>
   );
 };

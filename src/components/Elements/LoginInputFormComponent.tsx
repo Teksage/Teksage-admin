@@ -294,7 +294,7 @@ interface LoginInputFormProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSendOtp: (e: React.FormEvent) => void;
   handleSwitchMethod: (newMethod: "email" | "mobile") => void;
-  countriesList: Array<{ countryCode: string; countryName: string }>;
+  countriesList: Array<{ dial_code: string; name: string, mobile_number_length: number }>;
 }
 
 const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
@@ -430,10 +430,10 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                 IconComponent={() => null}
                 renderValue={(selected) => {
                   const selectedOption = countriesList.find(
-                    (option: any) => option.countryCode === selected
+                    (option: any) => option.dial_code === selected
                   );
                   const displayText = selectedOption
-                    ? `${selectedOption.countryCode} (${selectedOption.countryName})`
+                    ? `${selectedOption.dial_code} (${selectedOption.name})`
                     : selected;
 
                   return (
@@ -484,8 +484,8 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
               >
                 {countriesList.map((option: any) => (
                   <MenuItem
-                    key={option.countryCode}
-                    value={option.countryCode}
+                    key={option.dial_code}
+                    value={option.dial_code}
                     sx={{
                       fontFamily: "Urbanist",
                       fontSize: "0.9rem",
@@ -508,7 +508,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                       },
                     }}
                   >
-                    {`${option.countryCode} (${option.countryName})`}
+                    {`${option.dial_code} (${option.name})`}
                   </MenuItem>
                 ))}
               </Select>
