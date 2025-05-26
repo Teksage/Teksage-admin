@@ -1099,12 +1099,15 @@ import {
   capitalizeFirstLetter,
   GlassSelect,
 } from "../../Elements/CommonFunctions";
+import { useSelector } from "react-redux";
+import { AppState } from "../../Auth/Login";
+// import { fetchCountriesList } from "../../Auth/Login";
 
 interface UserFormData {
   first_name: string;
   last_name: string;
   email: string;
-  countryCode: string;
+  country_code: string;
   mobile: string;
   dateOfBirth: Date | null;
   timeOfBirth: Date | null;
@@ -1171,7 +1174,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     first_name: "",
     last_name: "",
     email: "",
-    countryCode: "+91", // Add this field with a default value
+    country_code: "+91", // Add this field with a default value
     mobile: "",
     dateOfBirth: null,
     timeOfBirth: null,
@@ -1197,14 +1200,16 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     severity: "success",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const countriesList = useSelector((state: AppState) => state.countriesList);
+  console.log(countriesList, "countriesList");
 
-  const countryCodes = [
-    { code: "+1", country: "USA", pattern: /^\d{10}$/, length: 10 },
-    { code: "+44", country: "UK", pattern: /^\d{10,11}$/, length: "10-11" },
-    { code: "+91", country: "India", pattern: /^\d{10}$/, length: 10 },
-    { code: "+61", country: "Australia", pattern: /^\d{9}$/, length: 9 },
-    { code: "+81", country: "Japan", pattern: /^\d{10,11}$/, length: "10-11" },
-  ];
+  // const countryCodes = [
+  //   { code: "+1", country: "USA", pattern: /^\d{10}$/, length: 10 },
+  //   { code: "+44", country: "UK", pattern: /^\d{10,11}$/, length: "10-11" },
+  //   { code: "+91", country: "India", pattern: /^\d{10}$/, length: 10 },
+  //   { code: "+61", country: "Australia", pattern: /^\d{9}$/, length: 9 },
+  //   { code: "+81", country: "Japan", pattern: /^\d{10,11}$/, length: "10-11" },
+  // ];
 
   // Fetch user data in edit mode
   useEffect(() => {
@@ -1227,7 +1232,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             first_name: user.first_name || "",
             last_name: user.last_name || "",
             email: user.email || "",
-            countryCode: user.country_code || "+91", // Adjust based on API response
+            country_code: user.country_code || "+91", // Adjust based on API response
             mobile: user.mobile_number || "",
             dateOfBirth: user.date_of_birth
               ? new Date(user.date_of_birth)
@@ -1332,34 +1337,34 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           error = "Please enter a valid email address";
         }
         break;
-      // case "mobile":
-      //   if (!value.trim()) {
-      //     error = "Mobile number is required";
-      //   } else if (value && !/^\d{10}$/.test(value)) {
-      //     error = "Mobile number must be exactly 10 digits";
-      //   }
-      //   break;
       case "mobile":
         if (!value.trim()) {
           error = "Mobile number is required";
-        } else if (value) {
-          // Find the selected country code configuration
-          const selectedCountry = countryCodes.find(
-            (country) => country.code === formData.countryCode
-          );
-
-          if (selectedCountry) {
-            if (!selectedCountry.pattern.test(value)) {
-              error = `Mobile number must be exactly ${selectedCountry.length} digits for ${selectedCountry.country}`;
-            }
-          } else {
-            // Fallback validation
-            if (!/^\d{10}$/.test(value)) {
-              error = "Mobile number must be exactly 10 digits";
-            }
-          }
+        } else if (value && !/^\d{10}$/.test(value)) {
+          error = "Mobile number must be exactly 10 digits";
         }
         break;
+      // case "mobile":
+      //   if (!value.trim()) {
+      //     error = "Mobile number is required";
+      //   } else if (value) {
+      //     // Find the selected country code configuration
+      //     const selectedCountry = countriesList.find(
+      //       (country:any) => country.code === formData.countryCode
+      //     );
+
+      //     if (selectedCountry) {
+      //       if (!selectedCountry.pattern.test(value)) {
+      //         error = `Mobile number must be exactly ${selectedCountry.length} digits for ${selectedCountry.country}`;
+      //       }
+      //     } else {
+      //       // Fallback validation
+      //       if (!/^\d{10}$/.test(value)) {
+      //         error = "Mobile number must be exactly 10 digits";
+      //       }
+      //     }
+      //   }
+      //   break;
       default:
         break;
     }
@@ -1476,7 +1481,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           preferred_location: formData.preferredLocation,
           email: formData.email,
           // mobile_number: formData.mobile,
-          mobile_number: `${formData.countryCode}${formData.mobile}`, // Combine country code and mobile number
+          mobile_number: `${formData.country_code}${formData.mobile}`, // Combine country code and mobile number
           birth_location: formData.placeOfBirth,
           date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
           // time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
@@ -1652,7 +1657,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const handleCountryCodeChange = (event: SelectChangeEvent<string>) => {
     const newCountryCode = event.target.value as string;
-    updateFormData("countryCode", newCountryCode);
+    updateFormData("country_code", newCountryCode);
 
     // Revalidate mobile number with new country code
     if (formData.mobile) {
@@ -1922,7 +1927,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                     Code
                   </InputLabel>
                   <Select
-                    value={formData.countryCode || "+91"}
+                    value={formData.country_code || "+91"}
                     onChange={handleCountryCodeChange}
                     label="Code"
                     disabled={isViewMode}
@@ -1941,16 +1946,17 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       },
                     }}
                   >
-                    {countryCodes.map((option) => (
+                    {countriesList.map((option: any) => (
                       <MenuItem
-                        key={option.code}
-                        value={option.code}
+                        // key={option.countryCode}
+                        key={`${option.countryCode}-${option.countryName}`}
+                        value={option.countryCode}
                         sx={{
                           fontFamily: "Urbanist",
                           fontSize: "0.9rem",
                         }}
                       >
-                        {`${option.code} (${option.country})`}
+                        {`${option.countryCode} (${option.countryName})`}
                       </MenuItem>
                     ))}
                   </Select>

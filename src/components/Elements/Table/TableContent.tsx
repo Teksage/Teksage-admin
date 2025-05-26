@@ -1925,7 +1925,7 @@ const TableContent = <T,>({
                 </TableRow>
               ) : (
                 paginatedData.map((row, index) => {
-                  console.log(row, index);
+                  // console.log(row, index);
                   const id = getRowId(row);
                   const serialNumber = page * rowsPerPage + index + 1;
                   return (

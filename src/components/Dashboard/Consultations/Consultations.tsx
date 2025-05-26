@@ -34,7 +34,7 @@
 //     try {
 //       const params: Record<string, any> = {
 //         page: currentPage + 1,
-//         per_page: rowsPerPage,
+//         page_size: rowsPerPage,
 //       };
 
 //       const filterEntries = Object.entries(currentFilters).filter(([_, v]) => v.trim() !== "");
@@ -247,6 +247,8 @@ interface ConsultationData {
   customer_name: string;
   currency: string;
   consultation_fee: string | number | null;
+  cgst: string | number | null;
+  sgst: string | number | null;
 }
 
 const Consultations: React.FC = () => {
@@ -318,6 +320,28 @@ const Consultations: React.FC = () => {
         width: "140px",
         render: (value: any, row: ConsultationData) => {
           if (value == null || isNaN(Number(value))) return "N/A";
+          const currency = row.currency || "INR";
+          const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
+          return `${symbol} ${Number(value).toLocaleString("en-US")}`;
+        },
+      },
+      {
+        id: "cgst",
+        label: "CGST",
+        width: "140px",
+        render: (value: any, row: ConsultationData) => {
+          if (value == null || isNaN(Number(value))) return "0";
+          const currency = row.currency || "INR";
+          const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
+          return `${symbol} ${Number(value).toLocaleString("en-US")}`;
+        },
+      },
+      {
+        id: "sgst",
+        label: "SGST",
+        width: "140px",
+        render: (value: any, row: ConsultationData) => {
+          if (value == null || isNaN(Number(value))) return "0";
           const currency = row.currency || "INR";
           const symbol = currency.toUpperCase() === "DLR" ? "$" : "₹";
           return `${symbol} ${Number(value).toLocaleString("en-US")}`;
@@ -413,7 +437,7 @@ const Consultations: React.FC = () => {
     try {
       const params: Record<string, any> = {
         page: currentPage + 1,
-        per_page: rowsPerPage,
+        page_size: rowsPerPage,
       };
 
       const filterEntries = Object.entries(currentFilters).filter(

@@ -38,7 +38,7 @@
 //       // Default pagination params
 //       const params: Record<string, any> = {
 //         page: currentPage + 1,
-//         per_page: rowsPerPage,
+//         page_size: rowsPerPage,
 //       };
 
 //       // Add filters to params if they exist and are non-empty
@@ -394,7 +394,7 @@ const Astrologers: React.FC = () => {
     try {
       const params: Record<string, any> = {
         page: currentPage + 1,
-        per_page: rowsPerPage,
+        page_size: rowsPerPage,
       };
 
       const filterEntries = Object.entries(currentFilters).filter(

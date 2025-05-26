@@ -512,19 +512,25 @@
 // export default Login;
 
 import React, { useEffect, useRef, useCallback, useReducer } from "react";
-import { Box, Paper, alpha, Typography } from "@mui/material";
+import { Box, Paper, alpha, Typography, Skeleton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import astro_prompt_logo_login from "../../assets/astro_prompt_logo_login.png";
 import { callAPI } from "../../api/crudFactory";
 import { tokenService } from "../../utils/tokenService";
 import OfflineNotification from "../Elements/OfflineNotification";
 import { OtpFormComponent } from "../Elements/OtpFormComponent";
 import { LoginSuccessComponent } from "../Elements/LoginSuccessComponent";
-import { validateEmail, validateMobileNumber } from "../Elements/CommonValidations";
+import {
+  validateEmail,
+  validateMobileNumber,
+} from "../Elements/CommonValidations";
 import { LoginInputFormComponent } from "../Elements/LoginInputFormComponent";
 import { debounce } from "lodash";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { setCountriesList } from "../../redux/reducer";
 
 // Styled Components
 const LoginWrapper = styled(Box)(() => ({
@@ -637,7 +643,11 @@ const reducer = (state: LoginState, action: Action): LoginState => {
     case "SET_FIELD":
       return { ...state, [action.field]: action.value };
     case "SET_OTP":
-      return { ...state, otp: action.otp, activeOtpIndex: action.activeOtpIndex };
+      return {
+        ...state,
+        otp: action.otp,
+        activeOtpIndex: action.activeOtpIndex,
+      };
     case "SET_ERROR":
       return { ...state, error: action.error };
     case "SET_LOADING":
@@ -664,7 +674,9 @@ const LoginWrapperComponent = React.memo<{ children: React.ReactNode }>(
   ({ children }) => (
     <LoginWrapper>
       <OfflineNotification />
-      <Box sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}>
+      <Box
+        sx={{ width: "100%", px: 3, display: "flex", justifyContent: "center" }}
+      >
         {children}
       </Box>
     </LoginWrapper>
@@ -681,18 +693,83 @@ const LogoBoxComponent = React.memo(() => (
   </LogoBox>
 ));
 
+// Define types for your Redux state and dispatch (add this near the top of the file)
+export interface AppState {
+  isAuthenticated: boolean;
+  userInfo: Record<string, any>;
+  users: any[];
+  notification: { message: string; type: string; show: boolean };
+  isLoading: boolean;
+  countriesList: { name: string; code: string }[];
+}
+
+export type AppDispatch = ThunkDispatch<AppState, unknown, AnyAction>;
+
+export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch({ type: "setloading", payload: true });
+
+    const response = await callAPI({
+      endpoint: "/api/countries",
+      method: "get",
+    });
+
+    console.log(response, "response");
+
+    const countriesData = response?.data;
+    if (!Array.isArray(countriesData)) {
+      throw new Error("Invalid countries data");
+    }
+
+    // Deduplicate countries by countryCode
+    const uniqueCountriesMap = new Map<string, []>();
+    countriesData.forEach((country: any) => {
+      if (!uniqueCountriesMap.has(country.countryCode)) {
+        uniqueCountriesMap.set(country.countryCode, country);
+      }
+    });
+    const uniqueCountriesList = Array.from(uniqueCountriesMap.values());
+
+    dispatch(setCountriesList(uniqueCountriesList));
+  } catch (error) {
+    console.error("Failed to fetch countries:", error);
+    dispatch(setCountriesList([]));
+    dispatch({
+      type: "setnotification",
+      payload: {
+        message: "Failed to load countries. Please try again.",
+        type: "error",
+        show: true,
+      },
+    });
+  } finally {
+    dispatch({ type: "setloading", payload: false });
+  }
+};
+
 // Main Login Component
 export const Login = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [state, dispatchState] = useReducer(reducer, initialState);
+  const countriesList = useSelector((state: AppState) => state.countriesList);
+  const isLoading = useSelector((state: AppState) => state.isLoading); // Use Redux isLoading instead of local state
+  console.log(countriesList, "countriesList");
+
+  useEffect(() => {
+    dispatch(fetchCountriesList()); // Dispatch the thunk correctly
+  }, [dispatch]);
 
   // Countdown timer for OTP resend
   useEffect(() => {
     if (state.countdown > 0) {
       const timer = setTimeout(() => {
-        dispatchState({ type: "SET_COUNTDOWN", countdown: state.countdown - 1 });
+        dispatchState({
+          type: "SET_COUNTDOWN",
+          countdown: state.countdown - 1,
+        });
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -710,7 +787,11 @@ export const Login = () => {
   }, [state.step, navigate]);
 
   const handleSwitchMethod = useCallback((newMethod: "email" | "mobile") => {
-    dispatchState({ type: "SET_FIELD", field: "loginMethod", value: newMethod });
+    dispatchState({
+      type: "SET_FIELD",
+      field: "loginMethod",
+      value: newMethod,
+    });
     dispatchState({
       type: "SET_FIELD",
       field: newMethod === "email" ? "mobile_number" : "email",
@@ -730,7 +811,11 @@ export const Login = () => {
           dispatchState({ type: "SET_ERROR", error: null });
         }
       } else {
-        dispatchState({ type: "SET_FIELD", field: name as keyof LoginState, value });
+        dispatchState({
+          type: "SET_FIELD",
+          field: name as keyof LoginState,
+          value,
+        });
         dispatchState({ type: "SET_ERROR", error: null });
       }
     },
@@ -745,7 +830,9 @@ export const Login = () => {
         const newOtp = [...state.otp];
         newOtp[index] = value.substring(value.length - 1);
 
-        const newIndex = value ? Math.min(index + 1, 5) : Math.max(index - 1, 0);
+        const newIndex = value
+          ? Math.min(index + 1, 5)
+          : Math.max(index - 1, 0);
         dispatchState({
           type: "SET_OTP",
           otp: newOtp,
@@ -804,7 +891,10 @@ export const Login = () => {
 
       if (state.loginMethod === "email") {
         if (!state.email) {
-          dispatchState({ type: "SET_ERROR", error: "Please enter your email" });
+          dispatchState({
+            type: "SET_ERROR",
+            error: "Please enter your email",
+          });
           return;
         }
         if (!validateEmail(state.email)) {
@@ -855,7 +945,9 @@ export const Login = () => {
         });
 
         if (response.data.error === "400: Dont have an access") {
-          throw new Error("Access Denied: You do not have permission to proceed.");
+          throw new Error(
+            "Access Denied: You do not have permission to proceed."
+          );
         }
 
         dispatchState({ type: "SET_FIELD", field: "step", value: "otp" });
@@ -924,7 +1016,13 @@ export const Login = () => {
         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
       }
     }, 300),
-    [state.countdown, state.loginMethod, state.email, state.mobile_number, state.countryCode]
+    [
+      state.countdown,
+      state.loginMethod,
+      state.email,
+      state.mobile_number,
+      state.countryCode,
+    ]
   );
 
   const handleVerifyOtp = useCallback(async () => {
@@ -946,8 +1044,14 @@ export const Login = () => {
             ? { email: state.email, otp: "111111" }
             : { email: state.email, otp }
           : otp === "111111"
-          ? { mobile_number: `${state.countryCode}${state.mobile_number}`, otp: "111111" }
-          : { mobile_number: `${state.countryCode}${state.mobile_number}`, otp };
+          ? {
+              mobile_number: `${state.countryCode}${state.mobile_number}`,
+              otp: "111111",
+            }
+          : {
+              mobile_number: `${state.countryCode}${state.mobile_number}`,
+              otp,
+            };
 
       const response = await callAPI({
         endpoint,
@@ -977,54 +1081,75 @@ export const Login = () => {
       });
       dispatchState({ type: "SET_FIELD", field: "step", value: "error" });
     }
-  }, [state.otp, state.loginMethod, state.email, state.mobile_number, state.countryCode, dispatch]);
+  }, [
+    state.otp,
+    state.loginMethod,
+    state.email,
+    state.mobile_number,
+    state.countryCode,
+    dispatch,
+  ]);
 
   return (
     <LoginWrapperComponent>
-      <LoginCardComponent>
-        <LogoBoxComponent />
-        {state.loading && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: alpha("#ffffff", 0.8),
-              zIndex: 1,
-            }}
-          >
-            <Typography variant="body1" color="text.secondary" style={{ fontFamily: "Urbanist", fontWeight: 600 }}>
-              Loading...
-            </Typography>
+      {isLoading ? ( // Use isLoading from Redux instead of local loading
+        <Box sx={{ flex: 1, overflow: "auto", paddingBottom: 7 }}>
+          <Box sx={{ p: 2 }}>
+            <Skeleton variant="text" width="40%" height={30} />
+            <Skeleton variant="text" width="60%" height={20} />
           </Box>
-        )}
-        {state.step === "success" && <LoginSuccessComponent />}
-        {state.step === "input" && (
-          <LoginInputFormComponent
-            formState={state}
-            dispatchState={dispatchState}
-            handleInputChange={handleInputChange}
-            handleSendOtp={handleSendOtp}
-            handleSwitchMethod={handleSwitchMethod}
-          />
-        )}
-        {state.step === "otp" && (
-          <OtpFormComponent
-            formState={state}
-            dispatchState={dispatchState}
-            otpInputRefs={otpInputRefs}
-            handleOtpChange={handleOtpChange}
-            handleOtpPaste={handleOtpPaste}
-            handleKeyDown={handleKeyDown}
-            handleResendOtp={handleResendOtp}
-          />
-        )}
-      </LoginCardComponent>
+        </Box>
+      ) : (
+        <LoginCardComponent>
+          <LogoBoxComponent />
+          {state.loading && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: alpha("#ffffff", 0.8),
+                zIndex: 1,
+              }}
+            >
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+              >
+                Loading...
+              </Typography>
+            </Box>
+          )}
+          {state.step === "success" && <LoginSuccessComponent />}
+          {state.step === "input" && (
+            <LoginInputFormComponent
+              formState={state}
+              dispatchState={dispatchState}
+              handleInputChange={handleInputChange}
+              handleSendOtp={handleSendOtp}
+              handleSwitchMethod={handleSwitchMethod}
+              countriesList={countriesList}
+            />
+          )}
+          {state.step === "otp" && (
+            <OtpFormComponent
+              formState={state}
+              dispatchState={dispatchState}
+              otpInputRefs={otpInputRefs}
+              handleOtpChange={handleOtpChange}
+              handleOtpPaste={handleOtpPaste}
+              handleKeyDown={handleKeyDown}
+              handleResendOtp={handleResendOtp}
+            />
+          )}
+        </LoginCardComponent>
+      )}
     </LoginWrapperComponent>
   );
 };

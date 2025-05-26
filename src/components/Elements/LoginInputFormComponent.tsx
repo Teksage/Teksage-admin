@@ -222,7 +222,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
-  InputLabel
+  InputLabel,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { SignInTypeTabsComponent } from "./SignInTypeTabsComponent";
@@ -272,13 +272,13 @@ const Particle = styled(Box)(() => ({
   },
 }));
 
-const countryCodes = [
-  { code: "+1", country: "USA" },
-  { code: "+44", country: "UK" },
-  { code: "+91", country: "India" },
-  { code: "+61", country: "Australia" },
-  { code: "+81", country: "Japan" },
-];
+// const countryCodes = [
+//   { code: "+1", country: "USA" },
+//   { code: "+44", country: "UK" },
+//   { code: "+91", country: "India" },
+//   { code: "+61", country: "Australia" },
+//   { code: "+81", country: "Japan" },
+// ];
 
 // Interface for props
 interface LoginInputFormProps {
@@ -294,6 +294,7 @@ interface LoginInputFormProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSendOtp: (e: React.FormEvent) => void;
   handleSwitchMethod: (newMethod: "email" | "mobile") => void;
+  countriesList: Array<{ countryCode: string; countryName: string }>;
 }
 
 const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
@@ -325,7 +326,14 @@ const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
 );
 
 export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
-  ({ formState, dispatchState, handleInputChange, handleSendOtp, handleSwitchMethod }) => {
+  ({
+    formState,
+    dispatchState,
+    handleInputChange,
+    handleSendOtp,
+    handleSwitchMethod,
+    countriesList,
+  }) => {
     const handleLoginMethodChange = useCallback(
       (newMethod: "email" | "mobile") => {
         handleSwitchMethod(newMethod);
@@ -398,154 +406,163 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             }}
           />
         ) : (
-<Box
-  sx={{
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 2,
-    alignItems: "center",
-    marginTop: "16px",
-  }}
->
-  {/* Country Code Dropdown */}
-  <GlassSelect size="small">
-    <InputLabel id="country-code-label">
-      Code
-    </InputLabel>
-    <Select
-      labelId="country-code-label"
-      value={formState.countryCode || "+91"}
-      onChange={(event) => {
-        console.log("Country code selected:", event.target.value);
-        handleCountryCodeChange(event);
-      }}
-      onClick={() => console.log("Select clicked")}
-      label="Code"
-      IconComponent={() => null}
-      renderValue={(selected) => {
-        const selectedOption = countryCodes.find(option => option.code === selected);
-        const displayText = selectedOption 
-          ? `${selectedOption.code} (${selectedOption.country})`
-          : selected;
-        
-        return (
           <Box
             sx={{
               display: "flex",
+              flexWrap: "wrap",
+              gap: 2,
               alignItems: "center",
-              justifyContent: "flex-start",
-              color: "#4caf50",
-              fontFamily: "Urbanist",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              width: "100%",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              title: displayText, // Tooltip on hover
+              marginTop: "16px",
             }}
-            title={displayText}
           >
-            {displayText}
-          </Box>
-        );
-      }}
-      sx={{
-        "& .MuiSelect-select": {
-          paddingRight: "8px !important",
-        },
-      }}
-      MenuProps={{
-        PaperProps: {
-          sx: {
-            backdropFilter: "blur(10px)",
-            background: `linear-gradient(135deg, ${alpha("#ffffff", 0.4)}, ${alpha("#e0e0e0", 0.3)})`,
-            border: `1px solid ${alpha("#ffffff", 0.5)}`,
-            borderRadius: "8px",
-            boxShadow: `0 8px 20px ${alpha("#000000", 0.4)}`,
-            width: "auto",
-            minWidth: "200px",
-            maxWidth: "300px",
-            marginTop: "4px",
-          },
-        },
-      }}
-    >
-      {countryCodes.map((option) => (
-        <MenuItem
-          key={option.code}
-          value={option.code}
-          sx={{
-            fontFamily: "Urbanist",
-            fontSize: "0.9rem",
-            color: "#ffffff",
-            textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)",
-            padding: "8px 16px",
-            "&:hover": {
-              background: `linear-gradient(45deg, ${alpha("#1b4d3e", 0.4)}, ${alpha("#4caf50", 0.4)})`,
-            },
-            "&.Mui-selected": {
-              background: `linear-gradient(45deg, ${alpha("#1b4d3e", 0.5)}, ${alpha("#4caf50", 0.5)})`,
-              fontWeight: 600,
-              boxShadow: `inset 0 0 8px ${alpha("#4caf50", 0.3)}`,
-            },
-          }}
-        >
-          {`${option.code} (${option.country})`}
-        </MenuItem>
-      ))}
-    </Select>
-  </GlassSelect>
+            {/* Country Code Dropdown */}
+            <GlassSelect size="small">
+              <InputLabel id="country-code-label">Code</InputLabel>
+              <Select
+                labelId="country-code-label"
+                value={formState.countryCode || "+91"}
+                onChange={(event) => {
+                  console.log("Country code selected:", event.target.value);
+                  handleCountryCodeChange(event);
+                }}
+                onClick={() => console.log("Select clicked")}
+                label="Code"
+                IconComponent={() => null}
+                renderValue={(selected) => {
+                  const selectedOption = countriesList.find(
+                    (option: any) => option.countryCode === selected
+                  );
+                  const displayText = selectedOption
+                    ? `${selectedOption.countryCode} (${selectedOption.countryName})`
+                    : selected;
 
-  {/* Mobile Number Input */}
-  <TextField
-    required
-    fullWidth
-    label="Mobile Number"
-    name="mobile_number"
-    autoComplete="tel"
-    autoFocus
-    value={formState.mobile_number}
-    onChange={handleInputChange}
-    error={!!formState.error}
-    helperText={formState.error}
-    InputLabelProps={{
-      sx: {
-        fontSize: "0.95rem",
-        fontWeight: 500,
-        color: "#455a64",
-        fontFamily: "Urbanist",
-      },
-    }}
-    InputProps={{
-      sx: {
-        fontSize: "0.9rem",
-        borderRadius: "6px",
-        fontFamily: "Urbanist",
-        height: "56px",
-        padding: "0 12px",
-        boxSizing: "border-box",
-      },
-    }}
-    sx={{
-      "& .MuiInputLabel-root": {
-        fontFamily: "Urbanist",
-        fontSize: "0.95rem",
-      },
-      "& .MuiOutlinedInput-root": {
-        "&:hover fieldset": {
-          borderColor: alpha("#4caf50", 0.5),
-        },
-        "&.Mui-focused fieldset": {
-          borderColor: "#4caf50",
-          boxShadow: `0 0 8px ${alpha("#4caf50", 0.3)}`,
-        },
-      },
-      flex: 1,
-      minWidth: "200px",
-    }}
-  />
-</Box>
+                  return (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        color: "#4caf50",
+                        fontFamily: "Urbanist",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        width: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        title: displayText, // Tooltip on hover
+                      }}
+                      title={displayText}
+                    >
+                      {displayText}
+                    </Box>
+                  );
+                }}
+                sx={{
+                  "& .MuiSelect-select": {
+                    paddingRight: "8px !important",
+                  },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      backdropFilter: "blur(10px)",
+                      background: `linear-gradient(135deg, ${alpha(
+                        "#ffffff",
+                        0.4
+                      )}, ${alpha("#e0e0e0", 0.3)})`,
+                      border: `1px solid ${alpha("#ffffff", 0.5)}`,
+                      borderRadius: "8px",
+                      boxShadow: `0 8px 20px ${alpha("#000000", 0.4)}`,
+                      width: "auto",
+                      minWidth: "200px",
+                      maxWidth: "300px",
+                      marginTop: "4px",
+                    },
+                  },
+                }}
+              >
+                {countriesList.map((option: any) => (
+                  <MenuItem
+                    key={option.countryCode}
+                    value={option.countryCode}
+                    sx={{
+                      fontFamily: "Urbanist",
+                      fontSize: "0.9rem",
+                      color: "#ffffff",
+                      textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)",
+                      padding: "8px 16px",
+                      "&:hover": {
+                        background: `linear-gradient(45deg, ${alpha(
+                          "#1b4d3e",
+                          0.4
+                        )}, ${alpha("#4caf50", 0.4)})`,
+                      },
+                      "&.Mui-selected": {
+                        background: `linear-gradient(45deg, ${alpha(
+                          "#1b4d3e",
+                          0.5
+                        )}, ${alpha("#4caf50", 0.5)})`,
+                        fontWeight: 600,
+                        boxShadow: `inset 0 0 8px ${alpha("#4caf50", 0.3)}`,
+                      },
+                    }}
+                  >
+                    {`${option.countryCode} (${option.countryName})`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </GlassSelect>
+
+            {/* Mobile Number Input */}
+            <TextField
+              required
+              fullWidth
+              label="Mobile Number"
+              name="mobile_number"
+              autoComplete="tel"
+              autoFocus
+              value={formState.mobile_number}
+              onChange={handleInputChange}
+              error={!!formState.error}
+              helperText={formState.error}
+              InputLabelProps={{
+                sx: {
+                  fontSize: "0.95rem",
+                  fontWeight: 500,
+                  color: "#455a64",
+                  fontFamily: "Urbanist",
+                },
+              }}
+              InputProps={{
+                sx: {
+                  fontSize: "0.9rem",
+                  borderRadius: "6px",
+                  fontFamily: "Urbanist",
+                  height: "56px",
+                  padding: "0 12px",
+                  boxSizing: "border-box",
+                },
+              }}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Urbanist",
+                  fontSize: "0.95rem",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "&:hover fieldset": {
+                    borderColor: alpha("#4caf50", 0.5),
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#4caf50",
+                    boxShadow: `0 0 8px ${alpha("#4caf50", 0.3)}`,
+                  },
+                },
+                flex: 1,
+                minWidth: "200px",
+              }}
+            />
+          </Box>
         )}
         <StyledButton
           type="submit"

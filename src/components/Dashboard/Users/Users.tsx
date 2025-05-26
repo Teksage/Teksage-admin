@@ -36,7 +36,7 @@ const Users: React.FC = () => {
     try {
       const params: Record<string, any> = {
         page: currentPage + 1,
-        per_page: rowsPerPage,
+        page_size: rowsPerPage,
       };
 
       const filterEntries = Object.entries(currentFilters).filter(
@@ -176,6 +176,7 @@ const Users: React.FC = () => {
   };
 
   const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    console.log(newRowsPerPage, "newRowsPerPage 123")
     setRowsPerPage(newRowsPerPage);
     setPage(0);
   };

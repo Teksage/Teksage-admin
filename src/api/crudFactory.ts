@@ -257,7 +257,7 @@ export const callAPI = async ({
       ...config,
     });
 
-    console.log(response, "response");
+    // console.log(response, "response");
 
     return response;
   } catch (error: any) {

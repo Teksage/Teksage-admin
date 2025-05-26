@@ -199,10 +199,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-// import {
-//   FirstPage as FirstPageIcon,
-//   LastPage as LastPageIcon,
-// } from "@mui/icons-material";
+import { useLocation } from 'react-router-dom';
 
 const StyledPaginationContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -238,6 +235,11 @@ const PaginationSection = ({
 }: PaginationSectionProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const location = useLocation();
+  const pathSegments = location.pathname.split('/');
+  const lastSegment = pathSegments[pathSegments.length - 1];
+  const showLabel = ['subscription', 'coupons', 'services'].includes(lastSegment);
+  console.log(lastSegment, "lastSegment", showLabel, "showLabel");
 
   // Ensure totalCount is non-negative to prevent pagination issues
   const safeTotalCount = Math.max(0, totalCount);
@@ -266,6 +268,7 @@ const PaginationSection = ({
       onRowsPerPageChange(newRowsPerPage);
       // Reset to page 0 when rows per page changes to avoid invalid page
       if (onPageChange) {
+        console.log(newRowsPerPage, "newRowsPerPage");
         onPageChange(0);
       }
     }
@@ -331,8 +334,14 @@ const PaginationSection = ({
           page={safePage}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={rowsPerPageOptions}
+          // onRowsPerPageChange={handleChangeRowsPerPage}
+          // rowsPerPageOptions={rowsPerPageOptions}
+          onRowsPerPageChange={
+            showLabel ? undefined : handleChangeRowsPerPage
+          }
+          rowsPerPageOptions={
+            showLabel ? [rowsPerPage] : rowsPerPageOptions
+          }
           showFirstButton
           showLastButton
           labelRowsPerPage="Rows per page:"

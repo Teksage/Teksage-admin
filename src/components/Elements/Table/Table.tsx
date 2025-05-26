@@ -246,7 +246,7 @@ function GenericTable<T>({
     const filters: Record<string, string> = {};
     columns.forEach((column) => {
       if (column.filterable && column.defaultValue && !column.dependsOn) {
-        console.log(column, column.defaultValue, "column.defaultValue")
+        // console.log(column, column.defaultValue, "column.defaultValue")
         filters[column.id as string] = column.defaultValue.toUpperCase();
       }
     });
@@ -326,6 +326,8 @@ function GenericTable<T>({
     a.click();
     window.URL.revokeObjectURL(url);
   };
+
+  console.log(rowsPerPage, "rowsPerPage");
 
   return (
     <div
