@@ -327,8 +327,6 @@ function GenericTable<T>({
     window.URL.revokeObjectURL(url);
   };
 
-  console.log(rowsPerPage, "rowsPerPage");
-
   return (
     <div
       style={{

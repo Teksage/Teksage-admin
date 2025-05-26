@@ -384,7 +384,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         severity: "success",
       });
       setTimeout(() => {
-        navigate(-1);
+        navigate("/dashboard/faqs", { replace: true })
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
@@ -423,7 +423,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           }}
         >
           <IconButton
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/dashboard/faqs", { replace: true })}
             sx={{
               mr: 1,
               color: "#06402B",
@@ -656,7 +656,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         >
                           <Button
                             variant="outlined"
-                            onClick={() => navigate(-1)}
+                            onClick={() => navigate("/dashboard/faqs", { replace: true })}
                             sx={{
                               mr: 2,
                               color: "#555",

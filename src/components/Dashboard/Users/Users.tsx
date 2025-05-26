@@ -159,6 +159,8 @@ const Users: React.FC = () => {
     },
   ];
 
+  console.log(filters, "filters in Users component");
+
   const handleAdd = () => {
     navigate("/dashboard/users/new");
   };

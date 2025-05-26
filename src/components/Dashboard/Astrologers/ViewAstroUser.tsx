@@ -182,7 +182,7 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
     <Box>
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
+        <IconButton onClick={() => navigate("/dashboard/astrologers", { replace: true })} sx={{ mr: 2 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography

@@ -4,7 +4,7 @@ import { TableColumn } from "../../Elements/Table/types";
 import { callAPI } from "../../../api/crudFactory";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import ConfirmModal from "../../Elements/ConfirmModal";
+// import ConfirmModal from "../../Elements/ConfirmModal";
 
 interface CouponData {
   coupon_id: number;
@@ -20,8 +20,8 @@ interface CouponData {
 const Coupons: React.FC = () => {
   const navigate = useNavigate();
   const [coupons, setCoupons] = useState<CouponData[]>([]);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<CouponData | null>(null);
+  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [selectedRow, setSelectedRow] = useState<CouponData | null>(null);
 
   useEffect(() => {
     fetchCoupons();
@@ -86,25 +86,25 @@ const Coupons: React.FC = () => {
   const handleEdit = (row: CouponData) =>
     navigate(`/dashboard/coupons/edit/${row.coupon_id}`);
 
-  const handleDelete = (row: CouponData) => {
-    console.log(row, "row")
-    setSelectedRow(row);
-    setDeleteModalOpen(true);
-  };
+  // const handleDelete = (row: CouponData) => {
+  //   console.log(row, "row")
+  //   setSelectedRow(row);
+  //   setDeleteModalOpen(true);
+  // };
 
-  const confirmDelete = async () => {
-    try {
-      await callAPI({
-        endpoint: `/api/admin/coupons/${selectedRow?.coupon_id}`,
-        method: "delete",
-      });
-      setDeleteModalOpen(false);
-      setSelectedRow(null);
-      fetchCoupons();
-    } catch (error) {
-      console.error("Error deleting coupon:", error);
-    }
-  };
+  // const confirmDelete = async () => {
+  //   try {
+  //     await callAPI({
+  //       endpoint: `/api/admin/coupons/${selectedRow?.coupon_id}`,
+  //       method: "delete",
+  //     });
+  //     setDeleteModalOpen(false);
+  //     setSelectedRow(null);
+  //     fetchCoupons();
+  //   } catch (error) {
+  //     console.error("Error deleting coupon:", error);
+  //   }
+  // };
 
   // const handleSelectionChange = (selectedIds: number[]) => {};
 
@@ -117,7 +117,7 @@ const Coupons: React.FC = () => {
         onAdd={handleAdd}
         // onView={handleView}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        // onDelete={handleDelete}
         // onSelectionChange={handleSelectionChange}
         getRowId={(row) => row.coupon_id}
         tableHeight="calc(100vh - 250px)"
@@ -125,7 +125,7 @@ const Coupons: React.FC = () => {
       />
 
       {/* 💬 Delete Confirmation Modal */}
-      <ConfirmModal
+      {/* <ConfirmModal
         open={deleteModalOpen}
         title="Confirm Deletion"
         message={`Are you sure you want to delete "${selectedRow?.coupon_name}"?`}
@@ -133,7 +133,7 @@ const Coupons: React.FC = () => {
         cancelText="Cancel"
         onConfirm={confirmDelete}
         onClose={() => setDeleteModalOpen(false)}
-      />
+      /> */}
     </>
   );
 };

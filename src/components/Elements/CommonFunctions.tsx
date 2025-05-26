@@ -8,10 +8,10 @@ import { AnyAction } from "redux";
 
 export const formatYears = (years: number): string => {
   return `${years} Year${years === 1 ? "" : "s"}`;
-}
+};
 
 export const normalizeYearText = (text: string) =>
-  text.replace(/(Year)(s?)/gi, (_match, _y, s) => 'year' + s.toLowerCase());
+  text.replace(/(Year)(s?)/gi, (_match, _y, s) => "year" + s.toLowerCase());
 
 // export const capitalizeFirstLetter = (text: string) =>
 //   text?.charAt(0).toUpperCase() + text.slice(1);
@@ -103,9 +103,8 @@ export const GlassSelect = styled(FormControl)(({ theme }) => ({
     fontSize: "0.85rem",
     fontWeight: 600,
     color: "#4caf50",
-    padding: theme.spacing(1.5, 2),
-    height: "24px",
-    lineHeight: "24px",
+    padding: theme.spacing(2), // Increased padding for better height
+    minHeight: "40px", // Ensure a consistent minimum height
     borderRadius: "6px",
     background: `rgba(255, 255, 255, 0.05)`,
     backdropFilter: "blur(10px)",
@@ -152,7 +151,11 @@ export interface AppState {
   users: any[];
   notification: { message: string; type: string; show: boolean };
   isLoading: boolean;
-  countriesList: { dial_code: string; name: string; mobile_number_length: number }[];
+  countriesList: {
+    dial_code: string;
+    name: string;
+    mobile_number_length: number;
+  }[];
 }
 
 export type AppDispatch = ThunkDispatch<AppState, unknown, AnyAction>;
@@ -165,8 +168,6 @@ export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
       endpoint: "/api/countries",
       method: "get",
     });
-
-    console.log(response, "response");
 
     const countriesData = response?.data;
     if (!Array.isArray(countriesData)) {
@@ -197,4 +198,37 @@ export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
   } finally {
     dispatch({ type: "setloading", payload: false });
   }
+};
+
+export const transformDateKeys = (
+  obj: Record<string, any>
+): Record<string, any> => {
+  const newObj = { ...obj };
+
+  if ("start_datetime" in newObj) {
+    newObj.start_time = newObj.start_datetime;
+    delete newObj.start_datetime;
+  }
+
+  if ("end_datetime" in newObj) {
+    newObj.end_time = newObj.end_datetime;
+    delete newObj.end_datetime;
+  }
+
+  return newObj;
+};
+
+// Format number with commas and decimals for display
+export const formatNumberWithCommas = (value: string | number): string => {
+  if (value === "" || value == null) return "";
+  const stringValue = String(value);
+  // Remove any existing commas to avoid duplication
+  const cleanValue = stringValue.replace(/,/g, "");
+  const [integerPart, decimalPart] = cleanValue.split(".");
+  // Add commas to integer part
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  // Include decimal part if present, up to two places
+  return decimalPart !== undefined
+    ? `${formattedInteger}.${decimalPart.slice(0, 2)}`
+    : formattedInteger;
 };

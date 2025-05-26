@@ -542,7 +542,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         severity: "success",
       });
       setTimeout(() => {
-        navigate(-1);
+        navigate("/dashboard/services", { replace: true })
       }, 1000);
     } catch (err: any) {
       console.error("Error fetching data:", err);
@@ -579,7 +579,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           }}
         >
           <IconButton
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/dashboard/services", { replace: true })}
             sx={{
               mr: 1,
               color: "#06402B",
@@ -804,7 +804,7 @@ const NewService: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         >
                           <Button
                             variant="outlined"
-                            onClick={() => navigate(-1)}
+                            onClick={() => navigate("/dashboard/services", { replace: true })}
                             sx={{
                               mr: 2,
                               color: "#555",

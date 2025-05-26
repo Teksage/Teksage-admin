@@ -718,6 +718,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { callAPI } from "../../../api/crudFactory";
 import CustomSnackbar from "../../Elements/CustomSnackbar";
 import { Subscriptions } from "@mui/icons-material";
+import { formatNumberWithCommas } from "../../Elements/CommonFunctions";
 
 interface SubscriptionFormData {
   plan_name: string;
@@ -819,21 +820,6 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
 
     fetchInitialData();
   }, [mode, userId]);
-
-  // Format number with commas and decimals for display
-  const formatNumberWithCommas = (value: string | number): string => {
-    if (value === "" || value == null) return "";
-    const stringValue = String(value);
-    // Remove any existing commas to avoid duplication
-    const cleanValue = stringValue.replace(/,/g, "");
-    const [integerPart, decimalPart] = cleanValue.split(".");
-    // Add commas to integer part
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // Include decimal part if present, up to two places
-    return decimalPart !== undefined
-      ? `${formattedInteger}.${decimalPart.slice(0, 2)}`
-      : formattedInteger;
-  };
 
   const handleTextChange =
     (field: keyof SubscriptionFormData) =>
@@ -944,13 +930,24 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     if (!formData.plan_services.length) {
       newErrors.plan_services = "Services field is required.";
     }
+    // if (
+    //   formData.tenure_value === "" ||
+    //   isNaN(formData.tenure_value as number) ||
+    //   (formData.tenure_value as number) < 0
+    // ) {
+    //   newErrors.tenure_value =
+    //     "Duration value must be a valid number greater than 0.";
+    // }
     if (
       formData.tenure_value === "" ||
       isNaN(formData.tenure_value as number) ||
-      (formData.tenure_value as number) < 0
+      (formData.tenure_value as number) < 0 ||
+      (formData.plan_type !== "free" && (formData.tenure_value as number) === 0)
     ) {
       newErrors.tenure_value =
-        "Duration value must be a valid number greater than 0.";
+        formData.plan_type === "free"
+          ? "Duration value must be a valid number (0 or greater)."
+          : "Duration value must be a valid number greater than 0.";
     }
     if (!formData.tenure_count) {
       newErrors.tenure_count = "Duration unit is required.";
@@ -985,7 +982,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
       });
 
       setTimeout(() => {
-        navigate(-1);
+        navigate("/dashboard/subscription", { replace: true })
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
@@ -1004,7 +1001,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+        <IconButton onClick={() => navigate("/dashboard/subscription", { replace: true })} sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
         <Typography

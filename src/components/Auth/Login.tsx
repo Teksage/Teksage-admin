@@ -704,7 +704,6 @@ export const Login = () => {
   const [state, dispatchState] = useReducer(reducer, initialState);
   const countriesList = useSelector((state: AppState) => state.countriesList);
   const isLoading = useSelector((state: AppState) => state.isLoading); // Use Redux isLoading instead of local state
-  console.log(countriesList, "countriesList");
 
   useEffect(() => {
     dispatch(fetchCountriesList()); // Dispatch the thunk correctly

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GenericTable from "../../Elements/Table/Table";
 import { TableColumn } from "../../Elements/Table/types";
-import { Alert } from "@mui/material";
+// import { Alert } from "@mui/material";
 import { callAPI } from "../../../api/crudFactory";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../Elements/ConfirmModal";
@@ -13,150 +13,151 @@ interface FAQData {
 }
 
 const FAQs: React.FC = () => {
-  // const navigate = useNavigate();
-  // const [data, setData] = useState<FAQData[]>([]);
-  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  // const [selectedRow, setSelectedRow] = useState<FAQData | null>(null);
-
-  // useEffect(() => {
-  //   fetchPlans();
-  // }, []);
-
-  // const fetchPlans = async () => {
-  //   try {
-  //     const response = await callAPI({
-  //       endpoint: "/api/faq",
-  //       method: "get",
-  //     });
-  //     console.log(response, "Plans Response");
-  //     const transformedPlans = response?.data?.map((plan: any) => ({
-  //       ...plan,
-  //       tenure: `${plan.tenure_value} ${plan.tenure_count}`,
-  //     }));
-
-  //     setData(transformedPlans);
-  //   } catch (error) {
-  //     console.error("Failed to fetch plans:", error);
-  //   }
-  // };
-
   const navigate = useNavigate();
-  const [data, setData] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [data, setData] = useState<FAQData[]>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<FAQData | null>(null);
 
-  const fetchPlans = async (
-    currentPage: number,
-    currentFilters: Record<string, string>
-  ) => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
     try {
-      const params: Record<string, any> = {
-        page: currentPage + 1,
-        page_size: rowsPerPage,
-      };
-
-      const filterEntries = Object.entries(currentFilters).filter(
-        ([_, v]) => v.trim() !== ""
-      );
-      filterEntries.forEach(([field, value]) => {
-        console.log(field, value, "Plan Filters");
-        params[field] = value.trim();
-      });
-
-      const endpoint = "/api/faq";
       const response = await callAPI({
-        endpoint,
+        endpoint: "/api/faq",
         method: "get",
-        params,
       });
+      console.log(response, "Plans Response");
+      const transformedPlans = response?.data?.map((plan: any) => ({
+        ...plan,
+        tenure: `${plan.tenure_value} ${plan.tenure_count}`,
+      }));
 
-      const responseData = response?.data;
-      if (!responseData) {
-        throw new Error("No data in response");
-      }
-
-      const fetchedPlans = Array.isArray(responseData.data)
-        ? responseData.data.map((plan: any) => ({
-            ...plan,
-            tenure: `${plan.tenure_value} ${plan.tenure_count}`,
-          }))
-        : [];
-      const fetchedTotal =
-        typeof responseData.total === "number" ? responseData.total : 0;
-
-      setData(fetchedPlans);
-      setTotalCount(fetchedTotal);
+      setData(transformedPlans);
     } catch (error) {
       console.error("Failed to fetch plans:", error);
-      setError("Failed to load plans. Please try again.");
-      setData([]);
-      setTotalCount(0);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const fetchFilterOptions = async (
-    field: keyof FAQData,
-    searchValue: string
-  ): Promise<string[]> => {
-    if (!searchValue.trim()) {
-      return [];
-    }
+  // const navigate = useNavigate();
+  // const [data, setData] = useState<any[]>([]);
+  // const [totalCount, setTotalCount] = useState<number>(0);
+  // const [loading, setLoading] = useState<boolean>(false);
+  // const [error, setError] = useState<string | null>(null);
+  // const [page, setPage] = useState<number>(0);
+  // const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  // const [filters, setFilters] = useState<Record<string, string>>({});
+  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [selectedRow, setSelectedRow] = useState<FAQData | null>(null);
 
-    try {
-      const uniqueValues = await fetchFilterValues(
-        "faq",
-        field as string,
-        searchValue
-      );
-      return uniqueValues;
-    } catch (error) {
-      console.error(`Failed to fetch filter options for ${field}:`, error);
-      return [];
-    }
-  };
+  // const fetchPlans = async (
+  //   currentPage: number,
+  //   currentFilters: Record<string, string>
+  // ) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const params: Record<string, any> = {
+  //       page: currentPage + 1,
+  //       page_size: rowsPerPage,
+  //     };
 
-  const fetchFilterValues = async (
-    resource: string,
-    field: string,
-    searchValue: string
-  ): Promise<string[]> => {
-    try {
-      const response = await callAPI({
-        endpoint: `/api/${resource}/filters`,
-        method: "get",
-        params: {
-          field,
-          search: searchValue,
-        },
-      });
+  //     const filterEntries = Object.entries(currentFilters).filter(
+  //       ([_, v]) => v.trim() !== ""
+  //     );
+  //     filterEntries.forEach(([field, value]) => {
+  //       console.log(field, value, "Plan Filters");
+  //       params[field] = value.trim();
+  //     });
 
-      const responseData = response?.data;
-      if (!responseData || !Array.isArray(responseData.values)) {
-        throw new Error(`Invalid response for ${field} filter options`);
-      }
+  //     const endpoint = "/api/faq";
+  //     const response = await callAPI({
+  //       endpoint,
+  //       method: "get",
+  //       params,
+  //     });
+  //     console.log(response, "response")
 
-      return responseData.values;
-    } catch (error: any) {
-      throw new Error(
-        `Failed to fetch ${field} filter options: ${error.message}`
-      );
-    }
-  };
+  //     const responseData = response?.data;
+  //     if (!responseData) {
+  //       throw new Error("No data in response");
+  //     }
+
+  //     const fetchedPlans = Array.isArray(responseData.data)
+  //       ? responseData.data.map((plan: any) => ({
+  //           ...plan,
+  //           tenure: `${plan.tenure_value} ${plan.tenure_count}`,
+  //         }))
+  //       : [];
+  //     const fetchedTotal =
+  //       typeof responseData.total === "number" ? responseData.total : 0;
+
+  //     setData(fetchedPlans);
+  //     setTotalCount(fetchedTotal);
+  //   } catch (error) {
+  //     console.error("Failed to fetch plans:", error);
+  //     setError("Failed to load plans. Please try again.");
+  //     setData([]);
+  //     setTotalCount(0);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const fetchFilterOptions = async (
+  //   field: keyof FAQData,
+  //   searchValue: string
+  // ): Promise<string[]> => {
+  //   if (!searchValue.trim()) {
+  //     return [];
+  //   }
+
+  //   try {
+  //     const uniqueValues = await fetchFilterValues(
+  //       "faq",
+  //       field as string,
+  //       searchValue
+  //     );
+  //     return uniqueValues;
+  //   } catch (error) {
+  //     console.error(`Failed to fetch filter options for ${field}:`, error);
+  //     return [];
+  //   }
+  // };
+
+  // const fetchFilterValues = async (
+  //   resource: string,
+  //   field: string,
+  //   searchValue: string
+  // ): Promise<string[]> => {
+  //   try {
+  //     const response = await callAPI({
+  //       endpoint: `/api/${resource}/filters`,
+  //       method: "get",
+  //       params: {
+  //         field,
+  //         search: searchValue,
+  //       },
+  //     });
+
+  //     const responseData = response?.data;
+  //     if (!responseData || !Array.isArray(responseData.values)) {
+  //       throw new Error(`Invalid response for ${field} filter options`);
+  //     }
+
+  //     return responseData.values;
+  //   } catch (error: any) {
+  //     throw new Error(
+  //       `Failed to fetch ${field} filter options: ${error.message}`
+  //     );
+  //   }
+  // };
 
   // Fetch plans when page, rowsPerPage, or filters change
-  useEffect(() => {
-    fetchPlans(page, filters);
-  }, [page, rowsPerPage, filters]);
+  // useEffect(() => {
+  //   fetchPlans();
+  // }, [page, rowsPerPage, filters]);
 
   const faqColumns: TableColumn<FAQData>[] = [
     { id: "question", label: "Query", width: "300px" },
@@ -186,59 +187,59 @@ const FAQs: React.FC = () => {
       });
       setDeleteModalOpen(false);
       setSelectedRow(null);
-      fetchPlans(page, filters);
+      fetchPlans();
     } catch (error) {
       console.error("Error deleting coupon:", error);
     }
   };
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
+  // const handlePageChange = (newPage: number) => {
+  //   setPage(newPage);
+  // };
 
-  const handleRowsPerPageChange = (newRowsPerPage: number) => {
-    console.log(newRowsPerPage, "newRowsPerPage 123");
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-  };
+  // const handleRowsPerPageChange = (newRowsPerPage: number) => {
+  //   console.log(newRowsPerPage, "newRowsPerPage 123");
+  //   setRowsPerPage(newRowsPerPage);
+  //   setPage(0);
+  // };
 
-  const handleFilterChange = (newFilters: Record<string, string>) => {
-    setFilters(newFilters);
-    setPage(0);
-  };
+  // const handleFilterChange = (newFilters: Record<string, string>) => {
+  //   setFilters(newFilters);
+  //   setPage(0);
+  // };
 
   return (
     <>
-      {error && (
+      {/* {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
-      )}
+      )} */}
       <GenericTable<FAQData>
         title="FAQ Management"
         data={data}
-        // columns={faqColumns}
-        // onAdd={handleAddFAQ}
-        // onEdit={handleEditFAQ}
-        // onDelete={handleDelete}
-        // getRowId={(row) => row.faq_id}
-        // tableHeight="calc(100vh - 250px)"
-        // initialRowsPerPage={10}
         columns={faqColumns}
-        totalCount={totalCount}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
         getRowId={(row) => row.faq_id}
         tableHeight="calc(100vh - 250px)"
-        initialRowsPerPage={rowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        onFetchFilterOptions={fetchFilterOptions}
-        onFilterChange={handleFilterChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        loading={loading}
+        initialRowsPerPage={10}
+        // columns={faqColumns}
+        // totalCount={totalCount}
+        // onAdd={handleAdd}
+        // onEdit={handleEdit}
+        // onDelete={handleDelete}
+        // getRowId={(row) => row.faq_id}
+        // tableHeight="calc(100vh - 250px)"
+        // initialRowsPerPage={rowsPerPage}
+        // onPageChange={handlePageChange}
+        // onRowsPerPageChange={handleRowsPerPageChange}
+        // onFetchFilterOptions={fetchFilterOptions}
+        // onFilterChange={handleFilterChange}
+        // page={page}
+        // rowsPerPage={rowsPerPage}
+        // loading={loading}
       />
 
       {/* 💬 Delete Confirmation Modal */}

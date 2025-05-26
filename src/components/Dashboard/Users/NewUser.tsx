@@ -1199,7 +1199,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const loadingTemplate = useSelector((state: AppState) => state.isLoading); // Use Redux isLoading instead of local state
 
   const countriesList = useSelector((state: AppState) => state.countriesList);
-  console.log(countriesList, "countriesList");
 
   // const countryCodes = [
   //   { code: "+1", country: "USA", pattern: /^\d{10}$/, length: 10 },
@@ -1503,7 +1502,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       });
 
       setTimeout(() => {
-        navigate(-1);
+        navigate("/dashboard/users", { replace: true })
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
@@ -1680,7 +1679,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           {/* Header with back button - compact and aligned */}
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+            <IconButton onClick={() => navigate("/dashboard/users", { replace: true })} sx={{ mr: 1 }}>
               <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
             </IconButton>
             <Typography

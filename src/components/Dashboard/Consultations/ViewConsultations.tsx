@@ -88,7 +88,7 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
     <>
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-          <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
+          <IconButton onClick={() => navigate("/dashboard/consultations", { replace: true })} sx={{ mr: 2 }}>
             <ArrowBackIcon />
           </IconButton>
           <Typography

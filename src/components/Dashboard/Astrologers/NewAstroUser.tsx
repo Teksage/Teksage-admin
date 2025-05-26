@@ -1171,7 +1171,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       case "local_consulting_fee":
       case "foreign_consulting_fee":
       case "status":
-      case "astrologer_profile_info":
+      // case "astrologer_profile_info":
         if (!value) {
           error = "This field is required";
         } else if (
@@ -1416,6 +1416,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       payload.append("email", formData.email);
       payload.append("mobile_number", formData.mobile_number);
       payload.append("status", formData.status);
+      payload.append("astrologer_profile_info", formData.astrologer_profile_info);
       if (formData.user_id !== null) {
         payload.append("user_id", formData.user_id.toString());
       }
@@ -1452,7 +1453,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       });
 
       setTimeout(() => {
-        navigate(-1);
+        navigate("/dashboard/astrologers", { replace: true });
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
@@ -1469,7 +1470,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+        <IconButton onClick={() => navigate("/dashboard/astrologers", { replace: true }) } sx={{ mr: 1 }}>
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
         <Typography
@@ -1523,8 +1524,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
           style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         >
           <Star sx={{ fontSize: 24 }} /> {/* Add the Star icon */}
-          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astro
-          User
+          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astrologer
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>

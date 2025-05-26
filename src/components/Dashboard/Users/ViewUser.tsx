@@ -187,7 +187,7 @@ const UserView: React.FC<{ mode: "view" }> = () => {
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
+        <IconButton onClick={() => navigate("/dashboard/users", { replace: true })} sx={{ mr: 2 }}>
           <ArrowBackIcon />
         </IconButton>
         <Typography

@@ -294,7 +294,11 @@ interface LoginInputFormProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSendOtp: (e: React.FormEvent) => void;
   handleSwitchMethod: (newMethod: "email" | "mobile") => void;
-  countriesList: Array<{ dial_code: string; name: string, mobile_number_length: number }>;
+  countriesList: Array<{
+    dial_code: string;
+    name: string;
+    mobile_number_length: number;
+  }>;
 }
 
 const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
@@ -419,6 +423,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             <GlassSelect size="small">
               <InputLabel id="country-code-label">Code</InputLabel>
               <Select
+                key={formState.countryCode || "default"} // Force re-render on navigation
                 labelId="country-code-label"
                 value={formState.countryCode || "+91"}
                 onChange={(event) => {
@@ -466,14 +471,14 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      backdropFilter: "blur(10px)",
+                      backdropFilter: "blur(20px)", // Kept the same for glass effect
                       background: `linear-gradient(135deg, ${alpha(
-                        "#ffffff",
-                        0.4
-                      )}, ${alpha("#e0e0e0", 0.3)})`,
-                      border: `1px solid ${alpha("#ffffff", 0.5)}`,
+                        "#808080",
+                        0.6 // Darker starting color
+                      )}, ${alpha("#606060", 0.5)})`, // Even darker ending color
+                      border: `1px solid ${alpha("#707070", 0.7)}`, // Darker border to match
                       borderRadius: "8px",
-                      boxShadow: `0 8px 20px ${alpha("#000000", 0.4)}`,
+                      boxShadow: `0 8px 20px ${alpha("#000000", 0.6)}`, // Kept the same for depth
                       width: "auto",
                       minWidth: "200px",
                       maxWidth: "300px",
