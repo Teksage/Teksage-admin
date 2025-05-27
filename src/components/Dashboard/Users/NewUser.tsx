@@ -1471,8 +1471,9 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           last_name: formData.last_name,
           preferred_location: formData.preferredLocation,
           email: formData.email,
-          // mobile_number: formData.mobile,
-          mobile_number: `${formData.country_code}${formData.mobile}`, // Combine country code and mobile number
+          country_code: formData.country_code,
+          mobile_number: formData.mobile,
+          // mobile_number: `${formData.country_code}${formData.mobile}`, // Combine country code and mobile number
           birth_location: formData.placeOfBirth,
           date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
           // time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),

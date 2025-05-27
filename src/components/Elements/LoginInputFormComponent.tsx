@@ -286,7 +286,7 @@ interface LoginInputFormProps {
     loginMethod: "email" | "mobile";
     email: string;
     mobile_number: string;
-    countryCode: string;
+    country_code: string;
     loading: boolean;
     error: string | null;
   };
@@ -349,7 +349,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
       const newCountryCode = event.target.value as string;
       dispatchState({
         type: "SET_FIELD",
-        field: "countryCode",
+        field: "country_code",
         value: newCountryCode,
       });
     };
@@ -581,9 +581,9 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             <GlassSelect size="small">
               <InputLabel id="country-code-label">Code</InputLabel>
               <Select
-                key={formState.countryCode || "default"}
+                key={formState.country_code || "default"}
                 labelId="country-code-label"
-                value={formState.countryCode || "+91"}
+                value={formState.country_code || "+91"}
                 onChange={(event) => {
                   console.log("Country code selected:", event.target.value);
                   handleCountryCodeChange(event);
@@ -794,7 +794,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             formState.loading ||
             (formState.loginMethod === "email"
               ? !formState.email
-              : !formState.mobile_number || !formState.countryCode)
+              : !formState.mobile_number || !formState.country_code)
           }
         >
           {formState.loading ? (

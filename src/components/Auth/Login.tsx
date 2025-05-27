@@ -610,7 +610,7 @@ export interface LoginState {
   loginMethod: "email" | "mobile";
   email: string;
   mobile_number: string;
-  countryCode: string;
+  country_code: string;
   otp: string[];
   activeOtpIndex: number;
   step: "input" | "otp" | "success" | "error";
@@ -631,7 +631,7 @@ const initialState: LoginState = {
   loginMethod: "email",
   email: "",
   mobile_number: "",
-  countryCode: "+91",
+  country_code: "+91",
   otp: Array(6).fill(""),
   activeOtpIndex: 0,
   step: "input",
@@ -661,7 +661,7 @@ const reducer = (state: LoginState, action: Action): LoginState => {
         ...state,
         email: "",
         mobile_number: "",
-        countryCode: "+91",
+        country_code: "+91",
         otp: Array(6).fill(""),
         activeOtpIndex: 0,
         error: null,
@@ -744,7 +744,7 @@ export const Login = () => {
       field: newMethod === "email" ? "mobile_number" : "email",
       value: "",
     });
-    dispatchState({ type: "SET_FIELD", field: "countryCode", value: "+91" });
+    dispatchState({ type: "SET_FIELD", field: "country_code", value: "+91" });
     dispatchState({ type: "SET_ERROR", error: null });
   }, []);
 
@@ -868,7 +868,7 @@ export const Login = () => {
         // }
         // Find the selected country code config
         const selectedCountry = countriesList.find(
-          (country: any) => country.dial_code === state.countryCode
+          (country: any) => country.dial_code === state.country_code
         );
 
         if (selectedCountry) {
@@ -906,7 +906,7 @@ export const Login = () => {
           state.loginMethod === "email"
             ? { email: state.email, user_type: "admin" }
             : {
-                mobile_number: `${state.countryCode}${state.mobile_number}`,
+                mobile_number: `${state.country_code}${state.mobile_number}`,
                 user_type: "admin",
               };
 
@@ -939,7 +939,7 @@ export const Login = () => {
         dispatchState({ type: "SET_FIELD", field: "step", value: "input" });
       }
     },
-    [state.loginMethod, state.email, state.mobile_number, state.countryCode]
+    [state.loginMethod, state.email, state.mobile_number, state.country_code]
   );
 
   const handleResendOtp = useCallback(
@@ -958,7 +958,7 @@ export const Login = () => {
         const data =
           state.loginMethod === "email"
             ? { email: state.email }
-            : { mobile_number: `${state.countryCode}${state.mobile_number}` };
+            : { mobile_number: `${state.country_code}${state.mobile_number}` };
 
         await callAPI({
           endpoint,
@@ -993,7 +993,7 @@ export const Login = () => {
       state.loginMethod,
       state.email,
       state.mobile_number,
-      state.countryCode,
+      state.country_code,
     ]
   );
 
@@ -1017,11 +1017,11 @@ export const Login = () => {
             : { email: state.email, otp }
           : otp === "111111"
           ? {
-              mobile_number: `${state.countryCode}${state.mobile_number}`,
+              mobile_number: `${state.country_code}${state.mobile_number}`,
               otp: "111111",
             }
           : {
-              mobile_number: `${state.countryCode}${state.mobile_number}`,
+              mobile_number: `${state.country_code}${state.mobile_number}`,
               otp,
             };
 
@@ -1058,7 +1058,7 @@ export const Login = () => {
     state.loginMethod,
     state.email,
     state.mobile_number,
-    state.countryCode,
+    state.country_code,
     dispatch,
   ]);
 
