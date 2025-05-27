@@ -1424,7 +1424,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       payload.append("local_consulting_fee", formData.local_consulting_fee);
       payload.append("foreign_consulting_fee", formData.foreign_consulting_fee);
 
-      formData.languages.forEach((lang) => payload.append("languages[]", lang));
+      formData.languages.forEach((lang) => payload.append("languages[]", lang.toLowerCase()));
       formData.expertise.forEach((exp) => payload.append("expertise[]", exp));
 
       if (formData.picture instanceof File) {
