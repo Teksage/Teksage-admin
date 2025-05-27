@@ -537,7 +537,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           color="#455a64"
                           style={{ fontFamily: "Urbanist" }}
                         >
-                          Question
+                          Question *
                         </Typography>
                       </Box>
                       <TextField
@@ -598,7 +598,7 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                           color="#455a64"
                           style={{ fontFamily: "Urbanist" }}
                         >
-                          Answer
+                          Answer *
                         </Typography>
                       </Box>
                       <TextField

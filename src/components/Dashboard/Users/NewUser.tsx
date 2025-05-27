@@ -2031,7 +2031,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
                 <Grid item xs={12} sm={6} md={4}>
                   <DatePicker
-                    label="Date of Birth *"
+                    label="Date of Birth"
                     value={formData.dateOfBirth}
                     onChange={(newValue) => {
                       const today = new Date();
