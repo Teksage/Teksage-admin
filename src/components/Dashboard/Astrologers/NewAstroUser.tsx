@@ -1415,7 +1415,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       payload.append("last_name", formData.last_name);
       payload.append("email", formData.email);
       payload.append("mobile_number", formData.mobile_number);
-      payload.append("status", formData.status);
+      payload.append("status", formData.status.toLowerCase());
       payload.append("astrologer_profile_info", formData.astrologer_profile_info);
       if (formData.user_id !== null) {
         payload.append("user_id", formData.user_id.toString());

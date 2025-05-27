@@ -1083,7 +1083,7 @@ import {
   CircularProgress,
   SelectChangeEvent,
   TextFieldProps,
-  Skeleton
+  Skeleton,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -1199,14 +1199,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const loadingTemplate = useSelector((state: AppState) => state.isLoading); // Use Redux isLoading instead of local state
 
   const countriesList = useSelector((state: AppState) => state.countriesList);
-
-  // const countryCodes = [
-  //   { code: "+1", country: "USA", pattern: /^\d{10}$/, length: 10 },
-  //   { code: "+44", country: "UK", pattern: /^\d{10,11}$/, length: "10-11" },
-  //   { code: "+91", country: "India", pattern: /^\d{10}$/, length: 10 },
-  //   { code: "+61", country: "Australia", pattern: /^\d{9}$/, length: 9 },
-  //   { code: "+81", country: "Japan", pattern: /^\d{10,11}$/, length: "10-11" },
-  // ];
 
   // Fetch user data in edit mode
   useEffect(() => {
@@ -1334,34 +1326,36 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           error = "Please enter a valid email address";
         }
         break;
-      case "mobile":
-        if (!value.trim()) {
-          error = "Mobile number is required";
-        } else if (value && !/^\d{10}$/.test(value)) {
-          error = "Mobile number must be exactly 10 digits";
-        }
-        break;
       // case "mobile":
       //   if (!value.trim()) {
       //     error = "Mobile number is required";
-      //   } else if (value) {
-      //     // Find the selected country code configuration
-      //     const selectedCountry = countriesList.find(
-      //       (country:any) => country.code === formData.countryCode
-      //     );
-
-      //     if (selectedCountry) {
-      //       if (!selectedCountry.pattern.test(value)) {
-      //         error = `Mobile number must be exactly ${selectedCountry.length} digits for ${selectedCountry.country}`;
-      //       }
-      //     } else {
-      //       // Fallback validation
-      //       if (!/^\d{10}$/.test(value)) {
-      //         error = "Mobile number must be exactly 10 digits";
-      //       }
-      //     }
+      //   } else if (value && !/^\d{10}$/.test(value)) {
+      //     error = "Mobile number must be exactly 10 digits";
       //   }
       //   break;
+      case "mobile":
+        if (!value.trim()) {
+          error = "Mobile number is required";
+        } else {
+          const selectedCountry = countriesList.find(
+            (country: any) => country.dial_code === formData.country_code
+          );
+
+          if (selectedCountry) {
+            const expectedLength = selectedCountry.mobile_number_length;
+
+            if (value.length !== expectedLength) {
+              error = `Mobile number must be exactly ${expectedLength} digits for ${selectedCountry.name}`;
+            }
+          } else {
+            // Fallback validation: default to 10 digits
+            if (value.length !== 10) {
+              error = "Mobile number must be exactly 10 digits";
+            }
+          }
+        }
+        break;
+
       default:
         break;
     }
@@ -1502,7 +1496,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
       });
 
       setTimeout(() => {
-        navigate("/dashboard/users", { replace: true })
+        navigate("/dashboard/users", { replace: true });
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
@@ -1679,7 +1673,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           {/* Header with back button - compact and aligned */}
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <IconButton onClick={() => navigate("/dashboard/users", { replace: true })} sx={{ mr: 1 }}>
+            <IconButton
+              onClick={() => navigate("/dashboard/users", { replace: true })}
+              sx={{ mr: 1 }}
+            >
               <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
             </IconButton>
             <Typography

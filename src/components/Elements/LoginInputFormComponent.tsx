@@ -410,12 +410,170 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             }}
           />
         ) : (
+          // <Box
+          //   sx={{
+          //     display: "flex",
+          //     flexWrap: "wrap",
+          //     gap: 2,
+          //     alignItems: "center",
+          //     marginTop: "16px",
+          //   }}
+          // >
+          //   {/* Country Code Dropdown */}
+          //   <GlassSelect size="small">
+          //     <InputLabel id="country-code-label">Code</InputLabel>
+          //     <Select
+          //       key={formState.countryCode || "default"} // Force re-render on navigation
+          //       labelId="country-code-label"
+          //       value={formState.countryCode || "+91"}
+          //       onChange={(event) => {
+          //         console.log("Country code selected:", event.target.value);
+          //         handleCountryCodeChange(event);
+          //       }}
+          //       onClick={() => console.log("Select clicked")}
+          //       label="Code"
+          //       IconComponent={() => null}
+          //       renderValue={(selected) => {
+          //         const selectedOption = countriesList.find(
+          //           (option: any) => option.dial_code === selected
+          //         );
+          //         const displayText = selectedOption
+          //           ? `${selectedOption.dial_code} (${selectedOption.name})`
+          //           : selected;
+
+          //         return (
+          //           <Box
+          //             sx={{
+          //               display: "flex",
+          //               alignItems: "center",
+          //               justifyContent: "flex-start",
+          //               color: "#4caf50",
+          //               fontFamily: "Urbanist",
+          //               fontSize: "0.85rem",
+          //               fontWeight: 600,
+          //               width: "100%",
+          //               overflow: "hidden",
+          //               textOverflow: "ellipsis",
+          //               whiteSpace: "nowrap",
+          //               title: displayText, // Tooltip on hover
+          //             }}
+          //             title={displayText}
+          //           >
+          //             {displayText}
+          //           </Box>
+          //         );
+          //       }}
+          //       sx={{
+          //         "& .MuiSelect-select": {
+          //           paddingRight: "8px !important",
+          //         },
+          //       }}
+          //       MenuProps={{
+          //         PaperProps: {
+          //           sx: {
+          //             backdropFilter: "blur(20px)", // Kept the same for glass effect
+          //             background: `linear-gradient(135deg, ${alpha(
+          //               "#808080",
+          //               0.6 // Darker starting color
+          //             )}, ${alpha("#606060", 0.5)})`, // Even darker ending color
+          //             border: `1px solid ${alpha("#707070", 0.7)}`, // Darker border to match
+          //             borderRadius: "8px",
+          //             boxShadow: `0 8px 20px ${alpha("#000000", 0.6)}`, // Kept the same for depth
+          //             width: "auto",
+          //             minWidth: "200px",
+          //             maxWidth: "300px",
+          //             marginTop: "4px",
+          //           },
+          //         },
+          //       }}
+          //     >
+          //       {countriesList.map((option: any) => (
+          //         <MenuItem
+          //           key={option.dial_code}
+          //           value={option.dial_code}
+          //           sx={{
+          //             fontFamily: "Urbanist",
+          //             fontSize: "0.9rem",
+          //             color: "#ffffff",
+          //             textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)",
+          //             padding: "8px 16px",
+          //             "&:hover": {
+          //               background: `linear-gradient(45deg, ${alpha(
+          //                 "#1b4d3e",
+          //                 0.4
+          //               )}, ${alpha("#4caf50", 0.4)})`,
+          //             },
+          //             "&.Mui-selected": {
+          //               background: `linear-gradient(45deg, ${alpha(
+          //                 "#1b4d3e",
+          //                 0.5
+          //               )}, ${alpha("#4caf50", 0.5)})`,
+          //               fontWeight: 600,
+          //               boxShadow: `inset 0 0 8px ${alpha("#4caf50", 0.3)}`,
+          //             },
+          //           }}
+          //         >
+          //           {`${option.dial_code} (${option.name})`}
+          //         </MenuItem>
+          //       ))}
+          //     </Select>
+          //   </GlassSelect>
+
+          //   {/* Mobile Number Input */}
+          //   <TextField
+          //     required
+          //     fullWidth
+          //     label="Mobile Number"
+          //     name="mobile_number"
+          //     autoComplete="tel"
+          //     autoFocus
+          //     value={formState.mobile_number}
+          //     onChange={handleInputChange}
+          //     error={!!formState.error}
+          //     helperText={formState.error}
+          //     InputLabelProps={{
+          //       sx: {
+          //         fontSize: "0.95rem",
+          //         fontWeight: 500,
+          //         color: "#455a64",
+          //         fontFamily: "Urbanist",
+          //       },
+          //     }}
+          //     InputProps={{
+          //       sx: {
+          //         fontSize: "0.9rem",
+          //         borderRadius: "6px",
+          //         fontFamily: "Urbanist",
+          //         height: "56px",
+          //         padding: "0 12px",
+          //         boxSizing: "border-box",
+          //       },
+          //     }}
+          //     sx={{
+          //       "& .MuiInputLabel-root": {
+          //         fontFamily: "Urbanist",
+          //         fontSize: "0.95rem",
+          //       },
+          //       "& .MuiOutlinedInput-root": {
+          //         "&:hover fieldset": {
+          //           borderColor: alpha("#4caf50", 0.5),
+          //         },
+          //         "&.Mui-focused fieldset": {
+          //           borderColor: "#4caf50",
+          //           boxShadow: `0 0 8px ${alpha("#4caf50", 0.3)}`,
+          //         },
+          //       },
+          //       flex: 1,
+          //       minWidth: "200px",
+          //     }}
+          //   />
+          // </Box>
           <Box
             sx={{
               display: "flex",
               flexWrap: "wrap",
               gap: 2,
-              alignItems: "center",
+              alignItems: "flex-start", // Changed to flex-start to align items better with error message
               marginTop: "16px",
             }}
           >
@@ -423,7 +581,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             <GlassSelect size="small">
               <InputLabel id="country-code-label">Code</InputLabel>
               <Select
-                key={formState.countryCode || "default"} // Force re-render on navigation
+                key={formState.countryCode || "default"}
                 labelId="country-code-label"
                 value={formState.countryCode || "+91"}
                 onChange={(event) => {
@@ -455,7 +613,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
-                        title: displayText, // Tooltip on hover
+                        title: displayText,
                       }}
                       title={displayText}
                     >
@@ -471,14 +629,14 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      backdropFilter: "blur(20px)", // Kept the same for glass effect
+                      backdropFilter: "blur(20px)",
                       background: `linear-gradient(135deg, ${alpha(
                         "#808080",
-                        0.6 // Darker starting color
-                      )}, ${alpha("#606060", 0.5)})`, // Even darker ending color
-                      border: `1px solid ${alpha("#707070", 0.7)}`, // Darker border to match
+                        0.6
+                      )}, ${alpha("#606060", 0.5)})`,
+                      border: `1px solid ${alpha("#707070", 0.7)}`,
                       borderRadius: "8px",
-                      boxShadow: `0 8px 20px ${alpha("#000000", 0.6)}`, // Kept the same for depth
+                      boxShadow: `0 8px 20px ${alpha("#000000", 0.6)}`,
                       width: "auto",
                       minWidth: "200px",
                       maxWidth: "300px",
@@ -530,7 +688,48 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
               value={formState.mobile_number}
               onChange={handleInputChange}
               error={!!formState.error}
-              helperText={formState.error}
+              helperText={
+                formState.error ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      fontFamily: "Urbanist",
+                      fontSize: "0.85rem",
+                      fontWeight: 500,
+                      color: "#ff6d60", // Softer red-orange shade for error
+                      background: `linear-gradient(90deg, ${alpha(
+                        "#ff6d60",
+                        0.1
+                      )}, ${alpha("#ff6d60", 0.05)})`,
+                      backdropFilter: "blur(5px)", // Match glass effect
+                      borderRadius: "4px",
+                      padding: "2px 6px",
+                      mt: 0.5,
+                    }}
+                  >
+                    <Box
+                      component="span"
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "14px",
+                        height: "14px",
+                        borderRadius: "50%",
+                        backgroundColor: alpha("#ff6d60", 0.2),
+                        color: "#ff6d60",
+                        fontSize: "0.75rem",
+                        mr: 0.5,
+                      }}
+                    >
+                      !
+                    </Box>
+                    {formState.error}
+                  </Box>
+                ) : null
+              }
               InputLabelProps={{
                 sx: {
                   fontSize: "0.95rem",
@@ -547,6 +746,11 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                   height: "56px",
                   padding: "0 12px",
                   boxSizing: "border-box",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: formState.error
+                      ? alpha("#ff6d60", 0.5)
+                      : undefined, // Custom error border color
+                  },
                 },
               }}
               sx={{
@@ -562,9 +766,13 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
                     borderColor: "#4caf50",
                     boxShadow: `0 0 8px ${alpha("#4caf50", 0.3)}`,
                   },
+                  "&.Mui-error fieldset": {
+                    borderColor: alpha("#ff6d60", 0.5), // Custom error border color
+                    boxShadow: `0 0 6px ${alpha("#ff6d60", 0.2)}`, // Subtle error glow
+                  },
                 },
                 flex: 1,
-                minWidth: "200px",
+                minWidth: { xs: "100%", sm: "200px" }, // Responsive minWidth
               }}
             />
           </Box>

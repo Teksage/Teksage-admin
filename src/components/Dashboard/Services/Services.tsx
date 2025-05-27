@@ -25,7 +25,6 @@ const Services: React.FC = () => {
           endpoint: "/api/admin/services",
           method: "get",
         });
-        console.log(response?.data, "Plans Response");
         setServices(response?.data);
       } catch (error) {
         console.error("Failed to fetch plans:", error);

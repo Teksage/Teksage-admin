@@ -969,7 +969,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
             ? `/api/admin/service-catalogs/${userId}`
             : "/api/admin/service-catalogs",
         method: mode === "edit" ? "put" : "post",
-        data: formData,
+        data: {...formData, status: formData.status.toLowerCase()},
       });
 
       setSnackbar({

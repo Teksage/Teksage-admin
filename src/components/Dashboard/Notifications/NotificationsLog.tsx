@@ -32,8 +32,6 @@ const NotificationLog: React.FC = () => {
   );
   const [openModal, setOpenModal] = useState(false);
 
-  console.log(filters, "filters in NotificationLog");
-
   const fetchNotificationLogs = async (
     currentPage: number,
     currentFilters: Record<string, string>

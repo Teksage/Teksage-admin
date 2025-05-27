@@ -1639,8 +1639,10 @@ const SendNotification: React.FC = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  // const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [rowsPerPage] = useState<number>(10);
   const [totalCount, setTotalCount] = useState<number>(0);
+  // console.log(setRowsPerPage(10))
 
   // State for notification fields
   const [allNotification, setAllNotification] = useState({
@@ -1850,13 +1852,6 @@ const SendNotification: React.FC = () => {
     } else {
       setSelectedRashis([...selectedRashis, rashi]);
     }
-  };
-
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    page: number
-  ) => {
-    setCurrentPage(page - 1);
   };
 
   const handleSendNotification = async (type: string): Promise<void> => {

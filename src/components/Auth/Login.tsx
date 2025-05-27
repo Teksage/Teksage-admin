@@ -524,7 +524,7 @@ import { OtpFormComponent } from "../Elements/OtpFormComponent";
 import { LoginSuccessComponent } from "../Elements/LoginSuccessComponent";
 import {
   validateEmail,
-  validateMobileNumber,
+  // validateMobileNumber,
 } from "../Elements/CommonValidations";
 import { LoginInputFormComponent } from "../Elements/LoginInputFormComponent";
 import { debounce } from "lodash";
@@ -859,12 +859,37 @@ export const Login = () => {
           });
           return;
         }
-        if (!validateMobileNumber(state.mobile_number)) {
-          dispatchState({
-            type: "SET_ERROR",
-            error: "Please enter a valid mobile number (e.g., 9952368687)",
-          });
-          return;
+        // if (!validateMobileNumber(state.mobile_number)) {
+        //   dispatchState({
+        //     type: "SET_ERROR",
+        //     error: "Please enter a valid mobile number (e.g., 9952368687)",
+        //   });
+        //   return;
+        // }
+        // Find the selected country code config
+        const selectedCountry = countriesList.find(
+          (country: any) => country.dial_code === state.countryCode
+        );
+
+        if (selectedCountry) {
+          const expectedLength = selectedCountry.mobile_number_length;
+
+          if (state.mobile_number.length !== expectedLength) {
+            dispatchState({
+              type: "SET_ERROR",
+              error: `Mobile number must be exactly ${expectedLength} digits for ${selectedCountry.name}`,
+            });
+            return;
+          }
+        } else {
+          // Fallback: default to 10 digits
+          if (state.mobile_number.length !== 10) {
+            dispatchState({
+              type: "SET_ERROR",
+              error: "Mobile number must be exactly 10 digits",
+            });
+            return;
+          }
         }
       }
 

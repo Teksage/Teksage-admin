@@ -28,7 +28,6 @@ const FAQs: React.FC = () => {
         endpoint: "/api/faq",
         method: "get",
       });
-      console.log(response, "Plans Response");
       const transformedPlans = response?.data?.map((plan: any) => ({
         ...plan,
         tenure: `${plan.tenure_value} ${plan.tenure_count}`,
