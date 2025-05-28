@@ -20,8 +20,6 @@ export default defineConfig({
             "react",
             "react-dom",
             "react-router-dom",
-            "react-hot-toast",
-            "react-phone-input-2",
           ],
         },
       },
