@@ -526,6 +526,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
               alt="Logo"
               style={{ borderRadius: "8px" }}
               loading="lazy"
+              onClick={() => navigate("/dashboard/users", { replace: true })}
             />
           </Box>
         </LogoContainer>

@@ -68,3 +68,8 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+body *:not(button):not(a):not(input):not(textarea):not(select) {
+  pointer-events: none;
+  user-select: none;
+}

@@ -257,26 +257,13 @@ export const callAPI = async ({
       ...config,
     });
 
-    // console.log(response, "response");
-
     return response;
   } catch (error: any) {
-    // // const errorMessage = `API ${method.toUpperCase()} ${endpoint} failed: ${
-    // //   error.message || "Unknown error"
-    // // }`;
-    // console.error(error, new Error(error));
-    // // const errorMessage = error.response.data.detail || "Something went wrong. Please try again."
-    // throw new Error(error);
-    // Log the error for debugging
     console.error(`API ${method.toUpperCase()} ${endpoint} failed:`, error);
-
-    // Extract the detailed error message from the response, if available
     const errorMessage =
       error.response?.data?.detail ||
       error.message ||
       "Something went wrong. Please try again.";
-
-    // Throw a new error with the detailed message
     throw new Error(errorMessage);
   }
 };
