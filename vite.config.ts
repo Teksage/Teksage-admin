@@ -11,4 +11,20 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
   },
+  build: {
+    minify: "esbuild",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+            "react",
+            "react-dom",
+            "react-router-dom",
+            "react-hot-toast",
+            "react-phone-input-2",
+          ],
+        },
+      },
+    },
+  },
 });
