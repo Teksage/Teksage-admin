@@ -1745,6 +1745,7 @@ const SendNotification: React.FC = () => {
         const params: Record<string, any> = {
           page: page + 1,
           page_size: rowsPerPage,
+          is_profile_updated : true, // Only fetch users with updated profiles
         };
 
         // Add search query as filters for "name" and "email"

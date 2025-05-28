@@ -775,7 +775,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
           method: "get",
         });
 
-        console.log(serviceResponse, "serviceResponse");
+        // console.log(serviceResponse, "serviceResponse");
         setServices(serviceResponse?.data);
 
         if (mode === "edit" && userId) {
@@ -962,14 +962,14 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     if (!validateForm()) return;
     setIsLoading(true);
     try {
-      console.log("Submitting formData:", formData);
+      // console.log("Submitting formData:", {...formData, plan_type: formData.plan_type, status: formData.status.toLowerCase()});
       await callAPI({
         endpoint:
           mode === "edit"
             ? `/api/admin/service-catalogs/${userId}`
             : "/api/admin/service-catalogs",
         method: mode === "edit" ? "put" : "post",
-        data: {...formData, status: formData.status.toLowerCase()},
+        data: {...formData, plan_type: formData.plan_type, status: formData.status.toLowerCase()},
       });
 
       setSnackbar({
