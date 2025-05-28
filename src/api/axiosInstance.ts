@@ -85,42 +85,50 @@
 //           user: `${res.data.first_name} ${res.data.last_name}`,
 //         });
 
-//         // Update the instance headers for future requests
 //         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 //         processQueue(null, newAccessToken);
 //         return axiosInstance(originalRequest);
 //       } catch (err: any) {
 //         console.error("Token refresh failed:", err.message || err);
-//       processQueue(err, null);
+//         processQueue(err, null);
 //         tokenService.clearTokens();
-//         // Log for debugging; can be replaced with a user notification
 //         console.warn("Session expired, redirecting to login...");
 //         window.location.href = "/auth/login";
-//         return Promise.reject(new Error("Session expired: Unable to refresh token"));
+//         return Promise.reject(err); // Preserve the error
 //       } finally {
 //         isRefreshing = false;
 //       }
 //     }
 
-//     // const errorMessage = `Request failed: ${error.message || "Unknown error"}`;
-//     // const errorMessage = error.response.data.detail || "Something went wrong. Please try again."
-//     console.error(new Error(error), error);
-//     return Promise.reject(new Error());
-//     // return error;
+//     // Log the error for debugging but preserve the full error object
+//     console.error("Response interceptor error:", error);
+//     return Promise.reject(error); // Pass the original error object
 //   }
 // );
 
 // export default axiosInstance;
 
+// src/utils/axiosInstance.ts
 import axios from "axios";
+import axiosRetry from "axios-retry"; // Import axios-retry
 import { tokenService } from "../utils/tokenService";
 
+// Create axios instance
 const axiosInstance = axios.create({
   baseURL: "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/",
   headers: {
     "Content-Type": "application/json",
   },
   timeout: 10000, // 10 seconds timeout to prevent hanging requests
+});
+
+// Configure axios-retry (Add this right after creating axiosInstance)
+axiosRetry(axiosInstance, {
+  retries: 2, // Retry twice
+  retryDelay: (retryCount) => retryCount * 1000, // 1s, 2s delays (1000ms, 2000ms)
+  retryCondition: (error) => {
+    return error.code === "ECONNABORTED" || !error.response; // Retry on timeout or network errors
+  },
 });
 
 // Request Interceptor: Add Authorization header
@@ -208,15 +216,14 @@ axiosInstance.interceptors.response.use(
         tokenService.clearTokens();
         console.warn("Session expired, redirecting to login...");
         window.location.href = "/auth/login";
-        return Promise.reject(err); // Preserve the error
+        return Promise.reject(err);
       } finally {
         isRefreshing = false;
       }
     }
 
-    // Log the error for debugging but preserve the full error object
     console.error("Response interceptor error:", error);
-    return Promise.reject(error); // Pass the original error object
+    return Promise.reject(error);
   }
 );
 

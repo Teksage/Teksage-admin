@@ -160,7 +160,54 @@ export interface AppState {
 
 export type AppDispatch = ThunkDispatch<AppState, unknown, AnyAction>;
 
-export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
+// export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
+//   try {
+//     dispatch({ type: "setloading", payload: true });
+
+//     const response = await callAPI({
+//       endpoint: "/api/countries",
+//       method: "get",
+//     });
+
+//     const countriesData = response?.data;
+//     if (!Array.isArray(countriesData)) {
+//       throw new Error("Invalid countries data");
+//     }
+
+//     // Deduplicate countries by countryCode
+//     const uniqueCountriesMap = new Map<string, []>();
+//     countriesData.forEach((country: any) => {
+//       if (!uniqueCountriesMap.has(country.dial_code)) {
+//         uniqueCountriesMap.set(country.dial_code, country);
+//       }
+//     });
+//     const uniqueCountriesList = Array.from(uniqueCountriesMap.values());
+
+//     dispatch(setCountriesList(uniqueCountriesList));
+//   } catch (error) {
+//     console.error("Failed to fetch countries:", error);
+//     dispatch(setCountriesList([]));
+//     dispatch({
+//       type: "setnotification",
+//       payload: {
+//         message: "Failed to load countries. Please try again.",
+//         type: "error",
+//         show: true,
+//       },
+//     });
+//   } finally {
+//     dispatch({ type: "setloading", payload: false });
+//   }
+// };
+
+export const fetchCountriesList = () => async (dispatch: AppDispatch, getState: () => AppState) => {
+  const cachedCountries = localStorage.getItem("countriesList");
+  if (cachedCountries) {
+    const parsedCountries = JSON.parse(cachedCountries);
+    dispatch(setCountriesList(parsedCountries));
+    return;
+  }
+
   try {
     dispatch({ type: "setloading", payload: true });
 
@@ -169,12 +216,11 @@ export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
       method: "get",
     });
 
-    const countriesData = response?.data;
+    const countriesData = response?.data?.response;
     if (!Array.isArray(countriesData)) {
       throw new Error("Invalid countries data");
     }
 
-    // Deduplicate countries by countryCode
     const uniqueCountriesMap = new Map<string, []>();
     countriesData.forEach((country: any) => {
       if (!uniqueCountriesMap.has(country.dial_code)) {
@@ -183,6 +229,7 @@ export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
     });
     const uniqueCountriesList = Array.from(uniqueCountriesMap.values());
 
+    localStorage.setItem("countriesList", JSON.stringify(uniqueCountriesList));
     dispatch(setCountriesList(uniqueCountriesList));
   } catch (error) {
     console.error("Failed to fetch countries:", error);
@@ -191,7 +238,7 @@ export const fetchCountriesList = () => async (dispatch: AppDispatch) => {
       type: "setnotification",
       payload: {
         message: "Failed to load countries. Please try again.",
-        type: "error",
+        type: "ERROR",
         show: true,
       },
     });

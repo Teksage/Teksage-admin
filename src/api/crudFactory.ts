@@ -234,6 +234,9 @@ interface RequestOptions {
   headers?: object;
 }
 
+// Simple in-memory cache
+const cache: { [key: string]: any } = {};
+
 export const callAPI = async ({
   endpoint,
   method,
@@ -241,6 +244,14 @@ export const callAPI = async ({
   params = {},
   headers = {},
 }: RequestOptions) => {
+  const cacheKey = `${method}:${endpoint}:${JSON.stringify(
+    data
+  )}:${JSON.stringify(params)}`;
+
+  // Check cache first
+  if (cache[cacheKey]) {
+    return cache[cacheKey];
+  }
   try {
     const config = {
       params,
@@ -257,26 +268,17 @@ export const callAPI = async ({
       ...config,
     });
 
-    // console.log(response, "response");
-
+    // Cache the response (only for successful OTP verification)
+    if (endpoint.includes("login-verify") && response.status === 200) {
+      cache[cacheKey] = response;
+    }
     return response;
   } catch (error: any) {
-    // // const errorMessage = `API ${method.toUpperCase()} ${endpoint} failed: ${
-    // //   error.message || "Unknown error"
-    // // }`;
-    // console.error(error, new Error(error));
-    // // const errorMessage = error.response.data.detail || "Something went wrong. Please try again."
-    // throw new Error(error);
-    // Log the error for debugging
     console.error(`API ${method.toUpperCase()} ${endpoint} failed:`, error);
-
-    // Extract the detailed error message from the response, if available
     const errorMessage =
       error.response?.data?.detail ||
       error.message ||
       "Something went wrong. Please try again.";
-
-    // Throw a new error with the detailed message
     throw new Error(errorMessage);
   }
 };
