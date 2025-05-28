@@ -1101,11 +1101,13 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               data.expertise.map((item: any) => item.toLowerCase()) || [],
             user_id: data.user_id || null,
           });
-        } catch (err:any) {
+        } catch (err: any) {
           console.error("Error fetching user data:", err);
           setSnackbar({
             open: true,
-            message: err.message || "Failed to load astrologer data. Please try again.",
+            message:
+              err.message ||
+              "Failed to load astrologer data. Please try again.",
             severity: "error",
           });
         } finally {
@@ -1171,7 +1173,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       case "local_consulting_fee":
       case "foreign_consulting_fee":
       case "status":
-      // case "astrologer_profile_info":
+        // case "astrologer_profile_info":
         if (!value) {
           error = "This field is required";
         } else if (
@@ -1416,7 +1418,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       payload.append("email", formData.email);
       payload.append("mobile_number", formData.mobile_number);
       payload.append("status", formData.status.toLowerCase());
-      payload.append("astrologer_profile_info", formData.astrologer_profile_info);
+      payload.append(
+        "astrologer_profile_info",
+        formData.astrologer_profile_info
+      );
       if (formData.user_id !== null) {
         payload.append("user_id", formData.user_id.toString());
       }
@@ -1424,7 +1429,9 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       payload.append("local_consulting_fee", formData.local_consulting_fee);
       payload.append("foreign_consulting_fee", formData.foreign_consulting_fee);
 
-      formData.languages.forEach((lang) => payload.append("languages[]", lang.toLowerCase()));
+      formData.languages.forEach((lang) =>
+        payload.append("languages[]", lang.toLowerCase())
+      );
       formData.expertise.forEach((exp) => payload.append("expertise[]", exp));
 
       if (formData.picture instanceof File) {
@@ -1470,7 +1477,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <IconButton onClick={() => navigate("/dashboard/astrologers", { replace: true }) } sx={{ mr: 1 }}>
+        <IconButton
+          onClick={() => navigate("/dashboard/astrologers", { replace: true })}
+          sx={{ mr: 1 }}
+        >
           <ArrowBackIcon sx={{ fontSize: 24, color: "#06402B" }} />
         </IconButton>
         <Typography
@@ -1524,7 +1534,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
           style={{ fontFamily: "Urbanist", fontWeight: 800 }}
         >
           <Star sx={{ fontSize: 24 }} /> {/* Add the Star icon */}
-          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"} Astrologer
+          {mode === "new" ? "Create" : mode === "edit" ? "Edit" : "View"}{" "}
+          Astrologer
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
@@ -1600,7 +1611,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 </Typography>
               )}
             </Grid>
-
             {/* Personal Information */}
             <Grid item xs={12}>
               <Typography
@@ -1613,7 +1623,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 Personal Information
               </Typography>
             </Grid>
-
             {/* Astrologer User Dropdown */}
             {mode !== "edit" && (
               <Grid item xs={12} sm={6}>
@@ -1675,7 +1684,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 </FormControl>
               </Grid>
             )}
-
             {/* Personal info fields */}
             {(
               [
@@ -1730,7 +1738,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 />
               </Grid>
             ))}
-
             {/* Professional Information */}
             <Grid item xs={12} mt={1}>
               <Typography
@@ -1743,7 +1750,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 Professional Details
               </Typography>
             </Grid>
-
             {/* Astrologer Profile Info */}
             <Grid item xs={12}>
               <TextField
@@ -1785,9 +1791,8 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 }}
               />
             </Grid>
-
             {/* Expertise as Dropdown */}
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <FormControl fullWidth size="small" error={!!errors.expertise}>
                 <InputLabel
                   sx={{
@@ -1854,8 +1859,87 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
               </FormControl>
             </Grid>
 
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small" error={!!errors.languages}>
+                <InputLabel
+                  sx={{
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                    fontFamily: "Urbanist",
+                  }}
+                >
+                  Languages *
+                </InputLabel>
+                <Select
+                  multiple
+                  value={formData.languages}
+                  onChange={handleChange("languages")}
+                  label="Languages"
+                  disabled={isViewMode}
+                  renderValue={(selected) => selected.join(", ")}
+                  sx={{
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#cfd8dc",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
+                >
+                  {[
+                    "Tamil",
+                    "English",
+                    "Telugu",
+                    "Malayalam",
+                    "Kannada",
+                    "Hindi",
+                    "Bengali",
+                    "Marathi",
+                    "Urdu",
+                    "Gujarati",
+                    "Odia",
+                    "Punjabi",
+                    "Assamese",
+                    "Bhojpuri",
+                    "Kashmiri",
+                    "Nepali",
+                    "Sindhi",
+                    "Sinhala",
+                    "Maithili",
+                    "Manipuri",
+                    "Santali",
+                  ].map((lang) => (
+                    <MenuItem key={lang} value={lang}>
+                      <Checkbox checked={formData.languages.includes(lang)} />
+                      <ListItemText
+                        primary={lang}
+                        sx={{
+                          "& .MuiTypography-root": {
+                            fontSize: "0.9rem",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                      />
+                    </MenuItem>
+                  ))}
+                </Select>
+                {!!errors.languages && (
+                  <FormHelperText sx={{ fontSize: "0.75rem" }}>
+                    {errors.languages}
+                  </FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+
             {/* Languages as Tags */}
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <TextField
                 fullWidth
                 size="small"
@@ -1917,8 +2001,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                   />
                 ))}
               </Box>
-            </Grid>
-
+            </Grid> */}
             {/* Experience, Local Consulting Fee, Foreign Consulting Fee, Status */}
             <Grid item xs={12} sm={6}>
               <TextField
@@ -2106,7 +2189,6 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 )}
               </FormControl>
             </Grid>
-
             {/* Submit Button */}
             {!isViewMode && (
               <Grid item xs={12} mt={2}>
