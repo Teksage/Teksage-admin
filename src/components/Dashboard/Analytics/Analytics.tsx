@@ -1003,7 +1003,13 @@ import {
 import { motion, useAnimation } from "framer-motion";
 
 // Simulated callAPI function
-const callAPI = async ({ endpoint, method }: { endpoint: string; method: string }) => {
+const callAPI = async ({
+  endpoint,
+  method,
+}: {
+  endpoint: string;
+  method: string;
+}) => {
   if (endpoint === "/api/admin/analytics" && method === "get") {
     return {
       data: {
@@ -1113,7 +1119,7 @@ const Analytics: React.FC = () => {
           method: "get",
         });
         if (isMounted) {
-          console.log(response.data, "response.data");
+          // console.log(response.data, "response.data");
           setAnalyticsData(response.data);
           const availableYears = Object.keys(response.data.subscription)
             .map((year) => parseInt(year))
@@ -1149,7 +1155,6 @@ const Analytics: React.FC = () => {
     const years = Object.keys(analyticsData.subscription)
       .map((year) => parseInt(year))
       .sort((a, b) => a - b);
-    console.log("Available Years:", years);
     return years;
   }, [analyticsData.subscription]);
 
@@ -1193,7 +1198,9 @@ const Analytics: React.FC = () => {
     const allPlanNames = getPlanNames();
 
     return monthOrder.map((monthName) => {
-      const monthData = plans.find((month: any) => month.name === monthName) || { name: monthName };
+      const monthData = plans.find(
+        (month: any) => month.name === monthName
+      ) || { name: monthName };
       const dataPoint: any = { name: monthName };
       allPlanNames.forEach((plan) => {
         dataPoint[plan] = monthData[plan] || 0;
@@ -1208,16 +1215,17 @@ const Analytics: React.FC = () => {
     // Step 1: Collect all data points
     for (const year in analyticsData.subscription) {
       if (analyticsData.subscription[year]?.plans) {
-        const yearPlans = analyticsData.subscription[year].plans.map((month: any) => ({
-          name: `${month.name} ${year}`,
-          ...month,
-          year: parseInt(year),
-          monthIndex: monthOrder.indexOf(month.name),
-        }));
+        const yearPlans = analyticsData.subscription[year].plans.map(
+          (month: any) => ({
+            name: `${month.name} ${year}`,
+            ...month,
+            year: parseInt(year),
+            monthIndex: monthOrder.indexOf(month.name),
+          })
+        );
         allData = allData.concat(yearPlans);
       }
     }
-    console.log("All Data:", allData);
 
     // Step 2: Sort by date
     allData.sort((a, b) => {
@@ -1226,29 +1234,36 @@ const Analytics: React.FC = () => {
       return dateA - dateB;
     });
 
+    // const keys = Object.keys(analyticsData.subscription);
+    // const firstTwoKeys = keys.slice(0, 2);
+
     // Step 3: Filter for the last 12 months (June 2024 to May 2025)
-    const startDate = new Date(2024, 5, 1); // June 2024
-    const endDate = new Date(2025, 4, 1); // May 2025
+    // const startDate = new Date(Number(firstTwoKeys[0]), 5, 1);
+    // const endDate = new Date(Number(firstTwoKeys[1]), 4, 1);
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), today.getMonth() - 11, 1);
+    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     const filteredData = allData.filter((d) => {
       const date = new Date(d.year, d.monthIndex, 1);
       return date >= startDate && date <= endDate;
     });
-
     // Step 4: Generate data for each month in the range
     const allPlanNames = getPlanNames();
     const result: any[] = [];
-    let currentDate = new Date(startDate);
+    const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
       const year = currentDate.getFullYear();
       const monthName = monthOrder[currentDate.getMonth()];
       const monthYear = `${monthName} ${year}`;
 
-      const existingData = filteredData.find((d) => d.name === monthYear) || {};
+      const existingData =
+        filteredData.find((d) => `${d.name} ${d.year}` === monthYear) || {};
 
       const dataPoint: any = { name: monthYear };
       allPlanNames.forEach((plan) => {
-        dataPoint[plan] = existingData[plan] !== undefined ? existingData[plan] : 0;
+        dataPoint[plan] =
+          existingData[plan] !== undefined ? existingData[plan] : 0;
       });
 
       result.push(dataPoint);
@@ -1260,7 +1275,10 @@ const Analytics: React.FC = () => {
 
   // Memoize planData to prevent re-computation
   const planData = useMemo(() => {
-    if (!analyticsData.subscription || Object.keys(analyticsData.subscription).length === 0) {
+    if (
+      !analyticsData.subscription ||
+      Object.keys(analyticsData.subscription).length === 0
+    ) {
       return [];
     }
     return filterType === "previous12"
@@ -1269,8 +1287,6 @@ const Analytics: React.FC = () => {
       ? getYearWiseData(selectedYear)
       : [];
   }, [filterType, selectedYear, analyticsData.subscription]);
-
-  console.log("Computed PlanData:", planData);
 
   // Memoize donutData to prevent re-computation
   const donutData = useMemo(
@@ -1305,40 +1321,43 @@ const Analytics: React.FC = () => {
   );
 
   // Memoize latestMonthData for Compact Stats Row
-  const latestMonthData = useMemo(() => {
-    if (filterType === "previous12") {
-      const lastMonth = planData[planData.length - 1] || {};
-      const result: any = {};
-      getPlanNames().forEach((plan) => {
-        result[plan] = lastMonth[plan] || 0;
-      });
-      return result;
-    } else if (selectedYear && analyticsData.subscription[selectedYear]?.plans?.length > 0) {
-      const lastMonth = analyticsData.subscription[selectedYear].plans.reduce((acc: any, month: any) => {
-        Object.keys(month).forEach((key) => {
-          if (key !== "name") {
-            acc[key] = month[key] || 0;
-          }
-        });
-        return acc;
-      }, {});
-      return lastMonth;
-    }
-    return {};
-  }, [filterType, selectedYear, analyticsData.subscription, planData]);
+  // const latestMonthData = useMemo(() => {
+  //   if (filterType === "previous12") {
+  //     const lastMonth = planData[planData.length - 1] || {};
+  //     const result: any = {};
+  //     getPlanNames().forEach((plan) => {
+  //       result[plan] = lastMonth[plan] || 0;
+  //     });
+  //     return result;
+  //   } else if (
+  //     selectedYear &&
+  //     analyticsData.subscription[selectedYear]?.plans?.length > 0
+  //   ) {
+  //     const lastMonth = analyticsData.subscription[selectedYear].plans.reduce(
+  //       (acc: any, month: any) => {
+  //         Object.keys(month).forEach((key) => {
+  //           if (key !== "name") {
+  //             acc[key] = (acc[key] || 0) + (month[key] || 0);
+  //           }
+  //         });
+  //         return acc;
+  //       },
+  //       {}
+  //     );
+  //     return lastMonth;
+  //   }
+  //   return {};
+  // }, [filterType, selectedYear, analyticsData.subscription, planData]);
 
   // Memoize compactStatsData
-  const compactStatsData = useMemo(
-    () =>
-      Object.keys(latestMonthData)
-        .filter((key) => key !== "name")
-        .map((plan, index) => ({
-          plan_name: plan,
-          users: latestMonthData[plan] || 0,
-          color: getPlanColor(plan, index),
-        })),
-    [latestMonthData]
-  );
+  // const compactStatsData = useMemo(() => {
+  //   const allPlanNames = getPlanNames();
+  //   return allPlanNames.map((plan, index) => ({
+  //     plan_name: plan,
+  //     users: latestMonthData[plan] || 0,
+  //     color: getPlanColor(plan, index),
+  //   }));
+  // }, [latestMonthData]);
 
   const handleYearChange = (event: SelectChangeEvent<number>) => {
     setSelectedYear(event.target.value as number);
@@ -1435,18 +1454,18 @@ const Analytics: React.FC = () => {
     },
   };
 
-  const statsVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut",
-        delay: 0.7 + i * 0.15,
-      },
-    }),
-  };
+  // const statsVariants = {
+  //   hidden: { opacity: 0, y: 20 },
+  //   visible: (i: number) => ({
+  //     opacity: 1,
+  //     y: 0,
+  //     transition: {
+  //       duration: 0.4,
+  //       ease: "easeOut",
+  //       delay: 0.7 + i * 0.15,
+  //     },
+  //   }),
+  // };
 
   useEffect(() => {
     const animate = async () => {
@@ -1545,7 +1564,9 @@ const Analytics: React.FC = () => {
                 fontWeight: 600,
                 "& .MuiSelect-select": { py: 1 },
                 "&:hover": { background: "#E8F5E9" },
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "#4CAF50" },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#4CAF50",
+                },
               }}
               disabled={availableYears.length === 0 || loading}
             >
@@ -1700,51 +1721,51 @@ const Analytics: React.FC = () => {
         </motion.div>
 
         {/* Compact Stats Row */}
-        <Grid container spacing={2}>
-          {compactStatsData.map((plan, index) => (
-            <Grid item xs={6} sm={3} key={index}>
-              <motion.div
-                variants={statsVariants}
-                initial="hidden"
-                animate={statsControls}
-                custom={index}
-              >
-                <Box
-                  sx={{
-                    p: 1.5,
-                    borderRadius: "8px",
-                    background: `linear-gradient(135deg, ${plan.color}, ${plan.color}AA)`,
-                    color: "white",
-                    textAlign: "center",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    transition: "transform 0.2s",
-                    "&:hover": { transform: "scale(1.05)" },
-                  }}
+        {/* <Grid container spacing={2}>
+            {compactStatsData.map((plan, index) => (
+              <Grid item xs={6} sm={3} key={index}>
+                <motion.div
+                  variants={statsVariants}
+                  initial="hidden"
+                  animate={statsControls}
+                  custom={index}
                 >
-                  <Typography
-                    variant="h6"
+                  <Box
                     sx={{
-                      fontWeight: 700,
-                      fontSize: isMobile ? "1rem" : "1.25rem",
-                      fontFamily: "Arial",
+                      p: 1.5,
+                      borderRadius: "8px",
+                      background: `linear-gradient(135deg, ${plan.color}, ${plan.color}AA)`,
+                      color: "white",
+                      textAlign: "center",
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                      transition: "transform 0.2s",
+                      "&:hover": { transform: "scale(1.05)" },
                     }}
                   >
-                    {plan.users}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontSize: isMobile ? "0.65rem" : "0.75rem",
-                      fontFamily: "Arial",
-                    }}
-                  >
-                    {plan.plan_name} Users
-                  </Typography>
-                </Box>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: isMobile ? "1rem" : "1.25rem",
+                        fontFamily: "Arial",
+                      }}
+                    >
+                      {plan.users}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: isMobile ? "0.65rem" : "0.75rem",
+                        fontFamily: "Arial",
+                      }}
+                    >
+                      {plan.plan_name} Users
+                    </Typography>
+                  </Box>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid> */}
 
         {/* Donut Chart: Service Usage */}
         <motion.div
@@ -1935,13 +1956,18 @@ const Analytics: React.FC = () => {
                                   transition: "all 0.2s ease",
                                 }}
                               >
-                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
                                   <Box
                                     sx={{
                                       width: "12px",
                                       height: "12px",
                                       borderRadius: "2px",
-                                      background: DONUT_COLORS[index % DONUT_COLORS.length],
+                                      background:
+                                        DONUT_COLORS[
+                                          index % DONUT_COLORS.length
+                                        ],
                                       mr: 1.5,
                                       flexShrink: 0,
                                     }}
@@ -1949,14 +1975,19 @@ const Analytics: React.FC = () => {
                                   <Typography
                                     variant="body2"
                                     sx={{
-                                      fontSize: isMobile ? "0.85rem" : "0.875rem",
+                                      fontSize: isMobile
+                                        ? "0.85rem"
+                                        : "0.875rem",
                                       color: "#1B5E20",
                                       fontWeight: 500,
                                       overflow: "hidden",
                                       textOverflow: "ellipsis",
                                       whiteSpace: "nowrap",
                                     }}
-                                    style={{ fontFamily: "Arial", fontWeight: 500 }}
+                                    style={{
+                                      fontFamily: "Arial",
+                                      fontWeight: 500,
+                                    }}
                                   >
                                     {entry.name}
                                   </Typography>

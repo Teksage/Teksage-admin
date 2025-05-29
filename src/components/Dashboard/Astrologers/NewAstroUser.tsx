@@ -953,7 +953,6 @@ import {
   Typography,
   Paper,
   IconButton,
-  Chip,
   FormControl,
   InputLabel,
   Select,
@@ -1036,7 +1035,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     user_id: null,
   });
 
-  const [inputLang, setInputLang] = useState<string>("");
+  // const [inputLang, setInputLang] = useState<string>("");
   const [errors, setErrors] = useState<
     Partial<Record<keyof AstroFormData, string>>
   >({});
@@ -1356,53 +1355,53 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
       }
     };
 
-  const handleTagAdd =
-    (field: "languages" | "expertise") =>
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter" && inputLang.trim()) {
-        e.preventDefault();
-        const normalizedValue = inputLang.trim().toLowerCase();
+  // const handleTagAdd =
+  //   (field: "languages" | "expertise") =>
+  //   (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //     if (e.key === "Enter" && inputLang.trim()) {
+  //       e.preventDefault();
+  //       const normalizedValue = inputLang.trim().toLowerCase();
 
-        const existingValues = formData[field].map((v) =>
-          v.trim().toLowerCase()
-        );
+  //       const existingValues = formData[field].map((v) =>
+  //         v.trim().toLowerCase()
+  //       );
 
-        if (existingValues.includes(normalizedValue)) {
-          setErrors((prev) => ({
-            ...prev,
-            [field]: `${
-              field === "languages" ? "Language" : "Expertise"
-            } already added`,
-          }));
-          return;
-        }
+  //       if (existingValues.includes(normalizedValue)) {
+  //         setErrors((prev) => ({
+  //           ...prev,
+  //           [field]: `${
+  //             field === "languages" ? "Language" : "Expertise"
+  //           } already added`,
+  //         }));
+  //         return;
+  //       }
 
-        const updatedTags = [...formData[field], inputLang.trim()];
+  //       const updatedTags = [...formData[field], inputLang.trim()];
 
-        setFormData((prev) => ({
-          ...prev,
-          [field]: updatedTags,
-        }));
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         [field]: updatedTags,
+  //       }));
 
-        setInputLang("");
-        setErrors((prev) => ({
-          ...prev,
-          [field]: "",
-        }));
-      }
-    };
+  //       setInputLang("");
+  //       setErrors((prev) => ({
+  //         ...prev,
+  //         [field]: "",
+  //       }));
+  //     }
+  //   };
 
-  const handleTagDelete =
-    (type: "languages" | "expertise", index: number) => () => {
-      const updated = [...formData[type]];
-      updated.splice(index, 1);
-      setFormData((prev) => ({
-        ...prev,
-        [type]: updated,
-      }));
-      const error = validateField(type, updated);
-      setErrors((prev) => ({ ...prev, [type]: error }));
-    };
+  // const handleTagDelete =
+  //   (type: "languages" | "expertise", index: number) => () => {
+  //     const updated = [...formData[type]];
+  //     updated.splice(index, 1);
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       [type]: updated,
+  //     }));
+  //     const error = validateField(type, updated);
+  //     setErrors((prev) => ({ ...prev, [type]: error }));
+  //   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
