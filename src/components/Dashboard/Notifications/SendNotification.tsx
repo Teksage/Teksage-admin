@@ -1750,8 +1750,8 @@ const SendNotification: React.FC = () => {
 
         // Add search query as filters for "name" and "email"
         if (searchQuery.trim()) {
-          params.name = searchQuery.trim();
-          params.email = searchQuery.trim();
+          params.first_name = searchQuery.trim();
+          // params.email = searchQuery.trim();
         }
 
         const endpoint = "api/admin/users";

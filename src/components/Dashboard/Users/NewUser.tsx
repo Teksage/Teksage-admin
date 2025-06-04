@@ -1216,7 +1216,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           });
 
           const user = res?.data;
-          console.log(user, "user 112");
+          console.log(user, "user 112", user.time_of_birth);
           setFormData({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -1229,16 +1229,22 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             // timeOfBirth: user.time_of_birth
             //   ? new Date(`1970-01-01T${user.time_of_birth}`)
             //   : null,
+            // timeOfBirth: user.time_of_birth
+            //   ? (() => {
+            //       const timeParts = user.time_of_birth.split(":");
+            //       if (timeParts.length === 2) {
+            //         const hours = parseInt(timeParts[0], 10);
+            //         const minutes = parseInt(timeParts[1], 10);
+            //         const date = new Date(1970, 0, 1, hours, minutes);
+            //         return isNaN(date.getTime()) ? null : date;
+            //       }
+            //       return null;
+            //     })()
+            //   : null,
             timeOfBirth: user.time_of_birth
               ? (() => {
-                  const timeParts = user.time_of_birth.split(":");
-                  if (timeParts.length === 2) {
-                    const hours = parseInt(timeParts[0], 10);
-                    const minutes = parseInt(timeParts[1], 10);
-                    const date = new Date(1970, 0, 1, hours, minutes);
-                    return isNaN(date.getTime()) ? null : date;
-                  }
-                  return null;
+                  const date = new Date(`1970-01-01T${user.time_of_birth}`);
+                  return isNaN(date.getTime()) ? null : date;
                 })()
               : null,
             placeOfBirth: capitalizeFirstLetter(user.place_of_birth) || "",
