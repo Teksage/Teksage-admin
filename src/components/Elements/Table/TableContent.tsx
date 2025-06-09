@@ -1604,6 +1604,61 @@ const TableContent = <T,>({
     return null;
   };
 
+  // const safeRenderValue = (
+  //   value: any,
+  //   row: any,
+  //   render?: (value: any, row: any) => React.ReactNode
+  // ) => {
+  //   const isEmailKey = (val: any, r: any) => {
+  //     const key = Object.keys(r).find((k) => r[k] === val);
+  //     return key === "email";
+  //   };
+
+  //   if (render) {
+  //     const renderedValue = render(value, row);
+  //     if (typeof renderedValue === "string") {
+  //       const formattedDateTime = formatDateTime(renderedValue);
+  //       if (formattedDateTime) return formattedDateTime;
+  //       if (isEmailKey(renderedValue, row)) {
+  //         return (
+  //           <span style={{ wordBreak: "break-all", whiteSpace: "normal" }}>
+  //             {renderedValue || "N/A"}
+  //           </span>
+  //         );
+  //       }
+  //       // Apply capitalization for strings starting with a number
+  //       const capitalizedNumberString =
+  //         capitalizeFirstAlphabetAfterNumber(renderedValue);
+  //       return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
+  //     }
+  //     return renderedValue || "N/A";
+  //   }
+
+  //   if (value && typeof value === "object" && "first_name" in value) {
+  //     const fullName = `${value.first_name || ""} ${
+  //       value.last_name || ""
+  //     }`.trim();
+  //     return fullName ? capitalizeFirstLetter(fullName) : "N/A";
+  //   }
+
+  //   if (typeof value === "string") {
+  //     const formattedDateTime = formatDateTime(value);
+  //     if (formattedDateTime) return formattedDateTime;
+  //     if (isEmailKey(value, row)) {
+  //       return (
+  //         <span style={{ wordBreak: "break-all", whiteSpace: "normal" }}>
+  //           {value || "N/A"}
+  //         </span>
+  //       );
+  //     }
+  //     // Apply capitalization for strings starting with a number
+  //     const capitalizedNumberString = capitalizeFirstAlphabetAfterNumber(value);
+  //     return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
+  //   }
+
+  //   return value?.toString() || "N/A";
+  // };
+
   const safeRenderValue = (
     value: any,
     row: any,
@@ -1613,12 +1668,21 @@ const TableContent = <T,>({
       const key = Object.keys(r).find((k) => r[k] === val);
       return key === "email";
     };
-
+  
+    const getKeyName = (val: any, r: any): string | undefined => {
+      return Object.keys(r).find((k) => r[k] === val);
+    };
+  
     if (render) {
       const renderedValue = render(value, row);
+      const key = getKeyName(value, row);
+  
       if (typeof renderedValue === "string") {
         const formattedDateTime = formatDateTime(renderedValue);
         if (formattedDateTime) return formattedDateTime;
+  
+        if (key === "coupon_name") return renderedValue || "N/A";
+  
         if (isEmailKey(renderedValue, row)) {
           return (
             <span style={{ wordBreak: "break-all", whiteSpace: "normal" }}>
@@ -1626,24 +1690,29 @@ const TableContent = <T,>({
             </span>
           );
         }
-        // Apply capitalization for strings starting with a number
+  
         const capitalizedNumberString =
           capitalizeFirstAlphabetAfterNumber(renderedValue);
         return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
       }
+  
       return renderedValue || "N/A";
     }
-
+  
     if (value && typeof value === "object" && "first_name" in value) {
       const fullName = `${value.first_name || ""} ${
         value.last_name || ""
       }`.trim();
       return fullName ? capitalizeFirstLetter(fullName) : "N/A";
     }
-
+  
     if (typeof value === "string") {
       const formattedDateTime = formatDateTime(value);
       if (formattedDateTime) return formattedDateTime;
+  
+      const key = getKeyName(value, row);
+      if (key === "coupon_name") return value || "N/A";
+  
       if (isEmailKey(value, row)) {
         return (
           <span style={{ wordBreak: "break-all", whiteSpace: "normal" }}>
@@ -1651,13 +1720,14 @@ const TableContent = <T,>({
           </span>
         );
       }
-      // Apply capitalization for strings starting with a number
+  
       const capitalizedNumberString = capitalizeFirstAlphabetAfterNumber(value);
       return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
     }
-
+  
     return value?.toString() || "N/A";
   };
+  
 
   if (isMobile) {
     return (
