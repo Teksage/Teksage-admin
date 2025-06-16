@@ -1221,7 +1221,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             first_name: user.first_name || "",
             last_name: user.last_name || "",
             email: user.email || "",
-            country_code: user.country_code || "+91", // Adjust based on API response
+            // country_code: `${user.country_code}` || "+91", // Adjust based on API response
+            country_code: user.country_code ? `+${user.country_code}` : "+91",
             mobile: user.mobile_number || "",
             dateOfBirth: user.date_of_birth
               ? new Date(user.date_of_birth)
@@ -1454,20 +1455,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     }
     setIsLoading(true);
     try {
-      console.log({
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        preferred_location: formData.preferredLocation,
-        email: formData.email,
-        mobile_number: formData.mobile,
-        birth_location: formData.placeOfBirth,
-        date_of_birth: formData.dateOfBirth?.toISOString().split("T")[0],
-        time_of_birth: formData.timeOfBirth?.toTimeString().slice(0, 5),
-        rashi: formData.rashi,
-        nakshatra: formData.nakshatra,
-        status: formData.status.toLowerCase(),
-        user_type: formData.user_type.toLowerCase(),
-      });
+      const cleanedCountryCode = formData.country_code.replace(/^\+/, "");
       const response = await callAPI({
         endpoint:
           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
@@ -1477,7 +1465,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           last_name: formData.last_name,
           preferred_location: formData.preferredLocation,
           email: formData.email,
-          country_code: formData.country_code,
+          country_code: cleanedCountryCode,
           mobile_number: formData.mobile,
           // mobile_number: `${formData.country_code}${formData.mobile}`, // Combine country code and mobile number
           birth_location: formData.placeOfBirth,
