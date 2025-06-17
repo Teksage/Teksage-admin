@@ -728,7 +728,7 @@ interface SubscriptionFormData {
   status: "Active" | "Inactive";
   plan_type: "free" | "premium";
   tenure_value: number | "";
-  tenure_count: "days" | "months" | "years";
+  tenure_count: "day" | "month" | "year";
 }
 
 const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
@@ -744,7 +744,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
     status: "Active",
     plan_type: "free",
     tenure_value: "",
-    tenure_count: "months",
+    tenure_count: "month",
   });
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -1423,7 +1423,7 @@ const NewSubscription: React.FC<{ mode: "new" | "edit" | "view" }> = ({
                         },
                       }}
                     >
-                      {["days", "months", "years"].map((unit) => (
+                      {["day", "month", "year"].map((unit) => (
                         <MenuItem
                           key={unit}
                           value={unit}
