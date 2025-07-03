@@ -40,7 +40,7 @@ interface CouponFormData {
   foreign_max_cap: number | "";
   start_date: Date | null;
   end_date: Date | null;
-  plan_id: number | null;
+  type: string;
 }
 
 interface DatePickerTextFieldProps extends Omit<TextFieldProps, "variant"> {
@@ -57,10 +57,10 @@ const NewCoupon = ({ mode = "new" }) => {
     foreign_max_cap: "",
     start_date: null,
     end_date: null,
-    plan_id: null,
+    type: "subscription",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [planData, setPlanData] = useState([]);
+  // const [planData, setPlanData] = useState([]);
   const [inputValues, setInputValues] = useState({
     coupon_percentage: "",
     local_max_cap: "",
@@ -80,17 +80,17 @@ const NewCoupon = ({ mode = "new" }) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const serviceResponse = await callAPI({
-          endpoint: "/api/admin/service-catalogs",
-          method: "get",
-        });
+        // const serviceResponse = await callAPI({
+        //   endpoint: "/api/admin/service-catalogs",
+        //   method: "get",
+        // });
 
-        const transformedPlans = serviceResponse?.data?.map((plan: any) => ({
-          id: plan?.plan_id,
-          name: `${plan.plan_name} (${plan.tenure_value} ${plan.tenure_count})`,
-        }));
+        // const transformedPlans = serviceResponse?.data?.map((plan: any) => ({
+        //   id: plan?.plan_id,
+        //   name: `${plan.plan_name} (${plan.tenure_value} ${plan.tenure_count})`,
+        // }));
 
-        setPlanData(transformedPlans);
+        // setPlanData(transformedPlans);
 
         if (mode === "edit" && userId) {
           setIsLoading(true);
@@ -114,7 +114,8 @@ const NewCoupon = ({ mode = "new" }) => {
             foreign_max_cap: foreignMaxCap,
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
-            plan_id: data?.plan_id || null,
+            // plan_id: data?.plan_id || null,
+            type: data?.type || "subscription",
           });
           setInputValues({
             coupon_percentage: percentage === "" ? "" : String(percentage),
@@ -145,7 +146,8 @@ const NewCoupon = ({ mode = "new" }) => {
       setFormData((prev) => ({
         ...prev,
         [field]:
-          field === "plan_id" ? (value === "" ? null : Number(value)) : value,
+          // field === "plan_id" ? (value === "" ? null : Number(value)) : value,
+          value,
       }));
 
       setErrors((prev: any) => ({
@@ -233,7 +235,7 @@ const NewCoupon = ({ mode = "new" }) => {
       newErrors.foreign_max_cap = "Enter a valid foreign max cap (0 or more).";
     if (!formData.start_date) newErrors.start_date = "Start date is required.";
     if (!formData.end_date) newErrors.end_date = "End date is required.";
-    if (!formData.plan_id) newErrors.plan_id = "Plan name is required.";
+    // if (!formData.plan_id) newErrors.plan_id = "Plan name is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -282,7 +284,7 @@ const NewCoupon = ({ mode = "new" }) => {
         severity: "success",
       });
       setTimeout(() => {
-        navigate("/dashboard/coupons", { replace: true })
+        navigate("/dashboard/coupons", { replace: true });
       }, 1000);
     } catch (err: any) {
       console.error("API Error:", err);
@@ -762,7 +764,7 @@ const NewCoupon = ({ mode = "new" }) => {
                     />
                   </Grid>
 
-                  <Grid item xs={12} mt={1}>
+                  {/* <Grid item xs={12} mt={1}>
                     <Typography
                       variant="subtitle1"
                       sx={{
@@ -802,6 +804,51 @@ const NewCoupon = ({ mode = "new" }) => {
                           {plan.name}
                         </MenuItem>
                       ))}
+                    </TextField>
+                  </Grid> */}
+                  <Grid item xs={12} mt={1}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        color: "#455a64",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 2,
+                      }}
+                      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+                    >
+                      <PackageIcon size={18} />
+                      Coupon Type
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="Coupon Type *"
+                      fullWidth
+                      size="medium"
+                      value={formData.type ?? "subscription"}
+                      onChange={handleChange("type")}
+                      disabled={isViewMode}
+                      error={!!errors.type}
+                      helperText={errors.type || ""}
+                      sx={textFieldStyling}
+                    >
+                      <MenuItem
+                        value="subscription"
+                        style={{ fontFamily: "Urbanist" }}
+                      >
+                        Subscription
+                      </MenuItem>
+                      <MenuItem
+                        value="consultation"
+                        style={{ fontFamily: "Urbanist" }}
+                      >
+                        Consultation
+                      </MenuItem>
                     </TextField>
                   </Grid>
                 </Grid>
