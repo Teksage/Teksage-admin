@@ -1203,9 +1203,10 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         if (mode === "edit") {
           if (!value) {
             error = "This field is required";
-          } else if (!/^\d{10}$/.test(value)) {
-            error = "Please enter a valid 10-digit mobile number";
-          }
+          } 
+          // else if (!/^\d{10}$/.test(value)) {
+          //   error = "Please enter a valid 10-digit mobile number";
+          // }
         }
         break;
       case "languages":

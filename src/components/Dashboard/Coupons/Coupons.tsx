@@ -14,7 +14,7 @@ interface CouponData {
   foreign_max_cap: number;
   start_date: string;
   end_date: string;
-  plan_name: string;
+  type: string;
 }
 
 const Coupons: React.FC = () => {
@@ -33,6 +33,7 @@ const Coupons: React.FC = () => {
         endpoint: "/api/admin/coupons",
         method: "get",
       });
+      console.log(response, "response")
       setCoupons(response.data);
     } catch (error) {
       console.error("Failed to fetch coupons:", error);
@@ -77,7 +78,8 @@ const Coupons: React.FC = () => {
       width: "180px",
       render: (value:any) => format(new Date(value), "dd MMM yyyy"),
     },
-    { id: "plan_name", label: "Linked Plan", width: "200px" },
+    { id: "type", label: "Type", width: "200px" },
+    // { id: "plan_name", label: "Linked Plan", width: "200px" },
   ];
 
   const handleAdd = () => navigate("/dashboard/coupons/new");
