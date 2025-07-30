@@ -261,9 +261,12 @@ const NewCoupon = ({ mode = "new" }) => {
               Date.UTC(
                 formData.end_date.getFullYear(),
                 formData.end_date.getMonth(),
-                formData.end_date.getDate()
+                formData.end_date.getDate(),
+                23, // Set hour to 23
+                59, // Set minutes to 59
+                59, // Set seconds to 59
               )
-            ).toISOString()
+            ).toISOString().slice(0, 19)
           : null,
       };
 

@@ -85,28 +85,24 @@
 //           user: `${res.data.first_name} ${res.data.last_name}`,
 //         });
 
-//         // Update the instance headers for future requests
 //         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 //         processQueue(null, newAccessToken);
 //         return axiosInstance(originalRequest);
 //       } catch (err: any) {
 //         console.error("Token refresh failed:", err.message || err);
-//       processQueue(err, null);
+//         processQueue(err, null);
 //         tokenService.clearTokens();
-//         // Log for debugging; can be replaced with a user notification
 //         console.warn("Session expired, redirecting to login...");
 //         window.location.href = "/auth/login";
-//         return Promise.reject(new Error("Session expired: Unable to refresh token"));
+//         return Promise.reject(err); // Preserve the error
 //       } finally {
 //         isRefreshing = false;
 //       }
 //     }
 
-//     // const errorMessage = `Request failed: ${error.message || "Unknown error"}`;
-//     // const errorMessage = error.response.data.detail || "Something went wrong. Please try again."
-//     console.error(new Error(error), error);
-//     return Promise.reject(new Error());
-//     // return error;
+//     // Log the error for debugging but preserve the full error object
+//     console.error("Response interceptor error:", error);
+//     return Promise.reject(error); // Pass the original error object
 //   }
 // );
 
@@ -120,10 +116,10 @@ const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 seconds timeout to prevent hanging requests
+  timeout: 10000,
 });
 
-// Request Interceptor: Add Authorization header
+// Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = tokenService.getAccessToken();
@@ -138,7 +134,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response Interceptor: Handle token refresh and 401 errors
+// Response Interceptor with improved token refresh
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (token: string) => void;
@@ -156,11 +152,20 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
+const redirectToLogin = () => {
+  tokenService.clearTokens();
+  // Avoid infinite redirects
+  if (window.location.pathname !== "/auth/login") {
+    window.location.href = "/auth/login";
+  }
+};
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // Only attempt refresh for 401 errors and if we haven't already tried
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -187,36 +192,43 @@ axiosInstance.interceptors.response.use(
         const res = await axios.post(
           "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/api/auth/refresh",
           { refresh_token: refreshToken },
-          { timeout: 5000 } // 5 seconds timeout for refresh request
+          { 
+            timeout: 10000,
+            headers: {
+              "Content-Type": "application/json",
+            }
+          }
         );
 
         const newAccessToken = res.data.access_token;
         const newRefreshToken = res.data.refresh_token;
+        const userName = res.data.first_name && res.data.last_name 
+          ? `${res.data.first_name} ${res.data.last_name}` 
+          : tokenService.getUser() || "User";
 
         tokenService.setTokens({
           access: newAccessToken,
           refresh: newRefreshToken,
-          user: `${res.data.first_name} ${res.data.last_name}`,
+          user: userName,
         });
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
+        
         return axiosInstance(originalRequest);
-      } catch (err: any) {
-        console.error("Token refresh failed:", err.message || err);
-        processQueue(err, null);
-        tokenService.clearTokens();
-        console.warn("Session expired, redirecting to login...");
-        window.location.href = "/auth/login";
-        return Promise.reject(err); // Preserve the error
+      } catch (refreshError: any) {
+        console.error("Token refresh failed:", refreshError);
+        processQueue(refreshError, null);
+        redirectToLogin();
+        return Promise.reject(new Error("Session expired. Please login again."));
       } finally {
         isRefreshing = false;
       }
     }
 
-    // Log the error for debugging but preserve the full error object
-    console.error("Response interceptor error:", error);
-    return Promise.reject(error); // Pass the original error object
+    // For other errors, preserve the original error
+    console.error("API Error:", error);
+    return Promise.reject(error);
   }
 );
 
