@@ -112,7 +112,8 @@ import axios from "axios";
 import { tokenService } from "../utils/tokenService";
 
 const axiosInstance = axios.create({
-  baseURL: "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/",
+  // baseURL: "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/",
+  baseURL: "https://astroprompt-dev-lwxak.ondigitalocean.app/",
   headers: {
     "Content-Type": "application/json",
   },
