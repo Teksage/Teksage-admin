@@ -13,7 +13,7 @@ interface PlanData {
   foreign_plan_price: string;
   plan_services: string;
   status: string;
-  plan_type: string;
+  os_type: string;
   tenure: string;
   tenure_value: string;
   tenure_count: string;
@@ -71,8 +71,8 @@ const Subscription: React.FC = () => {
       },
     },
     {
-      id: "plan_type",
-      label: "Services Type",
+      id: "os_type",
+      label: "Device Type",
       width: "250px",
     },
     {
