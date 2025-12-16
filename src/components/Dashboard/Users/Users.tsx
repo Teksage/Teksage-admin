@@ -13,6 +13,7 @@ interface UserData {
   status: string;
   plan_type: string;
   user_type: string;
+  created_at: string;
 }
 
 const Users: React.FC = () => {
@@ -154,6 +155,27 @@ const Users: React.FC = () => {
       label: "User Type",
       filterable: true,
       filterOptions: ["Customer", "Astrologer", "Admin"],
+    },
+    {
+      id: "created_at",
+      label: "Created At",
+      filterable: false,
+      width: "180px",
+      render: (value: any) => {
+        if (!value) {
+          return "N/A";
+        }
+        // Format the date to a more readable format: Dec 11, 2025, 06:29 PM
+        const date = new Date(value);
+        return date.toLocaleString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
     },
   ];
 

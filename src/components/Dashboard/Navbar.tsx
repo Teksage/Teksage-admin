@@ -526,7 +526,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
               alt="Logo"
               style={{ borderRadius: "8px" }}
               loading="lazy"
-              onClick={() => {navigate("/dashboard/users", { replace: true }); setNotificationsExpanded(false)}}
+              onClick={()=> { navigate("/dashboard/users",{replace: true}); setNotificationsExpanded(false)}}
             />
           </Box>
         </LogoContainer>
@@ -728,7 +728,10 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
         </GradientDrawer>
         {!isMobile && (
           <ToggleButton
-            onClick={handleToggleSidebar}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleSidebar();
+            }}
             sx={{
               left: `${open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH}px`, // Position fully outside the sidebar
             }}

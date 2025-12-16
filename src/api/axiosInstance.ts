@@ -114,6 +114,7 @@ import { tokenService } from "../utils/tokenService";
 const axiosInstance = axios.create({
   // baseURL: "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/",
   baseURL: "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com:8000/",
+  // baseURL: "http://127.0.0.1:8000/",
   headers: {
     "Content-Type": "application/json",
   },
