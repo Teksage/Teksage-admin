@@ -46,6 +46,8 @@ const Users: React.FC = () => {
         // Ensure status is sent in lowercase to match backend expectations
         if (field === "status") {
           params[field] = value.toLowerCase();
+        } else if (field === "incomplete_user") {
+          params[field] = value === "Incomplete users" ? "true" : "false";
         } else {
           params[field] = value.trim();
         }
@@ -155,6 +157,13 @@ const Users: React.FC = () => {
       label: "User Type",
       filterable: true,
       filterOptions: ["Customer", "Astrologer", "Admin"],
+    },
+    {
+      id: "incomplete_user",
+      label: "Profile Status",
+      filterable: true,
+      filterOnly: true,
+      filterOptions: ["Incomplete users", "Complete users"],
     },
     {
       id: "created_at",
