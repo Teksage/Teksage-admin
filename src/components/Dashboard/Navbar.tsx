@@ -30,6 +30,7 @@ import astro_prompt_logo from "../../assets/astro_prompt_logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SendIcon from "@mui/icons-material/Send";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 const DRAWER_WIDTH = 240;
 const DRAWER_COLLAPSED_WIDTH = 72;
@@ -462,6 +463,7 @@ const menuItems = [
 const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
   ({ open, toggleSidebar }) => {
     const [notificationsExpanded, setNotificationsExpanded] = useState(false);
+    const [whatsappExpanded, setWhatsappExpanded] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const navigate = useNavigate();
     const theme = useTheme();
@@ -473,11 +475,24 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
       (e: React.MouseEvent) => {
         e.stopPropagation();
         setNotificationsExpanded((prev) => !prev);
+        setWhatsappExpanded(false);
         if (!notificationsExpanded && open) {
           navigate("/dashboard/notifications/send");
         }
       },
       [notificationsExpanded, open, navigate]
+    );
+
+    const handleWhatsappClick = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setWhatsappExpanded((prev) => !prev);
+        setNotificationsExpanded(false);
+        if (!whatsappExpanded && open) {
+          navigate("/dashboard/whatsapp/send");
+        }
+      },
+      [whatsappExpanded, open, navigate]
     );
 
     const handleToggleSidebar = useCallback(() => {
@@ -538,6 +553,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
               onClick={() => {
                 handleMenuItemClick(item.path);
                 setNotificationsExpanded(false);
+                setWhatsappExpanded(false);
               }}
               selected={isActive(item.path)}
               open={open}
@@ -664,6 +680,90 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
+                      fontFamily: "Urbanist",
+                      fontWeight: 600,
+                    }}
+                  />
+                )}
+              </NavItem>
+            </List>
+          </Collapse>
+
+          <NavItem
+            onClick={
+              open ? handleWhatsappClick : () => navigate("/dashboard/whatsapp/send")
+            }
+            selected={isActive("/dashboard/whatsapp")}
+            open={open}
+          >
+            <ListItemIcon sx={{ color: "inherit" }}>
+              <ChatBubbleOutlineIcon />
+            </ListItemIcon>
+            {(open || isMobile) && (
+              <>
+                <ListItemText
+                  primary="WhatsApp"
+                  primaryTypographyProps={{
+                    variant: "body1",
+                    whiteSpace: "nowrap",
+                    fontFamily: "Urbanist",
+                    fontWeight: 800,
+                  }}
+                  sx={{ flexGrow: 1 }}
+                />
+                {open && (
+                  <IconButton
+                    size="small"
+                    onClick={handleWhatsappClick}
+                    sx={{ padding: 0.5, ml: -1 }}
+                  >
+                    {whatsappExpanded ? <ExpandLess /> : <ExpandMore />}
+                  </IconButton>
+                )}
+              </>
+            )}
+          </NavItem>
+
+          <Collapse
+            in={whatsappExpanded && (open || isMobile)}
+            timeout="auto"
+            unmountOnExit
+          >
+            <List component="div" disablePadding>
+              <NavItem
+                sx={{ pl: open ? 4 : 2, ml: 1, mr: 1, borderRadius: theme.shape.borderRadius }}
+                onClick={() => handleMenuItemClick("/dashboard/whatsapp/send")}
+                selected={locationPathname === "/dashboard/whatsapp/send"}
+                open={open}
+              >
+                <ListItemIcon sx={{ color: "inherit" }}>
+                  <SendIcon fontSize="small" />
+                </ListItemIcon>
+                {(open || isMobile) && (
+                  <ListItemText
+                    primary="Send WhatsApp"
+                    primaryTypographyProps={{
+                      variant: "body2",
+                      fontFamily: "Urbanist",
+                      fontWeight: 600,
+                    }}
+                  />
+                )}
+              </NavItem>
+              <NavItem
+                sx={{ pl: open ? 4 : 2, ml: 1, mr: 1, borderRadius: theme.shape.borderRadius }}
+                onClick={() => handleMenuItemClick("/dashboard/whatsapp/log")}
+                selected={locationPathname === "/dashboard/whatsapp/log"}
+                open={open}
+              >
+                <ListItemIcon sx={{ color: "inherit" }}>
+                  <SendIcon fontSize="small" />
+                </ListItemIcon>
+                {(open || isMobile) && (
+                  <ListItemText
+                    primary="WhatsApp Log"
+                    primaryTypographyProps={{
+                      variant: "body2",
                       fontFamily: "Urbanist",
                       fontWeight: 600,
                     }}
