@@ -10,6 +10,21 @@ interface FAQData {
   faq_id: number;
   question: string;
   answer: string;
+  question_tamil: string;
+  answer_tamil: string;
+  question_telugu: string;
+  answer_telugu: string;
+  question_kannada: string;
+  answer_kannada: string;
+  question_malayalam: string;
+  answer_malayalam: string;
+  question_hindi: string;
+  answer_hindi: string;
+  question_marathi: string;
+  answer_marathi: string;
+  faq_status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const FAQs: React.FC = () => {
@@ -159,8 +174,20 @@ const FAQs: React.FC = () => {
   // }, [page, rowsPerPage, filters]);
 
   const faqColumns: TableColumn<FAQData>[] = [
-    { id: "question", label: "Query", width: "300px" },
-    { id: "answer", label: "Answer", width: "350px" },
+    { id: "question", label: "Question (English)", width: "250px" },
+    { id: "answer", label: "Answer (English)", width: "300px" },
+    { id: "question_tamil", label: "Question (Tamil)", width: "250px" },
+    { id: "answer_tamil", label: "Answer (Tamil)", width: "300px" },
+    { id: "question_telugu", label: "Question (Telugu)", width: "250px" },
+    { id: "answer_telugu", label: "Answer (Telugu)", width: "300px" },
+    { id: "question_kannada", label: "Question (Kannada)", width: "250px" },
+    { id: "answer_kannada", label: "Answer (Kannada)", width: "300px" },
+    { id: "question_malayalam", label: "Question (Malayalam)", width: "250px" },
+    { id: "answer_malayalam", label: "Answer (Malayalam)", width: "300px" },
+    { id: "question_hindi", label: "Question (Hindi)", width: "250px" },
+    { id: "answer_hindi", label: "Answer (Hindi)", width: "300px" },
+    { id: "question_marathi", label: "Question (Marathi)", width: "250px" },
+    { id: "answer_marathi", label: "Answer (Marathi)", width: "300px" },
   ];
 
   const handleAdd = () => {

@@ -207,8 +207,8 @@ const FilterItem = <T,>({
         key={columnId}
         size="small"
         sx={{
-          minWidth: { xs: "100%", sm: 150 },
-          maxWidth: { xs: "100%", sm: 200 },
+          minWidth: { xs: "100%", sm: 180 },
+          maxWidth: { xs: "100%", sm: 220 },
         }}
       >
         <Autocomplete
@@ -272,7 +272,9 @@ const FilterItem = <T,>({
                 "& .MuiInputLabel-root": {
                   fontFamily: "Urbanist",
                   fontWeight: 600,
-                  fontSize: "0.9rem",
+                  fontSize: "0.85rem",
+                  whiteSpace: "nowrap",
+                  overflow: "visible",
                 },
                 "& .MuiInputBase-root": {
                   fontSize: { xs: "0.8rem", sm: "0.9rem" },
