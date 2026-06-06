@@ -1668,21 +1668,21 @@ const TableContent = <T,>({
       const key = Object.keys(r).find((k) => r[k] === val);
       return key === "email";
     };
-  
+
     const getKeyName = (val: any, r: any): string | undefined => {
       return Object.keys(r).find((k) => r[k] === val);
     };
-  
+
     if (render) {
       const renderedValue = render(value, row);
       const key = getKeyName(value, row);
-  
+
       if (typeof renderedValue === "string") {
         const formattedDateTime = formatDateTime(renderedValue);
         if (formattedDateTime) return formattedDateTime;
-  
+
         if (key === "coupon_name") return renderedValue || "N/A";
-  
+
         if (isEmailKey(renderedValue, row)) {
           return (
             <span style={{ wordBreak: "break-all", whiteSpace: "normal" }}>
@@ -1690,29 +1690,28 @@ const TableContent = <T,>({
             </span>
           );
         }
-  
+
         const capitalizedNumberString =
           capitalizeFirstAlphabetAfterNumber(renderedValue);
         return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
       }
-  
+
       return renderedValue || "N/A";
     }
-  
+
     if (value && typeof value === "object" && "first_name" in value) {
-      const fullName = `${value.first_name || ""} ${
-        value.last_name || ""
-      }`.trim();
+      const fullName = `${value.first_name || ""} ${value.last_name || ""
+        }`.trim();
       return fullName ? capitalizeFirstLetter(fullName) : "N/A";
     }
-  
+
     if (typeof value === "string") {
       const formattedDateTime = formatDateTime(value);
       if (formattedDateTime) return formattedDateTime;
-  
+
       const key = getKeyName(value, row);
       if (key === "coupon_name") return value || "N/A";
-  
+
       if (isEmailKey(value, row)) {
         return (
           <span style={{ wordBreak: "break-all", whiteSpace: "normal" }}>
@@ -1720,14 +1719,14 @@ const TableContent = <T,>({
           </span>
         );
       }
-  
+
       const capitalizedNumberString = capitalizeFirstAlphabetAfterNumber(value);
       return capitalizeFirstLetter(capitalizedNumberString) || "N/A";
     }
-  
+
     return value?.toString() || "N/A";
   };
-  
+
 
   if (isMobile) {
     return (
@@ -1805,10 +1804,10 @@ const TableContent = <T,>({
                         secondary={
                           visibleColumns[1]
                             ? safeRenderValue(
-                                row[visibleColumns[1].id],
-                                row,
-                                visibleColumns[1].render
-                              )
+                              row[visibleColumns[1].id],
+                              row,
+                              visibleColumns[1].render
+                            )
                             : undefined
                         }
                         primaryTypographyProps={{
@@ -1920,9 +1919,8 @@ const TableContent = <T,>({
                     //   sortConfig.key === column.id ? sortConfig.direction : false
                     // }
                     sx={{
-                      width: `${
-                        100 / (dataColumns.length + (showActions ? 1 : 0))
-                      }%`,
+                      width: `${100 / (dataColumns.length + (showActions ? 1 : 0))
+                        }%`,
                       minWidth: "120px",
                       maxWidth: "220px",
                       textAlign: "center",
@@ -2012,16 +2010,17 @@ const TableContent = <T,>({
                           column.render
                         );
                         const isLongText =
-                          typeof value === "string" && value.length > 20;
+                          typeof value === "string" &&
+                          value.length > 20 &&
+                          value.includes("@");
                         return (
                           <TableCell
                             key={column.id as string}
                             sx={{
                               textAlign: "center",
-                              width: `${
-                                100 /
+                              width: `${100 /
                                 (dataColumns.length + (showActions ? 1 : 0))
-                              }%`,
+                                }%`,
                               minWidth: "120px",
                               maxWidth: "220px",
                               [theme.breakpoints.down("md")]: {
@@ -2042,7 +2041,7 @@ const TableContent = <T,>({
                             ) : (
                               displayValue
                             )} */}
-                            {isLongText? (
+                            {isLongText ? (
                               <Tooltip title={value as React.ReactNode}>
                                 <Box
                                   sx={{

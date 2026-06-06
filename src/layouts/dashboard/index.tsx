@@ -413,6 +413,14 @@ const LayoutContainer = styled(Box)(() => ({
   },
 }));
 
+const ScrollableContent = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  overflowY: "auto",
+  height: `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+  paddingTop: 0,
+  boxSizing: "border-box",
+}));
+
 const DashboardLayout = () => {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -473,16 +481,6 @@ const DashboardLayout = () => {
       .toUpperCase()
       .substring(0, 2);
   }, []);
-
-  const ScrollableContent = styled(Box)(({ theme }) => ({
-    flexGrow: 1,
-    overflowY: "auto",
-    height: isMobile
-      ? `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
-      : `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
-    paddingTop: isMobile ? 0 : 0,
-    boxSizing: "border-box",
-  }));
 
   return (
     <LayoutContainer>

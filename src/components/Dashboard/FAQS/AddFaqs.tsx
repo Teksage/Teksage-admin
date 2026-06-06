@@ -286,6 +286,18 @@ import CustomSnackbar from "../../Elements/CustomSnackbar";
 interface FAQFormData {
   question: string;
   answer: string;
+  question_tamil: string;
+  answer_tamil: string;
+  question_telugu: string;
+  answer_telugu: string;
+  question_kannada: string;
+  answer_kannada: string;
+  question_malayalam: string;
+  answer_malayalam: string;
+  question_hindi: string;
+  answer_hindi: string;
+  question_marathi: string;
+  answer_marathi: string;
 }
 
 const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
@@ -297,6 +309,18 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const [formData, setFormData] = useState<FAQFormData>({
     question: "",
     answer: "",
+    question_tamil: "",
+    answer_tamil: "",
+    question_telugu: "",
+    answer_telugu: "",
+    question_kannada: "",
+    answer_kannada: "",
+    question_malayalam: "",
+    answer_malayalam: "",
+    question_hindi: "",
+    answer_hindi: "",
+    question_marathi: "",
+    answer_marathi: "",
   });
   const [errors, setErrors] = useState<
     Partial<Record<keyof FAQFormData, string>>
@@ -357,8 +381,20 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof FAQFormData, string>> = {};
-    if (!formData.question.trim()) newErrors.question = "Question is required";
-    if (!formData.answer.trim()) newErrors.answer = "Answer is required";
+    if (!formData.question.trim()) newErrors.question = "Question (English) is required";
+    if (!formData.answer.trim()) newErrors.answer = "Answer (English) is required";
+    if (!formData.question_tamil.trim()) newErrors.question_tamil = "Question (Tamil) is required";
+    if (!formData.answer_tamil.trim()) newErrors.answer_tamil = "Answer (Tamil) is required";
+    if (!formData.question_telugu.trim()) newErrors.question_telugu = "Question (Telugu) is required";
+    if (!formData.answer_telugu.trim()) newErrors.answer_telugu = "Answer (Telugu) is required";
+    if (!formData.question_kannada.trim()) newErrors.question_kannada = "Question (Kannada) is required";
+    if (!formData.answer_kannada.trim()) newErrors.answer_kannada = "Answer (Kannada) is required";
+    if (!formData.question_malayalam.trim()) newErrors.question_malayalam = "Question (Malayalam) is required";
+    if (!formData.answer_malayalam.trim()) newErrors.answer_malayalam = "Answer (Malayalam) is required";
+    if (!formData.question_hindi.trim()) newErrors.question_hindi = "Question (Hindi) is required";
+    if (!formData.answer_hindi.trim()) newErrors.answer_hindi = "Answer (Hindi) is required";
+    if (!formData.question_marathi.trim()) newErrors.question_marathi = "Question (Marathi) is required";
+    if (!formData.answer_marathi.trim()) newErrors.answer_marathi = "Answer (Marathi) is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -613,6 +649,804 @@ const NewFAQ: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                         rows={6}
                         error={Boolean(errors.answer)}
                         helperText={errors.answer || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Divider for Tamil Section */}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="textSecondary" fontWeight={600} style={{ fontFamily: "Urbanist" }}>
+                          Tamil Translation
+                        </Typography>
+                      </Divider>
+                    </Grid>
+
+                    {/* Tamil Question Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question (Tamil) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="தமிழில் உங்கள் கேள்வியை இங்கே உள்ளிடவும்..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.question_tamil}
+                        onChange={handleChange("question_tamil")}
+                        disabled={isViewMode || isLoading}
+                        error={Boolean(errors.question_tamil)}
+                        helperText={errors.question_tamil || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Tamil Answer Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer (Tamil) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="விரிவான பதிலை வழங்கவும்..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.answer_tamil}
+                        onChange={handleChange("answer_tamil")}
+                        disabled={isViewMode || isLoading}
+                        multiline
+                        rows={6}
+                        error={Boolean(errors.answer_tamil)}
+                        helperText={errors.answer_tamil || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Divider for Telugu Section */}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="textSecondary" fontWeight={600} style={{ fontFamily: "Urbanist" }}>
+                          Telugu Translation
+                        </Typography>
+                      </Divider>
+                    </Grid>
+
+                    {/* Telugu Question Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question (Telugu) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="తెలుగులో మీ ప్రశ్నను ఇక్కడ నమోదు చేయండి..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.question_telugu}
+                        onChange={handleChange("question_telugu")}
+                        disabled={isViewMode || isLoading}
+                        error={Boolean(errors.question_telugu)}
+                        helperText={errors.question_telugu || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Telugu Answer Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer (Telugu) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="వివరణాత్మక సమాధానాన్ని అందించండి..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.answer_telugu}
+                        onChange={handleChange("answer_telugu")}
+                        disabled={isViewMode || isLoading}
+                        multiline
+                        rows={6}
+                        error={Boolean(errors.answer_telugu)}
+                        helperText={errors.answer_telugu || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Divider for Kannada Section */}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="textSecondary" fontWeight={600} style={{ fontFamily: "Urbanist" }}>
+                          Kannada Translation
+                        </Typography>
+                      </Divider>
+                    </Grid>
+
+                    {/* Kannada Question Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question (Kannada) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="ಕನ್ನಡದಲ್ಲಿ ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ನಮೂದಿಸಿ..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.question_kannada}
+                        onChange={handleChange("question_kannada")}
+                        disabled={isViewMode || isLoading}
+                        error={Boolean(errors.question_kannada)}
+                        helperText={errors.question_kannada || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Kannada Answer Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer (Kannada) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="ವಿವರವಾದ ಉತ್ತರವನ್ನು ಒದಗಿಸಿ..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.answer_kannada}
+                        onChange={handleChange("answer_kannada")}
+                        disabled={isViewMode || isLoading}
+                        multiline
+                        rows={6}
+                        error={Boolean(errors.answer_kannada)}
+                        helperText={errors.answer_kannada || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Divider for Malayalam Section */}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="textSecondary" fontWeight={600} style={{ fontFamily: "Urbanist" }}>
+                          Malayalam Translation
+                        </Typography>
+                      </Divider>
+                    </Grid>
+
+                    {/* Malayalam Question Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question (Malayalam) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="മലയാളത്തിൽ നിങ്ങളുടെ ചോദ്യം ഇവിടെ നൽകുക..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.question_malayalam}
+                        onChange={handleChange("question_malayalam")}
+                        disabled={isViewMode || isLoading}
+                        error={Boolean(errors.question_malayalam)}
+                        helperText={errors.question_malayalam || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Malayalam Answer Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer (Malayalam) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="വിശദമായ ഉത്തരം നൽകുക..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.answer_malayalam}
+                        onChange={handleChange("answer_malayalam")}
+                        disabled={isViewMode || isLoading}
+                        multiline
+                        rows={6}
+                        error={Boolean(errors.answer_malayalam)}
+                        helperText={errors.answer_malayalam || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Divider for Hindi Section */}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="textSecondary" fontWeight={600} style={{ fontFamily: "Urbanist" }}>
+                          Hindi Translation
+                        </Typography>
+                      </Divider>
+                    </Grid>
+
+                    {/* Hindi Question Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question (Hindi) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="हिंदी में अपना प्रश्न यहां दर्ज करें..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.question_hindi}
+                        onChange={handleChange("question_hindi")}
+                        disabled={isViewMode || isLoading}
+                        error={Boolean(errors.question_hindi)}
+                        helperText={errors.question_hindi || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Hindi Answer Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer (Hindi) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="विस्तृत उत्तर प्रदान करें..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.answer_hindi}
+                        onChange={handleChange("answer_hindi")}
+                        disabled={isViewMode || isLoading}
+                        multiline
+                        rows={6}
+                        error={Boolean(errors.answer_hindi)}
+                        helperText={errors.answer_hindi || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Divider for Marathi Section */}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }}>
+                        <Typography variant="body2" color="textSecondary" fontWeight={600} style={{ fontFamily: "Urbanist" }}>
+                          Marathi Translation
+                        </Typography>
+                      </Divider>
+                    </Grid>
+
+                    {/* Marathi Question Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <HelpOutlineIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Question (Marathi) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="मराठीत तुमचा प्रश्न येथे प्रविष्ट करा..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.question_marathi}
+                        onChange={handleChange("question_marathi")}
+                        disabled={isViewMode || isLoading}
+                        error={Boolean(errors.question_marathi)}
+                        helperText={errors.question_marathi || ""}
+                        InputLabelProps={{
+                          sx: {
+                            fontWeight: 500,
+                            color: "#455a64",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        InputProps={{
+                          sx: {
+                            fontSize: "0.95rem",
+                            borderRadius: "8px",
+                            fontFamily: "Urbanist",
+                          },
+                        }}
+                        sx={{
+                          "& .MuiInputLabel-root": {
+                            fontFamily: "Urbanist",
+                            fontSize: "0.9rem",
+                          },
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#cfd8dc" },
+                            "&:hover fieldset": { borderColor: "#43a047" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#43a047",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                        }}
+                      />
+                    </Grid>
+
+                    {/* Marathi Answer Field */}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          mb: 1,
+                        }}
+                      >
+                        <QuestionAnswerIcon
+                          sx={{ color: "#43a047", mr: 1, mt: 0.5 }}
+                        />
+                        <Typography
+                          fontWeight={500}
+                          color="#455a64"
+                          style={{ fontFamily: "Urbanist" }}
+                        >
+                          Answer (Marathi) *
+                        </Typography>
+                      </Box>
+                      <TextField
+                        fullWidth
+                        placeholder="तपशीलवार उत्तर प्रदान करा..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.answer_marathi}
+                        onChange={handleChange("answer_marathi")}
+                        disabled={isViewMode || isLoading}
+                        multiline
+                        rows={6}
+                        error={Boolean(errors.answer_marathi)}
+                        helperText={errors.answer_marathi || ""}
                         InputLabelProps={{
                           sx: {
                             fontWeight: 500,

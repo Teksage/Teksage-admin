@@ -24,6 +24,10 @@ const ConsultationView = React.lazy(() => import("./components/Dashboard/Consult
 const Analytics = React.lazy(() => import("./components/Dashboard/Analytics/Analytics"));
 const SendNotification = React.lazy(() => import("./components/Dashboard/Notifications/SendNotification"));
 const NotificationsLog = React.lazy(() => import("./components/Dashboard/Notifications/NotificationsLog"));
+const SendWhatsApp = React.lazy(() => import("./components/Dashboard/WhatsApp/SendWhatsApp"));
+const WhatsAppBroadcastLog = React.lazy(
+  () => import("./components/Dashboard/WhatsApp/WhatsAppBroadcastLog")
+);
 
 export const router = createBrowserRouter([
   {
@@ -113,6 +117,14 @@ export const router = createBrowserRouter([
             children: [
               { path: "send", element: <SendNotification /> },
               { path: "log", element: <NotificationsLog /> },
+              { index: true, element: <Navigate to="send" replace /> },
+            ],
+          },
+          {
+            path: "whatsapp",
+            children: [
+              { path: "send", element: <SendWhatsApp /> },
+              { path: "log", element: <WhatsAppBroadcastLog /> },
               { index: true, element: <Navigate to="send" replace /> },
             ],
           },
