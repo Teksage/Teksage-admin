@@ -30,16 +30,20 @@ import {
 import { TableColumn } from "./types";
 import { capitalizeFirstLetter } from "../CommonFunctions";
 
-const FiltersContainer = styled(Box)(({ theme }) => ({
+const FiltersContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "singleRow",
+})<{ singleRow?: boolean }>(({ theme, singleRow }) => ({
   padding: theme.spacing(2),
   display: "flex",
-  flexWrap: "wrap",
-  gap: theme.spacing(2),
+  flexWrap: singleRow ? "nowrap" : "wrap",
+  gap: singleRow ? theme.spacing(1.5) : theme.spacing(2),
   justifyContent: "flex-start",
+  overflowX: singleRow ? "auto" : "visible",
   background: alpha(theme.palette.grey[50], 0.5),
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
     gap: theme.spacing(1),
+    overflowX: "visible",
   },
 }));
 
@@ -110,6 +114,7 @@ interface FilterItemProps<T> {
     filterKey?: keyof T | ((filters: Record<string, string>) => string)
   ) => void;
   handleSearchChange: (columnId: keyof T, searchValue: string) => Promise<void>;
+  singleRow?: boolean;
 }
 
 const useOptionsListWidth = (options: string[]) => {
@@ -149,6 +154,7 @@ const FilterItem = <T,>({
   setFilterOptions,
   handleFilterChange,
   handleSearchChange,
+  singleRow = false,
 }: FilterItemProps<T>) => {
   const theme = useTheme();
   const columnId = column.id as string;
@@ -207,8 +213,9 @@ const FilterItem = <T,>({
         key={columnId}
         size="small"
         sx={{
-          minWidth: { xs: "100%", sm: 180 },
-          maxWidth: { xs: "100%", sm: 220 },
+          minWidth: singleRow ? 130 : { xs: "100%", sm: 180 },
+          maxWidth: singleRow ? "none" : { xs: "100%", sm: 220 },
+          flex: singleRow ? "1 1 0" : undefined,
         }}
       >
         <Autocomplete
@@ -993,7 +1000,7 @@ const FilterSection = <T,>({
   };
 
   return (
-    <FiltersContainer>
+    <FiltersContainer singleRow={title === "User Management"}>
       {columns
         .filter((col) => col.filterable)
         .map((column) => (
@@ -1007,6 +1014,7 @@ const FilterSection = <T,>({
             setFilterOptions={setFilterOptions}
             handleFilterChange={handleFilterChange}
             handleSearchChange={handleSearchChange}
+            singleRow={title === "User Management"}
           />
         ))}
       {title !== "User Management" &&
