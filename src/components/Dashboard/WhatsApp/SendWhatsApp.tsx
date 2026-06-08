@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Checkbox,
   FormControl,
   FormControlLabel,
   InputLabel,
@@ -24,6 +23,7 @@ import {
   type OptedInUser,
   type WhatsAppTemplate,
 } from "../../../api/whatsappAdmin";
+import { OptedInUserPicker } from "./OptedInUserPicker";
 
 export default function SendWhatsApp() {
   const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
@@ -70,6 +70,14 @@ export default function SendWhatsApp() {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+  };
+
+  const selectAllUsers = () => {
+    setSelectedIds(users.map((u) => u.user_id));
+  };
+
+  const clearSelectedUsers = () => {
+    setSelectedIds([]);
   };
 
   const handleSend = async () => {
@@ -149,25 +157,18 @@ export default function SendWhatsApp() {
             <TextField
               size="small"
               fullWidth
-              label="Search"
+              label="Search by name, email, or phone"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              sx={{ mb: 1 }}
+              sx={{ mb: 1.5 }}
             />
-            <Box sx={{ maxHeight: 200, overflow: "auto" }}>
-              {users.map((u) => (
-                <FormControlLabel
-                  key={u.user_id}
-                  control={
-                    <Checkbox
-                      checked={selectedIds.includes(u.user_id)}
-                      onChange={() => toggleUser(u.user_id)}
-                    />
-                  }
-                  label={`${u.name} (${u.phone_masked})`}
-                />
-              ))}
-            </Box>
+            <OptedInUserPicker
+              users={users}
+              selectedIds={selectedIds}
+              onToggle={toggleUser}
+              onSelectAll={selectAllUsers}
+              onClear={clearSelectedUsers}
+            />
           </>
         )}
       </Paper>
