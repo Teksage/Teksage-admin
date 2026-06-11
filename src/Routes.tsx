@@ -28,6 +28,12 @@ const SendWhatsApp = React.lazy(() => import("./components/Dashboard/WhatsApp/Se
 const WhatsAppBroadcastLog = React.lazy(
   () => import("./components/Dashboard/WhatsApp/WhatsAppBroadcastLog")
 );
+const AskAstrologerList = React.lazy(
+  () => import("./components/Dashboard/AskAstrologer/AskAstrologerList")
+);
+const ViewAskAstrologer = React.lazy(
+  () => import("./components/Dashboard/AskAstrologer/ViewAskAstrologer")
+);
 
 export const router = createBrowserRouter([
   {
@@ -126,6 +132,13 @@ export const router = createBrowserRouter([
               { path: "send", element: <SendWhatsApp /> },
               { path: "log", element: <WhatsAppBroadcastLog /> },
               { index: true, element: <Navigate to="send" replace /> },
+            ],
+          },
+          {
+            path: "ask-astrologer",
+            children: [
+              { index: true, element: <AskAstrologerList /> },
+              { path: "view/:requestId", element: <ViewAskAstrologer /> },
             ],
           },
         ],

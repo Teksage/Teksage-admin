@@ -772,6 +772,29 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
               </NavItem>
             </List>
           </Collapse>
+
+          {/* Ask Astrologer */}
+          <NavItem
+            onClick={() => navigate("/dashboard/ask-astrologer")}
+            selected={isActive("/dashboard/ask-astrologer")}
+            open={open}
+          >
+            <ListItemIcon sx={{ color: "inherit" }}>
+              <StarsIcon />
+            </ListItemIcon>
+            {(open || isMobile) && (
+              <ListItemText
+                primary="Ask Astrologer"
+                primaryTypographyProps={{
+                  variant: "body1",
+                  whiteSpace: "nowrap",
+                  fontFamily: "Urbanist",
+                  fontWeight: 800,
+                }}
+              />
+            )}
+          </NavItem>
+
         </List>
       </>
     );
