@@ -21,16 +21,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { fetchAskRequests, type AskAstrologerItem } from "../../../api/askAstrologerAdmin";
 import { formatDateTimeDMY } from "../../../utils/formatDateTime";
+import { ASK_STATUS_COLOR, formatAskStatus } from "./askAstrologerUi";
 
 const STATUS_OPTIONS = ["", "paid", "assigned", "answered", "cancelled"];
-
-const STATUS_COLOR: Record<string, "warning" | "info" | "secondary" | "success" | "error" | "default"> = {
-  pending_payment: "warning",
-  paid: "info",
-  assigned: "secondary",
-  answered: "success",
-  cancelled: "error",
-};
 
 const AskAstrologerList: React.FC = () => {
   const navigate = useNavigate();
@@ -114,8 +107,8 @@ const AskAstrologerList: React.FC = () => {
                     <TableCell>
                       <Chip
                         size="small"
-                        label={r.status}
-                        color={STATUS_COLOR[r.status] ?? "default"}
+                        label={formatAskStatus(r.status)}
+                        color={ASK_STATUS_COLOR[r.status] ?? "default"}
                       />
                     </TableCell>
                     <TableCell>
