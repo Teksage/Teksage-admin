@@ -1,4 +1,3 @@
-import React from "react";
 import { Typography } from "@mui/material";
 import { DashboardSectionPaper } from "../../Elements/DashboardSectionPaper";
 import { ASK_DETAIL_PAGE } from "./askAstrologerUi";

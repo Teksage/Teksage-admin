@@ -1,5 +1,4 @@
-import React from "react";
-import { Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
