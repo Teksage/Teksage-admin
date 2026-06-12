@@ -110,11 +110,11 @@
 
 import axios from "axios";
 import { tokenService } from "../utils/tokenService";
-const API_BASE_URL="https://teksage-backend-latest.onrender.com/";
+// const API_BASE_URL="http://localhost:8000/";
 const axiosInstance = axios.create({
   
-  // baseURL: "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com:8000/",
-  baseURL: API_BASE_URL,
+  baseURL: "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com:8000/",
+  // baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
