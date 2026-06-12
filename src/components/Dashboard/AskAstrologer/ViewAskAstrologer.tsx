@@ -34,7 +34,7 @@ const ViewAskAstrologer: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [assignAstroId, setAssignAstroId] = useState<number | "">("");
   const [waMode, setWaMode] = useState<"preset" | "custom">("preset");
-  const [selectedPreset, setSelectedPreset] = useState(ASK_WA_PRESET_MESSAGES[0]);
+  const [selectedPreset, setSelectedPreset] = useState<string>(ASK_WA_PRESET_MESSAGES[0]);
   const [customWaText, setCustomWaText] = useState("");
   const [snack, setSnack] = useState<{ open: boolean; msg: string; ok: boolean }>({
     open: false,
