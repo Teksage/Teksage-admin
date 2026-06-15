@@ -49,8 +49,22 @@ export default function VoiceAnswerPlayer({ src, style }: VoiceAnswerPlayerProps
   useEffect(() => {
     const audio = ref.current;
     if (!audio || !playbackSrc) return;
-    audio.preload = "metadata";
+
+    audio.preload = "auto";
+    const resetPosition = () => {
+      if (audio.currentTime > 0 && audio.paused) {
+        audio.currentTime = 0;
+      }
+    };
+
+    audio.addEventListener("loadedmetadata", resetPosition);
+    audio.addEventListener("canplay", resetPosition);
     audio.load();
+
+    return () => {
+      audio.removeEventListener("loadedmetadata", resetPosition);
+      audio.removeEventListener("canplay", resetPosition);
+    };
   }, [playbackSrc]);
 
   if (!playbackSrc) {
@@ -74,7 +88,7 @@ export default function VoiceAnswerPlayer({ src, style }: VoiceAnswerPlayerProps
       ref={ref}
       key={playbackSrc}
       controls
-      preload="metadata"
+      preload="auto"
       src={playbackSrc}
       style={{ width: "100%", ...style }}
     />
