@@ -72,6 +72,7 @@ interface UserData {
   experience: number;
   expertise: any;
   languages: any;
+  profile_link?: string | null;
   user: {
     first_name: string;
     last_name: string;
@@ -514,6 +515,13 @@ const AstroUserView: React.FC<{ mode: "view" }> = () => {
                               value={(userData?.languages || []).join(", ")}
                               icon={
                                 <Language sx={{ color: "#90EE90", mr: 1 }} />
+                              }
+                            />
+                            <InfoItem
+                              label="Public Profile Link"
+                              value={userData?.profile_link || "—"}
+                              icon={
+                                <PublicIcon sx={{ color: "#90EE90", mr: 1 }} />
                               }
                             />
                             <InfoItem
