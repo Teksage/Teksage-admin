@@ -32,7 +32,14 @@ export function AskAssignAstrologerSection({
 }: AskAssignAstrologerSectionProps) {
   return (
     <DashboardSectionPaper title={ASK_DETAIL_PAGE.sectionAssign}>
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "flex-start" }}>
+      <Box
+        component="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onAssign();
+        }}
+        sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "flex-start" }}
+      >
         <FormControl size="small" sx={{ minWidth: 280, flex: 1 }}>
           <InputLabel>{ASK_DETAIL_PAGE.labelSelectAstrologer}</InputLabel>
           <Select
@@ -48,9 +55,9 @@ export function AskAssignAstrologerSection({
           </Select>
         </FormControl>
         <Button
+          type="submit"
           variant="contained"
           disabled={!assignAstroId || busy}
-          onClick={onAssign}
           sx={{ minWidth: 120 }}
         >
           {busy ? ASK_DETAIL_PAGE.labelAssigning : ASK_DETAIL_PAGE.labelAssign}

@@ -31,7 +31,8 @@ const ViewAskAstrologer: React.FC = () => {
   const [data, setData] = useState<AskAstrologerItem | null>(null);
   const [astrologers, setAstrologers] = useState<AstrologerOption[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
+  const [assignBusy, setAssignBusy] = useState(false);
+  const [waBusy, setWaBusy] = useState(false);
   const [assignAstroId, setAssignAstroId] = useState<number | "">("");
   const [waMode, setWaMode] = useState<"preset" | "custom">("preset");
   const [selectedPreset, setSelectedPreset] = useState<string>(ASK_WA_PRESET_MESSAGES[0]);
@@ -69,8 +70,8 @@ const ViewAskAstrologer: React.FC = () => {
   }, [load]);
 
   async function handleAssign() {
-    if (!assignAstroId) return;
-    setBusy(true);
+    if (!assignAstroId || assignBusy) return;
+    setAssignBusy(true);
     try {
       await assignAstrologer(id, Number(assignAstroId));
       setSnack({ open: true, msg: ASK_DETAIL_PAGE.assignSuccess, ok: true });
@@ -78,14 +79,14 @@ const ViewAskAstrologer: React.FC = () => {
     } catch {
       setSnack({ open: true, msg: ASK_DETAIL_PAGE.assignFailed, ok: false });
     } finally {
-      setBusy(false);
+      setAssignBusy(false);
     }
   }
 
   async function handleSendWhatsApp() {
     const text = waMode === "preset" ? selectedPreset : customWaText.trim();
-    if (!text) return;
-    setBusy(true);
+    if (!text || waBusy) return;
+    setWaBusy(true);
     try {
       await sendWhatsAppStatus(id, { message_mode: "custom", custom_text: text });
       setSnack({ open: true, msg: ASK_DETAIL_PAGE.waSendSuccess, ok: true });
@@ -94,7 +95,7 @@ const ViewAskAstrologer: React.FC = () => {
       const msg = err?.response?.data?.detail ?? ASK_DETAIL_PAGE.waSendFailed;
       setSnack({ open: true, msg, ok: false });
     } finally {
-      setBusy(false);
+      setWaBusy(false);
     }
   }
 
@@ -130,7 +131,7 @@ const ViewAskAstrologer: React.FC = () => {
         astrologers={astrologers}
         assignAstroId={assignAstroId}
         assignedAt={data.assigned_at}
-        busy={busy}
+        busy={assignBusy}
         onSelect={setAssignAstroId}
         onAssign={() => void handleAssign()}
       />
@@ -140,7 +141,7 @@ const ViewAskAstrologer: React.FC = () => {
         waMode={waMode}
         selectedPreset={selectedPreset}
         customWaText={customWaText}
-        busy={busy}
+        busy={waBusy}
         onModeChange={setWaMode}
         onPresetChange={setSelectedPreset}
         onCustomChange={setCustomWaText}
