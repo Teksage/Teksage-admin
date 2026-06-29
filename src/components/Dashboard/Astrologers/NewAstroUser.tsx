@@ -996,6 +996,7 @@ interface AstroFormData {
   languages: string[];
   expertise: string[];
   user_id: number | null;
+  profile_link: string;
 }
 
 interface DropdownAstrologer {
@@ -1033,6 +1034,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
     languages: [],
     expertise: [],
     user_id: null,
+    profile_link: "",
   });
 
   // const [inputLang, setInputLang] = useState<string>("");
@@ -1099,6 +1101,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
             expertise:
               data.expertise.map((item: any) => item.toLowerCase()) || [],
             user_id: data.user_id || null,
+            profile_link: data.profile_link || "",
           });
         } catch (err: any) {
           console.error("Error fetching user data:", err);
@@ -1422,6 +1425,7 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
         "astrologer_profile_info",
         formData.astrologer_profile_info
       );
+      payload.append("profile_link", formData.profile_link.trim());
       if (formData.user_id !== null) {
         payload.append("user_id", formData.user_id.toString());
       }
@@ -1762,6 +1766,45 @@ const NewAstroUser: React.FC<Props> = ({ mode }) => {
                 disabled={isViewMode}
                 multiline
                 minRows={3}
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.95rem",
+                    fontWeight: 500,
+                    color: "#455a64",
+                    fontFamily: "Urbanist",
+                  },
+                }}
+                InputProps={{
+                  sx: {
+                    fontSize: "0.9rem",
+                    borderRadius: "6px",
+                    fontFamily: "Urbanist",
+                  },
+                }}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "Urbanist",
+                    fontSize: "0.9rem",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#cfd8dc" },
+                    "&:hover fieldset": { borderColor: "#3f51b5" },
+                    "&.Mui-focused fieldset": { borderColor: "#3f51b5" },
+                  },
+                  "& .MuiFormHelperText-root": { fontSize: "0.75rem" },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Public Profile Link"
+                fullWidth
+                size="small"
+                value={formData.profile_link}
+                onChange={handleChange("profile_link")}
+                disabled={isViewMode}
+                placeholder="https://teksage-new.pages.dev/astrologers/yourname"
+                helperText="Full URL shown in Ask Astrologer answer popup. Re-save after changing."
                 InputLabelProps={{
                   sx: {
                     fontSize: "0.95rem",

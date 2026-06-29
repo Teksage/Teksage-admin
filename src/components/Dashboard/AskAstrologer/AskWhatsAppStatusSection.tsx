@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   FormControl,
   FormControlLabel,
@@ -46,6 +47,13 @@ export function AskWhatsAppStatusSection({
 
   return (
     <DashboardSectionPaper title={ASK_DETAIL_PAGE.sectionWhatsApp}>
+      <Box
+        component="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSend();
+        }}
+      >
       <RadioGroup
         row
         value={waMode}
@@ -93,12 +101,13 @@ export function AskWhatsAppStatusSection({
       )}
 
       <Button
+        type="submit"
         variant="contained"
         disabled={busy || (waMode === "custom" && !customWaText.trim())}
-        onClick={onSend}
       >
         {busy ? ASK_DETAIL_PAGE.labelSending : ASK_DETAIL_PAGE.labelSendWa}
       </Button>
+      </Box>
     </DashboardSectionPaper>
   );
 }

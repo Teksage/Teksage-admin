@@ -14,6 +14,7 @@ export type AskAstrologerItem = {
   ai_response: string;
   answer_text: string | null;
   answer_voice_url: string | null;
+  answer_voice_duration_sec?: number | null;
   answered_at: string | null;
   base_price: number | null;
   currency: string | null;

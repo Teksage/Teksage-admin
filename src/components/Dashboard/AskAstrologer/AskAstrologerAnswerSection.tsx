@@ -19,7 +19,11 @@ export function AskAstrologerAnswerSection({ data }: { data: AskAstrologerItem }
         </Typography>
       ) : null}
       {data.answer_voice_url ? (
-        <VoiceAnswerPlayer src={data.answer_voice_url} style={{ marginBottom: 12 }} />
+        <VoiceAnswerPlayer
+          src={data.answer_voice_url}
+          durationSec={data.answer_voice_duration_sec}
+          style={{ marginBottom: 2 }}
+        />
       ) : null}
       <Typography variant="caption" color="text.secondary">
         {ASK_DETAIL_PAGE.labelAnsweredAt}: {formatDateTimeDMY(data.answered_at)}
