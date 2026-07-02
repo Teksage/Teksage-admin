@@ -1084,6 +1084,8 @@ import {
   SelectChangeEvent,
   TextFieldProps,
   Skeleton,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -1113,6 +1115,8 @@ interface UserFormData {
   nakshatra: string;
   status: string;
   user_type: string;
+  has_used_android: boolean;
+  has_used_web: boolean;
 }
 
 interface DatePickerTextFieldProps extends Omit<TextFieldProps, "variant"> {
@@ -1180,6 +1184,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     nakshatra: "",
     status: "Active",
     user_type: "Customer",
+    has_used_android: false,
+    has_used_web: false,
   });
 
   const [errors, setErrors] = useState<
@@ -1216,7 +1222,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           });
 
           const user = res?.data;
-          console.log(user, "user 112", user.time_of_birth);
           setFormData({
             first_name: user.first_name || "",
             last_name: user.last_name || "",
@@ -1257,6 +1262,8 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
             user_type:
               user.user_type.charAt(0).toUpperCase() +
                 user.user_type.slice(1).toLowerCase() || "Customer",
+            has_used_android: Boolean(user.has_used_android),
+            has_used_web: Boolean(user.has_used_web),
           });
 
           isFormInitialized.current = true;
@@ -1423,7 +1430,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
   const handleBlur =
     (field: keyof UserFormData) =>
     (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      console.log(event);
+      void event;
       const value: any = formData[field];
       const error = validateField(field, value);
       if (error) {
@@ -1456,7 +1463,7 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
     setIsLoading(true);
     try {
       const cleanedCountryCode = formData.country_code.replace(/^\+/, "");
-      const response = await callAPI({
+      await callAPI({
         endpoint:
           mode === "edit" ? `api/admin/users/${userId}` : "api/admin/users",
         method: mode === "edit" ? "put" : "post",
@@ -1478,9 +1485,10 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
           nakshatra: formData.nakshatra,
           status: formData.status.toLowerCase(),
           user_type: formData.user_type.toLowerCase(),
+          has_used_android: formData.has_used_android,
+          has_used_web: formData.has_used_web,
         },
       });
-      console.log(response, "response");
       setSnackbar({
         open: true,
         message:
@@ -1571,8 +1579,6 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
               birth_location: placeOfBirth,
             },
           });
-
-          console.log("Rashi-Nakshatra API Response:", response);
 
           const apiData = response?.data || {};
           const rashi = apiData.rashi || apiData.Rashi || "";
@@ -2362,6 +2368,34 @@ const NewUser: React.FC<{ mode: "new" | "edit" | "view" }> = ({ mode }) => {
                       </MenuItem>
                     </Select>
                   </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.has_used_android}
+                        onChange={(event) =>
+                          updateFormData("has_used_android", event.target.checked)
+                        }
+                        disabled={isViewMode}
+                      />
+                    }
+                    label="Has Used Android"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.has_used_web}
+                        onChange={(event) =>
+                          updateFormData("has_used_web", event.target.checked)
+                        }
+                        disabled={isViewMode}
+                      />
+                    }
+                    label="Has Used Web"
+                  />
                 </Grid>
 
                 {/* Submit Button - Centered and styled */}

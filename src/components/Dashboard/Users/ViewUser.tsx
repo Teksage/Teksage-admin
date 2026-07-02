@@ -83,6 +83,11 @@ interface UserData {
   date_of_birth: string;
   time_of_birth: string;
   preferred_location: string;
+  usage_channel: string;
+  signup_channel: string;
+  last_login_channel: string;
+  last_login_at: string | null;
+  referral_source: string | null;
 }
 
 interface SubscriptionData {
@@ -160,7 +165,6 @@ const UserView: React.FC<{ mode: "view" }> = () => {
       setUserData(res?.data || null);
       setSubscriptionData(res?.data?.subscription || null);
       setConsultationData(res?.data?.events || null);
-      console.log(res?.data, "TTF");
     } catch (err: any) {
       setUserData(null);
       setSubscriptionData(null);
@@ -513,6 +517,75 @@ const UserView: React.FC<{ mode: "view" }> = () => {
           style={{ fontFamily: "Urbanist", fontWeight: 800 }}
           sx={{ mb: 2 }}
         >
+          Platform & Attribution
+        </Typography>
+        {loading ? (
+          <Skeleton height={80} />
+        ) : (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={3}>
+              <InfoItem
+                label="Channel"
+                value={
+                  userData?.usage_channel
+                    ? userData.usage_channel.charAt(0).toUpperCase() +
+                      userData.usage_channel.slice(1)
+                    : "Unknown"
+                }
+                icon={<Language sx={{ color: "#90EE90", mr: 1 }} />}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <InfoItem
+                label="Signed Up Via"
+                value={userData?.signup_channel ?? "—"}
+                icon={<Public sx={{ color: "#90EE90", mr: 1 }} />}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <InfoItem
+                label="Last Login Via"
+                value={userData?.last_login_channel ?? "—"}
+                icon={<Done sx={{ color: "#90EE90", mr: 1 }} />}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <InfoItem
+                label="Last Login At"
+                value={
+                  userData?.last_login_at
+                    ? new Date(userData.last_login_at).toLocaleString("en-IN", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })
+                    : "—"
+                }
+                icon={<CalendarToday sx={{ color: "#90EE90", mr: 1 }} />}
+              />
+            </Grid>
+            {userData?.referral_source && (
+              <Grid item xs={12} md={6}>
+                <InfoItem
+                  label="Referral Source"
+                  value={userData.referral_source}
+                  icon={<Badge sx={{ color: "#90EE90", mr: 1 }} />}
+                />
+              </Grid>
+            )}
+          </Grid>
+        )}
+      </Paper>
+
+      <Paper elevation={3} sx={{ p: 3, mt: 4, borderRadius: 3 }}>
+        <Typography
+          variant="h6"
+          style={{ fontFamily: "Urbanist", fontWeight: 800 }}
+          sx={{ mb: 2 }}
+        >
           Subscription Details
         </Typography>
         {loading ? (
@@ -798,8 +871,6 @@ const ConsultationDetails = React.memo<{
   //     </Grid>
   //   );
   // });
-
-  console.log(consultationData, typeof consultationData, "consultationData");
 
   const ConsultationCard = React.memo<{
     consultation: ConsultationData;
