@@ -13,6 +13,7 @@ import { AskAssignAstrologerSection } from "./AskAssignAstrologerSection";
 import { AskAstrologerAnswerSection } from "./AskAstrologerAnswerSection";
 import { AskAstrologerClientSection } from "./AskAstrologerClientSection";
 import { AskAstrologerQaSection } from "./AskAstrologerQaSection";
+import { MuhurthaEventPlanSection } from "./MuhurthaEventPlanSection";
 import { AskWhatsAppStatusSection } from "./AskWhatsAppStatusSection";
 import {
   ASK_DETAIL_PAGE,
@@ -124,7 +125,9 @@ const ViewAskAstrologer: React.FC = () => {
       />
 
       <AskAstrologerClientSection data={data} />
-      <AskAstrologerQaSection data={data} />
+      {data.muhurtha_result
+        ? <MuhurthaEventPlanSection data={data} />
+        : <AskAstrologerQaSection data={data} />}
       <AskAstrologerAnswerSection data={data} />
 
       <AskAssignAstrologerSection
