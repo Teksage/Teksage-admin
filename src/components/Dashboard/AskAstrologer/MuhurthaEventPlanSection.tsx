@@ -2,7 +2,9 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Chip,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -13,7 +15,11 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DashboardSectionPaper } from "../../Elements/DashboardSectionPaper";
 import { ASK_DETAIL_PAGE } from "./askAstrologerUi";
-import type { AskAstrologerItem, MuhurthaDayResult } from "../../../api/askAstrologerAdmin";
+import type {
+  AskAstrologerItem,
+  MuhurthaDayResult,
+  MuhurthaDaySegment,
+} from "../../../api/askAstrologerAdmin";
 
 function formatRange(start: string, end: string) {
   const s = new Date(`${start}T12:00:00`);
@@ -23,12 +29,98 @@ function formatRange(start: string, end: string) {
   return `${fmt(s)} – ${fmt(e)}`;
 }
 
-function dayWindows(day: MuhurthaDayResult): string {
-  if (day.windows && day.windows.length > 0) {
-    return day.windows.map((w) => w.replace(/\bTo\b/g, "–")).join(", ");
+function formatWindows(windows?: string[], window?: string): string {
+  if (windows && windows.length > 0) {
+    return windows.map((w) => w.replace(/\bTo\b/g, "–")).join(", ");
   }
-  if (day.window) return day.window.replace(/\bTo\b/g, "–");
+  if (window) return window.replace(/\bTo\b/g, "–");
   return "—";
+}
+
+function periodLabel(period: string): string {
+  if (period === "Morning") return ASK_DETAIL_PAGE.labelEventPlanMorning;
+  if (period === "Evening") return ASK_DETAIL_PAGE.labelEventPlanEvening;
+  if (period === "Full day") return ASK_DETAIL_PAGE.labelEventPlanFullDay;
+  return period;
+}
+
+function segmentDetails(segment: MuhurthaDaySegment): string {
+  if (segment.is_suitable) {
+    return formatWindows(segment.windows, segment.window);
+  }
+  const codes = segment.reason_codes ?? (segment.reason_code ? [segment.reason_code] : []);
+  return codes.join(", ") || "—";
+}
+
+function StatusChips({ day }: { day: MuhurthaDayResult }) {
+  const segments = day.segments && day.segments.length > 1 ? day.segments : null;
+  if (segments) {
+    return (
+      <Stack spacing={0.75} alignItems="flex-start">
+        {segments.map((segment) => (
+          <Box key={`${day.iso_date}-${segment.period}`}>
+            <Typography variant="caption" color="text.secondary" display="block">
+              {periodLabel(segment.period)}
+            </Typography>
+            <Chip
+              label={
+                segment.is_suitable
+                  ? `${ASK_DETAIL_PAGE.labelEventPlanSuitable}${segment.rating ? ` – ${segment.rating}` : ""}`
+                  : ASK_DETAIL_PAGE.labelEventPlanNotSuitable
+              }
+              color={segment.is_suitable ? "success" : "error"}
+              size="small"
+              variant="outlined"
+            />
+          </Box>
+        ))}
+      </Stack>
+    );
+  }
+
+  return day.is_suitable ? (
+    <Chip
+      label={`${ASK_DETAIL_PAGE.labelEventPlanSuitable}${day.rating ? ` – ${day.rating}` : ""}`}
+      color="success"
+      size="small"
+      variant="outlined"
+    />
+  ) : (
+    <Chip
+      label={ASK_DETAIL_PAGE.labelEventPlanNotSuitable}
+      color="error"
+      size="small"
+      variant="outlined"
+    />
+  );
+}
+
+function DetailsCell({ day }: { day: MuhurthaDayResult }) {
+  const segments = day.segments && day.segments.length > 1 ? day.segments : null;
+  if (segments) {
+    return (
+      <Stack spacing={0.75} alignItems="flex-start">
+        {segments.map((segment) => (
+          <Box key={`${day.iso_date}-${segment.period}-details`}>
+            <Typography variant="caption" color="text.secondary" display="block">
+              {periodLabel(segment.period)}
+            </Typography>
+            <Typography variant="body2" sx={{ fontFamily: "Urbanist", fontSize: "0.8rem" }}>
+              {segmentDetails(segment)}
+            </Typography>
+          </Box>
+        ))}
+      </Stack>
+    );
+  }
+
+  return (
+    <>
+      {day.is_suitable
+        ? formatWindows(day.windows, day.window)
+        : (day.reason_codes ?? (day.reason_code ? [day.reason_code] : [])).join(", ") || "—"}
+    </>
+  );
 }
 
 export function MuhurthaEventPlanSection({ data }: { data: AskAstrologerItem }) {
@@ -57,7 +149,8 @@ export function MuhurthaEventPlanSection({ data }: { data: AskAstrologerItem }) 
       <Accordion disableGutters elevation={0} sx={{ border: "1px solid", borderColor: "divider" }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="body2" sx={{ fontFamily: "Urbanist", fontWeight: 600 }}>
-            {ASK_DETAIL_PAGE.labelEventPlanDate} / {ASK_DETAIL_PAGE.labelEventPlanStatus} / {ASK_DETAIL_PAGE.labelEventPlanDetails}
+            {ASK_DETAIL_PAGE.labelEventPlanDate} / {ASK_DETAIL_PAGE.labelEventPlanStatus} /{" "}
+            {ASK_DETAIL_PAGE.labelEventPlanDetails}
           </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ p: 0 }}>
@@ -89,24 +182,10 @@ export function MuhurthaEventPlanSection({ data }: { data: AskAstrologerItem }) 
                     ) : null}
                   </TableCell>
                   <TableCell>
-                    {day.is_suitable ? (
-                      <Chip
-                        label={`${ASK_DETAIL_PAGE.labelEventPlanSuitable}${day.rating ? ` – ${day.rating}` : ""}`}
-                        color="success"
-                        size="small"
-                        variant="outlined"
-                      />
-                    ) : (
-                      <Chip
-                        label={ASK_DETAIL_PAGE.labelEventPlanNotSuitable}
-                        color="error"
-                        size="small"
-                        variant="outlined"
-                      />
-                    )}
+                    <StatusChips day={day} />
                   </TableCell>
                   <TableCell sx={{ fontFamily: "Urbanist", fontSize: "0.8rem" }}>
-                    {day.is_suitable ? dayWindows(day) : (day.reason_codes ?? (day.reason_code ? [day.reason_code] : [])).join(", ") || "—"}
+                    <DetailsCell day={day} />
                   </TableCell>
                 </TableRow>
               ))}

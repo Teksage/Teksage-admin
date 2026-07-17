@@ -1,6 +1,19 @@
 import { callAPI } from "./crudFactory";
 
 /** Mirrors MuhurthaDayResult from the website types. */
+export type MuhurthaDaySegment = {
+  period: string;
+  nakshatra?: string;
+  thara_bala?: number;
+  chandra_bala?: number;
+  is_suitable: boolean;
+  reason_code?: string | null;
+  reason_codes?: string[];
+  rating?: string;
+  window?: string;
+  windows?: string[];
+};
+
 export type MuhurthaDayResult = {
   date: string;
   iso_date: string;
@@ -11,6 +24,7 @@ export type MuhurthaDayResult = {
   window?: string;
   windows?: string[];
   weekday?: string;
+  segments?: MuhurthaDaySegment[];
 };
 
 /** Mirrors MuhurthaResult from the website types. */
