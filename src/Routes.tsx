@@ -22,6 +22,9 @@ const NewCoupon = React.lazy(() => import("./components/Dashboard/Coupons/AddCou
 const NewSubscription = React.lazy(() => import("./components/Dashboard/Subscription/AddSubscription"));
 const ConsultationView = React.lazy(() => import("./components/Dashboard/Consultations/ViewConsultations"));
 const Analytics = React.lazy(() => import("./components/Dashboard/Analytics/Analytics"));
+const SmsFraudDashboard = React.lazy(
+  () => import("./components/Dashboard/SmsFraud/SmsFraudDashboard")
+);
 const SendNotification = React.lazy(() => import("./components/Dashboard/Notifications/SendNotification"));
 const NotificationsLog = React.lazy(() => import("./components/Dashboard/Notifications/NotificationsLog"));
 const SendWhatsApp = React.lazy(() => import("./components/Dashboard/WhatsApp/SendWhatsApp"));
@@ -117,6 +120,10 @@ export const router = createBrowserRouter([
           {
             path: "analytics",
             element: <Analytics />,
+          },
+          {
+            path: "sms-fraud",
+            element: <SmsFraudDashboard />,
           },
           {
             path: "notifications",
