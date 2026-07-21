@@ -8,6 +8,8 @@ import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import LanguageIcon from "@mui/icons-material/Language";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import EventIcon from "@mui/icons-material/Event";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
 import {
   InfoItem,
   capitalizeCommaSeparated,
@@ -17,18 +19,43 @@ import { formatDateTimeDMY } from "../../../utils/formatDateTime";
 import { ASK_DETAIL_PAGE } from "./askAstrologerUi";
 import type { AskAstrologerItem } from "../../../api/askAstrologerAdmin";
 
+function formatMobile(
+  countryCode?: string | null,
+  mobile?: string | null
+): string | undefined {
+  const digits = (mobile ?? "").trim();
+  if (!digits) return undefined;
+  const cc = (countryCode ?? "").replace(/\D/g, "");
+  return cc ? `+${cc} ${digits}` : digits;
+}
+
 export function AskAstrologerClientSection({ data }: { data: AskAstrologerItem }) {
   const languages = (data.preferred_languages ?? []).join(", ");
   const fee =
     data.currency && data.base_price != null
       ? `${data.currency} ${data.base_price}`
       : undefined;
+  const mobile = formatMobile(data.customer_country_code, data.customer_mobile);
 
   return (
     <DashboardSectionPaper title={ASK_DETAIL_PAGE.sectionClient}>
       <Grid container spacing={1}>
         <Grid item xs={12} md={6}>
           <InfoItem label="Name" value={data.customer_name} icon={<PersonIcon fontSize="small" />} />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <InfoItem
+            label="Email"
+            value={data.customer_email}
+            icon={<EmailIcon fontSize="small" />}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <InfoItem
+            label="Mobile"
+            value={mobile}
+            icon={<PhoneIcon fontSize="small" />}
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <InfoItem
