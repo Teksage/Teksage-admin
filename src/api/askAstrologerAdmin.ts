@@ -4,6 +4,9 @@ export type AskAstrologerItem = {
   id: number;
   status: string;
   customer_name: string | null;
+  customer_email?: string | null;
+  customer_mobile?: string | null;
+  customer_country_code?: string | null;
   date_of_birth: string | null;
   time_of_birth: string | null;
   place_of_birth: string | null;
