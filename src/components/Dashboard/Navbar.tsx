@@ -177,6 +177,7 @@ const menuItems = [
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
+  { name: "SMS Fraud", path: "/dashboard/sms-fraud", icon: <BarChartIcon /> },
 ];
 
 // const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
