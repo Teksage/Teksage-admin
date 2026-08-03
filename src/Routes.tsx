@@ -22,12 +22,16 @@ const NewCoupon = React.lazy(() => import("./components/Dashboard/Coupons/AddCou
 const NewSubscription = React.lazy(() => import("./components/Dashboard/Subscription/AddSubscription"));
 const ConsultationView = React.lazy(() => import("./components/Dashboard/Consultations/ViewConsultations"));
 const Analytics = React.lazy(() => import("./components/Dashboard/Analytics/Analytics"));
+const SmsFraudDashboard = React.lazy(
+  () => import("./components/Dashboard/SmsFraud/SmsFraudDashboard")
+);
 const SendNotification = React.lazy(() => import("./components/Dashboard/Notifications/SendNotification"));
 const NotificationsLog = React.lazy(() => import("./components/Dashboard/Notifications/NotificationsLog"));
 const SendWhatsApp = React.lazy(() => import("./components/Dashboard/WhatsApp/SendWhatsApp"));
 const WhatsAppBroadcastLog = React.lazy(
   () => import("./components/Dashboard/WhatsApp/WhatsAppBroadcastLog")
 );
+const WhatsAppInbox = React.lazy(() => import("./components/Dashboard/WhatsApp/WhatsAppInbox"));
 const AskAstrologerList = React.lazy(
   () => import("./components/Dashboard/AskAstrologer/AskAstrologerList")
 );
@@ -119,6 +123,10 @@ export const router = createBrowserRouter([
             element: <Analytics />,
           },
           {
+            path: "sms-fraud",
+            element: <SmsFraudDashboard />,
+          },
+          {
             path: "notifications",
             children: [
               { path: "send", element: <SendNotification /> },
@@ -129,9 +137,10 @@ export const router = createBrowserRouter([
           {
             path: "whatsapp",
             children: [
+              { path: "inbox", element: <WhatsAppInbox /> },
               { path: "send", element: <SendWhatsApp /> },
               { path: "log", element: <WhatsAppBroadcastLog /> },
-              { index: true, element: <Navigate to="send" replace /> },
+              { index: true, element: <Navigate to="inbox" replace /> },
             ],
           },
           {

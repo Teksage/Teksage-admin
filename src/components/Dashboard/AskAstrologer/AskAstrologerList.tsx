@@ -23,7 +23,7 @@ import { fetchAskRequests, type AskAstrologerItem } from "../../../api/askAstrol
 import { formatDateTimeDMY } from "../../../utils/formatDateTime";
 import { ASK_STATUS_COLOR, formatAskStatus } from "./askAstrologerUi";
 
-const STATUS_OPTIONS = ["", "paid", "assigned", "answered", "cancelled"];
+const STATUS_OPTIONS = ["", "pending_payment", "paid", "assigned", "answered", "cancelled"];
 
 const AskAstrologerList: React.FC = () => {
   const navigate = useNavigate();
@@ -88,6 +88,7 @@ const AskAstrologerList: React.FC = () => {
                 <TableRow>
                   <TableCell>ID</TableCell>
                   <TableCell>Customer</TableCell>
+                  <TableCell>Email</TableCell>
                   <TableCell>Languages</TableCell>
                   <TableCell>Question</TableCell>
                   <TableCell>Status</TableCell>
@@ -100,6 +101,11 @@ const AskAstrologerList: React.FC = () => {
                   <TableRow key={r.id} hover>
                     <TableCell>{r.id}</TableCell>
                     <TableCell>{r.customer_name ?? "—"}</TableCell>
+                    <TableCell sx={{ maxWidth: 200 }}>
+                      <Typography variant="body2" noWrap>
+                        {r.customer_email ?? "—"}
+                      </Typography>
+                    </TableCell>
                     <TableCell>{(r.preferred_languages ?? []).join(", ") || "—"}</TableCell>
                     <TableCell sx={{ maxWidth: 240 }}>
                       <Typography variant="body2" noWrap>{r.user_question}</Typography>
@@ -127,7 +133,7 @@ const AskAstrologerList: React.FC = () => {
                 ))}
                 {rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 4, color: "text.secondary" }}>
+                    <TableCell colSpan={8} align="center" sx={{ py: 4, color: "text.secondary" }}>
                       No requests found
                     </TableCell>
                   </TableRow>

@@ -177,6 +177,7 @@ const menuItems = [
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
+  { name: "SMS Fraud", path: "/dashboard/sms-fraud", icon: <BarChartIcon /> },
 ];
 
 // const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
@@ -489,7 +490,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
         setWhatsappExpanded((prev) => !prev);
         setNotificationsExpanded(false);
         if (!whatsappExpanded && open) {
-          navigate("/dashboard/whatsapp/send");
+          navigate("/dashboard/whatsapp/inbox");
         }
       },
       [whatsappExpanded, open, navigate]
@@ -691,7 +692,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
 
           <NavItem
             onClick={
-              open ? handleWhatsappClick : () => navigate("/dashboard/whatsapp/send")
+              open ? handleWhatsappClick : () => navigate("/dashboard/whatsapp/inbox")
             }
             selected={isActive("/dashboard/whatsapp")}
             open={open}
@@ -730,6 +731,26 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             unmountOnExit
           >
             <List component="div" disablePadding>
+              <NavItem
+                sx={{ pl: open ? 4 : 2, ml: 1, mr: 1, borderRadius: theme.shape.borderRadius }}
+                onClick={() => handleMenuItemClick("/dashboard/whatsapp/inbox")}
+                selected={locationPathname === "/dashboard/whatsapp/inbox"}
+                open={open}
+              >
+                <ListItemIcon sx={{ color: "inherit" }}>
+                  <ChatBubbleOutlineIcon fontSize="small" />
+                </ListItemIcon>
+                {(open || isMobile) && (
+                  <ListItemText
+                    primary="WhatsApp Inbox"
+                    primaryTypographyProps={{
+                      variant: "body2",
+                      fontFamily: "Urbanist",
+                      fontWeight: 600,
+                    }}
+                  />
+                )}
+              </NavItem>
               <NavItem
                 sx={{ pl: open ? 4 : 2, ml: 1, mr: 1, borderRadius: theme.shape.borderRadius }}
                 onClick={() => handleMenuItemClick("/dashboard/whatsapp/send")}

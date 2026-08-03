@@ -1,9 +1,50 @@
 import { callAPI } from "./crudFactory";
 
+/** Mirrors MuhurthaDayResult from the website types. */
+export type MuhurthaDaySegment = {
+  period: string;
+  nakshatra?: string;
+  thara_bala?: number;
+  chandra_bala?: number;
+  is_suitable: boolean;
+  reason_code?: string | null;
+  reason_codes?: string[];
+  rating?: string;
+  window?: string;
+  windows?: string[];
+};
+
+export type MuhurthaDayResult = {
+  date: string;
+  iso_date: string;
+  is_suitable: boolean;
+  reason_code?: string | null;
+  reason_codes?: string[];
+  rating?: string;
+  window?: string;
+  windows?: string[];
+  weekday?: string;
+  segments?: MuhurthaDaySegment[];
+};
+
+/** Mirrors MuhurthaResult from the website types. */
+export type MuhurthaResult = {
+  event: string;
+  start_date: string;
+  end_date: string;
+  location: string;
+  days: MuhurthaDayResult[];
+  dates?: MuhurthaDayResult[];
+  summary_text?: string;
+};
+
 export type AskAstrologerItem = {
   id: number;
   status: string;
   customer_name: string | null;
+  customer_email?: string | null;
+  customer_mobile?: string | null;
+  customer_country_code?: string | null;
   date_of_birth: string | null;
   time_of_birth: string | null;
   place_of_birth: string | null;
@@ -12,6 +53,7 @@ export type AskAstrologerItem = {
   preferred_languages: string[] | null;
   user_question: string;
   ai_response: string;
+  muhurtha_result?: MuhurthaResult | null;
   answer_text: string | null;
   answer_voice_url: string | null;
   answer_voice_duration_sec?: number | null;

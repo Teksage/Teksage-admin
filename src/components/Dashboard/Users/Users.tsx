@@ -14,6 +14,10 @@ interface UserData {
   plan_type: string;
   user_type: string;
   created_at: string;
+  usage_channel: string;
+  signup_channel: string;
+  last_login_channel: string;
+  last_login_at: string | null;
 }
 
 const Users: React.FC = () => {
@@ -42,12 +46,12 @@ const Users: React.FC = () => {
         ([_, v]) => v.trim() !== ""
       );
       filterEntries.forEach(([field, value]) => {
-        console.log(field, value, "12345")
-        // Ensure status is sent in lowercase to match backend expectations
         if (field === "status") {
           params[field] = value.toLowerCase();
         } else if (field === "incomplete_user") {
           params[field] = value === "Incomplete users" ? "true" : "false";
+        } else if (field === "usage_channel") {
+          params[field] = value.toLowerCase();
         } else {
           params[field] = value.trim();
         }
@@ -134,6 +138,29 @@ const Users: React.FC = () => {
       filterOptions: ["Free", "Premium"],
     },
     {
+      id: "usage_channel",
+      label: "Channel",
+      filterable: true,
+      filterOptions: ["Android", "Web", "Both"],
+      render: (value: string) => {
+        const label = value
+          ? value.charAt(0).toUpperCase() + value.slice(1)
+          : "Unknown";
+        const colorMap: Record<string, "default" | "primary" | "secondary" | "success" | "warning"> = {
+          Android: "success",
+          Web: "primary",
+          Both: "warning",
+        };
+        return (
+          <Chip
+            label={label}
+            color={colorMap[label] ?? "default"}
+            size="small"
+          />
+        );
+      },
+    },
+    {
       id: "status",
       label: "Status",
       filterable: true,
@@ -204,7 +231,6 @@ const Users: React.FC = () => {
   };
 
   const handleRowsPerPageChange = (newRowsPerPage: number) => {
-    console.log(newRowsPerPage, "newRowsPerPage 123")
     setRowsPerPage(newRowsPerPage);
     setPage(0);
   };

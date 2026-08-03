@@ -85,3 +85,62 @@ export async function fetchWhatsAppBroadcastLogs(page = 1) {
     total: number;
   };
 }
+
+export type WhatsAppInboxConversation = {
+  phone_number: string;
+  user_id?: number | null;
+  name?: string | null;
+  email?: string | null;
+  last_message: string;
+  last_direction: string;
+  last_at?: string | null;
+  last_inbound_at?: string | null;
+  session_active: boolean;
+};
+
+export type WhatsAppInboxMessage = {
+  id: number;
+  phone_number: string;
+  user_id?: number | null;
+  direction: string;
+  body: string;
+  created_at?: string | null;
+};
+
+export async function fetchWhatsAppInbox(search?: string) {
+  const res = await callAPI({
+    endpoint: "api/admin/whatsapp/inbox",
+    method: "get",
+    params: { page: 1, page_size: 50, search: search || undefined },
+  });
+  return res.data as { data: WhatsAppInboxConversation[]; total: number };
+}
+
+export async function fetchWhatsAppThread(phone: string) {
+  const res = await callAPI({
+    endpoint: `api/admin/whatsapp/inbox/${encodeURIComponent(phone)}`,
+    method: "get",
+  });
+  return res.data as {
+    phone_number: string;
+    user_id?: number | null;
+    name?: string | null;
+    email?: string | null;
+    session_active: boolean;
+    last_inbound_at?: string | null;
+    messages: WhatsAppInboxMessage[];
+  };
+}
+
+export async function replyWhatsAppInbox(phone: string, text: string) {
+  const res = await callAPI({
+    endpoint: `api/admin/whatsapp/inbox/${encodeURIComponent(phone)}/reply`,
+    method: "post",
+    data: { text },
+  });
+  return res.data as {
+    ok: boolean;
+    message_id?: string | null;
+    message: WhatsAppInboxMessage;
+  };
+}
