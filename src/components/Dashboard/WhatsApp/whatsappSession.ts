@@ -9,15 +9,23 @@ export type SessionStatus = {
   urgency: "ok" | "soon" | "inactive";
 };
 
+/** Parse API timestamps as UTC (naive values are treated as UTC). */
+export function parseUtcMs(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const raw = value.trim();
+  if (!raw) return null;
+  const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw);
+  const normalized = hasZone ? raw : `${raw}Z`;
+  const ms = Date.parse(normalized);
+  return Number.isNaN(ms) ? null : ms;
+}
+
 export function getSessionStatus(
   lastInboundAt: string | null | undefined,
   nowMs = Date.now()
 ): SessionStatus {
-  if (!lastInboundAt) {
-    return { active: false, msLeft: 0, label: "inactive", urgency: "inactive" };
-  }
-  const start = Date.parse(lastInboundAt);
-  if (Number.isNaN(start)) {
+  const start = parseUtcMs(lastInboundAt);
+  if (start == null) {
     return { active: false, msLeft: 0, label: "inactive", urgency: "inactive" };
   }
   const msLeft = start + SESSION_MS - nowMs;
