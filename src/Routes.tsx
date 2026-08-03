@@ -31,6 +31,7 @@ const SendWhatsApp = React.lazy(() => import("./components/Dashboard/WhatsApp/Se
 const WhatsAppBroadcastLog = React.lazy(
   () => import("./components/Dashboard/WhatsApp/WhatsAppBroadcastLog")
 );
+const WhatsAppInbox = React.lazy(() => import("./components/Dashboard/WhatsApp/WhatsAppInbox"));
 const AskAstrologerList = React.lazy(
   () => import("./components/Dashboard/AskAstrologer/AskAstrologerList")
 );
@@ -136,9 +137,10 @@ export const router = createBrowserRouter([
           {
             path: "whatsapp",
             children: [
+              { path: "inbox", element: <WhatsAppInbox /> },
               { path: "send", element: <SendWhatsApp /> },
               { path: "log", element: <WhatsAppBroadcastLog /> },
-              { index: true, element: <Navigate to="send" replace /> },
+              { index: true, element: <Navigate to="inbox" replace /> },
             ],
           },
           {
