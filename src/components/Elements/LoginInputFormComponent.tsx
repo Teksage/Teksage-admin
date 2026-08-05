@@ -62,8 +62,9 @@ const Particle = styled(Box)(() => ({
 // Interface for props
 interface LoginInputFormProps {
   formState: {
-    loginMethod: "email" | "mobile";
+    loginMethod: "email" | "mobile" | "partner";
     email: string;
+    password?: string;
     mobile_number: string;
     country_code: string;
     loading: boolean;
@@ -72,7 +73,7 @@ interface LoginInputFormProps {
   dispatchState: React.Dispatch<Action>;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSendOtp: (e: React.FormEvent) => void;
-  handleSwitchMethod: (newMethod: "email" | "mobile") => void;
+  handleSwitchMethod: (newMethod: "email" | "mobile" | "partner") => void;
   countriesList: Array<{
     dial_code: string;
     name: string;
@@ -80,33 +81,37 @@ interface LoginInputFormProps {
   }>;
 }
 
-const GlassBoxComponent = React.memo<{ loginMethod: "email" | "mobile" }>(
-  ({ loginMethod }) => (
-    <GlassBox>
-      <Typography
-        variant="h6"
-        sx={{
-          position: "relative",
-          textAlign: "center",
-          fontFamily: "'Poppins', sans-serif",
-          background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
-          backgroundClip: "text",
-          WebkitBackgroundClip: "text",
-          color: "transparent",
-          letterSpacing: "0.5px",
-          zIndex: 1,
-        }}
-        style={{ fontFamily: "Urbanist", fontWeight: 600 }}
-      >
-        Sign in using your {loginMethod === "email" ? "Email" : "Mobile Number"}
-      </Typography>
-      <Particle sx={{ top: "10%", left: "10%", animationDelay: "0s" }} />
-      <Particle sx={{ top: "20%", right: "15%", animationDelay: "1s" }} />
-      <Particle sx={{ bottom: "15%", left: "20%", animationDelay: "2s" }} />
-      <Particle sx={{ bottom: "10%", right: "10%", animationDelay: "3s" }} />
-    </GlassBox>
-  )
-);
+const GlassBoxComponent = React.memo<{
+  loginMethod: "email" | "mobile" | "partner";
+}>(({ loginMethod }) => (
+  <GlassBox>
+    <Typography
+      variant="h6"
+      sx={{
+        position: "relative",
+        textAlign: "center",
+        fontFamily: "'Poppins', sans-serif",
+        background: "linear-gradient(45deg, #1b4d3e, #4caf50)",
+        backgroundClip: "text",
+        WebkitBackgroundClip: "text",
+        color: "transparent",
+        letterSpacing: "0.5px",
+        zIndex: 1,
+      }}
+      style={{ fontFamily: "Urbanist", fontWeight: 600 }}
+    >
+      {loginMethod === "partner"
+        ? "Partner sign in with email & password"
+        : `Sign in using your ${
+            loginMethod === "email" ? "Email" : "Mobile Number"
+          }`}
+    </Typography>
+    <Particle sx={{ top: "10%", left: "10%", animationDelay: "0s" }} />
+    <Particle sx={{ top: "20%", right: "15%", animationDelay: "1s" }} />
+    <Particle sx={{ bottom: "15%", left: "20%", animationDelay: "2s" }} />
+    <Particle sx={{ bottom: "10%", right: "10%", animationDelay: "3s" }} />
+  </GlassBox>
+));
 
 export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
   ({
@@ -118,7 +123,7 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
     countriesList,
   }) => {
     const handleLoginMethodChange = useCallback(
-      (newMethod: "email" | "mobile") => {
+      (newMethod: "email" | "mobile" | "partner") => {
         handleSwitchMethod(newMethod);
       },
       [handleSwitchMethod]
@@ -140,7 +145,9 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
           loginMethod={formState.loginMethod}
           handleLoginMethodChange={handleLoginMethodChange}
         />
-        {formState.loginMethod === "email" ? (
+        {formState.loginMethod === "email" ||
+        formState.loginMethod === "partner" ? (
+          <>
           <TextField
             margin="normal"
             required
@@ -151,8 +158,10 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             autoFocus
             value={formState.email}
             onChange={handleInputChange}
-            error={!!formState.error}
-            helperText={formState.error}
+            error={!!formState.error && formState.loginMethod === "email"}
+            helperText={
+              formState.loginMethod === "email" ? formState.error : undefined
+            }
             InputLabelProps={{
               sx: {
                 fontSize: "0.95rem",
@@ -188,6 +197,56 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
               },
             }}
           />
+          {formState.loginMethod === "partner" ? (
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={formState.password || ""}
+              onChange={handleInputChange}
+              error={!!formState.error}
+              helperText={formState.error}
+              InputLabelProps={{
+                sx: {
+                  fontSize: "0.95rem",
+                  fontWeight: 500,
+                  color: "#4caf50",
+                  fontFamily: "Urbanist",
+                },
+              }}
+              InputProps={{
+                sx: {
+                  fontSize: "0.9rem",
+                  borderRadius: "6px",
+                  fontFamily: "Urbanist",
+                  height: "56px",
+                  padding: "0 12px",
+                  boxSizing: "border-box",
+                },
+              }}
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Urbanist",
+                  fontSize: "0.95rem",
+                },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover fieldset": {
+                    borderColor: alpha("#4caf50", 0.5),
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#4caf50",
+                    boxShadow: `0 0 8px ${alpha("#4caf50", 0.3)}`,
+                  },
+                },
+              }}
+            />
+          ) : null}
+          </>
         ) : (
           // <Box
           //   sx={{
@@ -571,13 +630,17 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
           }}
           disabled={
             formState.loading ||
-            (formState.loginMethod === "email"
-              ? !formState.email
-              : !formState.mobile_number || !formState.country_code)
+            (formState.loginMethod === "partner"
+              ? !formState.email || !formState.password
+              : formState.loginMethod === "email"
+                ? !formState.email
+                : !formState.mobile_number || !formState.country_code)
           }
         >
           {formState.loading ? (
             <CircularProgress size={24} color="inherit" />
+          ) : formState.loginMethod === "partner" ? (
+            "Sign in"
           ) : (
             "Send OTP"
           )}

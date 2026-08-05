@@ -224,7 +224,7 @@ const suggestionCache = new Map<string, { data: any; timestamp: number }>();
 const filterCache = new Map<string, { data: string[]; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-type Method = "get" | "post" | "put" | "delete";
+type Method = "get" | "post" | "put" | "patch" | "delete";
 
 interface RequestOptions {
   endpoint: string;
@@ -242,27 +242,33 @@ export const callAPI = async ({
   headers = {},
 }: RequestOptions) => {
   try {
-    const config = {
-      params,
-      headers: {
-        "Content-Type": "application/json",
-        ...headers,
-      },
-    };
-
+    const isBodyMethod = method === "post" || method === "put" || method === "patch";
     const response = await axiosInstance.request({
       url: endpoint,
       method,
-      data,
-      ...config,
+      ...(isBodyMethod ? { data } : {}),
+      params,
+      headers: {
+        ...(isBodyMethod ? { "Content-Type": "application/json" } : {}),
+        ...headers,
+      },
     });
 
     return response;
   } catch (error: any) {
     console.error(`API ${method.toUpperCase()} ${endpoint} failed:`, error);
+    const detail = error.response?.data?.detail;
+    const detailMsg =
+      typeof detail === "string"
+        ? detail
+        : Array.isArray(detail)
+          ? detail.map((d: { msg?: string }) => d?.msg).filter(Boolean).join(", ")
+          : null;
     const errorMessage =
-      error.response?.data?.detail ||
-      error.message ||
+      detailMsg ||
+      (error.message === "Network Error"
+        ? "Network Error — check backend is running on localhost:8000 and CORS allows this request."
+        : error.message) ||
       "Something went wrong. Please try again.";
     throw new Error(errorMessage);
   }
