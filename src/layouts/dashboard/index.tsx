@@ -431,6 +431,7 @@ const DashboardLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const [user, setUser] = useState<string | null>(null);
+  const isPartner = tokenService.isPartner();
 
   useEffect(() => {
     const userName = tokenService.getUser();
@@ -442,6 +443,14 @@ const DashboardLayout = () => {
       setSidebarOpen(false);
     }
   }, [location, isMobile]);
+
+  useEffect(() => {
+    if (!isPartner) return;
+    const path = location.pathname || "";
+    if (!path.startsWith("/dashboard/partner-dashboard")) {
+      navigate("/dashboard/partner-dashboard", { replace: true });
+    }
+  }, [isPartner, location.pathname, navigate]);
 
   const handleMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -593,7 +602,7 @@ const DashboardLayout = () => {
                       mt: 0.5,
                     }}
                   >
-                    {"Administrator"}
+                    {isPartner ? "Partner" : "Administrator"}
                   </Typography>
                 </Paper>
                 <MenuItem

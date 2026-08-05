@@ -31,6 +31,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SendIcon from "@mui/icons-material/Send";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import { tokenService } from "../../utils/tokenService";
 
 const DRAWER_WIDTH = 240;
 const DRAWER_COLLAPSED_WIDTH = 72;
@@ -50,6 +52,14 @@ const GradientDrawer = styled(Drawer, {
     width: open ? DRAWER_WIDTH : DRAWER_COLLAPSED_WIDTH,
     boxSizing: "border-box",
     overflowX: "hidden",
+    overflowY: "auto",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
+      width: 0,
+      height: 0,
+    },
     position: "fixed",
     top: 0,
     bottom: 0,
@@ -160,7 +170,7 @@ const NavItem = styled(ListItemButton, {
   ),
 }));
 
-const menuItems = [
+const adminMenuItems = [
   { name: "Users", path: "/dashboard/users", icon: <PeopleIcon /> },
   { name: "Astrologers", path: "/dashboard/astrologers", icon: <StarsIcon /> },
   {
@@ -174,10 +184,19 @@ const menuItems = [
     icon: <BarChartIcon />,
   },
   { name: "Coupons", path: "/dashboard/coupons", icon: <LocalOfferIcon /> },
+  { name: "Partners", path: "/dashboard/partners", icon: <PeopleIcon /> },
   { name: "Services", path: "/dashboard/services", icon: <ShoppingCartIcon /> },
   { name: "FAQs", path: "/dashboard/faqs", icon: <HelpIcon /> },
   { name: "Analytics", path: "/dashboard/analytics", icon: <LayersIcon /> },
   { name: "SMS Fraud", path: "/dashboard/sms-fraud", icon: <BarChartIcon /> },
+];
+
+const partnerMenuItems = [
+  {
+    name: "My Dashboard",
+    path: "/dashboard/partner-dashboard",
+    icon: <DashboardIcon />,
+  },
 ];
 
 // const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
@@ -471,6 +490,11 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const location = useLocation();
     const locationPathname = location?.pathname;
+    const isPartner = tokenService.isPartner();
+    const menuItems = isPartner ? partnerMenuItems : adminMenuItems;
+    const homePath = isPartner
+      ? "/dashboard/partner-dashboard"
+      : "/dashboard/users";
 
     const handleNotificationsClick = useCallback(
       (e: React.MouseEvent) => {
@@ -542,7 +566,10 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
               alt="Logo"
               style={{ borderRadius: "8px" }}
               loading="lazy"
-              onClick={()=> { navigate("/dashboard/users",{replace: true}); setNotificationsExpanded(false)}}
+              onClick={() => {
+                navigate(homePath, { replace: true });
+                setNotificationsExpanded(false);
+              }}
             />
           </Box>
         </LogoContainer>
@@ -583,6 +610,8 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             </NavItem>
           ))}
 
+          {!isPartner ? (
+          <>
           <NavItem
             onClick={
               open
@@ -815,6 +844,8 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
               />
             )}
           </NavItem>
+          </>
+          ) : null}
 
         </List>
       </>
@@ -856,6 +887,14 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
                   "linear-gradient(180deg, rgba(16, 177, 0, 0.5) -202.06%, rgba(255, 255, 255, 0.5) 100%)",
                 backdropFilter: "blur(10px)",
                 width: DRAWER_WIDTH,
+                overflowY: "auto",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                  width: 0,
+                  height: 0,
+                },
               },
             }}
           >
