@@ -73,8 +73,9 @@ export function UsageStatusChip({
 }) {
   const key = (status || "na").toLowerCase();
   const tone = STATUS_SX[key] || STATUS_SX.na;
-  const paid = showAmount ? formatPaidAmount(amount) : null;
-  const discount = showAmount ? formatPaidAmount(discountAmount) : null;
+  const isUsed = key === "consumed";
+  const paid = showAmount && isUsed ? formatPaidAmount(amount) : null;
+  const discount = showAmount && isUsed ? formatPaidAmount(discountAmount) : null;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "flex-start" }}>

@@ -99,10 +99,22 @@ export default function PartnerCustomersPanel({
       u.yearly_status === "active"
   ).length;
   const consultDiscountTotal = showAmounts
-    ? users.reduce((sum, u) => sum + (Number(u.consult_discount_amount) || 0), 0)
+    ? users.reduce(
+        (sum, u) =>
+          u.consult_status === "consumed"
+            ? sum + (Number(u.consult_discount_amount) || 0)
+            : sum,
+        0
+      )
     : 0;
   const yearlyDiscountTotal = showAmounts
-    ? users.reduce((sum, u) => sum + (Number(u.yearly_discount_amount) || 0), 0)
+    ? users.reduce(
+        (sum, u) =>
+          u.yearly_status === "consumed"
+            ? sum + (Number(u.yearly_discount_amount) || 0)
+            : sum,
+        0
+      )
     : 0;
 
   return (
