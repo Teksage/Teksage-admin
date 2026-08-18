@@ -603,11 +603,16 @@ const UserView: React.FC<{ mode: "view" }> = () => {
             <Grid item xs={12} md={4}>
               <InfoItem
                 label="Subscribed On"
-                value={dateFormat(
+                value={
                   subscriptionData.date_of_subscription ||
-                    subscriptionData.subscription_start_date,
-                  "DD MMM YYYY"
-                )}
+                  subscriptionData.subscription_start_date
+                    ? dateFormat(
+                        (subscriptionData.date_of_subscription ||
+                          subscriptionData.subscription_start_date) as string,
+                        "DD MMM YYYY"
+                      )
+                    : "—"
+                }
               />
             </Grid>
             <Grid item xs={12} md={4}>
