@@ -92,8 +92,13 @@ interface UserData {
 
 interface SubscriptionData {
   plan_name: string;
-  date_of_subscription: string;
+  date_of_subscription?: string;
+  subscription_start_date?: string;
   subscription_end_date: string;
+  auto_pay_status?: string | null;
+  auto_pay_cancel_reason?: string | null;
+  auto_pay_cancelled_at?: string | null;
+  is_auto_pay?: boolean;
 }
 
 interface ConsultationData {
@@ -598,10 +603,16 @@ const UserView: React.FC<{ mode: "view" }> = () => {
             <Grid item xs={12} md={4}>
               <InfoItem
                 label="Subscribed On"
-                value={dateFormat(
-                  subscriptionData.date_of_subscription,
-                  "DD MMM YYYY"
-                )}
+                value={
+                  subscriptionData.date_of_subscription ||
+                  subscriptionData.subscription_start_date
+                    ? dateFormat(
+                        (subscriptionData.date_of_subscription ||
+                          subscriptionData.subscription_start_date) as string,
+                        "DD MMM YYYY"
+                      )
+                    : "—"
+                }
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -613,6 +624,39 @@ const UserView: React.FC<{ mode: "view" }> = () => {
                 )}
               />
             </Grid>
+            {(subscriptionData.auto_pay_status ||
+              subscriptionData.auto_pay_cancel_reason) && (
+              <Grid item xs={12} md={4}>
+                <InfoItem
+                  label="Auto-renew"
+                  value={
+                    (subscriptionData.auto_pay_status || "").toLowerCase() ===
+                    "cancelled"
+                      ? "Cancelled"
+                      : subscriptionData.auto_pay_status || "—"
+                  }
+                />
+              </Grid>
+            )}
+            {subscriptionData.auto_pay_cancelled_at && (
+              <Grid item xs={12} md={4}>
+                <InfoItem
+                  label="Cancelled On"
+                  value={dateFormat(
+                    subscriptionData.auto_pay_cancelled_at,
+                    "DD MMM YYYY"
+                  )}
+                />
+              </Grid>
+            )}
+            {subscriptionData.auto_pay_cancel_reason && (
+              <Grid item xs={12} md={4}>
+                <InfoItem
+                  label="Cancel Reason"
+                  value={subscriptionData.auto_pay_cancel_reason}
+                />
+              </Grid>
+            )}
           </Grid>
         ) : (
           <Typography color="text.disabled">
