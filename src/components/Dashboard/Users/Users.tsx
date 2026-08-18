@@ -18,6 +18,8 @@ interface UserData {
   signup_channel: string;
   last_login_channel: string;
   last_login_at: string | null;
+  auto_pay_status?: string | null;
+  cancel_reason?: string | null;
 }
 
 const Users: React.FC = () => {
@@ -135,7 +137,18 @@ const Users: React.FC = () => {
       id: "plan_type",
       label: "Subscription",
       filterable: true,
-      filterOptions: ["Free", "Premium"],
+      filterOptions: ["Free", "Premium", "Cancelled"],
+      render: (_value: string, row: UserData) => {
+        const isCancelled =
+          (row.auto_pay_status ?? "").toLowerCase() === "cancelled";
+        return (
+          <Chip
+            label={isCancelled ? "Cancelled" : row.plan_type || "Free"}
+            color={isCancelled ? "warning" : row.plan_type === "Free" ? "default" : "success"}
+            size="small"
+          />
+        );
+      },
     },
     {
       id: "usage_channel",
