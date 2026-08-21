@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useReducer } from "react";
+import React, { useEffect, useRef, useCallback, useReducer, useState } from "react";
 import { Box, Paper, alpha, Typography, Skeleton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -94,8 +94,9 @@ const LogoBox = styled(Box)(({ theme }) => ({
 
 // State Management with useReducer
 export interface LoginState {
-  loginMethod: "email" | "mobile";
+  loginMethod: "email" | "mobile" | "partner";
   email: string;
+  password: string;
   mobile_number: string;
   country_code: string;
   otp: string[];
@@ -117,6 +118,7 @@ export type Action =
 const initialState: LoginState = {
   loginMethod: "email",
   email: "",
+  password: "",
   mobile_number: "",
   country_code: "+91",
   otp: Array(6).fill(""),
@@ -147,6 +149,7 @@ const reducer = (state: LoginState, action: Action): LoginState => {
       return {
         ...state,
         email: "",
+        password: "",
         mobile_number: "",
         country_code: "+91",
         otp: Array(6).fill(""),
@@ -234,31 +237,37 @@ export const Login = () => {
     };
   }, [state.step]);
 
+  const [redirectPath, setRedirectPath] = useState("/dashboard/users");
+
   useEffect(() => {
     if (state.step === "success") {
       const timer = setTimeout(() => {
         if (state.step === "success") {
-          navigate("/dashboard/users");
+          navigate(redirectPath);
         }
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [state.step, navigate]);
+  }, [state.step, navigate, redirectPath]);
 
-  const handleSwitchMethod = useCallback((newMethod: "email" | "mobile") => {
-    dispatchState({
-      type: "SET_FIELD",
-      field: "loginMethod",
-      value: newMethod,
-    });
-    dispatchState({
-      type: "SET_FIELD",
-      field: newMethod === "email" ? "mobile_number" : "email",
-      value: "",
-    });
-    dispatchState({ type: "SET_FIELD", field: "country_code", value: "+91" });
-    dispatchState({ type: "SET_ERROR", error: null });
-  }, []);
+  const handleSwitchMethod = useCallback(
+    (newMethod: "email" | "mobile" | "partner") => {
+      dispatchState({
+        type: "SET_FIELD",
+        field: "loginMethod",
+        value: newMethod,
+      });
+      if (newMethod === "email" || newMethod === "partner") {
+        dispatchState({ type: "SET_FIELD", field: "mobile_number", value: "" });
+      } else {
+        dispatchState({ type: "SET_FIELD", field: "email", value: "" });
+      }
+      dispatchState({ type: "SET_FIELD", field: "password", value: "" });
+      dispatchState({ type: "SET_FIELD", field: "country_code", value: "+91" });
+      dispatchState({ type: "SET_ERROR", error: null });
+    },
+    []
+  );
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,6 +356,62 @@ export const Login = () => {
   const handleSendOtp = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+
+      if (state.loginMethod === "partner") {
+        if (!state.email) {
+          dispatchState({
+            type: "SET_ERROR",
+            error: "Please enter your email",
+          });
+          return;
+        }
+        if (!validateEmail(state.email)) {
+          dispatchState({
+            type: "SET_ERROR",
+            error: "Please enter a valid email address",
+          });
+          return;
+        }
+        if (!state.password) {
+          dispatchState({
+            type: "SET_ERROR",
+            error: "Please enter your password",
+          });
+          return;
+        }
+
+        dispatchState({ type: "SET_LOADING", loading: true });
+        dispatchState({ type: "SET_ERROR", error: null });
+        try {
+          const response = await callAPI({
+            endpoint: "api/auth/partner/password-login",
+            method: "post",
+            data: { email: state.email, password: state.password },
+          });
+          const access_token = response.data.access_token;
+          const refresh_token = response.data.refresh_token;
+          const userName = `${response.data.first_name || ""} ${
+            response.data.last_name || ""
+          }`.trim();
+          setRedirectPath("/dashboard/partner-dashboard");
+          tokenService.setTokens({
+            access: access_token,
+            refresh: refresh_token,
+            user: userName || state.email,
+            userType: "partner",
+          });
+          dispatch({ type: "setAuth", payload: true });
+          dispatchState({ type: "SET_FIELD", field: "step", value: "success" });
+        } catch (error: any) {
+          dispatchState({
+            type: "SET_ERROR",
+            error: error.message || "Invalid email or password",
+          });
+        } finally {
+          dispatchState({ type: "SET_LOADING", loading: false });
+        }
+        return;
+      }
 
       if (state.loginMethod === "email") {
         if (!state.email) {
@@ -451,7 +516,15 @@ export const Login = () => {
         dispatchState({ type: "SET_FIELD", field: "step", value: "input" });
       }
     },
-    [state.loginMethod, state.email, state.mobile_number, state.country_code]
+    [
+      state.loginMethod,
+      state.email,
+      state.password,
+      state.mobile_number,
+      state.country_code,
+      countriesList,
+      dispatch,
+    ]
   );
 
   const handleResendOtp = useCallback(
@@ -604,11 +677,16 @@ export const Login = () => {
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
       const userName = `${response.data.first_name} ${response.data.last_name}`;
+      const userType = String(response.data.user_type || "").toLowerCase();
+      setRedirectPath(
+        userType === "partner" ? "/dashboard/partner-dashboard" : "/dashboard/users"
+      );
 
       tokenService.setTokens({
         access: access_token,
         refresh: refresh_token,
         user: userName,
+        userType: userType || "admin",
       });
 
       dispatch({ type: "setAuth", payload: true });

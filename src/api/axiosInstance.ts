@@ -212,6 +212,7 @@ axiosInstance.interceptors.response.use(
           access: newAccessToken,
           refresh: newRefreshToken,
           user: userName,
+          userType: res.data.user_type || tokenService.getUserType() || undefined,
         });
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

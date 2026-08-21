@@ -32,6 +32,12 @@ const WhatsAppBroadcastLog = React.lazy(
   () => import("./components/Dashboard/WhatsApp/WhatsAppBroadcastLog")
 );
 const WhatsAppInbox = React.lazy(() => import("./components/Dashboard/WhatsApp/WhatsAppInbox"));
+const PartnersList = React.lazy(() => import("./components/Dashboard/Partners/PartnersList"));
+const AddPartner = React.lazy(() => import("./components/Dashboard/Partners/AddPartner"));
+const PartnerDetail = React.lazy(() => import("./components/Dashboard/Partners/PartnerDetail"));
+const PartnerDashboard = React.lazy(
+  () => import("./components/Dashboard/Partners/PartnerDashboard")
+);
 const AskAstrologerList = React.lazy(
   () => import("./components/Dashboard/AskAstrologer/AskAstrologerList")
 );
@@ -102,6 +108,18 @@ export const router = createBrowserRouter([
               { path: "new", element: <NewCoupon mode="new" /> },
               { path: "edit/:userId", element: <NewCoupon mode="edit" /> },
             ],
+          },
+          {
+            path: "partners",
+            children: [
+              { index: true, element: <PartnersList /> },
+              { path: "new", element: <AddPartner /> },
+              { path: "view/:partnerId", element: <PartnerDetail /> },
+            ],
+          },
+          {
+            path: "partner-dashboard",
+            element: <PartnerDashboard />,
           },
           {
             path: "subscription",

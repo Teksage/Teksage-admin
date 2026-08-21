@@ -112,7 +112,7 @@ import { Box, Typography, TextField, Link, CircularProgress } from "@mui/materia
 
 interface OtpFormProps {
   formState: {
-    loginMethod: "email" | "mobile";
+    loginMethod: "email" | "mobile" | "partner";
     email: string;
     mobile_number: string;
     otp: string[];
