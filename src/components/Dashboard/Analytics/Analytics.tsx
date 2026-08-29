@@ -166,6 +166,23 @@ const monthOrder = [
 const getPlanColor = (plan: string, index: number) =>
   PLAN_COLORS[plan] || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
 
+const formatIstDateTime = (value?: string | null): string => {
+  if (!value) return "-";
+  const str = value.trim();
+  const normalized = str.endsWith("Z") || str.includes("+") ? str : `${str.replace(" ", "T")}Z`;
+  const date = new Date(normalized);
+  if (isNaN(date.getTime())) return "-";
+  return date.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 const Analytics: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -832,15 +849,7 @@ const Analytics: React.FC = () => {
                           .map((row) => (
                             <TableRow key={row.id} hover>
                               <TableCell sx={{ whiteSpace: "nowrap" }}>
-                                {row.created_at
-                                  ? new Date(row.created_at).toLocaleString("en-IN", {
-                                      day: "2-digit",
-                                      month: "short",
-                                      year: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })
-                                  : "-"}
+                                {formatIstDateTime(row.created_at)}
                               </TableCell>
                               <TableCell>
                                 <Chip
