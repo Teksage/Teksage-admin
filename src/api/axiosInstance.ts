@@ -110,8 +110,8 @@
 
 import axios from "axios";
 import { tokenService } from "../utils/tokenService";
-// const API_BASE_URL = "https://teksage-backend-latest.onrender.com";
-const API_BASE_URL = "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com:8000/";
+const API_BASE_URL = "https://teksage-backend-latest.onrender.com";
+// const API_BASE_URL = "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com:8000/";
 // const API_BASE_URL = "http://localhost:8000";
 /** Same as teksage-website — backend issues 60-day access tokens for `web`. */
 const WEB_CLIENT_PLATFORM_HEADER = "X-Client-Platform";
