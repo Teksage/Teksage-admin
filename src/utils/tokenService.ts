@@ -79,8 +79,9 @@ export const tokenService = {
 
     if (!token || !timestamp) return false;
 
-    const sessionAge = Date.now() - parseInt(timestamp);
-    const maxAge = 24 * 60 * 60 * 1000;
+    const sessionAge = Date.now() - parseInt(timestamp, 10);
+    // Match website / mobile web client access lifetime (60 days).
+    const maxAge = 60 * 24 * 60 * 60 * 1000;
 
     return sessionAge < maxAge;
   },
