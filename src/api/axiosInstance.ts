@@ -110,13 +110,18 @@
 
 import axios from "axios";
 import { tokenService } from "../utils/tokenService";
-const API_BASE_URL = "https://teksage-backend-latest.onrender.com";
-// const API_BASE_URL = "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/";
-// const API_BASE_URL = "http://localhost:8000/";
+// const API_BASE_URL = "https://teksage-backend-latest.onrender.com";
+const API_BASE_URL = "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com:8000/";
+// const API_BASE_URL = "http://localhost:8000";
+/** Same as teksage-website — backend issues 60-day access tokens for `web`. */
+const WEB_CLIENT_PLATFORM_HEADER = "X-Client-Platform";
+const WEB_CLIENT_PLATFORM = "web";
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    [WEB_CLIENT_PLATFORM_HEADER]: WEB_CLIENT_PLATFORM,
   },
   timeout: 10000,
 });
@@ -128,6 +133,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers[WEB_CLIENT_PLATFORM_HEADER] = WEB_CLIENT_PLATFORM;
     return config;
   },
   (error) => {
@@ -192,12 +198,14 @@ axiosInstance.interceptors.response.use(
         }
 
         const res = await axios.post(
-          "http://ec2-13-200-235-10.ap-south-1.compute.amazonaws.com/api/auth/refresh",
+          `${API_BASE_URL}/api/auth/refresh`,
+          // "http://ec2-15-206-194-79.ap-south-1.compute.amazonaws.com/api/auth/refresh",
           { refresh_token: refreshToken },
           { 
             timeout: 10000,
             headers: {
               "Content-Type": "application/json",
+              [WEB_CLIENT_PLATFORM_HEADER]: WEB_CLIENT_PLATFORM,
             }
           }
         );
