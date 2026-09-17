@@ -14,6 +14,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { SignInTypeTabsComponent } from "./SignInTypeTabsComponent";
 import { Action } from "../Auth/Login"; // Adjust the path as needed
+import { AdminTurnstile } from "../Auth/AdminTurnstile";
 import { GlassSelect } from "./CommonFunctions";
 
 // Styled components
@@ -74,6 +75,9 @@ interface LoginInputFormProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSendOtp: (e: React.FormEvent) => void;
   handleSwitchMethod: (newMethod: "email" | "mobile" | "partner") => void;
+  turnstileToken: string | null;
+  turnstileKey: number;
+  onTurnstileTokenChange: (token: string | null) => void;
   countriesList: Array<{
     dial_code: string;
     name: string;
@@ -120,6 +124,9 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
     handleInputChange,
     handleSendOtp,
     handleSwitchMethod,
+    turnstileToken,
+    turnstileKey,
+    onTurnstileTokenChange,
     countriesList,
   }) => {
     const handleLoginMethodChange = useCallback(
@@ -615,6 +622,12 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             />
           </Box>
         )}
+        {formState.loginMethod !== "partner" && (
+          <AdminTurnstile
+            remountKey={turnstileKey}
+            onTokenChange={onTurnstileTokenChange}
+          />
+        )}
         <StyledButton
           type="submit"
           fullWidth
@@ -633,8 +646,10 @@ export const LoginInputFormComponent = React.memo<LoginInputFormProps>(
             (formState.loginMethod === "partner"
               ? !formState.email || !formState.password
               : formState.loginMethod === "email"
-                ? !formState.email
-                : !formState.mobile_number || !formState.country_code)
+                ? !formState.email || !turnstileToken
+                : !formState.mobile_number ||
+                  !formState.country_code ||
+                  !turnstileToken)
           }
         >
           {formState.loading ? (

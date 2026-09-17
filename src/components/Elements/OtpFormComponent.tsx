@@ -109,6 +109,7 @@
 
 import React, { useCallback } from "react";
 import { Box, Typography, TextField, Link, CircularProgress } from "@mui/material";
+import { AdminTurnstile } from "../Auth/AdminTurnstile";
 
 interface OtpFormProps {
   formState: {
@@ -128,6 +129,9 @@ interface OtpFormProps {
   handleOtpPaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>, index: number) => void;
   handleResendOtp: () => void;
+  turnstileToken: string | null;
+  turnstileKey: number;
+  onTurnstileTokenChange: (token: string | null) => void;
 }
 
 export const OtpFormComponent = React.memo<OtpFormProps>(
@@ -139,6 +143,9 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
     handleOtpPaste,
     handleKeyDown,
     handleResendOtp,
+    turnstileToken,
+    turnstileKey,
+    onTurnstileTokenChange,
   }) => {
     const handleBackToInput = useCallback(() => {
       dispatchState({ type: "SET_FIELD", field: "step", value: "input" });
@@ -194,21 +201,30 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
               Resend OTP in {formState.countdown}s
             </Typography>
           ) : (
-            <Link
-              component="button"
-              type="button"
-              variant="body2"
-              onClick={handleResendOtp}
-              sx={{
-                color: "text.secondary",
-                textDecoration: "none",
-                "&:hover": { color: "#2e7d32" },
-                fontFamily: "Urbanist",
-                fontWeight: 500
-              }}
-            >
-              Resend OTP
-            </Link>
+            <>
+              <AdminTurnstile
+                remountKey={turnstileKey}
+                onTokenChange={onTurnstileTokenChange}
+              />
+              <Link
+                component="button"
+                type="button"
+                variant="body2"
+                onClick={handleResendOtp}
+                aria-disabled={!turnstileToken}
+                sx={{
+                  color: "text.secondary",
+                  textDecoration: "none",
+                  pointerEvents: turnstileToken ? "auto" : "none",
+                  opacity: turnstileToken ? 1 : 0.5,
+                  "&:hover": { color: "#2e7d32" },
+                  fontFamily: "Urbanist",
+                  fontWeight: 500
+                }}
+              >
+                Resend OTP
+              </Link>
+            </>
           )}
         </Box>
         <Box sx={{ textAlign: "center", mt: 4 }}>

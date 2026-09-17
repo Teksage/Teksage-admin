@@ -192,6 +192,8 @@ export const Login = () => {
   const navigate = useNavigate();
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [state, dispatchState] = useReducer(reducer, initialState);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const countriesList = useSelector((state: AppState) => state.countriesList);
   const isLoading = useSelector((state: AppState) => state.isLoading); // Use Redux isLoading instead of local state
 
@@ -199,18 +201,16 @@ export const Login = () => {
     dispatch(fetchCountriesList()); // Dispatch the thunk correctly
   }, [dispatch]);
 
-  // Countdown timer for OTP resend
-  // useEffect(() => {
-  //   if (state.countdown > 0) {
-  //     const timer = setTimeout(() => {
-  //       dispatchState({
-  //         type: "SET_COUNTDOWN",
-  //         countdown: state.countdown - 1,
-  //       });
-  //     }, 1000);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [state.countdown]);
+  useEffect(() => {
+    if (state.countdown <= 0) return;
+    const timer = window.setTimeout(() => {
+      dispatchState({
+        type: "SET_COUNTDOWN",
+        countdown: state.countdown - 1,
+      });
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [state.countdown]);
 
   useEffect(() => {
     let otpTimer: number;
@@ -265,6 +265,8 @@ export const Login = () => {
       dispatchState({ type: "SET_FIELD", field: "password", value: "" });
       dispatchState({ type: "SET_FIELD", field: "country_code", value: "+91" });
       dispatchState({ type: "SET_ERROR", error: null });
+      setTurnstileToken(null);
+      setTurnstileKey((key) => key + 1);
     },
     []
   );
@@ -413,6 +415,14 @@ export const Login = () => {
         return;
       }
 
+      if (!turnstileToken) {
+        dispatchState({
+          type: "SET_ERROR",
+          error: "Please complete the CAPTCHA.",
+        });
+        return;
+      }
+
       if (state.loginMethod === "email") {
         if (!state.email) {
           dispatchState({
@@ -474,17 +484,20 @@ export const Login = () => {
       dispatchState({ type: "SET_ERROR", error: null });
 
       try {
-        const endpoint =
-          state.loginMethod === "email"
-            ? "api/auth/otp/request"
-            : "api/auth/mobile-otp/request";
+        const endpoint = "api/auth/otp/request";
 
         const data =
           state.loginMethod === "email"
-            ? { email: state.email, user_type: "admin" }
-            : {
-                mobile_number: `${state.country_code}${state.mobile_number}`,
+            ? {
+                email: state.email,
                 user_type: "admin",
+                cf_turnstile_token: turnstileToken,
+              }
+            : {
+                mobile_number: state.mobile_number,
+                country_code: state.country_code.replace(/\D/g, ""),
+                user_type: "admin",
+                cf_turnstile_token: turnstileToken,
               };
 
         const response = await callAPI({
@@ -514,6 +527,9 @@ export const Login = () => {
         dispatchState({ type: "SET_LOADING", loading: false });
         dispatchState({ type: "SET_ERROR", error: "Invalid User" });
         dispatchState({ type: "SET_FIELD", field: "step", value: "input" });
+      } finally {
+        setTurnstileToken(null);
+        setTurnstileKey((key) => key + 1);
       }
     },
     [
@@ -522,6 +538,7 @@ export const Login = () => {
       state.password,
       state.mobile_number,
       state.country_code,
+      turnstileToken,
       countriesList,
       dispatch,
     ]
@@ -530,20 +547,33 @@ export const Login = () => {
   const handleResendOtp = useCallback(
     debounce(async () => {
       if (state.countdown > 0) return;
+      if (!turnstileToken) {
+        dispatchState({
+          type: "SET_ERROR",
+          error: "Please complete the CAPTCHA.",
+        });
+        return;
+      }
 
       dispatchState({ type: "SET_LOADING", loading: true });
       dispatchState({ type: "SET_ERROR", error: null });
 
       try {
-        const endpoint =
-          state.loginMethod === "email"
-            ? "api/auth/otp/request"
-            : "api/auth/mobile-otp/request";
+        const endpoint = "api/auth/otp/request";
 
         const data =
           state.loginMethod === "email"
-            ? { email: state.email }
-            : { mobile_number: `${state.country_code}${state.mobile_number}` };
+            ? {
+                email: state.email,
+                user_type: "admin",
+                cf_turnstile_token: turnstileToken,
+              }
+            : {
+                mobile_number: state.mobile_number,
+                country_code: state.country_code.replace(/\D/g, ""),
+                user_type: "admin",
+                cf_turnstile_token: turnstileToken,
+              };
 
         await callAPI({
           endpoint,
@@ -571,6 +601,9 @@ export const Login = () => {
         });
 
         setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+      } finally {
+        setTurnstileToken(null);
+        setTurnstileKey((key) => key + 1);
       }
     }, 300),
     [
@@ -579,6 +612,7 @@ export const Login = () => {
       state.email,
       state.mobile_number,
       state.country_code,
+      turnstileToken,
     ]
   );
 
@@ -655,16 +689,14 @@ export const Login = () => {
     dispatchState({ type: "SET_ERROR", error: null });
 
     try {
-      const endpoint =
-        state.loginMethod === "email"
-          ? "api/auth/otp/login-verify"
-          : "api/auth/mobile-otp/login-verify";
+      const endpoint = "api/auth/otp/login-verify";
 
       const data =
         state.loginMethod === "email"
           ? { email: state.email, otp }
           : {
-              mobile_number: `${state.country_code}${state.mobile_number}`,
+              mobile_number: state.mobile_number,
+              country_code: state.country_code.replace(/\D/g, ""),
               otp,
             };
 
@@ -762,6 +794,9 @@ export const Login = () => {
                 handleInputChange={handleInputChange}
                 handleSendOtp={handleSendOtp}
                 handleSwitchMethod={handleSwitchMethod}
+                turnstileToken={turnstileToken}
+                turnstileKey={turnstileKey}
+                onTurnstileTokenChange={setTurnstileToken}
                 countriesList={countriesList}
               />
             )}
@@ -774,6 +809,9 @@ export const Login = () => {
                 handleOtpPaste={handleOtpPaste}
                 handleKeyDown={handleKeyDown}
                 handleResendOtp={handleResendOtp}
+                turnstileToken={turnstileToken}
+                turnstileKey={turnstileKey}
+                onTurnstileTokenChange={setTurnstileToken}
               />
             )}
           </>
