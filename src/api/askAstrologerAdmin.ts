@@ -65,6 +65,9 @@ export type AskAstrologerItem = {
   assigned_at: string | null;
   created_at: string | null;
   customer_whatsapp_opted_in?: boolean;
+  rating?: number | null;
+  feedback?: string | null;
+  review_status?: string | null;
 };
 
 export async function fetchAskRequests(page = 1, status?: string) {

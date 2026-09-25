@@ -21,6 +21,7 @@ const Consultations = React.lazy(() => import("./components/Dashboard/Consultati
 const NewCoupon = React.lazy(() => import("./components/Dashboard/Coupons/AddCoupons"));
 const NewSubscription = React.lazy(() => import("./components/Dashboard/Subscription/AddSubscription"));
 const ConsultationView = React.lazy(() => import("./components/Dashboard/Consultations/ViewConsultations"));
+const Reviews = React.lazy(() => import("./components/Dashboard/Reviews/Reviews"));
 const Analytics = React.lazy(() => import("./components/Dashboard/Analytics/Analytics"));
 const SmsFraudDashboard = React.lazy(
   () => import("./components/Dashboard/SmsFraud/SmsFraudDashboard")
@@ -134,6 +135,12 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <Consultations /> },
               { path: "view/:consultationId", element: <ConsultationView mode="view" /> },
+            ],
+          },
+          {
+            path: "reviews",
+            children: [
+              { index: true, element: <Reviews /> },
             ],
           },
           {
