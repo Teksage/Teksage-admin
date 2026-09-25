@@ -32,6 +32,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SendIcon from "@mui/icons-material/Send";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 import { tokenService } from "../../utils/tokenService";
 
 const DRAWER_WIDTH = 240;
@@ -177,6 +178,11 @@ const adminMenuItems = [
     name: "Consultations",
     path: "/dashboard/consultations",
     icon: <ChatIcon />,
+  },
+  {
+    name: "Reviews",
+    path: "/dashboard/reviews",
+    icon: <RateReviewIcon />,
   },
   {
     name: "Subscription Plans",
