@@ -2,9 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { callAPI } from "../../../api/crudFactory";
-import GenericTable, {
-  TableColumn,
-} from "../../Elements/Table/Table";
+import GenericTable from "../../Elements/Table/Table";
+import { TableColumn } from "../../Elements/Table/types";
 
 interface ReviewRow {
   id: number;
