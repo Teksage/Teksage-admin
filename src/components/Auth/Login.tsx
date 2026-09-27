@@ -115,13 +115,15 @@ export type Action =
   | { type: "SET_COUNTDOWN"; countdown: number }
   | { type: "RESET_FIELDS" };
 
+const OTP_LENGTH = 4;
+
 const initialState: LoginState = {
   loginMethod: "email",
   email: "",
   password: "",
   mobile_number: "",
   country_code: "+91",
-  otp: Array(6).fill(""),
+  otp: Array(OTP_LENGTH).fill(""),
   activeOtpIndex: 0,
   step: "input",
   loading: false,
@@ -152,7 +154,7 @@ const reducer = (state: LoginState, action: Action): LoginState => {
         password: "",
         mobile_number: "",
         country_code: "+91",
-        otp: Array(6).fill(""),
+        otp: Array(OTP_LENGTH).fill(""),
         activeOtpIndex: 0,
         error: null,
       };
@@ -301,7 +303,7 @@ export const Login = () => {
         newOtp[index] = value.substring(value.length - 1);
 
         const newIndex = value
-          ? Math.min(index + 1, 5)
+          ? Math.min(index + 1, OTP_LENGTH - 1)
           : Math.max(index - 1, 0);
         dispatchState({
           type: "SET_OTP",
@@ -310,7 +312,7 @@ export const Login = () => {
         });
         dispatchState({ type: "SET_ERROR", error: null });
 
-        if (value && index < 5) {
+        if (value && index < OTP_LENGTH - 1) {
           otpInputRefs.current[index + 1]?.focus();
         }
       }
@@ -322,13 +324,16 @@ export const Login = () => {
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
       const pastedData = e.clipboardData.getData("text/plain");
-      const otpArray = pastedData.replace(/\D/g, "").split("").slice(0, 6);
+      const otpArray = pastedData
+        .replace(/\D/g, "")
+        .split("")
+        .slice(0, OTP_LENGTH);
 
-      if (otpArray.length === 6) {
+      if (otpArray.length === OTP_LENGTH) {
         dispatchState({
           type: "SET_OTP",
           otp: otpArray,
-          activeOtpIndex: 5,
+          activeOtpIndex: OTP_LENGTH - 1,
         });
         dispatchState({ type: "SET_ERROR", error: null });
 
@@ -517,7 +522,7 @@ export const Login = () => {
         dispatchState({ type: "SET_COUNTDOWN", countdown: 30 });
         dispatchState({
           type: "SET_OTP",
-          otp: Array(6).fill(""),
+          otp: Array(OTP_LENGTH).fill(""),
           activeOtpIndex: 0,
         });
 
@@ -585,7 +590,7 @@ export const Login = () => {
         dispatchState({ type: "SET_COUNTDOWN", countdown: 30 });
         dispatchState({
           type: "SET_OTP",
-          otp: Array(6).fill(""),
+          otp: Array(OTP_LENGTH).fill(""),
           activeOtpIndex: 0,
         });
 
@@ -596,7 +601,7 @@ export const Login = () => {
         dispatchState({ type: "SET_COUNTDOWN", countdown: 30 });
         dispatchState({
           type: "SET_OTP",
-          otp: Array(6).fill(""),
+          otp: Array(OTP_LENGTH).fill(""),
           activeOtpIndex: 0,
         });
 
@@ -618,7 +623,7 @@ export const Login = () => {
 
   // const handleVerifyOtp = useCallback(async () => {
   //   const otp = state.otp.join("");
-  //   if (otp.length !== 6) return;
+  //   if (otp.length !== OTP_LENGTH) return;
 
   //   dispatchState({ type: "SET_LOADING", loading: true });
   //   dispatchState({ type: "SET_ERROR", error: null });
@@ -683,7 +688,7 @@ export const Login = () => {
 
   const handleVerifyOtp = useCallback(async () => {
     const otp = state.otp.join("");
-    if (otp.length !== 6) return;
+    if (otp.length !== OTP_LENGTH) return;
 
     dispatchState({ type: "SET_LOADING", loading: true });
     dispatchState({ type: "SET_ERROR", error: null });
@@ -732,7 +737,7 @@ export const Login = () => {
       // Reset OTP fields on error
       dispatchState({
         type: "SET_OTP",
-        otp: Array(6).fill(""),
+        otp: Array(OTP_LENGTH).fill(""),
         activeOtpIndex: 0,
       });
       // Focus back to first OTP input
