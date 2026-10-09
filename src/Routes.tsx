@@ -45,6 +45,12 @@ const AskAstrologerList = React.lazy(
 const ViewAskAstrologer = React.lazy(
   () => import("./components/Dashboard/AskAstrologer/ViewAskAstrologer")
 );
+const MarathonAdmin = React.lazy(
+  () => import("./components/Dashboard/Marathon/MarathonAdmin")
+);
+const MarathonEventPage = React.lazy(
+  () => import("./components/Dashboard/Marathon/MarathonEventPage")
+);
 
 export const router = createBrowserRouter([
   {
@@ -173,6 +179,13 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <AskAstrologerList /> },
               { path: "view/:requestId", element: <ViewAskAstrologer /> },
+            ],
+          },
+          {
+            path: "marathon",
+            children: [
+              { index: true, element: <MarathonAdmin /> },
+              { path: ":marathonId", element: <MarathonEventPage /> },
             ],
           },
         ],
