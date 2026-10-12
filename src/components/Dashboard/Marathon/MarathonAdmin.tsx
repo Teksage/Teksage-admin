@@ -45,7 +45,7 @@ const emptyForm = (): EventForm => ({
   startTime: "",
   endTime: "",
   timezone: "Asia/Kolkata",
-  fee: "199",
+  fee: "499",
   usdFee: "9",
   categories: ["Career"],
 });
