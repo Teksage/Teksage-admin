@@ -177,50 +177,41 @@ function BookingRow({
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={4} sx={{ pt: 0, pb: 1.5, borderTop: 0 }}>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-              columnGap: 2,
-              alignItems: "center",
-            }}
-          >
-            <Box sx={{ gridColumn: "1 / 4" }} display="flex" gap={1} alignItems="center" flexWrap="wrap">
-              {booking.meeting_link ? (
-                <Button size="small" variant="contained" startIcon={<VideocamOutlinedIcon />} href={booking.meeting_link} target="_blank" rel="noopener noreferrer" sx={actionSx("#1565c0")}>
-                  Open meeting
-                </Button>
-              ) : null}
-              {!waiting ? (
-                <>
-                  <Tooltip title="Creates a new Google Meet link and saves it on this booking">
-                    <Button size="small" variant="contained" startIcon={<RefreshIcon />} onClick={onRetry} sx={actionSx("#ef6c00")}>Retry Meet link</Button>
-                  </Tooltip>
-                  <Tooltip title="Emails the astrologer and the customer again">
-                    <Button size="small" variant="contained" startIcon={<EmailOutlinedIcon />} onClick={onEmail} sx={actionSx("#6a1b9a")}>Resend email</Button>
-                  </Tooltip>
-                </>
-              ) : null}
-              <Tooltip title="Sends the payment alert again to the admin WhatsApp number">
-                <Button size="small" variant="contained" startIcon={<WhatsAppIcon />} onClick={onWhatsapp} sx={actionSx("#128C7E")}>Resend WhatsApp</Button>
-              </Tooltip>
-            </Box>
-            <Box sx={{ gridColumn: "4" }}>
-              {waiting && options.length > 0 ? (
-                <Button
-                  size="small"
-                  variant="contained"
-                  disabled={!picked}
-                  startIcon={<PersonAddAlt1Icon />}
-                  onClick={onAssign}
-                  sx={{ textTransform: "none", ...(picked ? actionSx("#2e7d32") : {}) }}
-                >
-                  Assign
-                </Button>
-              ) : null}
-            </Box>
+        <TableCell colSpan={3} sx={{ pt: 0, pb: 1.5, borderTop: 0, verticalAlign: "middle" }}>
+          <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
+            {booking.meeting_link ? (
+              <Button size="small" variant="contained" startIcon={<VideocamOutlinedIcon />} href={booking.meeting_link} target="_blank" rel="noopener noreferrer" sx={actionSx("#1565c0")}>
+                Open meeting
+              </Button>
+            ) : null}
+            {!waiting ? (
+              <>
+                <Tooltip title="Creates a new Google Meet link and saves it on this booking">
+                  <Button size="small" variant="contained" startIcon={<RefreshIcon />} onClick={onRetry} sx={actionSx("#ef6c00")}>Retry Meet link</Button>
+                </Tooltip>
+                <Tooltip title="Emails the astrologer and the customer again">
+                  <Button size="small" variant="contained" startIcon={<EmailOutlinedIcon />} onClick={onEmail} sx={actionSx("#6a1b9a")}>Resend email</Button>
+                </Tooltip>
+              </>
+            ) : null}
+            <Tooltip title="Sends the payment alert again to the admin WhatsApp number">
+              <Button size="small" variant="contained" startIcon={<WhatsAppIcon />} onClick={onWhatsapp} sx={actionSx("#128C7E")}>Resend WhatsApp</Button>
+            </Tooltip>
           </Box>
+        </TableCell>
+        <TableCell sx={{ pt: 0, pb: 1.5, borderTop: 0, verticalAlign: "middle" }}>
+          {waiting && options.length > 0 ? (
+            <Button
+              size="small"
+              variant="contained"
+              disabled={!picked}
+              startIcon={<PersonAddAlt1Icon />}
+              onClick={onAssign}
+              sx={actionSx(picked ? "#2e7d32" : "#9e9e9e")}
+            >
+              Assign
+            </Button>
+          ) : null}
         </TableCell>
       </TableRow>
     </Fragment>
