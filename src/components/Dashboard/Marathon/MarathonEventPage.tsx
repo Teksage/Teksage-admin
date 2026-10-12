@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Snackbar, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Snackbar, Typography, Chip } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PaymentsIcon from "@mui/icons-material/Payments";
@@ -9,7 +9,9 @@ import { DashboardDetailHeader } from "../../Elements/DashboardDetailHeader";
 import { DashboardSectionPaper } from "../../Elements/DashboardSectionPaper";
 import { InfoItem } from "../../Elements/CommonFunctions";
 import {
+  addMarathonParticipant,
   addMarathonSlot,
+  listMarathonAstrologers,
   assignMarathonSeat,
   deleteMarathonSlot,
   endMarathon,
@@ -20,8 +22,10 @@ import {
   resendMarathonWhatsapp,
   retryMarathonLink,
   updateMarathonSlot,
+  type MarathonAstrologerOption,
   type MarathonRow,
 } from "../../../api/marathonAdmin";
+import { MarathonConfirmedAstrologers } from "./MarathonConfirmedAstrologers";
 import { MarathonEventBookings } from "./MarathonEventBookings";
 import { MarathonEventSlots } from "./MarathonEventSlots";
 import { LabeledField, SLOT_MS, formatClock, formatDay, formatWhen, localDate, marathonPhase, splitLocal } from "./marathonFields";
@@ -40,6 +44,7 @@ const MarathonEventPage: React.FC = () => {
   const [picks, setPicks] = useState<Record<number, number | "">>({});
   const [editing, setEditing] = useState<SlotEdit | null>(null);
   const [endOpen, setEndOpen] = useState(false);
+  const [astrologers, setAstrologers] = useState<MarathonAstrologerOption[]>([]);
   const [resumeOpen, setResumeOpen] = useState(false);
 
   async function load() {
@@ -55,6 +60,7 @@ const MarathonEventPage: React.FC = () => {
 
   useEffect(() => {
     void load().catch((err: Error) => setError(err.message));
+    void listMarathonAstrologers().then(setAstrologers).catch(() => setAstrologers([]));
   }, [id]);
 
   function run(action: Promise<unknown>, done?: string) {
@@ -184,15 +190,11 @@ const MarathonEventPage: React.FC = () => {
       </DashboardSectionPaper>
 
       <DashboardSectionPaper title="Confirmed astrologers">
-        {people.length === 0 ? (
-          <Alert severity="info">Publish stays off until at least one astrologer confirms participation.</Alert>
-        ) : (
-          <Box display="flex" gap={1} flexWrap="wrap">
-            {people.map((person) => (
-              <Chip key={person.user_id} label={person.name || `User ${person.user_id}`} />
-            ))}
-          </Box>
-        )}
+        <MarathonConfirmedAstrologers
+          people={people}
+          options={astrologers}
+          onAdd={(userId) => run(addMarathonParticipant(event.id, userId), "Astrologer added to confirmed.")}
+        />
       </DashboardSectionPaper>
 
       <Box>

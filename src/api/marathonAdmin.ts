@@ -129,6 +129,22 @@ export const resendMarathonEmail = async (bookingId: number) => {
   return res.data;
 };
 
+export type MarathonAstrologerOption = { user_id: number; name: string };
+
+export const listMarathonAstrologers = async () => {
+  const res = await callAPI({ endpoint: "api/admin/marathons/astrologers", method: "get" });
+  return (res.data?.data ?? []) as MarathonAstrologerOption[];
+};
+
+export const addMarathonParticipant = async (marathonId: number, astrologerUserId: number) => {
+  const res = await callAPI({
+    endpoint: `api/admin/marathons/${marathonId}/participants`,
+    method: "post",
+    data: { astrologer_user_id: astrologerUserId },
+  });
+  return res.data;
+};
+
 export const assignMarathonSeat = async (bookingId: number, astrologerUserId: number) => {
   const res = await callAPI({
     endpoint: `api/admin/marathons/bookings/${bookingId}/assign`,
