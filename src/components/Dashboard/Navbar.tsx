@@ -22,6 +22,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PeopleIcon from "@mui/icons-material/People";
 import StarsIcon from "@mui/icons-material/Stars";
+import TimerIcon from "@mui/icons-material/Timer";
 import HelpIcon from "@mui/icons-material/Help";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -841,6 +842,26 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             {(open || isMobile) && (
               <ListItemText
                 primary="Ask Astrologer"
+                primaryTypographyProps={{
+                  variant: "body1",
+                  whiteSpace: "nowrap",
+                  fontFamily: "Urbanist",
+                  fontWeight: 800,
+                }}
+              />
+            )}
+          </NavItem>
+          <NavItem
+            onClick={() => navigate("/dashboard/marathon")}
+            selected={isActive("/dashboard/marathon")}
+            open={open}
+          >
+            <ListItemIcon sx={{ color: "inherit" }}>
+              <TimerIcon />
+            </ListItemIcon>
+            {(open || isMobile) && (
+              <ListItemText
+                primary="Consultation marathon"
                 primaryTypographyProps={{
                   variant: "body1",
                   whiteSpace: "nowrap",
