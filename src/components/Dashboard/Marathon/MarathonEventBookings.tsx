@@ -69,7 +69,7 @@ export function MarathonEventBookings({
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {waiting
           ? `${waiting} paid ${waiting === 1 ? "seat needs" : "seats need"} an astrologer. Only people who confirmed this event can be assigned.`
-          : "Assign an astrologer after payment. The meeting link is created when someone accepts or you assign them."}
+          : "Assign an astrologer after payment. The meeting link is created when you assign them."}
       </Typography>
       <TableContainer sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}>
         <Table size="small" sx={{ width: "100%", tableLayout: "fixed", "& th, & td": { verticalAlign: "middle" } }}>
@@ -128,16 +128,24 @@ function BookingRow({
   onWhatsapp: () => void;
 }) {
   const waiting = booking.status === "paid";
+  const cellTop = { borderBottom: 0, verticalAlign: "top" as const, pt: 2, pb: 1 };
+  const cellActions = { borderTop: 0, verticalAlign: "middle" as const, pt: 1, pb: 2.5 };
   return (
     <Fragment>
       <TableRow hover>
-        <TableCell>
+        <TableCell sx={cellTop}>
           <Typography variant="body2" sx={{ fontWeight: 700 }}>{booking.user_name || "Customer"}</Typography>
           {booking.user_email ? (
             <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-all" }}>{booking.user_email}</Typography>
           ) : null}
+          {booking.customer_query ? (
+            <Typography variant="body2" sx={{ mt: 0.75, whiteSpace: "pre-wrap" }}>
+              <Box component="span" sx={{ fontWeight: 600 }}>Question: </Box>
+              {booking.customer_query}
+            </Typography>
+          ) : null}
         </TableCell>
-        <TableCell>
+        <TableCell sx={cellTop}>
           {booking.starts_at && booking.ends_at ? (
             <>
               <Typography variant="body2">{formatDay(booking.starts_at)}</Typography>
@@ -147,10 +155,10 @@ function BookingRow({
             </>
           ) : "—"}
         </TableCell>
-        <TableCell>
+        <TableCell sx={cellTop}>
           <Chip size="small" label={statusLabel(booking.status)} color={statusColor(booking.status)} />
         </TableCell>
-        <TableCell>
+        <TableCell sx={cellTop}>
           {waiting ? (
             options.length === 0 ? (
               <Typography variant="body2" color="text.secondary">No confirmed astrologer yet.</Typography>
@@ -177,8 +185,8 @@ function BookingRow({
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={3} sx={{ pt: 0, pb: 1.5, borderTop: 0, verticalAlign: "middle" }}>
-          <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
+        <TableCell colSpan={3} sx={cellActions}>
+          <Box display="flex" gap={1.25} alignItems="center" flexWrap="wrap" sx={{ pr: 1 }}>
             {booking.meeting_link ? (
               <Button size="small" variant="contained" startIcon={<VideocamOutlinedIcon />} href={booking.meeting_link} target="_blank" rel="noopener noreferrer" sx={actionSx("#1565c0")}>
                 Open meeting
@@ -199,7 +207,7 @@ function BookingRow({
             </Tooltip>
           </Box>
         </TableCell>
-        <TableCell sx={{ pt: 0, pb: 1.5, borderTop: 0, verticalAlign: "middle" }}>
+        <TableCell sx={{ ...cellActions, textAlign: "left" }}>
           {waiting && options.length > 0 ? (
             <Button
               size="small"

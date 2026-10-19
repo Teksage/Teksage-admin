@@ -230,7 +230,7 @@ const MarathonAdmin: React.FC = () => {
     <>
       {error && !open ? <Alert severity="error" sx={{ mx: 2, mt: 2 }}>{error}</Alert> : null}
       <GenericTable<MarathonRow>
-        title="Consultation marathon"
+        title="Teksage Expert Hours"
         data={rows}
         columns={columns}
         onAdd={startCreate}

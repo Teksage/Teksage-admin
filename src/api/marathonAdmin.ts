@@ -35,9 +35,11 @@ export type MarathonRow = {
     ends_at?: string;
     astrologer_name?: string | null;
     meeting_link?: string | null;
+    customer_query?: string | null;
     whatsapp_sent_at?: string | null;
     email_sent_at?: string | null;
   }[];
+  public_slug?: string | null;
 };
 
 export const listMarathons = async () => {

@@ -172,6 +172,7 @@ const ViewAskAstrologer: React.FC = () => {
         open={snack.open}
         autoHideDuration={4000}
         onClose={() => setSnack((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
           severity={snack.ok ? "success" : "error"}

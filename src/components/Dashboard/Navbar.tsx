@@ -861,7 +861,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             </ListItemIcon>
             {(open || isMobile) && (
               <ListItemText
-                primary="Consultation marathon"
+                primary="Teksage Expert Hours"
                 primaryTypographyProps={{
                   variant: "body1",
                   whiteSpace: "nowrap",
