@@ -280,6 +280,7 @@ export default function SendWhatsApp() {
         open={snack.open}
         autoHideDuration={6000}
         onClose={() => setSnack((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert severity={snack.ok ? "success" : "error"}>{snack.msg}</Alert>
       </Snackbar>

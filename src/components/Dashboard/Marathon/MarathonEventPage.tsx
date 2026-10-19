@@ -46,6 +46,7 @@ const MarathonEventPage: React.FC = () => {
   const [endOpen, setEndOpen] = useState(false);
   const [astrologers, setAstrologers] = useState<MarathonAstrologerOption[]>([]);
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [assignTarget, setAssignTarget] = useState<{ bookingId: number; astrologerName: string } | null>(null);
 
   async function load() {
     const row = await getMarathon(id);
@@ -70,11 +71,20 @@ const MarathonEventPage: React.FC = () => {
         const warning = result && typeof result === "object" && "warning" in result
           ? (result as { warning?: string | null }).warning
           : null;
-        if (warning) setError(warning);
-        else if (done) setNotice(done);
+        // Always show success when the action completed; warnings (Meet/email) are separate.
+        if (done) setNotice(done);
+        if (warning) setError(String(warning));
         return load();
       })
       .catch((err: Error) => setError(err.message));
+  }
+
+  function confirmAssign() {
+    if (!assignTarget) return;
+    const picked = picks[assignTarget.bookingId];
+    setAssignTarget(null);
+    if (!picked) return;
+    run(assignMarathonSeat(assignTarget.bookingId, Number(picked)), "Astrologer assigned.");
   }
 
   function addSlot() {
@@ -119,7 +129,7 @@ const MarathonEventPage: React.FC = () => {
   if (!event) {
     return (
       <Box sx={{ p: 3 }}>
-        <DashboardDetailHeader title="Consultation marathon" onBack={() => navigate("/dashboard/marathon")} />
+        <DashboardDetailHeader title="Teksage Expert Hours" onBack={() => navigate("/dashboard/marathon")} />
         {error ? <Alert severity="error">{error}</Alert> : (
           <Box sx={{ display: "flex", justifyContent: "center", pt: 8 }}>
             <CircularProgress />
@@ -204,9 +214,14 @@ const MarathonEventPage: React.FC = () => {
           onPick={(bookingId, userId) => setPicks((current) => ({ ...current, [bookingId]: userId }))}
           onAssign={(bookingId) => {
             const picked = picks[bookingId];
-            if (picked) run(assignMarathonSeat(bookingId, Number(picked)), "Astrologer assigned.");
+            if (!picked) return;
+            const person = (event.participants || []).find((row) => row.user_id === Number(picked));
+            setAssignTarget({
+              bookingId,
+              astrologerName: person?.name || `User ${picked}`,
+            });
           }}
-          onRetry={(bookingId) => run(retryMarathonLink(bookingId), "A new meeting link was saved.")}
+          onRetry={(bookingId) => run(retryMarathonLink(bookingId), "New meeting link saved and emailed to both.")}
           onEmail={(bookingId) => run(resendMarathonEmail(bookingId), "Email sent again.")}
           onWhatsapp={(bookingId) => run(resendMarathonWhatsapp(bookingId), "WhatsApp alert sent again.")}
         />
@@ -225,9 +240,29 @@ const MarathonEventPage: React.FC = () => {
         />
       </Box>
 
-      <Snackbar open={Boolean(notice)} autoHideDuration={4000} onClose={() => setNotice("")}>
-        <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert>
+      <Snackbar
+        open={Boolean(notice)}
+        autoHideDuration={4000}
+        onClose={() => setNotice("")}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert severity="success" onClose={() => setNotice("")} sx={{ width: "100%" }}>{notice}</Alert>
       </Snackbar>
+
+      <Dialog open={Boolean(assignTarget)} onClose={() => setAssignTarget(null)}>
+        <DialogTitle>Assign astrologer?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Assign <strong>{assignTarget?.astrologerName}</strong> to this booking? A meeting link will be created and both people will be emailed.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAssignTarget(null)}>Cancel</Button>
+          <Button variant="contained" color="success" onClick={confirmAssign}>
+            Assign
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={resumeOpen} onClose={() => setResumeOpen(false)}>
         <DialogTitle>Resume this event?</DialogTitle>
