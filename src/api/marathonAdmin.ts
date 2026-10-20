@@ -36,6 +36,7 @@ export type MarathonRow = {
     astrologer_name?: string | null;
     meeting_link?: string | null;
     customer_query?: string | null;
+    preferred_language?: string | null;
     whatsapp_sent_at?: string | null;
     email_sent_at?: string | null;
   }[];

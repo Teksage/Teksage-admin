@@ -138,6 +138,12 @@ function BookingRow({
           {booking.user_email ? (
             <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-all" }}>{booking.user_email}</Typography>
           ) : null}
+          {booking.preferred_language ? (
+            <Typography variant="body2" sx={{ mt: 0.75 }}>
+              <Box component="span" sx={{ fontWeight: 600 }}>Language: </Box>
+              {booking.preferred_language.charAt(0).toUpperCase() + booking.preferred_language.slice(1)}
+            </Typography>
+          ) : null}
           {booking.customer_query ? (
             <Typography variant="body2" sx={{ mt: 0.75, whiteSpace: "pre-wrap" }}>
               <Box component="span" sx={{ fontWeight: 600 }}>Question: </Box>
