@@ -38,13 +38,13 @@ export function MarathonEventSlots({ event, slot, onSlot, onAdd, onEdit, onDelet
           onClick={onAdd}
           sx={{ height: 40, justifySelf: "start", textTransform: "none", whiteSpace: "nowrap", mb: "1px" }}
         >
-          Add 10-minute slot
+          Add 15-minute slot
         </Button>
       </Box>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
         {preview
           ? `This seat ends at ${formatWhen(preview)}. It must sit inside ${formatWhen(event.starts_at)} – ${formatWhen(event.ends_at)}.`
-          : "Pick a start time inside the event window. Each seat is 10 minutes."}
+          : "Pick a start time inside the event window. Each seat is 15 minutes."}
       </Typography>
       <TableContainer sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}>
         <Table size="small">
@@ -61,7 +61,7 @@ export function MarathonEventSlots({ event, slot, onSlot, onAdd, onEdit, onDelet
             {slots.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} align="center" sx={{ py: 4, color: "text.secondary" }}>
-                  No slots yet. Add the first 10-minute seat above.
+                  No slots yet. Add the first 15-minute seat above.
                 </TableCell>
               </TableRow>
             ) : slots.map((item) => {

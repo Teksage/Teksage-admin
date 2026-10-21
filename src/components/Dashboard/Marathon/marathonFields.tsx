@@ -2,7 +2,7 @@ import React from "react";
 import { Box, TextField, Typography } from "@mui/material";
 
 export const MARATHON_CATEGORIES = ["Career", "Wealth", "Marriage & Relationships", "Health", "All"];
-export const SLOT_MS = 10 * 60 * 1000;
+export const SLOT_MS = 15 * 60 * 1000;
 
 function pad(value: number) {
   return String(value).padStart(2, "0");

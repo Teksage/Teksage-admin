@@ -1,5 +1,5 @@
-import { Fragment } from "react";
-import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
+import { Fragment, useState } from "react";
+import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Tooltip, Typography } from "@mui/material";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -21,6 +21,22 @@ type MarathonEventBookingsProps = {
   onEmail: (bookingId: number) => void;
   onWhatsapp: (bookingId: number) => void;
 };
+
+const RELATIONSHIP_LABELS: Record<string, string> = {
+  spouse: "Spouse",
+  brother: "Brother",
+  sister: "Sister",
+  father: "Father",
+  mother: "Mother",
+  son: "Son",
+  daughter: "Daughter",
+  friend: "Friend",
+  other: "Others",
+};
+
+function relationshipLabel(code: string) {
+  return RELATIONSHIP_LABELS[code] || code;
+}
 
 function statusLabel(status: string) {
   if (status === "paid") return "Needs an astrologer";
@@ -47,6 +63,26 @@ function statusColor(status: string): "warning" | "success" | "default" {
   return "success";
 }
 
+type BookingTab = "upcoming" | "assigned" | "completed";
+
+function bookingTab(status: string): BookingTab {
+  if (status === "completed") return "completed";
+  if (status === "assigned" || status === "accepted") return "assigned";
+  return "upcoming";
+}
+
+const TAB_HINT: Record<BookingTab, string> = {
+  upcoming: "Paid seats that still need an astrologer. Only people who confirmed this event can be assigned.",
+  assigned: "These seats have an astrologer. The meeting link is created when you assign them.",
+  completed: "These sessions are finished.",
+};
+
+const TAB_EMPTY: Record<BookingTab, string> = {
+  upcoming: "No seats are waiting for an astrologer.",
+  assigned: "No assigned seats yet.",
+  completed: "No completed sessions yet.",
+};
+
 export function MarathonEventBookings({
   event,
   picks,
@@ -57,19 +93,32 @@ export function MarathonEventBookings({
   onWhatsapp,
 }: MarathonEventBookingsProps) {
   const options: ConfirmedAstrologer[] = event.participants || [];
-  const bookings = [...(event.bookings || [])].sort((left, right) => {
-    if (left.status === "paid" && right.status !== "paid") return -1;
-    if (right.status === "paid" && left.status !== "paid") return 1;
-    return new Date(left.starts_at || 0).getTime() - new Date(right.starts_at || 0).getTime();
-  });
-  const waiting = bookings.filter((row) => row.status === "paid").length;
+  const bookings = [...(event.bookings || [])].sort(
+    (left, right) => new Date(left.starts_at || 0).getTime() - new Date(right.starts_at || 0).getTime()
+  );
+  const counts: Record<BookingTab, number> = {
+    upcoming: bookings.filter((row) => bookingTab(row.status) === "upcoming").length,
+    assigned: bookings.filter((row) => bookingTab(row.status) === "assigned").length,
+    completed: bookings.filter((row) => bookingTab(row.status) === "completed").length,
+  };
+  const [tab, setTab] = useState<BookingTab>(counts.upcoming > 0 ? "upcoming" : "assigned");
+  const visible = bookings.filter((row) => bookingTab(row.status) === tab);
 
   return (
     <DashboardSectionPaper title="Bookings">
+      <Tabs
+        value={tab}
+        onChange={(_, value: BookingTab) => setTab(value)}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ minHeight: 40, mb: 1, "& .MuiTab-root": { fontFamily: "Urbanist", fontWeight: 700, textTransform: "none", minHeight: 40 } }}
+      >
+        <Tab value="upcoming" label={`Upcoming (${counts.upcoming})`} />
+        <Tab value="assigned" label={`Assigned (${counts.assigned})`} />
+        <Tab value="completed" label={`Completed (${counts.completed})`} />
+      </Tabs>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {waiting
-          ? `${waiting} paid ${waiting === 1 ? "seat needs" : "seats need"} an astrologer. Only people who confirmed this event can be assigned.`
-          : "Assign an astrologer after payment. The meeting link is created when you assign them."}
+        {TAB_HINT[tab]}
       </Typography>
       <TableContainer sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}>
         <Table size="small" sx={{ width: "100%", tableLayout: "fixed", "& th, & td": { verticalAlign: "middle" } }}>
@@ -82,13 +131,13 @@ export function MarathonEventBookings({
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookings.length === 0 ? (
+            {visible.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 4, color: "text.secondary" }}>
-                  No paid seats yet.
+                  {TAB_EMPTY[tab]}
                 </TableCell>
               </TableRow>
-            ) : bookings.map((booking) => (
+            ) : visible.map((booking) => (
               <BookingRow
                 key={booking.id}
                 booking={booking}
@@ -135,6 +184,12 @@ function BookingRow({
       <TableRow hover>
         <TableCell sx={cellTop}>
           <Typography variant="body2" sx={{ fontWeight: 700 }}>{booking.user_name || "Customer"}</Typography>
+          {booking.related_profile_id && booking.member_display_name ? (
+            <Typography variant="body2" color="text.secondary">
+              For: {booking.member_display_name}
+              {booking.relationship ? ` (${relationshipLabel(booking.relationship)})` : ""}
+            </Typography>
+          ) : null}
           {booking.user_email ? (
             <Typography variant="body2" color="text.secondary" sx={{ wordBreak: "break-all" }}>{booking.user_email}</Typography>
           ) : null}

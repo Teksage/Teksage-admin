@@ -37,6 +37,9 @@ export type MarathonRow = {
     meeting_link?: string | null;
     customer_query?: string | null;
     preferred_language?: string | null;
+    related_profile_id?: number | null;
+    member_display_name?: string | null;
+    relationship?: string | null;
     whatsapp_sent_at?: string | null;
     email_sent_at?: string | null;
   }[];
