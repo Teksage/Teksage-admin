@@ -96,7 +96,7 @@ const MarathonEventPage: React.FC = () => {
       return;
     }
     if (starts < new Date(event.starts_at) || ends > new Date(event.ends_at)) {
-      setError(`This 10-minute seat (${formatWhen(starts)} – ${formatWhen(ends)}) is outside the event window.`);
+      setError(`This 15-minute seat (${formatWhen(starts)} – ${formatWhen(ends)}) is outside the event window.`);
       return;
     }
     run(addMarathonSlot(event.id, {
@@ -116,7 +116,7 @@ const MarathonEventPage: React.FC = () => {
     const starts = localDate(editing.date, editing.time);
     const ends = new Date(starts.getTime() + SLOT_MS);
     if (editing.paid === 0 && (starts < new Date(event.starts_at) || ends > new Date(event.ends_at))) {
-      setError("A slot must be 10 minutes and must sit inside the event start and end.");
+      setError("A slot must be 15 minutes and must sit inside the event start and end.");
       return;
     }
     setEditing(null);
@@ -168,8 +168,6 @@ const MarathonEventPage: React.FC = () => {
           </Box>
         }
       />
-
-      {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
 
       <DashboardSectionPaper title="Event details">
         {event.description ? (
@@ -239,6 +237,15 @@ const MarathonEventPage: React.FC = () => {
           }}
         />
       </Box>
+
+      <Snackbar
+        open={Boolean(error)}
+        autoHideDuration={5000}
+        onClose={() => setError("")}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert severity="error" onClose={() => setError("")} sx={{ width: "100%" }}>{error}</Alert>
+      </Snackbar>
 
       <Snackbar
         open={Boolean(notice)}
