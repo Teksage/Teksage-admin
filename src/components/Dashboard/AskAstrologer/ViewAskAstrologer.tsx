@@ -15,6 +15,7 @@ import { AskAstrologerClientSection } from "./AskAstrologerClientSection";
 import { AskAstrologerQaSection } from "./AskAstrologerQaSection";
 import { MuhurthaEventPlanSection } from "./MuhurthaEventPlanSection";
 import { AskWhatsAppStatusSection } from "./AskWhatsAppStatusSection";
+import { AskReviewModerationSection } from "./AskReviewModerationSection";
 import {
   ASK_DETAIL_PAGE,
   ASK_STATUS_COLOR,
@@ -130,6 +131,22 @@ const ViewAskAstrologer: React.FC = () => {
         : <AskAstrologerQaSection data={data} />}
       <AskAstrologerAnswerSection data={data} />
 
+      <AskReviewModerationSection
+        data={data}
+        onUpdated={(next) =>
+          setData((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  rating: next.rating,
+                  feedback: next.feedback,
+                  review_status: next.review_status,
+                }
+              : prev
+          )
+        }
+      />
+
       <AskAssignAstrologerSection
         astrologers={astrologers}
         assignAstroId={assignAstroId}
@@ -155,6 +172,7 @@ const ViewAskAstrologer: React.FC = () => {
         open={snack.open}
         autoHideDuration={4000}
         onClose={() => setSnack((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
           severity={snack.ok ? "success" : "error"}

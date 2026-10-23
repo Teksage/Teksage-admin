@@ -20,7 +20,7 @@ const CustomSnackbar: React.FC<CustomSnackbarProps> = ({
       open={open}
       autoHideDuration={4000}
       onClose={onClose}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
     >
       <MuiAlert
         elevation={6}

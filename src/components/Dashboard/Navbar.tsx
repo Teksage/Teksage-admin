@@ -22,6 +22,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PeopleIcon from "@mui/icons-material/People";
 import StarsIcon from "@mui/icons-material/Stars";
+import TimerIcon from "@mui/icons-material/Timer";
 import HelpIcon from "@mui/icons-material/Help";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -32,6 +33,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SendIcon from "@mui/icons-material/Send";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 import { tokenService } from "../../utils/tokenService";
 
 const DRAWER_WIDTH = 240;
@@ -177,6 +179,11 @@ const adminMenuItems = [
     name: "Consultations",
     path: "/dashboard/consultations",
     icon: <ChatIcon />,
+  },
+  {
+    name: "Reviews",
+    path: "/dashboard/reviews",
+    icon: <RateReviewIcon />,
   },
   {
     name: "Subscription Plans",
@@ -835,6 +842,26 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             {(open || isMobile) && (
               <ListItemText
                 primary="Ask Astrologer"
+                primaryTypographyProps={{
+                  variant: "body1",
+                  whiteSpace: "nowrap",
+                  fontFamily: "Urbanist",
+                  fontWeight: 800,
+                }}
+              />
+            )}
+          </NavItem>
+          <NavItem
+            onClick={() => navigate("/dashboard/astroconnect")}
+            selected={isActive("/dashboard/astroconnect")}
+            open={open}
+          >
+            <ListItemIcon sx={{ color: "inherit" }}>
+              <TimerIcon />
+            </ListItemIcon>
+            {(open || isMobile) && (
+              <ListItemText
+                primary="AstroConnect Pro"
                 primaryTypographyProps={{
                   variant: "body1",
                   whiteSpace: "nowrap",

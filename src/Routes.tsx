@@ -1,4 +1,4 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
 import React from "react";
 
 // Lazy-load components
@@ -21,6 +21,7 @@ const Consultations = React.lazy(() => import("./components/Dashboard/Consultati
 const NewCoupon = React.lazy(() => import("./components/Dashboard/Coupons/AddCoupons"));
 const NewSubscription = React.lazy(() => import("./components/Dashboard/Subscription/AddSubscription"));
 const ConsultationView = React.lazy(() => import("./components/Dashboard/Consultations/ViewConsultations"));
+const Reviews = React.lazy(() => import("./components/Dashboard/Reviews/Reviews"));
 const Analytics = React.lazy(() => import("./components/Dashboard/Analytics/Analytics"));
 const SmsFraudDashboard = React.lazy(
   () => import("./components/Dashboard/SmsFraud/SmsFraudDashboard")
@@ -44,6 +45,18 @@ const AskAstrologerList = React.lazy(
 const ViewAskAstrologer = React.lazy(
   () => import("./components/Dashboard/AskAstrologer/ViewAskAstrologer")
 );
+const MarathonAdmin = React.lazy(
+  () => import("./components/Dashboard/Marathon/MarathonAdmin")
+);
+const MarathonEventPage = React.lazy(
+  () => import("./components/Dashboard/Marathon/MarathonEventPage")
+);
+
+function MarathonLegacyRedirect() {
+  const { marathonId } = useParams();
+  const next = marathonId ? `/dashboard/astroconnect/${marathonId}` : "/dashboard/astroconnect";
+  return <Navigate to={next} replace />;
+}
 
 export const router = createBrowserRouter([
   {
@@ -137,6 +150,12 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            path: "reviews",
+            children: [
+              { index: true, element: <Reviews /> },
+            ],
+          },
+          {
             path: "analytics",
             element: <Analytics />,
           },
@@ -166,6 +185,20 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <AskAstrologerList /> },
               { path: "view/:requestId", element: <ViewAskAstrologer /> },
+            ],
+          },
+          {
+            path: "astroconnect",
+            children: [
+              { index: true, element: <MarathonAdmin /> },
+              { path: ":marathonId", element: <MarathonEventPage /> },
+            ],
+          },
+          {
+            path: "marathon",
+            children: [
+              { index: true, element: <Navigate to="/dashboard/astroconnect" replace /> },
+              { path: ":marathonId", element: <MarathonLegacyRedirect /> },
             ],
           },
         ],

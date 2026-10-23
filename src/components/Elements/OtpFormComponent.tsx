@@ -17,7 +17,7 @@
 //   }:any) => (
 //     <Box component="form" noValidate>
 //       <Typography variant="h6" gutterBottom sx={{ textAlign: "center", mb: 3 }}>
-//         Enter 6-digit OTP sent to{" "}
+//         Enter 4-digit OTP sent to{" "}
 //         {formState.loginMethod === "email" ? formState.email : formState.mobile_number}
 //       </Typography>
 //       <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 2 }}>
@@ -86,7 +86,7 @@
 //             setFormState((prev:any) => ({
 //               ...prev,
 //               step: "input",
-//               otp: Array(6).fill(""),
+//               otp: Array(4).fill(""),
 //               error: null,
 //             }))
 //           }
@@ -155,7 +155,7 @@ export const OtpFormComponent = React.memo<OtpFormProps>(
     return (
       <Box component="form" noValidate>
         <Typography variant="h6" gutterBottom sx={{ textAlign: "center", mb: 3 }} style={{fontFamily: "Urbanist", fontWeight: 600}}>
-          Enter 6-digit OTP sent to{" "}
+          Enter 4-digit OTP sent to{" "}
           {formState.loginMethod === "email" ? formState.email : formState.mobile_number}
         </Typography>
         <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 2 }}>

@@ -9,6 +9,9 @@ import {
   Button,
   CardActions,
   Modal,
+  TextField,
+  Stack,
+  Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import StarIcon from "@mui/icons-material/Star";
@@ -48,6 +51,10 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
     horoscope: any;
     customerName: string;
   } | null>(null);
+  const [editRating, setEditRating] = useState<number | "">("");
+  const [editFeedback, setEditFeedback] = useState("");
+  const [reviewSaving, setReviewSaving] = useState(false);
+  const [reviewMsg, setReviewMsg] = useState<string | null>(null);
 
   const handleOpenModal = (horoscope: any, customerName: string) => {
     setSelectedHoroscope({ horoscope, customerName });
@@ -73,6 +80,12 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
           )
         );
         setConsultationData(res?.data || null);
+        setEditRating(
+          res?.data?.rating != null && Number.isFinite(Number(res.data.rating))
+            ? Number(res.data.rating)
+            : ""
+        );
+        setEditFeedback(res?.data?.feedback ?? "");
       } catch (err: any) {
         console.log(err);
         setConsultationData(null);
@@ -83,6 +96,48 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
 
     if (consultationId) fetchConsultation();
   }, [consultationId]);
+
+  const saveReview = async (review_status: "approved" | "rejected" | "pending") => {
+    if (!consultationId) return;
+    setReviewSaving(true);
+    setReviewMsg(null);
+    try {
+      const body: Record<string, unknown> = { review_status };
+      if (editRating !== "") body.rating = Number(editRating);
+      body.feedback = editFeedback;
+      const res = await callAPI({
+        endpoint: `api/admin/consultations/${consultationId}/review`,
+        method: "put",
+        data: body,
+      });
+      const payload = res?.data ?? {};
+      setConsultationData((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              rating: payload.rating ?? prev.rating,
+              feedback: payload.feedback ?? prev.feedback,
+              review_status: payload.review_status ?? review_status,
+            }
+          : prev
+      );
+      setReviewMsg(
+        review_status === "approved"
+          ? "Review approved — now visible on astrologer page."
+          : review_status === "rejected"
+            ? "Review rejected."
+            : "Review saved as pending."
+      );
+    } catch (err: any) {
+      const msg =
+        typeof err?.message === "string" && err.message.trim()
+          ? err.message
+          : err?.response?.data?.detail || "Failed to update review";
+      setReviewMsg(msg);
+    } finally {
+      setReviewSaving(false);
+    }
+  };
 
   return (
     <>
@@ -174,6 +229,100 @@ const ConsultationView: React.FC<{ mode: "view" }> = () => {
                   }
                 />
               </Grid>
+              <Grid item xs={12} md={6}>
+                <InfoItem
+                  label="Review Status"
+                  value={
+                    <Chip
+                      label={(consultationData.review_status || "none").toUpperCase()}
+                      color={
+                        consultationData.review_status === "approved"
+                          ? "success"
+                          : consultationData.review_status === "pending"
+                            ? "warning"
+                            : consultationData.review_status === "rejected"
+                              ? "error"
+                              : "default"
+                      }
+                      size="small"
+                      sx={{ fontFamily: "Urbanist", fontWeight: 700 }}
+                    />
+                  }
+                />
+              </Grid>
+              {consultationData.rating != null || consultationData.feedback ? (
+                <Grid item xs={12}>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    sx={{ fontSize: "0.85rem", mb: 1 }}
+                    style={{ fontFamily: "Urbanist" }}
+                  >
+                    Moderate Review
+                  </Typography>
+                  <Stack spacing={2}>
+                    <TextField
+                      label="Rating (1–5)"
+                      type="number"
+                      size="small"
+                      value={editRating}
+                      onChange={(e) =>
+                        setEditRating(
+                          e.target.value === "" ? "" : Number(e.target.value)
+                        )
+                      }
+                      inputProps={{ min: 1, max: 5 }}
+                      sx={{ maxWidth: 160, fontFamily: "Urbanist" }}
+                    />
+                    <TextField
+                      label="Feedback"
+                      multiline
+                      minRows={3}
+                      fullWidth
+                      value={editFeedback}
+                      onChange={(e) => setEditFeedback(e.target.value)}
+                      sx={{ fontFamily: "Urbanist" }}
+                    />
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        disabled={reviewSaving}
+                        onClick={() => void saveReview("approved")}
+                        sx={{ fontFamily: "Urbanist", fontWeight: 700, textTransform: "none" }}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        disabled={reviewSaving}
+                        onClick={() => void saveReview("rejected")}
+                        sx={{ fontFamily: "Urbanist", fontWeight: 700, textTransform: "none" }}
+                      >
+                        Reject
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        disabled={reviewSaving}
+                        onClick={() => void saveReview("pending")}
+                        sx={{ fontFamily: "Urbanist", fontWeight: 700, textTransform: "none" }}
+                      >
+                        Save edits (pending)
+                      </Button>
+                    </Stack>
+                    {reviewMsg ? (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        style={{ fontFamily: "Urbanist" }}
+                      >
+                        {reviewMsg}
+                      </Typography>
+                    ) : null}
+                  </Stack>
+                </Grid>
+              ) : null}
               <Grid item xs={12} md={6}>
                 <InfoItem
                   label="Astrologer Share"
