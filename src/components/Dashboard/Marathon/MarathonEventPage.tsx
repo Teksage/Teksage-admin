@@ -129,7 +129,7 @@ const MarathonEventPage: React.FC = () => {
   if (!event) {
     return (
       <Box sx={{ p: 3 }}>
-        <DashboardDetailHeader title="Teksage Expert Hours" onBack={() => navigate("/dashboard/marathon")} />
+        <DashboardDetailHeader title="AstroConnect Pro" onBack={() => navigate("/dashboard/astroconnect")} />
         {error ? <Alert severity="error">{error}</Alert> : (
           <Box sx={{ display: "flex", justifyContent: "center", pt: 8 }}>
             <CircularProgress />
@@ -151,12 +151,12 @@ const MarathonEventPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <DashboardDetailHeader
         title={event.name}
-        onBack={() => navigate("/dashboard/marathon")}
+        onBack={() => navigate("/dashboard/astroconnect")}
         trailing={
           <Box display="flex" gap={1} alignItems="center" flexWrap="wrap" justifyContent="flex-end">
             <Chip size="small" label={phase.label} color={phase.color} />
             {event.status === "draft" ? (
-              <Button variant="contained" onClick={() => run(publishMarathon(event.id), "Event published. It is now on the consultation marathon page.")}>
+              <Button variant="contained" onClick={() => run(publishMarathon(event.id), "Event published. It is now on the AstroConnect Pro page.")}>
                 Publish
               </Button>
             ) : null}
