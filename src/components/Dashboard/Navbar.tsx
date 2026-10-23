@@ -852,8 +852,8 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             )}
           </NavItem>
           <NavItem
-            onClick={() => navigate("/dashboard/marathon")}
-            selected={isActive("/dashboard/marathon")}
+            onClick={() => navigate("/dashboard/astroconnect")}
+            selected={isActive("/dashboard/astroconnect")}
             open={open}
           >
             <ListItemIcon sx={{ color: "inherit" }}>

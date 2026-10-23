@@ -1,4 +1,4 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
 import React from "react";
 
 // Lazy-load components
@@ -51,6 +51,12 @@ const MarathonAdmin = React.lazy(
 const MarathonEventPage = React.lazy(
   () => import("./components/Dashboard/Marathon/MarathonEventPage")
 );
+
+function MarathonLegacyRedirect() {
+  const { marathonId } = useParams();
+  const next = marathonId ? `/dashboard/astroconnect/${marathonId}` : "/dashboard/astroconnect";
+  return <Navigate to={next} replace />;
+}
 
 export const router = createBrowserRouter([
   {
@@ -182,10 +188,17 @@ export const router = createBrowserRouter([
             ],
           },
           {
-            path: "marathon",
+            path: "astroconnect",
             children: [
               { index: true, element: <MarathonAdmin /> },
               { path: ":marathonId", element: <MarathonEventPage /> },
+            ],
+          },
+          {
+            path: "marathon",
+            children: [
+              { index: true, element: <Navigate to="/dashboard/astroconnect" replace /> },
+              { path: ":marathonId", element: <MarathonLegacyRedirect /> },
             ],
           },
         ],

@@ -234,7 +234,7 @@ const MarathonAdmin: React.FC = () => {
         data={rows}
         columns={columns}
         onAdd={startCreate}
-        onView={(row) => navigate(`/dashboard/marathon/${row.id}`)}
+        onView={(row) => navigate(`/dashboard/astroconnect/${row.id}`)}
         onEdit={startEdit}
         onDelete={remove}
         getRowId={(row) => row.id}
