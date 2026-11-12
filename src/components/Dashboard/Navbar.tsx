@@ -853,7 +853,7 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
           </NavItem>
           <NavItem
             onClick={() => navigate("/dashboard/astroconnect")}
-            selected={isActive("/dashboard/astroconnect")}
+            selected={isActive("/dashboard/astroconnect") && !isActive("/dashboard/astroconnect/leads")}
             open={open}
           >
             <ListItemIcon sx={{ color: "inherit" }}>
@@ -862,6 +862,26 @@ const Navbar = React.memo<{ open: boolean; toggleSidebar: () => void }>(
             {(open || isMobile) && (
               <ListItemText
                 primary="AstroConnect Pro"
+                primaryTypographyProps={{
+                  variant: "body1",
+                  whiteSpace: "nowrap",
+                  fontFamily: "Urbanist",
+                  fontWeight: 800,
+                }}
+              />
+            )}
+          </NavItem>
+          <NavItem
+            onClick={() => navigate("/dashboard/astroconnect/leads")}
+            selected={isActive("/dashboard/astroconnect/leads")}
+            open={open}
+          >
+            <ListItemIcon sx={{ color: "inherit" }}>
+              <TimerIcon />
+            </ListItemIcon>
+            {(open || isMobile) && (
+              <ListItemText
+                primary="AstroConnect Leads"
                 primaryTypographyProps={{
                   variant: "body1",
                   whiteSpace: "nowrap",
