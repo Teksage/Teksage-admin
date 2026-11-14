@@ -51,6 +51,9 @@ const MarathonAdmin = React.lazy(
 const MarathonEventPage = React.lazy(
   () => import("./components/Dashboard/Marathon/MarathonEventPage")
 );
+const AstroConnectLeads = React.lazy(
+  () => import("./components/Dashboard/Marathon/AstroConnectLeads")
+);
 
 function MarathonLegacyRedirect() {
   const { marathonId } = useParams();
@@ -191,6 +194,7 @@ export const router = createBrowserRouter([
             path: "astroconnect",
             children: [
               { index: true, element: <MarathonAdmin /> },
+              { path: "leads", element: <AstroConnectLeads /> },
               { path: ":marathonId", element: <MarathonEventPage /> },
             ],
           },
